@@ -23,6 +23,8 @@ import { TerminalRegistry } from "./integrations/terminal/TerminalRegistry"
 import { McpServerManager } from "./services/mcp/McpServerManager"
 import { CodeIndexManager } from "./services/code-index/manager"
 import { migrateSettings } from "./utils/migrateSettings"
+import { maybeRunAutoLaunchPrompt } from "./utils/autoLaunchPrompt"
+import { registerAutocomplete } from "./services/autocomplete/AutocompleteProvider"
 import { API } from "./extension/api"
 
 import {
@@ -33,7 +35,6 @@ import {
 	CodeActionProvider,
 } from "./activate"
 import { initializeI18n } from "./i18n"
-import { registerAutocomplete } from "./services/autocomplete/AutocompleteProvider"
 
 /**
  * Built using https://github.com/microsoft/vscode-webview-ui-toolkit
@@ -175,6 +176,8 @@ export async function activate(context: vscode.ExtensionContext) {
 
 		context.subscriptions.push(watcher)
 	}
+
+	maybeRunAutoLaunchPrompt(context) // kilocode_change
 
 	return new API(outputChannel, provider, socketPath, enableLogging)
 }
