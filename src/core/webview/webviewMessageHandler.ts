@@ -1465,16 +1465,24 @@ export const webviewMessageHandler = async (provider: ClineProvider, message: We
 		}
 
 		case "toggleWorkflow": {
-			const { workflowPath, enabled } = message
+			const { workflowPath, enabled, isGlobal } = message
 			if (workflowPath && typeof enabled === "boolean") {
-				// For now, all workflows use workspace state (following Cline's pattern)
-				const toggles =
-					((await provider.contextProxy.getWorkspaceState(
-						provider.context,
-						"workflowToggles",
-					)) as ClineRulesToggles) || {}
-				toggles[workflowPath] = enabled
-				await provider.contextProxy.updateWorkspaceState(provider.context, "workflowToggles", toggles)
+				// Handle global vs local workflows
+				if (isGlobal) {
+					const toggles =
+						((await provider.contextProxy.getGlobalState("globalWorkflowToggles")) as ClineRulesToggles) ||
+						{}
+					toggles[workflowPath] = enabled
+					await provider.contextProxy.updateGlobalState("globalWorkflowToggles", toggles)
+				} else {
+					const toggles =
+						((await provider.contextProxy.getWorkspaceState(
+							provider.context,
+							"workflowToggles",
+						)) as ClineRulesToggles) || {}
+					toggles[workflowPath] = enabled
+					await provider.contextProxy.updateWorkspaceState(provider.context, "workflowToggles", toggles)
+				}
 
 				// Refresh rules data
 				await provider.postRulesDataToWebview()

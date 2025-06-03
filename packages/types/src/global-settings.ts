@@ -54,6 +54,7 @@ export const globalSettingsSchema = z.object({
 	workflowToggles: z.record(z.string(), z.boolean()).optional(), // kilocode_change
 	globalRulesToggles: z.record(z.string(), z.boolean()).optional(), // kilocode_change
 	localRulesToggles: z.record(z.string(), z.boolean()).optional(), // kilocode_change
+	globalWorkflowToggles: z.record(z.string(), z.boolean()).optional(), // kilocode_change
 	screenshotQuality: z.number().optional(),
 	remoteBrowserEnabled: z.boolean().optional(),
 	remoteBrowserHost: z.string().optional(),
@@ -195,6 +196,7 @@ export const GLOBAL_SETTINGS_KEYS = keysOf<GlobalSettings>()([
 	"workflowToggles", // kilocode_change
 	"globalRulesToggles", // kilocode_change
 	"localRulesToggles", // kilocode_change
+	"globalWorkflowToggles", // kilocode_change
 ])
 
 /**

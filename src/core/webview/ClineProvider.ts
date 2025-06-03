@@ -1231,7 +1231,7 @@ export class ClineProvider extends EventEmitter<ClineProviderEvents> implements 
 	}
 
 	private async getRulesData(workspacePath: string) {
-		// Global rules are stored in a global directory (like ~/.kilocode)
+		// Global rules are stored in ~/.kilocode directory
 		const globalRulesDir = path.join(require("os").homedir(), ".kilocode", "rules")
 		const globalWorkflowsDir = path.join(require("os").homedir(), ".kilocode", "workflows")
 
@@ -1247,15 +1247,17 @@ export class ClineProvider extends EventEmitter<ClineProviderEvents> implements 
 				string,
 				boolean
 			>) || {}
-		const workflowToggleState =
+		const globalWorkflowToggleState =
+			((await this.contextProxy.getGlobalState("globalWorkflowToggles")) as Record<string, boolean>) || {}
+		const localWorkflowToggleState =
 			((await this.contextProxy.getWorkspaceState(this.context, "workflowToggles")) as Record<string, boolean>) ||
 			{}
 
 		const [globalRules, localRules, globalWorkflows, localWorkflows] = await Promise.all([
 			this.getRulesFromDirectory(globalRulesDir, globalRulesToggleState),
 			this.getRulesFromDirectory(localRulesDir, localRulesToggleState),
-			this.getRulesFromDirectory(globalWorkflowsDir, workflowToggleState),
-			this.getRulesFromDirectory(localWorkflowsDir, workflowToggleState),
+			this.getRulesFromDirectory(globalWorkflowsDir, globalWorkflowToggleState),
+			this.getRulesFromDirectory(localWorkflowsDir, localWorkflowToggleState),
 		])
 
 		return {

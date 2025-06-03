@@ -197,6 +197,7 @@ export type ExtensionState = Pick<
 	| "workflowToggles" // kilocode_change
 	| "globalRulesToggles" // kilocode_change
 	| "localRulesToggles" // kilocode_change
+	| "globalWorkflowToggles" // kilocode_change
 	| "condensingApiConfigId"
 	| "customCondensingPrompt"
 	| "codebaseIndexConfig"
