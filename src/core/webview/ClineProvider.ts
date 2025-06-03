@@ -1230,8 +1230,8 @@ export class ClineProvider extends EventEmitter<ClineProviderEvents> implements 
 
 	private async getRulesData(workspacePath: string) {
 		// Global rules are stored in ~/.kilocode directory
-		const globalRulesDir = path.join(require("os").homedir(), ".kilocode", "rules")
-		const globalWorkflowsDir = path.join(require("os").homedir(), ".kilocode", "workflows")
+		const globalRulesDir = path.join(os.homedir(), ".kilocode", "rules")
+		const globalWorkflowsDir = path.join(os.homedir(), ".kilocode", "workflows")
 
 		// Local rules are stored in workspace directory
 		const localRulesDir = path.join(workspacePath, ".kilocode", "rules")
