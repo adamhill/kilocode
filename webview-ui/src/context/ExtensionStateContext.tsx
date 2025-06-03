@@ -34,6 +34,11 @@ export interface ExtensionStateContextType extends ExtensionState {
 	filePaths: string[]
 	openedTabs: Array<{ label: string; isActive: boolean; path?: string }>
 	setWorkflowToggles: (toggles: Record<string, boolean>) => void // kilocode_change
+	// kilocode_change: Rules data
+	globalRules: Record<string, boolean>
+	localRules: Record<string, boolean>
+	globalWorkflows: Record<string, boolean>
+	localWorkflows: Record<string, boolean>
 	condensingApiConfigId?: string
 	setCondensingApiConfigId: (value: string) => void
 	customCondensingPrompt?: string
@@ -216,6 +221,11 @@ export const ExtensionStateContextProvider: React.FC<{ children: React.ReactNode
 	const [mcpMarketplaceCatalog, setMcpMarketplaceCatalog] = useState<McpMarketplaceCatalog>({ items: [] }) // kilocode_change
 	const [currentCheckpoint, setCurrentCheckpoint] = useState<string>()
 	const [extensionRouterModels, setExtensionRouterModels] = useState<RouterModels | undefined>(undefined)
+	// kilocode_change: Rules data state
+	const [globalRules, setGlobalRules] = useState<Record<string, boolean>>({})
+	const [localRules, setLocalRules] = useState<Record<string, boolean>>({})
+	const [globalWorkflows, setGlobalWorkflows] = useState<Record<string, boolean>>({})
+	const [localWorkflows, setLocalWorkflows] = useState<Record<string, boolean>>({})
 
 	const setListApiConfigMeta = useCallback(
 		(value: ProviderSettingsEntry[]) => setState((prevState) => ({ ...prevState, listApiConfigMeta: value })),
@@ -282,6 +292,13 @@ export const ExtensionStateContextProvider: React.FC<{ children: React.ReactNode
 					}
 					break
 				}
+				case "rulesData": {
+					if (message.globalRules) setGlobalRules(message.globalRules)
+					if (message.localRules) setLocalRules(message.localRules)
+					if (message.globalWorkflows) setGlobalWorkflows(message.globalWorkflows)
+					if (message.localWorkflows) setLocalWorkflows(message.localWorkflows)
+					break
+				}
 				// end kilocode_change
 				case "currentCheckpointUpdated": {
 					setCurrentCheckpoint(message.text)
@@ -316,6 +333,11 @@ export const ExtensionStateContextProvider: React.FC<{ children: React.ReactNode
 		currentCheckpoint,
 		filePaths,
 		openedTabs,
+		// kilocode_change: Rules data
+		globalRules,
+		localRules,
+		globalWorkflows,
+		localWorkflows,
 		soundVolume: state.soundVolume,
 		ttsSpeed: state.ttsSpeed,
 		fuzzyMatchThreshold: state.fuzzyMatchThreshold,

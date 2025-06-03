@@ -78,6 +78,7 @@ export interface ExtensionMessage {
 		| "indexingStatusUpdate"
 		| "indexCleared"
 		| "codebaseIndexConfig"
+		| "rulesData" // kilocode_change
 	text?: string
 	action?:
 		| "chatButtonClicked"
@@ -125,6 +126,11 @@ export interface ExtensionMessage {
 	setting?: string
 	value?: any
 	payload?: ProfileDataResponsePayload | BalanceDataResponsePayload // New: Add payload for profile and balance data
+	// kilocode_change: Rules data
+	globalRules?: Record<string, boolean>
+	localRules?: Record<string, boolean>
+	globalWorkflows?: Record<string, boolean>
+	localWorkflows?: Record<string, boolean>
 }
 
 export type ExtensionState = Pick<

@@ -1479,6 +1479,97 @@ export const webviewMessageHandler = async (provider: ClineProvider, message: We
 			break
 		}
 
+		case "refreshRules": {
+			// Send rules data to webview
+			await provider.postRulesDataToWebview()
+			break
+		}
+
+		case "toggleRule": {
+			const { rulePath, enabled, isGlobal } = message
+			if (rulePath && typeof enabled === "boolean" && typeof isGlobal === "boolean") {
+				// For now, just open the file - full implementation would toggle the rule state
+				await openFile(rulePath)
+			}
+			break
+		}
+
+		case "createRuleFile": {
+			const { filename, isGlobal, ruleType } = message
+			if (filename && typeof isGlobal === "boolean") {
+				try {
+					const workspacePath = getWorkspacePath()
+					if (!workspacePath) {
+						vscode.window.showErrorMessage("No workspace folder found")
+						break
+					}
+
+					// Determine the rules directory path
+					const rulesDir = isGlobal
+						? path.join(workspacePath, ".kilocode", "rules")
+						: ruleType === "workflow"
+							? path.join(workspacePath, ".kilocode", "workflows")
+							: path.join(workspacePath, ".kilocode", "rules")
+
+					// Ensure the directory exists
+					await fs.mkdir(rulesDir, { recursive: true })
+
+					// Create the file path
+					const filePath = path.join(rulesDir, filename)
+
+					// Check if file already exists
+					const exists = await fileExistsAtPath(filePath)
+					if (exists) {
+						vscode.window.showErrorMessage(`File ${filename} already exists`)
+						break
+					}
+
+					// Create the file with basic content
+					const content =
+						ruleType === "workflow"
+							? `# ${filename.replace(/\.[^/.]+$/, "")}\n\nWorkflow description here...\n\n## Steps\n\n1. Step 1\n2. Step 2\n`
+							: `# ${filename.replace(/\.[^/.]+$/, "")}\n\nRule description here...\n\n## Guidelines\n\n- Guideline 1\n- Guideline 2\n`
+
+					await fs.writeFile(filePath, content, "utf8")
+
+					// Open the file for editing
+					await openFile(filePath)
+
+					// Refresh rules data
+					await provider.postRulesDataToWebview()
+				} catch (error) {
+					console.error("Error creating rule file:", error)
+					vscode.window.showErrorMessage(`Failed to create rule file: ${error}`)
+				}
+			}
+			break
+		}
+
+		case "deleteRuleFile": {
+			const { rulePath, isGlobal, ruleType } = message
+			if (rulePath) {
+				try {
+					const result = await vscode.window.showWarningMessage(
+						`Are you sure you want to delete ${path.basename(rulePath)}?`,
+						{ modal: true },
+						"Delete",
+					)
+
+					if (result === "Delete") {
+						await fs.unlink(rulePath)
+						vscode.window.showInformationMessage(`Deleted ${path.basename(rulePath)}`)
+
+						// Refresh rules data
+						await provider.postRulesDataToWebview()
+					}
+				} catch (error) {
+					console.error("Error deleting rule file:", error)
+					vscode.window.showErrorMessage(`Failed to delete rule file: ${error}`)
+				}
+			}
+			break
+		}
+
 		case "reportBug":
 			provider.getCurrentCline()?.handleWebviewAskResponse("yesButtonClicked")
 			break

@@ -57,19 +57,16 @@ const NewRuleRow: React.FC<NewRuleRowProps> = ({ isGlobal, ruleType }) => {
 			if (extension === "") {
 				finalFilename = `${trimmedFilename}.md`
 			}
-
 			try {
-				// For now, we'll use openFile to create a new rule file
-				// This will need backend support for proper rule file creation
-				const rulePath = isGlobal ? `.kilocode/rules/${finalFilename}` : `.kilocode/rules/${finalFilename}`
 				vscode.postMessage({
-					type: "openFile",
-					text: rulePath,
+					type: "createRuleFile",
+					isGlobal,
+					filename: finalFilename,
+					ruleType: ruleType || "kilocode",
 				})
 			} catch (err) {
 				console.error("Error creating rule file:", err)
 			}
-
 			setFilename("")
 			setError(null)
 			setIsExpanded(false)

@@ -29,8 +29,7 @@ const KiloRulesToggleModal: React.FC = () => {
 	useEffect(() => {
 		if (isVisible) {
 			// Request rules refresh from the extension
-			// For now, we'll use openFile to trigger a refresh - this will need backend support
-			vscode.postMessage({ type: "openFile", text: ".kilocode/rules" })
+			vscode.postMessage({ type: "refreshRules" })
 		}
 	}, [isVisible])
 
@@ -68,11 +67,12 @@ const KiloRulesToggleModal: React.FC = () => {
 	}, [])
 
 	// Handle toggle rule
-	const toggleRule = (_isGlobal: boolean, rulePath: string, _enabled: boolean) => {
-		// For now, we'll use openFile to edit rules - this will need backend support
+	const toggleRule = (isGlobal: boolean, rulePath: string, enabled: boolean) => {
 		vscode.postMessage({
-			type: "openFile",
-			text: rulePath,
+			type: "toggleRule",
+			rulePath,
+			enabled,
+			isGlobal,
 		})
 	}
 
