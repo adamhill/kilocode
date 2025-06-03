@@ -1220,18 +1220,14 @@ export class ClineProvider extends EventEmitter<ClineProviderEvents> implements 
 	}
 
 	async postRulesDataToWebview() {
-		try {
-			const workspacePath = this.cwd
-			if (!workspacePath) {
-				return
-			}
-
-			// Get rules data
-			const rulesData = await this.getRulesData(workspacePath)
-			this.postMessageToWebview({ type: "rulesData", ...rulesData })
-		} catch (error) {
-			console.error("Error posting rules data to webview:", error)
+		const workspacePath = this.cwd
+		if (!workspacePath) {
+			return
 		}
+
+		// Get rules data
+		const rulesData = await this.getRulesData(workspacePath)
+		this.postMessageToWebview({ type: "rulesData", ...rulesData })
 	}
 
 	private async getRulesData(workspacePath: string) {
@@ -1259,27 +1255,22 @@ export class ClineProvider extends EventEmitter<ClineProviderEvents> implements 
 	}
 
 	private async getRulesFromDirectory(dirPath: string): Promise<Record<string, boolean>> {
-		try {
-			const exists = await fileExistsAtPath(dirPath)
-			if (!exists) {
-				return {}
-			}
-
-			const files = await fs.readdir(dirPath, { withFileTypes: true })
-			const rules: Record<string, boolean> = {}
-
-			for (const file of files) {
-				if (file.isFile() && (file.name.endsWith(".md") || file.name.endsWith(".txt"))) {
-					const filePath = path.join(dirPath, file.name)
-					rules[filePath] = true // For now, all rules are enabled by default
-				}
-			}
-
-			return rules
-		} catch (error) {
-			console.error(`Error reading rules from ${dirPath}:`, error)
+		const exists = await fileExistsAtPath(dirPath)
+		if (!exists) {
 			return {}
 		}
+
+		const files = await fs.readdir(dirPath, { withFileTypes: true })
+		const rules: Record<string, boolean> = {}
+
+		for (const file of files) {
+			if (file.isFile() && (file.name.endsWith(".md") || file.name.endsWith(".txt"))) {
+				const filePath = path.join(dirPath, file.name)
+				rules[filePath] = true // For now, all rules are enabled by default
+			}
+		}
+
+		return rules
 	}
 
 	/**
