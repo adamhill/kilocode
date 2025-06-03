@@ -373,19 +373,22 @@ export async function addCustomInstructions(
 
 	// Add generic rules with toggle state filtering
 	if (options.localRulesToggleState || options.globalRulesToggleState) {
-		const genericRuleContent = await loadRuleFilesWithToggles(
-			cwd,
-			options.localRulesToggleState || {},
-			options.globalRulesToggleState || {},
-		)
-		if (genericRuleContent && genericRuleContent.trim()) {
-			rules.push(genericRuleContent.trim())
+		const genericRuleContent =
+			(
+				await loadRuleFilesWithToggles(
+					cwd,
+					options.localRulesToggleState || {},
+					options.globalRulesToggleState || {},
+				)
+			)?.trim() ?? ""
+		if (genericRuleContent) {
+			rules.push(genericRuleContent)
 		}
 	} else {
 		// Fallback to legacy function if no toggle states provided
-		const genericRuleContent = await loadRuleFiles(cwd)
-		if (genericRuleContent && genericRuleContent.trim()) {
-			rules.push(genericRuleContent.trim())
+		const genericRuleContent = (await loadRuleFiles(cwd))?.trim() ?? ""
+		if (genericRuleContent) {
+			rules.push(genericRuleContent)
 		}
 	}
 
