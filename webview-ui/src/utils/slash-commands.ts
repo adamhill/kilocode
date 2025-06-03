@@ -12,7 +12,8 @@ export interface SlashCommand {
 // Create a function to get all supported slash commands
 export function getSupportedSlashCommands(
 	customModes?: any[],
-	workflowToggles: Record<string, boolean> = {}, // kilocode_change
+	localWorkflowToggles: Record<string, boolean> = {}, // kilocode_change
+	globalWorkflowToggles: Record<string, boolean> = {}, // kilocode_change
 ): SlashCommand[] {
 	// Start with non-mode commands
 	const baseCommands: SlashCommand[] = [
@@ -36,7 +37,7 @@ export function getSupportedSlashCommands(
 	}))
 
 	// add workflow commands
-	const workflowCommands = getWorkflowCommands(workflowToggles) // kilocode_change
+	const workflowCommands = getWorkflowCommands(localWorkflowToggles, globalWorkflowToggles) // kilocode_change
 	return [...baseCommands, ...modeCommands, ...workflowCommands] // kilocode_change
 }
 
@@ -78,19 +79,34 @@ export function shouldShowSlashCommandsMenu(text: string, cursorPosition: number
 }
 
 // kilocode_change start
-export function getWorkflowCommands(workflowToggles: Record<string, boolean>): SlashCommand[] {
-	return Object.entries(workflowToggles)
+export function getWorkflowCommands(
+	localWorkflowToggles: Record<string, boolean> = {},
+	globalWorkflowToggles: Record<string, boolean> = {},
+): SlashCommand[] {
+	// Get enabled local workflows
+	const localWorkflows = Object.entries(localWorkflowToggles)
 		.filter(([_, enabled]) => enabled)
 		.map(([filePath, _]) => {
-			// potentially remove the file extension if there is one, but this would then require
-			// that we prevent users from having the same fname with different extensions
 			const fileName = filePath.replace(/^.*[/\\]/, "")
-
 			return {
 				name: fileName,
-				section: "custom",
+				section: "custom" as const,
 			}
 		})
+
+	// Get enabled global workflows
+	const globalWorkflows = Object.entries(globalWorkflowToggles)
+		.filter(([_, enabled]) => enabled)
+		.map(([filePath, _]) => {
+			const fileName = filePath.replace(/^.*[/\\]/, "")
+			return {
+				name: fileName,
+				section: "custom" as const,
+			}
+		})
+
+	// Local workflows have precedence over global workflows (following Cline's pattern)
+	return [...localWorkflows, ...globalWorkflows]
 }
 // kilocode_change end
 
@@ -100,9 +116,10 @@ export function getWorkflowCommands(workflowToggles: Record<string, boolean>): S
 export function getMatchingSlashCommands(
 	query: string,
 	customModes?: any[],
-	workflowToggles: Record<string, boolean> = {}, // kilocode_change
+	localWorkflowToggles: Record<string, boolean> = {}, // kilocode_change
+	globalWorkflowToggles: Record<string, boolean> = {}, // kilocode_change
 ): SlashCommand[] {
-	const commands = getSupportedSlashCommands(customModes, workflowToggles)
+	const commands = getSupportedSlashCommands(customModes, localWorkflowToggles, globalWorkflowToggles)
 
 	if (!query) {
 		return [...commands]
@@ -135,14 +152,15 @@ export function insertSlashCommand(text: string, commandName: string): { newValu
 export function validateSlashCommand(
 	command: string,
 	customModes?: any[],
-	workflowToggles: Record<string, boolean> = {}, // kilocode_change
+	localWorkflowToggles: Record<string, boolean> = {}, // kilocode_change
+	globalWorkflowToggles: Record<string, boolean> = {}, // kilocode_change
 ): "full" | "partial" | null {
 	if (!command) {
 		return null
 	}
 
 	// case sensitive matching
-	const commands = getSupportedSlashCommands(customModes, workflowToggles) // kilocode_change
+	const commands = getSupportedSlashCommands(customModes, localWorkflowToggles, globalWorkflowToggles) // kilocode_change
 
 	const exactMatch = commands.some((cmd) => cmd.name === command)
 
