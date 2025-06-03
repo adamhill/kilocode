@@ -227,13 +227,10 @@ export async function loadRuleFilesWithToggles(
 	const globalRulesDir = path.join(require("os").homedir(), ".kilocode", "rules")
 	const localRulesDir = path.join(cwd, ".kilocode", "rules")
 
-	const [globalRulesContent, localRulesContent] = await Promise.all([
-		loadRulesFromDirectory(globalRulesDir, globalRulesToggleState, "Global Rules"),
-		loadRulesFromDirectory(localRulesDir, localRulesToggleState, "Local Rules"),
-	])
+	const globalRulesContent = await loadRulesFromDirectory(globalRulesDir, globalRulesToggleState, "Global Rules")
+	const localRulesContent = await loadRulesFromDirectory(localRulesDir, localRulesToggleState, "Local Rules")
 
-	const sections = [globalRulesContent, localRulesContent].filter(Boolean)
-	return sections.join("\n\n")
+	return [globalRulesContent, localRulesContent].filter(Boolean).join("\n\n")
 }
 
 /**
