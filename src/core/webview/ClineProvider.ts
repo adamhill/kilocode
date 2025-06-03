@@ -1239,11 +1239,23 @@ export class ClineProvider extends EventEmitter<ClineProviderEvents> implements 
 		const localRulesDir = path.join(workspacePath, ".kilocode", "rules")
 		const localWorkflowsDir = path.join(workspacePath, ".kilocode", "workflows")
 
+		// Get toggle states
+		const globalRulesToggleState =
+			((await this.contextProxy.getGlobalState("globalRulesToggles")) as Record<string, boolean>) || {}
+		const localRulesToggleState =
+			((await this.contextProxy.getWorkspaceState(this.context, "localRulesToggles")) as Record<
+				string,
+				boolean
+			>) || {}
+		const workflowToggleState =
+			((await this.contextProxy.getWorkspaceState(this.context, "workflowToggles")) as Record<string, boolean>) ||
+			{}
+
 		const [globalRules, localRules, globalWorkflows, localWorkflows] = await Promise.all([
-			this.getRulesFromDirectory(globalRulesDir),
-			this.getRulesFromDirectory(localRulesDir),
-			this.getRulesFromDirectory(globalWorkflowsDir),
-			this.getRulesFromDirectory(localWorkflowsDir),
+			this.getRulesFromDirectory(globalRulesDir, globalRulesToggleState),
+			this.getRulesFromDirectory(localRulesDir, localRulesToggleState),
+			this.getRulesFromDirectory(globalWorkflowsDir, workflowToggleState),
+			this.getRulesFromDirectory(localWorkflowsDir, workflowToggleState),
 		])
 
 		return {
@@ -1254,7 +1266,10 @@ export class ClineProvider extends EventEmitter<ClineProviderEvents> implements 
 		}
 	}
 
-	private async getRulesFromDirectory(dirPath: string): Promise<Record<string, boolean>> {
+	private async getRulesFromDirectory(
+		dirPath: string,
+		toggleState: Record<string, boolean> = {},
+	): Promise<Record<string, boolean>> {
 		const exists = await fileExistsAtPath(dirPath)
 		if (!exists) {
 			return {}
@@ -1266,7 +1281,8 @@ export class ClineProvider extends EventEmitter<ClineProviderEvents> implements 
 		for (const file of files) {
 			if (file.isFile() && (file.name.endsWith(".md") || file.name.endsWith(".txt"))) {
 				const filePath = path.join(dirPath, file.name)
-				rules[filePath] = true // For now, all rules are enabled by default
+				// Use stored toggle state if available, otherwise default to true
+				rules[filePath] = toggleState[filePath] !== undefined ? toggleState[filePath] : true
 			}
 		}
 

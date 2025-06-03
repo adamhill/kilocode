@@ -52,6 +52,8 @@ export const globalSettingsSchema = z.object({
 	browserViewportSize: z.string().optional(),
 	showAutoApproveMenu: z.boolean().optional(), // kilocode_change
 	workflowToggles: z.record(z.string(), z.boolean()).optional(), // kilocode_change
+	globalRulesToggles: z.record(z.string(), z.boolean()).optional(), // kilocode_change
+	localRulesToggles: z.record(z.string(), z.boolean()).optional(), // kilocode_change
 	screenshotQuality: z.number().optional(),
 	remoteBrowserEnabled: z.boolean().optional(),
 	remoteBrowserHost: z.string().optional(),
@@ -191,6 +193,8 @@ export const GLOBAL_SETTINGS_KEYS = keysOf<GlobalSettings>()([
 
 	"showAutoApproveMenu", // kilocode_change
 	"workflowToggles", // kilocode_change
+	"globalRulesToggles", // kilocode_change
+	"localRulesToggles", // kilocode_change
 ])
 
 /**

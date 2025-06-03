@@ -1467,6 +1467,7 @@ export const webviewMessageHandler = async (provider: ClineProvider, message: We
 		case "toggleWorkflow": {
 			const { workflowPath, enabled } = message
 			if (workflowPath && typeof enabled === "boolean") {
+				// For now, all workflows use workspace state (following Cline's pattern)
 				const toggles =
 					((await provider.contextProxy.getWorkspaceState(
 						provider.context,
@@ -1474,7 +1475,9 @@ export const webviewMessageHandler = async (provider: ClineProvider, message: We
 					)) as ClineRulesToggles) || {}
 				toggles[workflowPath] = enabled
 				await provider.contextProxy.updateWorkspaceState(provider.context, "workflowToggles", toggles)
-				await provider.postStateToWebview()
+
+				// Refresh rules data
+				await provider.postRulesDataToWebview()
 			}
 			break
 		}
@@ -1488,8 +1491,27 @@ export const webviewMessageHandler = async (provider: ClineProvider, message: We
 		case "toggleRule": {
 			const { rulePath, enabled, isGlobal } = message
 			if (rulePath && typeof enabled === "boolean" && typeof isGlobal === "boolean") {
-				// For now, just open the file - full implementation would toggle the rule state
-				await openFile(rulePath)
+				// Store toggle state in VSCode state
+				if (isGlobal) {
+					const toggles =
+						((await provider.contextProxy.getGlobalState("globalRulesToggles")) as Record<
+							string,
+							boolean
+						>) || {}
+					toggles[rulePath] = enabled
+					await provider.contextProxy.updateGlobalState("globalRulesToggles", toggles)
+				} else {
+					const toggles =
+						((await provider.contextProxy.getWorkspaceState(
+							provider.context,
+							"localRulesToggles",
+						)) as Record<string, boolean>) || {}
+					toggles[rulePath] = enabled
+					await provider.contextProxy.updateWorkspaceState(provider.context, "localRulesToggles", toggles)
+				}
+
+				// Refresh rules data
+				await provider.postRulesDataToWebview()
 			}
 			break
 		}
