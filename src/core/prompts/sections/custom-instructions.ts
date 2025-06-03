@@ -194,6 +194,29 @@ function formatDirectoryContent(dirPath: string, files: Array<{ filename: string
 }
 
 /**
+ * Load rules from a specific directory with toggle state filtering
+ */
+async function loadRulesFromDirectory(
+	rulesDir: string,
+	toggleState: Record<string, boolean>,
+	label: string,
+): Promise<string | null> {
+	if (!(await directoryExists(rulesDir))) {
+		return null
+	}
+
+	const files = await readTextFilesFromDirectory(rulesDir)
+	if (files.length === 0) {
+		return null
+	}
+
+	const filePaths = files.map((f) => f.filename)
+	const rulesContent = await getRuleFilesTotalContent(filePaths, rulesDir, toggleState)
+
+	return rulesContent ? `# ${label} from ${rulesDir}:\n${rulesContent}` : null
+}
+
+/**
  * Load rule files with toggle state filtering
  */
 export async function loadRuleFilesWithToggles(
@@ -201,34 +224,15 @@ export async function loadRuleFilesWithToggles(
 	localRulesToggleState: Record<string, boolean> = {},
 	globalRulesToggleState: Record<string, boolean> = {},
 ): Promise<string> {
-	const sections: string[] = []
-
-	// Load global rules first
 	const globalRulesDir = path.join(require("os").homedir(), ".kilocode", "rules")
-	if (await directoryExists(globalRulesDir)) {
-		const files = await readTextFilesFromDirectory(globalRulesDir)
-		if (files.length > 0) {
-			const filePaths = files.map((f) => f.filename)
-			const globalRulesContent = await getRuleFilesTotalContent(filePaths, globalRulesDir, globalRulesToggleState)
-			if (globalRulesContent) {
-				sections.push(`# Global Rules from ${globalRulesDir}:\n${globalRulesContent}`)
-			}
-		}
-	}
-
-	// Load local rules
 	const localRulesDir = path.join(cwd, ".kilocode", "rules")
-	if (await directoryExists(localRulesDir)) {
-		const files = await readTextFilesFromDirectory(localRulesDir)
-		if (files.length > 0) {
-			const filePaths = files.map((f) => f.filename)
-			const localRulesContent = await getRuleFilesTotalContent(filePaths, localRulesDir, localRulesToggleState)
-			if (localRulesContent) {
-				sections.push(`# Local Rules from ${localRulesDir}:\n${localRulesContent}`)
-			}
-		}
-	}
 
+	const [globalRulesContent, localRulesContent] = await Promise.all([
+		loadRulesFromDirectory(globalRulesDir, globalRulesToggleState, "Global Rules"),
+		loadRulesFromDirectory(localRulesDir, localRulesToggleState, "Local Rules"),
+	])
+
+	const sections = [globalRulesContent, localRulesContent].filter(Boolean)
 	return sections.join("\n\n")
 }
 
