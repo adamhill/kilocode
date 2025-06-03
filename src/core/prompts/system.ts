@@ -97,7 +97,18 @@ ${getSystemInfoSection(cwd)}
 
 ${getObjectiveSection()}
 
-${await addCustomInstructions(promptComponent?.customInstructions || modeConfig.customInstructions || "", globalCustomInstructions || "", cwd, mode, { language: language ?? formatLanguage(vscode.env.language), rooIgnoreInstructions })}`
+${await addCustomInstructions(
+	promptComponent?.customInstructions || modeConfig.customInstructions || "",
+	globalCustomInstructions || "",
+	cwd,
+	mode,
+	{
+		language: language ?? formatLanguage(vscode.env.language),
+		rooIgnoreInstructions,
+		localRulesToggleState: context.workspaceState.get("localRules") || {},
+		globalRulesToggleState: context.globalState.get("globalRules") || {},
+	},
+)}`
 
 	return basePrompt
 }

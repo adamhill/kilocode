@@ -37,6 +37,34 @@ async function safeReadFile(filePath: string): Promise<string> {
 }
 
 /**
+ * Get rule files content with toggle state filtering (similar to Cline's getRuleFilesTotalContent)
+ */
+async function getRuleFilesTotalContent(
+	rulesFilePaths: string[],
+	basePath: string,
+	toggles: Record<string, boolean>,
+): Promise<string> {
+	const ruleFilesTotalContent = await Promise.all(
+		rulesFilePaths.map(async (filePath) => {
+			const ruleFilePath = path.resolve(basePath, filePath)
+
+			// Check if this rule is disabled in toggles
+			if (ruleFilePath in toggles && toggles[ruleFilePath] === false) {
+				return null
+			}
+
+			const content = await safeReadFile(ruleFilePath)
+			if (content) {
+				return `${filePath}\n${content}`
+			}
+			return null
+		}),
+	).then((contents) => contents.filter(Boolean).join("\n\n"))
+
+	return ruleFilesTotalContent
+}
+
+/**
  * Check if a directory exists
  */
 async function directoryExists(dirPath: string): Promise<boolean> {
@@ -169,7 +197,46 @@ function formatDirectoryContent(dirPath: string, files: Array<{ filename: string
 }
 
 /**
- * Load rule files from the specified directory
+ * Load rule files with toggle state filtering
+ */
+export async function loadRuleFilesWithToggles(
+	cwd: string,
+	localRulesToggleState: Record<string, boolean> = {},
+	globalRulesToggleState: Record<string, boolean> = {},
+): Promise<string> {
+	const sections: string[] = []
+
+	// Load global rules first
+	const globalRulesDir = path.join(require("os").homedir(), ".kilocode", "rules")
+	if (await directoryExists(globalRulesDir)) {
+		const files = await readTextFilesFromDirectory(globalRulesDir)
+		if (files.length > 0) {
+			const filePaths = files.map((f) => f.filename)
+			const globalRulesContent = await getRuleFilesTotalContent(filePaths, globalRulesDir, globalRulesToggleState)
+			if (globalRulesContent) {
+				sections.push(`# Global Rules from ${globalRulesDir}:\n${globalRulesContent}`)
+			}
+		}
+	}
+
+	// Load local rules
+	const localRulesDir = path.join(cwd, ".kilocode", "rules")
+	if (await directoryExists(localRulesDir)) {
+		const files = await readTextFilesFromDirectory(localRulesDir)
+		if (files.length > 0) {
+			const filePaths = files.map((f) => f.filename)
+			const localRulesContent = await getRuleFilesTotalContent(filePaths, localRulesDir, localRulesToggleState)
+			if (localRulesContent) {
+				sections.push(`# Local Rules from ${localRulesDir}:\n${localRulesContent}`)
+			}
+		}
+	}
+
+	return sections.join("\n\n")
+}
+
+/**
+ * Load rule files from the specified directory (legacy function)
  */
 export async function loadRuleFiles(cwd: string): Promise<string> {
 	// kilocode_change start: add kilocode directory, leave fallback to roo directory
@@ -224,7 +291,12 @@ export async function addCustomInstructions(
 	globalCustomInstructions: string,
 	cwd: string,
 	mode: string,
-	options: { language?: string; rooIgnoreInstructions?: string } = {},
+	options: {
+		language?: string
+		rooIgnoreInstructions?: string
+		localRulesToggleState?: Record<string, boolean>
+		globalRulesToggleState?: Record<string, boolean>
+	} = {},
 ): Promise<string> {
 	const sections = []
 
@@ -301,10 +373,22 @@ export async function addCustomInstructions(
 		rules.push(options.rooIgnoreInstructions)
 	}
 
-	// Add generic rules
-	const genericRuleContent = await loadRuleFiles(cwd)
-	if (genericRuleContent && genericRuleContent.trim()) {
-		rules.push(genericRuleContent.trim())
+	// Add generic rules with toggle state filtering
+	if (options.localRulesToggleState || options.globalRulesToggleState) {
+		const genericRuleContent = await loadRuleFilesWithToggles(
+			cwd,
+			options.localRulesToggleState || {},
+			options.globalRulesToggleState || {},
+		)
+		if (genericRuleContent && genericRuleContent.trim()) {
+			rules.push(genericRuleContent.trim())
+		}
+	} else {
+		// Fallback to legacy function if no toggle states provided
+		const genericRuleContent = await loadRuleFiles(cwd)
+		if (genericRuleContent && genericRuleContent.trim()) {
+			rules.push(genericRuleContent.trim())
+		}
 	}
 
 	if (rules.length > 0) {
