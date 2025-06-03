@@ -74,7 +74,7 @@ const RuleRow: React.FC<{
 						role="switch"
 						aria-checked={enabled}
 						tabIndex={0}
-						className={`w-[20px] h-[10px] rounded-[5px] relative cursor-pointer transition-colors duration-200 ${
+						className={`w-[20px] h-[10px] rounded-[5px] relative cursor-pointer transition-colors duration-200 flex items-center ${
 							enabled
 								? "bg-[var(--vscode-testing-iconPassed)] opacity-90"
 								: "bg-[var(--vscode-titleBar-inactiveForeground)] opacity-50"
@@ -87,8 +87,8 @@ const RuleRow: React.FC<{
 							}
 						}}>
 						<div
-							className={`w-[6px] h-[6px] bg-white border border-[#66666699] rounded-full absolute top-[1px] transition-all duration-200 ${
-								enabled ? "left-[12px]" : "left-[2px]"
+							className={`w-[8px] h-[8px] bg-white border border-[#66666699] rounded-full absolute transition-all duration-200 ${
+								enabled ? "left-[11px]" : "left-[1px]"
 							}`}
 						/>
 					</div>
