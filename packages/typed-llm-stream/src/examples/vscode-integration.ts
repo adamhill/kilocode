@@ -1,15 +1,15 @@
 /**
- * Example: VSCode Integration
+ * Example: VSCode Integration with Functional API
  *
  * This example demonstrates how to integrate the typed-llm-stream library
- * with a VSCode extension. It shows how to create tools that interact with
- * the VSCode API and process LLM responses in a VSCode context.
+ * with a VSCode extension using the functional API. It shows how to create tools
+ * that interact with the VSCode API and process LLM responses in a VSCode context.
  *
  * Note: This is a conceptual example and would need to be adapted to work
  * in an actual VSCode extension with the proper imports and setup.
  */
 
-import { LLMToolSystem, BaseLLMTool, LLMToolContext } from "../index.js"
+import { createTool, createToolSystem } from "../index.js"
 import { z } from "zod"
 
 // Mock VSCode types for the example
@@ -45,57 +45,45 @@ const vscode = {
 	},
 }
 
-/**
- * A tool that generates code completions for VSCode
- */
-class CodeCompletionTool extends BaseLLMTool {
-	constructor() {
-		super({
-			id: "code-completion",
-			name: "Code Completion",
-			description: "Generates code completions based on the current context",
-			schema: z.object({
-				completion: z.string(),
-				language: z.string(),
-				indentation: z.string().optional(),
-				imports: z.array(z.string()).optional(),
-			}),
-			xmlTag: "completion",
-		})
-	}
+// Define schemas with proper typing
+const completionSchema = z.object({
+	completion: z.string().describe("Code to insert at cursor position"),
+	language: z.string().describe("Programming language"),
+	indentation: z.string().optional().describe("Detected indentation style"),
+	imports: z.array(z.string()).optional().describe("Additional imports that might be needed"),
+})
 
-	generatePromptSection(context: LLMToolContext) {
-		const editor = context.editor as VSCodeEditor | undefined
-		const prefix = editor?.document.getText().substring(0, editor.selection.start.character) || ""
-		const language = context.language || "unknown"
+const refactoringItemSchema = z.object({
+	description: z.string().describe("Brief description of the refactoring"),
+	before: z.string().describe("Code before refactoring"),
+	after: z.string().describe("Code after refactoring"),
+	startLine: z.number().optional().describe("Starting line number"),
+	endLine: z.number().optional().describe("Ending line number"),
+	confidence: z.number().min(0).max(1).optional().describe("Confidence score (0.0 to 1.0)"),
+})
 
-		return this.buildXMLPromptSection(
-			"CODE COMPLETION - Complete the code based on context",
-			`<completion>
-  <completion>Code to insert at cursor position</completion>
-  <language>Programming language</language>
-  <indentation>Detected indentation style (optional)</indentation>
-  <imports>
-    <import>Additional import that might be needed</import>
-    <!-- More imports as needed -->
-  </imports>
-</completion>`,
-			[
-				`Complete the code in ${language} based on the prefix`,
-				"Maintain consistent style and indentation",
-				"Suggest imports if needed",
-				"Ensure the completion is syntactically valid",
-			],
-			1,
-		)
-	}
+const refactoringSchema = z.object({
+	refactorings: z.array(refactoringItemSchema).describe("List of refactoring suggestions"),
+	explanation: z.string().describe("Overall explanation of the refactoring suggestions"),
+})
 
-	async handleResponse(data: z.infer<typeof this.schema>, context: LLMToolContext) {
-		const editor = context.editor as VSCodeEditor | undefined
+// Define types based on schemas
+type CompletionData = z.infer<typeof completionSchema>
+type RefactoringData = z.infer<typeof refactoringSchema>
+
+// Create a code completion tool
+const codeCompletionTool = createTool<typeof completionSchema, CompletionData>({
+	id: "code-completion",
+	name: "Code Completion",
+	description: "Generates code completions based on the current context",
+	schema: completionSchema,
+	xmlTag: "completion",
+	handler: async (data: CompletionData, context: any) => {
+		const editor = context?.system?.getContext?.()?.editor as VSCodeEditor | undefined
 
 		if (!editor) {
 			vscode.window.showErrorMessage("No active text editor found")
-			return
+			return data
 		}
 
 		try {
@@ -111,7 +99,7 @@ class CodeCompletionTool extends BaseLLMTool {
 			if (data.imports && data.imports.length > 0) {
 				const outputChannel = vscode.window.createOutputChannel("Code Completion")
 				outputChannel.appendLine("Suggested imports:")
-				data.imports.forEach((imp: string) => outputChannel.appendLine(`- ${imp}`))
+				data.imports.forEach((imp) => outputChannel.appendLine(`- ${imp}`))
 				outputChannel.show()
 			}
 		} catch (error) {
@@ -121,68 +109,22 @@ class CodeCompletionTool extends BaseLLMTool {
 		}
 
 		return data
-	}
-}
+	},
+})
 
-/**
- * A tool that provides code refactoring suggestions
- */
-class RefactoringTool extends BaseLLMTool {
-	constructor() {
-		super({
-			id: "refactoring",
-			name: "Code Refactoring",
-			description: "Suggests code refactoring improvements",
-			schema: z.object({
-				refactorings: z.array(
-					z.object({
-						description: z.string(),
-						before: z.string(),
-						after: z.string(),
-						startLine: z.number().optional(),
-						endLine: z.number().optional(),
-						confidence: z.number().min(0).max(1).optional(),
-					}),
-				),
-				explanation: z.string(),
-			}),
-			xmlTag: "refactoring",
-		})
-	}
-
-	generatePromptSection(context: LLMToolContext) {
-		return this.buildXMLPromptSection(
-			"CODE REFACTORING - Suggest improvements to the code",
-			`<refactoring>
-  <refactorings>
-    <refactoring>
-      <description>Brief description of the refactoring</description>
-      <before>Code before refactoring</before>
-      <after>Code after refactoring</after>
-      <startLine>Starting line number (optional)</startLine>
-      <endLine>Ending line number (optional)</endLine>
-      <confidence>0.0 to 1.0 (optional)</confidence>
-    </refactoring>
-    <!-- Additional refactorings as needed -->
-  </refactorings>
-  <explanation>Overall explanation of the refactoring suggestions</explanation>
-</refactoring>`,
-			[
-				"Identify code that could be improved",
-				"Suggest specific refactorings with before/after examples",
-				"Focus on readability, maintainability, and performance",
-				"Provide line numbers when possible for easier application",
-			],
-			2,
-		)
-	}
-
-	async handleResponse(data: z.infer<typeof this.schema>, context: LLMToolContext) {
-		const editor = context.editor as VSCodeEditor | undefined
+// Create a refactoring tool
+const refactoringTool = createTool<typeof refactoringSchema, RefactoringData>({
+	id: "refactoring",
+	name: "Code Refactoring",
+	description: "Suggests code refactoring improvements",
+	schema: refactoringSchema,
+	xmlTag: "refactoring",
+	handler: async (data: RefactoringData, context: any) => {
+		const editor = context?.system?.getContext?.()?.editor as VSCodeEditor | undefined
 
 		if (!editor) {
 			vscode.window.showErrorMessage("No active text editor found")
-			return
+			return data
 		}
 
 		// Create an output channel to display the refactoring suggestions
@@ -193,45 +135,33 @@ class RefactoringTool extends BaseLLMTool {
 		outputChannel.appendLine(data.explanation)
 		outputChannel.appendLine("")
 
-		data.refactorings.forEach(
-			(
-				refactoring: {
-					description: string
-					before: string
-					after: string
-					startLine?: number
-					endLine?: number
-					confidence?: number
-				},
-				index: number,
-			) => {
-				const confidenceStr = refactoring.confidence
-					? ` (Confidence: ${Math.round(refactoring.confidence * 100)}%)`
-					: ""
+		data.refactorings.forEach((refactoring, index) => {
+			const confidenceStr = refactoring.confidence
+				? ` (Confidence: ${Math.round(refactoring.confidence * 100)}%)`
+				: ""
 
-				const locationStr = refactoring.startLine
-					? ` [Lines ${refactoring.startLine}-${refactoring.endLine || refactoring.startLine}]`
-					: ""
+			const locationStr = refactoring.startLine
+				? ` [Lines ${refactoring.startLine}-${refactoring.endLine || refactoring.startLine}]`
+				: ""
 
-				outputChannel.appendLine(`## Suggestion ${index + 1}${locationStr}${confidenceStr}`)
-				outputChannel.appendLine(refactoring.description)
-				outputChannel.appendLine("")
-				outputChannel.appendLine("```diff")
-				outputChannel.appendLine("- " + refactoring.before.replace(/\n/g, "\n- "))
-				outputChannel.appendLine("+ " + refactoring.after.replace(/\n/g, "\n+ "))
-				outputChannel.appendLine("```")
-				outputChannel.appendLine("")
-			},
-		)
+			outputChannel.appendLine(`## Suggestion ${index + 1}${locationStr}${confidenceStr}`)
+			outputChannel.appendLine(refactoring.description)
+			outputChannel.appendLine("")
+			outputChannel.appendLine("```diff")
+			outputChannel.appendLine("- " + refactoring.before.replace(/\n/g, "\n- "))
+			outputChannel.appendLine("+ " + refactoring.after.replace(/\n/g, "\n+ "))
+			outputChannel.appendLine("```")
+			outputChannel.appendLine("")
+		})
 
 		outputChannel.show()
 
 		return data
-	}
-}
+	},
+})
 
 /**
- * Example of how to use the tools in a VSCode extension
+ * Example of how to use the tools in a VSCode extension with the functional API
  */
 async function vscodeExtensionExample() {
 	// Create mock editor for the example
@@ -261,24 +191,43 @@ async function vscodeExtensionExample() {
 		},
 	}
 
-	// Create the tools
-	const completionTool = new CodeCompletionTool()
-	const refactoringTool = new RefactoringTool()
+	// Create the tool system with proper typing
+	type ToolRegistry = {
+		"code-completion": {
+			tool: typeof codeCompletionTool
+			schema: typeof completionSchema
+			dataType: CompletionData
+		}
+		refactoring: {
+			tool: typeof refactoringTool
+			schema: typeof refactoringSchema
+			dataType: RefactoringData
+		}
+	}
 
-	// Create the tool system
-	const toolSystem = new LLMToolSystem({
-		tools: [completionTool, refactoringTool],
-		globalContext: {
-			editor: vscode.window.activeTextEditor,
-			language: "typescript",
-			indentationStyle: "  ", // 2 spaces
-		},
+	const toolSystem = createToolSystem<ToolRegistry>([codeCompletionTool, refactoringTool])
+		.onToolResponse("code-completion", (data: CompletionData) => {
+			console.log(`[UI] Completion inserted: ${data.completion.substring(0, 20)}...`)
+		})
+		.onToolResponse("refactoring", (data: RefactoringData) => {
+			console.log(`[UI] ${data.refactorings.length} refactoring suggestions displayed`)
+		})
+
+	// Set context for the tools
+	const context = {
+		editor: vscode.window.activeTextEditor,
+		language: "typescript",
+		indentationStyle: "  ", // 2 spaces
+	}
+
+	// Generate the prompt
+	const prompt = toolSystem.generatePrompt({
+		systemMessage: "You are a coding assistant that can provide code completions and refactoring suggestions.",
+		userMessage: "Complete the code at my cursor position and suggest refactoring improvements.",
 	})
 
-	// Generate the system prompt
-	console.log("\n=== VSCODE EXTENSION SYSTEM PROMPT ===\n")
-	const systemPrompt = toolSystem.generateSystemPrompt()
-	console.log(systemPrompt)
+	console.log("\n=== VSCODE EXTENSION PROMPT ===\n")
+	console.log(prompt)
 
 	// Example completion response
 	const completionResponse = `
@@ -295,7 +244,21 @@ const totalWithTax = total * 1.1;</completion>
 
 	// Process the completion response
 	console.log("\n=== PROCESSING COMPLETION RESPONSE ===\n")
-	await toolSystem.processCompleteResponse(completionResponse)
+
+	// Convert the string to a mock async iterable for demonstration
+	async function* mockCompletionStream() {
+		const chunks = completionResponse.split("\n")
+		for (const chunk of chunks) {
+			yield chunk + "\n"
+			// Simulate network delay
+			await new Promise((resolve) => setTimeout(resolve, 50))
+		}
+	}
+
+	await toolSystem.processStream(mockCompletionStream(), {
+		onChunk: (chunk: string) => {}, // Omitting chunk logging for brevity
+		onComplete: () => console.log("Completion processing complete"),
+	})
 
 	// Example refactoring response
 	const refactoringResponse = `
@@ -332,10 +295,36 @@ const totalWithTax = total * 1.1;</completion>
 
 	// Process the refactoring response
 	console.log("\n=== PROCESSING REFACTORING RESPONSE ===\n")
-	await toolSystem.processCompleteResponse(refactoringResponse)
+
+	// Convert the string to a mock async iterable for demonstration
+	async function* mockRefactoringStream() {
+		const chunks = refactoringResponse.split("\n")
+		for (const chunk of chunks) {
+			yield chunk + "\n"
+			// Simulate network delay
+			await new Promise((resolve) => setTimeout(resolve, 50))
+		}
+	}
+
+	await toolSystem.processStream(mockRefactoringStream(), {
+		onChunk: (chunk: string) => {}, // Omitting chunk logging for brevity
+		onComplete: () => console.log("Refactoring processing complete"),
+	})
+
+	// Get the final results
+	const results = toolSystem.getResults()
+	console.log("\n=== FINAL RESULTS ===\n")
+	console.log("Code Completion Result:", results["code-completion"] ? "✓" : "✗")
+	console.log("Refactoring Result:", results["refactoring"] ? "✓" : "✗")
 }
 
 // For direct execution:
-vscodeExtensionExample().catch(console.error)
+// For ES modules, we can check if this is the main module
+import { fileURLToPath } from "url"
+const isMainModule = process.argv[1] === fileURLToPath(import.meta.url)
 
-export { CodeCompletionTool, RefactoringTool, vscodeExtensionExample }
+if (isMainModule) {
+	vscodeExtensionExample().catch(console.error)
+}
+
+export { codeCompletionTool, refactoringTool, vscodeExtensionExample }

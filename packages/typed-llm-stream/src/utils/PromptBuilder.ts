@@ -1,4 +1,4 @@
-import { LLMPromptSection, LLMToolContext } from "../core/types.js"
+import { LLMPromptSection, LLMToolContext } from "../core/functional-types.js"
 
 export class PromptBuilder {
 	private sections: LLMPromptSection[] = []

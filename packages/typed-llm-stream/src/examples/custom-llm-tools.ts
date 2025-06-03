@@ -1,83 +1,77 @@
-import { LLMToolSystem, BaseLLMTool, LLMToolContext } from "../index.js"
+import { createTool, createToolSystem } from "../index.js"
 import { z } from "zod"
 
 /**
- * Example: Custom LLM Tools
+ * Example: Custom LLM Tools with Functional API
  *
  * This example demonstrates how to create more advanced custom LLM tools
- * with complex schemas and specialized functionality.
+ * with complex schemas and specialized functionality using the functional API.
  */
 
-// A code generation tool that produces code snippets
-class CodeGenerationTool extends BaseLLMTool {
-	constructor() {
-		super({
-			id: "code-generator",
-			name: "Code Generator",
-			description: "Generates code snippets in various languages",
-			schema: z.object({
-				language: z.string(),
-				code: z.string(),
-				explanation: z.string(),
-				imports: z.array(z.string()).optional(),
-				complexity: z.enum(["simple", "moderate", "complex"]).optional(),
-				performance: z
-					.object({
-						timeComplexity: z.string().optional(),
-						spaceComplexity: z.string().optional(),
-						optimizationNotes: z.string().optional(),
-					})
-					.optional(),
-			}),
-			xmlTag: "code-snippet",
-			category: "development",
+// Define schemas with proper typing
+const codeGenerationSchema = z.object({
+	language: z.string().describe("Programming language"),
+	code: z.string().describe("The generated code"),
+	explanation: z.string().describe("Explanation of how the code works"),
+	imports: z.string().optional().describe("Required imports or dependencies (comma-separated)"),
+	complexity: z.enum(["simple", "moderate", "complex"]).optional().describe("Complexity level of the code"),
+	performance: z
+		.object({
+			timeComplexity: z.string().optional().describe("Time complexity (e.g., O(n), O(log n))"),
+			spaceComplexity: z.string().optional().describe("Space complexity (e.g., O(n), O(1))"),
+			optimizationNotes: z.string().optional().describe("Notes about performance considerations"),
 		})
-	}
+		.optional()
+		.describe("Performance characteristics"),
+})
 
-	generatePromptSection(context: LLMToolContext) {
-		// Extract relevant context
-		const language = context.language || "any"
-		const task = context.task || "general purpose"
+const metricSchema = z.object({
+	name: z.string().describe("Name of the metric"),
+	value: z.union([z.number(), z.string()]).describe("Value of the metric"),
+	unit: z.string().optional().describe("Unit of measurement"),
+})
 
-		return this.buildXMLPromptSection(
-			"CODE GENERATION - Generate code snippets",
-			`<code-snippet>
-  <language>programming_language</language>
-  <code>
-    // Your code here
-  </code>
-  <explanation>Explanation of how the code works</explanation>
-  <imports>
-    <import>package or module name</import>
-    <!-- Additional imports as needed -->
-  </imports>
-  <complexity>simple|moderate|complex</complexity>
-  <performance>
-    <timeComplexity>O(n), O(log n), etc.</timeComplexity>
-    <spaceComplexity>O(n), O(1), etc.</spaceComplexity>
-    <optimizationNotes>Notes about performance considerations</optimizationNotes>
-  </performance>
-</code-snippet>`,
-			[
-				`Generate ${language} code for ${task}`,
-				"Include clear explanations of how the code works",
-				"List necessary imports or dependencies",
-				"Consider performance implications when relevant",
-			],
-			1,
-		)
-	}
+const insightSchema = z.object({
+	finding: z.string().describe("Key finding from the data"),
+	confidence: z.number().min(0).max(1).describe("Confidence score (0.0 to 1.0)"),
+	impact: z.enum(["low", "medium", "high"]).describe("Impact level of the finding"),
+})
 
-	async handleResponse(data: z.infer<typeof this.schema>, context: LLMToolContext) {
+const visualizationSuggestionSchema = z.object({
+	type: z.string().describe("Chart type (bar, line, scatter, etc.)"),
+	description: z.string().describe("What the visualization would show"),
+})
+
+const dataAnalysisSchema = z.object({
+	dataset_name: z.string().describe("Name of the dataset"),
+	analysis_type: z.enum(["descriptive", "diagnostic", "predictive", "prescriptive"]).describe("Type of analysis"),
+	metrics: z.array(metricSchema).describe("Key metrics from the analysis"),
+	insights: z.array(insightSchema).describe("Insights derived from the data"),
+	visualization_suggestions: z.array(visualizationSuggestionSchema).optional().describe("Recommended visualizations"),
+})
+
+// Define types based on schemas
+type CodeGenerationData = z.infer<typeof codeGenerationSchema>
+type DataAnalysisData = z.infer<typeof dataAnalysisSchema>
+
+// Create a code generation tool
+const codeGenerationTool = createTool<typeof codeGenerationSchema, CodeGenerationData>({
+	id: "code-generator",
+	name: "Code Generator",
+	description: "Generates code snippets in various languages",
+	schema: codeGenerationSchema,
+	xmlTag: "code-snippet",
+	category: "development",
+	handler: async (data: CodeGenerationData) => {
 		console.log(`Generated ${data.language} code snippet:`)
 		console.log("-----------------------------------")
 		console.log(data.code)
 		console.log("-----------------------------------")
 		console.log(`Explanation: ${data.explanation}`)
 
-		if (data.imports && data.imports.length > 0) {
+		if (data.imports && data.imports.trim() !== "") {
 			console.log("Required imports:")
-			data.imports.forEach((imp: string) => console.log(`- ${imp}`))
+			data.imports.split(",").forEach((imp) => console.log(`- ${imp.trim()}`))
 		}
 
 		if (data.complexity) {
@@ -98,134 +92,76 @@ class CodeGenerationTool extends BaseLLMTool {
 		}
 
 		return data
-	}
-}
+	},
+})
 
-// A data analysis tool that provides insights on datasets
-class DataAnalysisTool extends BaseLLMTool {
-	constructor() {
-		super({
-			id: "data-analysis",
-			name: "Data Analysis Tool",
-			description: "Analyzes data and provides statistical insights",
-			schema: z.object({
-				datasetName: z.string(),
-				analysisType: z.enum(["descriptive", "diagnostic", "predictive", "prescriptive"]),
-				metrics: z.array(
-					z.object({
-						name: z.string(),
-						value: z.union([z.number(), z.string()]),
-						unit: z.string().optional(),
-					}),
-				),
-				insights: z.array(
-					z.object({
-						finding: z.string(),
-						confidence: z.number().min(0).max(1),
-						impact: z.enum(["low", "medium", "high"]),
-					}),
-				),
-				visualizationSuggestions: z
-					.array(
-						z.object({
-							type: z.string(),
-							description: z.string(),
-						}),
-					)
-					.optional(),
-			}),
-			xmlTag: "data-analysis",
-			category: "analytics",
-		})
-	}
-
-	generatePromptSection(context: LLMToolContext) {
-		return this.buildXMLPromptSection(
-			"DATA ANALYSIS - Analyze data and provide insights",
-			`<data-analysis>
-  <datasetName>Name of the dataset</datasetName>
-  <analysisType>descriptive|diagnostic|predictive|prescriptive</analysisType>
-  <metrics>
-    <metric>
-      <name>Metric name</name>
-      <value>Metric value</value>
-      <unit>Unit of measurement (optional)</unit>
-    </metric>
-    <!-- Additional metrics as needed -->
-  </metrics>
-  <insights>
-    <insight>
-      <finding>Key finding from the data</finding>
-      <confidence>0.0 to 1.0</confidence>
-      <impact>low|medium|high</impact>
-    </insight>
-    <!-- Additional insights as needed -->
-  </insights>
-  <visualizationSuggestions>
-    <suggestion>
-      <type>Chart type (bar, line, scatter, etc.)</type>
-      <description>What the visualization would show</description>
-    </suggestion>
-    <!-- Additional visualization suggestions as needed -->
-  </visualizationSuggestions>
-</data-analysis>`,
-			[
-				"Analyze the provided data thoroughly",
-				"Include relevant statistical metrics",
-				"Provide actionable insights with confidence scores",
-				"Suggest appropriate visualizations when helpful",
-			],
-			2,
-		)
-	}
-
-	async handleResponse(data: z.infer<typeof this.schema>, context: LLMToolContext) {
-		console.log(`Analysis of ${data.datasetName} (${data.analysisType}):`)
+// Create a data analysis tool
+const dataAnalysisTool = createTool<typeof dataAnalysisSchema, DataAnalysisData>({
+	id: "data-analysis",
+	name: "Data Analysis Tool",
+	description: "Analyzes data and provides statistical insights",
+	schema: dataAnalysisSchema,
+	xmlTag: "data-analysis",
+	category: "analytics",
+	handler: async (data: DataAnalysisData) => {
+		console.log(`Analysis of ${data.dataset_name} (${data.analysis_type}):`)
 		console.log("-----------------------------------")
 
 		console.log("Key Metrics:")
-		data.metrics.forEach((metric: { name: string; value: string | number; unit?: string }) => {
+		data.metrics.forEach((metric) => {
 			const unitStr = metric.unit ? ` ${metric.unit}` : ""
 			console.log(`- ${metric.name}: ${metric.value}${unitStr}`)
 		})
 
 		console.log("\nInsights:")
-		data.insights.forEach((insight: { finding: string; confidence: number; impact: string }) => {
+		data.insights.forEach((insight) => {
 			const confidencePercent = Math.round(insight.confidence * 100)
 			console.log(`- ${insight.finding} (${confidencePercent}% confidence, ${insight.impact} impact)`)
 		})
 
-		if (data.visualizationSuggestions && data.visualizationSuggestions.length > 0) {
+		if (data.visualization_suggestions && data.visualization_suggestions.length > 0) {
 			console.log("\nRecommended Visualizations:")
-			data.visualizationSuggestions.forEach((viz: { type: string; description: string }) => {
+			data.visualization_suggestions.forEach((viz) => {
 				console.log(`- ${viz.type}: ${viz.description}`)
 			})
 		}
 
 		return data
-	}
-}
+	},
+})
 
 // Main example function
 async function runExample() {
-	// Create the custom tools
-	const codeGenTool = new CodeGenerationTool()
-	const dataAnalysisTool = new DataAnalysisTool()
+	// Create the tool system with both tools and proper typing
+	type ToolRegistry = {
+		"code-generator": {
+			tool: typeof codeGenerationTool
+			schema: typeof codeGenerationSchema
+			dataType: CodeGenerationData
+		}
+		"data-analysis": {
+			tool: typeof dataAnalysisTool
+			schema: typeof dataAnalysisSchema
+			dataType: DataAnalysisData
+		}
+	}
 
-	// Create the tool system with both tools
-	const toolSystem = new LLMToolSystem({
-		tools: [codeGenTool, dataAnalysisTool],
-		globalContext: {
-			user: "data scientist",
-			project: "customer behavior analysis",
-			language: "python",
-		},
+	const toolSystem = createToolSystem<ToolRegistry>([codeGenerationTool, dataAnalysisTool])
+		.onToolResponse("code-generator", (data: CodeGenerationData) => {
+			console.log(`[UI] Displaying code snippet in ${data.language}`)
+		})
+		.onToolResponse("data-analysis", (data: DataAnalysisData) => {
+			console.log(`[UI] Displaying analysis of ${data.dataset_name} with ${data.insights.length} insights`)
+		})
+
+	// Generate the prompt
+	const prompt = toolSystem.generatePrompt({
+		systemMessage: "You are a helpful assistant that can generate code and analyze data.",
+		userMessage: "Generate Python code for customer segmentation and analyze the results.",
 	})
 
-	// Generate the system prompt
-	const systemPrompt = toolSystem.generateSystemPrompt()
-	console.log("\n=== SYSTEM PROMPT ===\n")
-	console.log(systemPrompt)
+	console.log("\n=== PROMPT ===\n")
+	console.log(prompt)
 
 	// Example LLM response for code generation
 	const codeResponse = `
@@ -270,12 +206,7 @@ if __name__ == "__main__":
   <explanation>
     This code performs customer segmentation using KMeans clustering. It loads customer data from a CSV file, selects relevant features (purchase frequency, average order value, and time since last purchase), normalizes the data, and applies KMeans to identify customer segments. It then calculates the mean values for each feature within each segment to help understand the characteristics of each customer group.
   </explanation>
-  <imports>
-    <import>pandas</import>
-    <import>matplotlib.pyplot</import>
-    <import>seaborn</import>
-    <import>sklearn.cluster.KMeans</import>
-  </imports>
+  <imports>pandas,matplotlib.pyplot,seaborn,sklearn.cluster.KMeans</imports>
   <complexity>moderate</complexity>
   <performance>
     <timeComplexity>O(n*k*i) where n is the number of samples, k is the number of clusters, and i is the number of iterations</timeComplexity>
@@ -285,15 +216,11 @@ if __name__ == "__main__":
 </code-snippet>
 `
 
-	// Process the code generation response
-	console.log("\n=== PROCESSING CODE GENERATION RESPONSE ===\n")
-	const codeResults = await toolSystem.processCompleteResponse(codeResponse)
-
 	// Example LLM response for data analysis
 	const analysisResponse = `
 <data-analysis>
-  <datasetName>Customer Purchase History</datasetName>
-  <analysisType>diagnostic</analysisType>
+  <dataset_name>Customer Purchase History</dataset_name>
+  <analysis_type>diagnostic</analysis_type>
   <metrics>
     <metric>
       <name>Average Customer Lifetime Value</name>
@@ -337,7 +264,7 @@ if __name__ == "__main__":
       <impact>medium</impact>
     </insight>
   </insights>
-  <visualizationSuggestions>
+  <visualization_suggestions>
     <suggestion>
       <type>Cohort Analysis Heatmap</type>
       <description>Visualize retention rates by customer acquisition cohort over time</description>
@@ -350,16 +277,95 @@ if __name__ == "__main__":
       <type>Scatter Plot</type>
       <description>Plot customer lifetime value against purchase frequency with point size representing average order value</description>
     </suggestion>
-  </visualizationSuggestions>
+  </visualization_suggestions>
 </data-analysis>
 `
 
+	console.log("\n=== PROCESSING RESPONSES ===\n")
+
+	// Convert the strings to mock async iterables for demonstration
+	async function* mockCodeStream() {
+		// Extract complete XML blocks for better parsing
+		const codeMatch = codeResponse.match(/<code-snippet>[\s\S]*?<\/code-snippet>/)
+
+		if (codeMatch) {
+			console.log("Found code snippet XML block, length:", codeMatch[0].length)
+			console.log("Code snippet preview:", codeMatch[0].substring(0, 100) + "...")
+
+			// Simulate network delay
+			await new Promise((resolve) => setTimeout(resolve, 300))
+			yield codeMatch[0]
+		} else {
+			console.error("Failed to match code snippet XML block")
+		}
+	}
+
+	async function* mockAnalysisStream() {
+		// Extract complete XML blocks for better parsing
+		const analysisMatch = analysisResponse.match(/<data-analysis>[\s\S]*?<\/data-analysis>/)
+
+		if (analysisMatch) {
+			console.log("Found data analysis XML block, length:", analysisMatch[0].length)
+			console.log("Data analysis preview:", analysisMatch[0].substring(0, 100) + "...")
+
+			// Simulate network delay
+			await new Promise((resolve) => setTimeout(resolve, 300))
+			yield analysisMatch[0]
+		} else {
+			console.error("Failed to match data analysis XML block")
+		}
+	}
+
+	// Process the code generation response
+	console.log("Processing code generation response...")
+	try {
+		await toolSystem.processStream(mockCodeStream(), {
+			onChunk: (chunk: string) => console.log(`Received code chunk: ${chunk.substring(0, 50)}...`),
+			onComplete: () => console.log("Code generation processing complete"),
+			onError: (error: Error) => console.error("Code generation error:", error.message),
+		})
+	} catch (error) {
+		console.error("Error processing code stream:", error)
+	}
+
 	// Process the data analysis response
-	console.log("\n=== PROCESSING DATA ANALYSIS RESPONSE ===\n")
-	const analysisResults = await toolSystem.processCompleteResponse(analysisResponse)
+	console.log("\nProcessing data analysis response...")
+	try {
+		await toolSystem.processStream(mockAnalysisStream(), {
+			onChunk: (chunk: string) => console.log(`Received analysis chunk: ${chunk.substring(0, 50)}...`),
+			onComplete: () => console.log("Data analysis processing complete"),
+			onError: (error: Error) => console.error("Data analysis error:", error.message),
+		})
+	} catch (error) {
+		console.error("Error processing analysis stream:", error)
+	}
+
+	// Get the final results
+	const results = toolSystem.getResults()
+	console.log("\n=== FINAL RESULTS ===\n")
+	console.log("All results:", JSON.stringify(results, null, 2))
+	console.log("Code Generator Result:", results["code-generator"] ? "✓" : "✗")
+	if (results["code-generator"]) {
+		console.log("Code Generator Data:", results["code-generator"])
+	} else {
+		console.log("No code generator data found")
+	}
+
+	console.log("Data Analysis Result:", results["data-analysis"] ? "✓" : "✗")
+	if (results["data-analysis"]) {
+		console.log("Data Analysis Data:", results["data-analysis"])
+	} else {
+		console.log("No data analysis data found")
+	}
 }
 
 // For direct execution:
-runExample().catch(console.error)
+// For ES modules, we can check if this is the main module
+import { fileURLToPath } from "url"
+const isMainModule = process.argv[1] === fileURLToPath(import.meta.url)
 
-export { CodeGenerationTool, DataAnalysisTool, runExample }
+if (isMainModule) {
+	runExample().catch(console.error)
+}
+
+export { codeGenerationTool, dataAnalysisTool, runExample }

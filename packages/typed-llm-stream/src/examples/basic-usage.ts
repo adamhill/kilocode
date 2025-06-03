@@ -1,91 +1,58 @@
-import { LLMToolSystem, BaseLLMTool } from "../index.js"
+import { createTool, createToolSystem } from "../index.js"
 import { z } from "zod"
 
 /**
- * Example: Basic usage of typed-llm-stream
+ * Example: Basic usage of typed-llm-stream with functional API
  *
- * This example demonstrates how to create a simple LLM tool and use it with the LLMToolSystem.
+ * This example demonstrates how to create simple tools and use them with the tool system.
  */
 
-// Define a simple greeting tool
-class GreetingTool extends BaseLLMTool {
-	constructor() {
-		super({
-			id: "greeting",
-			name: "Greeting Generator",
-			description: "Generates personalized greetings",
-			schema: z.object({
-				name: z.string(),
-				style: z.enum(["formal", "casual", "friendly"]),
-				message: z.string(),
-			}),
-			xmlTag: "greeting",
-		})
-	}
+// Define schemas with proper typing
+const greetingSchema = z.object({
+	name: z.string().describe("Person's name"),
+	style: z.enum(["formal", "casual", "friendly"]).describe("Style of greeting"),
+	message: z.string().describe("The greeting message"),
+})
 
-	generatePromptSection(context: any) {
-		return this.buildXMLPromptSection(
-			"GREETING - Generate a personalized greeting",
-			"<greeting><name>person_name</name><style>formal|casual|friendly</style><message>greeting_text</message></greeting>",
-			["Generate appropriate greetings based on context", "Consider the relationship and setting"],
-			1,
-		)
-	}
+const recommendationItemSchema = z.object({
+	name: z.string().describe("Item name"),
+	reason: z.string().describe("Why this is recommended"),
+	score: z.number().min(1).max(10).optional().describe("Rating from 1-10"),
+})
 
-	async handleResponse(data: any, context: any) {
+const recommendationSchema = z.object({
+	category: z.string().describe("Category of recommendations"),
+	items: z.array(recommendationItemSchema).min(1).max(5).describe("List of recommended items"),
+	audience: z.string().optional().describe("Target audience"),
+})
+
+// Define types based on schemas
+type GreetingData = z.infer<typeof greetingSchema>
+type RecommendationData = z.infer<typeof recommendationSchema>
+
+// Create a greeting tool
+const greetingTool = createTool<typeof greetingSchema, GreetingData>({
+	id: "greeting",
+	name: "Greeting Generator",
+	description: "Generates personalized greetings",
+	schema: greetingSchema,
+	xmlTag: "greeting",
+	handler: async (data: GreetingData) => {
 		console.log(`Generated greeting: ${data.message} (${data.style} style for ${data.name})`)
 		return data
-	}
-}
+	},
+})
 
-// Define a recommendation tool
-class RecommendationTool extends BaseLLMTool {
-	constructor() {
-		super({
-			id: "recommendation",
-			name: "Recommendation Generator",
-			description: "Generates personalized recommendations",
-			schema: z.object({
-				category: z.string(),
-				items: z
-					.array(
-						z.object({
-							name: z.string(),
-							reason: z.string(),
-							score: z.number().min(1).max(10).optional(),
-						}),
-					)
-					.min(1)
-					.max(5),
-				audience: z.string().optional(),
-			}),
-			xmlTag: "recommendation",
-		})
-	}
-
-	generatePromptSection(context: any) {
-		return this.buildXMLPromptSection(
-			"RECOMMENDATION - Generate personalized recommendations",
-			`<recommendation>
-  <category>books|movies|restaurants|etc</category>
-  <items>
-    <item>
-      <name>Item name</name>
-      <reason>Why this is recommended</reason>
-      <score>1-10 (optional)</score>
-    </item>
-    <!-- More items can be included -->
-  </items>
-  <audience>Target audience (optional)</audience>
-</recommendation>`,
-			["Generate relevant recommendations based on context", "Include 1-5 items with clear reasons"],
-			2,
-		)
-	}
-
-	async handleResponse(data: any, context: any) {
+// Create a recommendation tool
+const recommendationTool = createTool<typeof recommendationSchema, RecommendationData>({
+	id: "recommendation",
+	name: "Recommendation Generator",
+	description: "Generates personalized recommendations",
+	schema: recommendationSchema,
+	xmlTag: "recommendation",
+	handler: async (data: RecommendationData) => {
 		console.log(`Generated ${data.items.length} recommendations for ${data.category}:`)
-		data.items.forEach((item: any, index: number) => {
+		data.items.forEach((item, index) => {
 			console.log(
 				`  ${index + 1}. ${item.name} - ${item.reason} ${item.score ? `(Score: ${item.score}/10)` : ""}`,
 			)
@@ -94,36 +61,37 @@ class RecommendationTool extends BaseLLMTool {
 			console.log(`Target audience: ${data.audience}`)
 		}
 		return data
-	}
-}
+	},
+})
 
 // Main example function
 async function runExample() {
-	// Create the tools
-	const greetingTool = new GreetingTool()
-	const recommendationTool = new RecommendationTool()
+	// Create the tool system with both tools and proper typing
+	type ToolRegistry = {
+		greeting: { tool: typeof greetingTool; schema: typeof greetingSchema; dataType: GreetingData }
+		recommendation: {
+			tool: typeof recommendationTool
+			schema: typeof recommendationSchema
+			dataType: RecommendationData
+		}
+	}
 
-	// Create the tool system with both tools
-	const toolSystem = new LLMToolSystem({
-		tools: [greetingTool, recommendationTool],
-		globalContext: {
-			user: "developer",
-			preferences: ["technology", "science fiction", "productivity"],
-		},
+	const toolSystem = createToolSystem<ToolRegistry>([greetingTool, recommendationTool])
+		.onToolResponse("greeting", (data: GreetingData) => {
+			console.log(`[UI] Displaying greeting: "${data.message}"`)
+		})
+		.onToolResponse("recommendation", (data: RecommendationData) => {
+			console.log(`[UI] Displaying ${data.items.length} recommendations`)
+		})
+
+	// Generate the prompt that would be sent to an LLM
+	const prompt = toolSystem.generatePrompt({
+		systemMessage: "You are a helpful assistant that can provide greetings and recommendations.",
+		userMessage: "Recommend some books and greet me as Alice.",
 	})
 
-	// Generate the system prompt that would be sent to an LLM
-	const systemPrompt = toolSystem.generateSystemPrompt()
-	console.log("\n=== SYSTEM PROMPT ===\n")
-	console.log(systemPrompt)
-
-	// Generate a user prompt
-	const userPrompt = toolSystem.generateUserPrompt({
-		query: "Recommend some books and greet me",
-		userName: "Alice",
-	})
-	console.log("\n=== USER PROMPT ===\n")
-	console.log(userPrompt)
+	console.log("\n=== PROMPT ===\n")
+	console.log(prompt)
 
 	// Example LLM response (this would normally come from an actual LLM API)
 	const exampleResponse = `
@@ -158,44 +126,62 @@ I'd be happy to help with that!
 </recommendation>
 `
 
-	console.log("\n=== PROCESSING RESPONSE ===\n")
-
-	// Process the complete response
-	const results = await toolSystem.processCompleteResponse(exampleResponse)
-
-	console.log("\n=== RESULTS ===\n")
-	console.log(`Processed ${results.length} tool results`)
-	results.forEach((result, index) => {
-		console.log(`\nResult ${index + 1}: ${result.toolId}`)
-		console.log(JSON.stringify(result.data, null, 2))
-	})
-
-	// Example of streaming processing
-	console.log("\n=== STREAMING EXAMPLE ===\n")
+	console.log("\n=== PROCESSING COMPLETE RESPONSE ===\n")
 
 	// Convert the string to a mock async iterable for demonstration
 	async function* mockStream() {
-		const chunks = exampleResponse.split("\n")
-		for (const chunk of chunks) {
-			yield chunk + "\n"
-			// Simulate network delay
-			await new Promise((resolve) => setTimeout(resolve, 100))
+		// Extract complete XML blocks for better parsing
+		const greetingMatch = exampleResponse.match(/<greeting>[\s\S]*?<\/greeting>/)
+		const recommendationMatch = exampleResponse.match(/<recommendation>[\s\S]*?<\/recommendation>/)
+
+		// Send intro text
+		yield "I'd be happy to help with that!\n\n"
+
+		// Send greeting block
+		if (greetingMatch) {
+			await new Promise((resolve) => setTimeout(resolve, 300))
+			yield greetingMatch[0]
+		}
+
+		// Send recommendation block
+		if (recommendationMatch) {
+			await new Promise((resolve) => setTimeout(resolve, 300))
+			yield recommendationMatch[0]
 		}
 	}
 
-	console.log("Processing stream...")
-	for await (const result of toolSystem.processResponseStream(mockStream())) {
-		console.log(`Received streaming result for tool: ${result.toolId}`)
+	// Process the streaming response
+	await toolSystem.processStream(mockStream(), {
+		onChunk: (chunk: string) => console.log(`Received chunk: ${chunk.trim()}`),
+		onComplete: () => console.log("\nStream processing complete"),
+	})
+
+	// Get the final results
+	const results = toolSystem.getResults()
+	console.log("\n=== RESULTS ===\n")
+	console.log(JSON.stringify(results, null, 2))
+
+	// Access specific results with type safety
+	const greetingResult = toolSystem.getResult("greeting")
+	if (greetingResult) {
+		console.log(`\nGreeting result: ${greetingResult.message}`)
+	}
+
+	const recommendationResult = toolSystem.getResult("recommendation")
+	if (recommendationResult) {
+		console.log(
+			`\nRecommendation result: ${recommendationResult.category} with ${recommendationResult.items.length} items`,
+		)
 	}
 }
 
-// Run the example when called directly
-// In a Node.js environment, you would use:
-// if (require.main === module) {
-//   runExample().catch(console.error);
-// }
+// Run the example
+// For ES modules, we can check if this is the main module
+import { fileURLToPath } from "url"
+const isMainModule = process.argv[1] === fileURLToPath(import.meta.url)
 
-// For browser or direct execution:
-runExample().catch(console.error)
+if (isMainModule) {
+	runExample().catch(console.error)
+}
 
-export { GreetingTool, RecommendationTool, runExample }
+export { greetingTool, recommendationTool, runExample }

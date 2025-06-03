@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { createTool, createFunctionalToolSystem } from "../index.js"
+import { createTool, createToolSystem } from "../index.js"
 
 // Example: Using the functional API to create tools and process responses
 
@@ -35,43 +35,39 @@ const weatherTool = createTool<typeof weatherSchema, WeatherData>({
 })
 
 // 2. Create a news headlines tool with proper typing
-const newsTool = createTool<z.ZodArray<typeof newsItemSchema>, NewsData>({
+const newsTool = createTool<typeof newsItemSchema, NewsItem>({
 	id: "news",
 	name: "News Headlines",
 	description: "Provides recent news headlines on a topic",
-	schema: z.array(newsItemSchema),
-	xmlTag: "news_headlines",
-	handler: (headlines: NewsData) => {
-		headlines.forEach((headline) => {
-			console.log(`${headline.title} (${headline.source}): ${headline.summary}`)
-		})
-		return headlines
+	schema: newsItemSchema,
+	xmlTag: "news_headline",
+	handler: (data: NewsItem) => {
+		console.log(`${data.title} (${data.source}): ${data.summary}`)
+		return data
 	},
 })
 
 // 3. Create a tool system with chaining and proper typing
 // TypeScript will infer the correct types for each tool
-const system = createFunctionalToolSystem()
+const system = createToolSystem()
 	.addTool(weatherTool)
 	.addTool(newsTool)
-	.onToolResponse("weather", (data) => {
+	.onToolResponse("weather", (data: WeatherData) => {
 		// TypeScript knows this is WeatherData
 		console.log(`[UI UPDATE] Weather widget updated with: ${data.temperature}°C in ${data.location}`)
 	})
-	.onToolResponse("news", (headlines) => {
-		// TypeScript knows this is NewsData (array of NewsItem)
-		console.log(`[UI UPDATE] News feed updated with ${headlines.length} headlines`)
-		// We can safely access properties of each headline
-		headlines.forEach((h) => console.log(`- ${h.title}`))
+	.onToolResponse("news", (data: NewsItem) => {
+		// TypeScript knows this is NewsItem
+		console.log(`[UI UPDATE] News feed updated with headline: ${data.title}`)
 	})
-	.onToolResponse((toolId, data) => {
+	.onToolResponse((toolId: string, data: any) => {
 		// Global callback with type discrimination
 		if (toolId === "weather") {
 			// TypeScript knows this is WeatherData
 			console.log(`Weather data received: ${data.temperature}°C`)
 		} else if (toolId === "news") {
-			// TypeScript knows this is NewsData
-			console.log(`News data received: ${data.length} items`)
+			// TypeScript knows this is NewsItem
+			console.log(`News data received: ${data.title}`)
 		}
 	})
 
@@ -81,16 +77,16 @@ async function* mockLLMStream(prompt: string) {
 
 	// Simulate chunks of a response
 	const chunks = [
-		`<weather_forecast>`,
-		`<location>San Francisco</location>`,
-		`<temperature>18</temperature>`,
-		`<conditions>Partly cloudy with fog</conditions>`,
-		`</weather_forecast>`,
-		`<news_headlines>`,
-		`<title>Tech Conference Announced</title>`,
-		`<source>Tech Daily</source>`,
-		`<summary>Major tech conference to be held next month</summary>`,
-		`</news_headlines>`,
+		`<weather_forecast>
+<location>San Francisco</location>
+<temperature>18</temperature>
+<conditions>Partly cloudy with fog</conditions>
+</weather_forecast>`,
+		`<news_headline>
+<title>Tech Conference Announced</title>
+<source>Tech Daily</source>
+<summary>Major tech conference to be held next month</summary>
+</news_headline>`,
 	]
 
 	for (const chunk of chunks) {
@@ -110,9 +106,9 @@ async function main() {
 
 	// Process the streaming response
 	await system.processStream(mockLLMStream(prompt), {
-		onChunk: (chunk) => console.log("Received chunk:", chunk),
+		onChunk: (chunk: string) => console.log("Received chunk:", chunk),
 		onComplete: () => console.log("Stream complete"),
-		onError: (err) => console.error("Error:", err),
+		onError: (err: Error) => console.error("Error:", err),
 	})
 
 	// Get the final results with proper typing
@@ -127,9 +123,9 @@ async function main() {
 	}
 
 	// Example of early termination with type safety
-	const earlyTerminationSystem = createFunctionalToolSystem()
+	const earlyTerminationSystem = createToolSystem()
 		.addTool(weatherTool)
-		.onToolResponse("weather", (data) => {
+		.onToolResponse("weather", (data: WeatherData) => {
 			console.log(`Got weather for ${data.location}, terminating stream early`)
 			// Terminate the stream after getting weather data
 			earlyTerminationSystem.terminateStream("Weather data received, no need for more")
@@ -137,13 +133,17 @@ async function main() {
 
 	console.log("\nDemonstrating early termination:")
 	await earlyTerminationSystem.processStream(mockLLMStream(prompt), {
-		onChunk: (chunk) => console.log("Received chunk:", chunk),
+		onChunk: (chunk: string) => console.log("Received chunk:", chunk),
 		onComplete: () => console.log("Stream complete (early termination)"),
 	})
 }
 
 // Run the example
-if (require.main === module) {
+// For ES modules, we can check if this is the main module
+import { fileURLToPath } from "url"
+const isMainModule = process.argv[1] === fileURLToPath(import.meta.url)
+
+if (isMainModule) {
 	main().catch(console.error)
 }
 
