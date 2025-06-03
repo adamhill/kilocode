@@ -1467,7 +1467,6 @@ export const webviewMessageHandler = async (provider: ClineProvider, message: We
 		case "toggleWorkflow": {
 			const { workflowPath, enabled, isGlobal } = message
 			if (workflowPath && typeof enabled === "boolean") {
-				// Handle global vs local workflows
 				if (isGlobal) {
 					const toggles =
 						((await provider.contextProxy.getGlobalState("globalWorkflowToggles")) as ClineRulesToggles) ||
@@ -1483,15 +1482,12 @@ export const webviewMessageHandler = async (provider: ClineProvider, message: We
 					toggles[workflowPath] = enabled
 					await provider.contextProxy.updateWorkspaceState(provider.context, "workflowToggles", toggles)
 				}
-
-				// Refresh rules data
 				await provider.postRulesDataToWebview()
 			}
 			break
 		}
 
 		case "refreshRules": {
-			// Send rules data to webview
 			await provider.postRulesDataToWebview()
 			break
 		}
@@ -1499,7 +1495,6 @@ export const webviewMessageHandler = async (provider: ClineProvider, message: We
 		case "toggleRule": {
 			const { rulePath, enabled, isGlobal } = message
 			if (rulePath && typeof enabled === "boolean" && typeof isGlobal === "boolean") {
-				// Store toggle state in VSCode state
 				if (isGlobal) {
 					const toggles =
 						((await provider.contextProxy.getGlobalState("globalRulesToggles")) as Record<
@@ -1517,8 +1512,6 @@ export const webviewMessageHandler = async (provider: ClineProvider, message: We
 					toggles[rulePath] = enabled
 					await provider.contextProxy.updateWorkspaceState(provider.context, "localRulesToggles", toggles)
 				}
-
-				// Refresh rules data
 				await provider.postRulesDataToWebview()
 			}
 			break
@@ -1533,8 +1526,6 @@ export const webviewMessageHandler = async (provider: ClineProvider, message: We
 						vscode.window.showErrorMessage("No workspace folder found")
 						break
 					}
-
-					// Determine the rules directory path
 					let rulesDir: string
 					if (isGlobal) {
 						const homeDir = require("os").homedir()
@@ -1549,20 +1540,16 @@ export const webviewMessageHandler = async (provider: ClineProvider, message: We
 								: path.join(workspacePath, ".kilocode", "rules")
 					}
 
-					// Ensure the directory exists
 					await fs.mkdir(rulesDir, { recursive: true })
 
-					// Create the file path
 					const filePath = path.join(rulesDir, filename)
 
-					// Check if file already exists
 					const exists = await fileExistsAtPath(filePath)
 					if (exists) {
 						vscode.window.showErrorMessage(`File ${filename} already exists`)
 						break
 					}
 
-					// Create the file with basic content
 					const content =
 						ruleType === "workflow"
 							? `# ${filename.replace(/\.[^/.]+$/, "")}\n\nWorkflow description here...\n\n## Steps\n\n1. Step 1\n2. Step 2\n`
@@ -1570,10 +1557,8 @@ export const webviewMessageHandler = async (provider: ClineProvider, message: We
 
 					await fs.writeFile(filePath, content, "utf8")
 
-					// Open the file for editing
 					await openFile(filePath)
 
-					// Refresh rules data
 					await provider.postRulesDataToWebview()
 				} catch (error) {
 					console.error("Error creating rule file:", error)
@@ -1584,7 +1569,7 @@ export const webviewMessageHandler = async (provider: ClineProvider, message: We
 		}
 
 		case "deleteRuleFile": {
-			const { rulePath, isGlobal, ruleType } = message
+			const { rulePath } = message
 			if (rulePath) {
 				try {
 					const result = await vscode.window.showWarningMessage(
@@ -1596,8 +1581,6 @@ export const webviewMessageHandler = async (provider: ClineProvider, message: We
 					if (result === "Delete") {
 						await fs.unlink(rulePath)
 						vscode.window.showInformationMessage(`Deleted ${path.basename(rulePath)}`)
-
-						// Refresh rules data
 						await provider.postRulesDataToWebview()
 					}
 				} catch (error) {
