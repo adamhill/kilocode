@@ -37,7 +37,7 @@ async function safeReadFile(filePath: string): Promise<string> {
 }
 
 /**
- * Get rule files content with toggle state filtering (similar to Cline's getRuleFilesTotalContent)
+ * Get rule files content with toggle state filtering (matches Cline's getRuleFilesTotalContent)
  */
 async function getRuleFilesTotalContent(
 	rulesFilePaths: string[],
@@ -47,17 +47,14 @@ async function getRuleFilesTotalContent(
 	const ruleFilesTotalContent = await Promise.all(
 		rulesFilePaths.map(async (filePath) => {
 			const ruleFilePath = path.resolve(basePath, filePath)
+			const ruleFilePathRelative = path.relative(basePath, ruleFilePath)
 
 			// Check if this rule is disabled in toggles
 			if (ruleFilePath in toggles && toggles[ruleFilePath] === false) {
 				return null
 			}
 
-			const content = await safeReadFile(ruleFilePath)
-			if (content) {
-				return `${filePath}\n${content}`
-			}
-			return null
+			return `${ruleFilePathRelative}\n` + (await fs.readFile(ruleFilePath, "utf8")).trim()
 		}),
 	).then((contents) => contents.filter(Boolean).join("\n\n"))
 
