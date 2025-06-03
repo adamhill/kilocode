@@ -1224,8 +1224,6 @@ export class ClineProvider extends EventEmitter<ClineProviderEvents> implements 
 		if (!workspacePath) {
 			return
 		}
-
-		// Get rules data
 		const rulesData = await this.getRulesData(workspacePath)
 		this.postMessageToWebview({ type: "rulesData", ...rulesData })
 	}
@@ -1253,18 +1251,11 @@ export class ClineProvider extends EventEmitter<ClineProviderEvents> implements 
 			((await this.contextProxy.getWorkspaceState(this.context, "workflowToggles")) as Record<string, boolean>) ||
 			{}
 
-		const [globalRules, localRules, globalWorkflows, localWorkflows] = await Promise.all([
-			this.getRulesFromDirectory(globalRulesDir, globalRulesToggleState),
-			this.getRulesFromDirectory(localRulesDir, localRulesToggleState),
-			this.getRulesFromDirectory(globalWorkflowsDir, globalWorkflowToggleState),
-			this.getRulesFromDirectory(localWorkflowsDir, localWorkflowToggleState),
-		])
-
 		return {
-			globalRules,
-			localRules,
-			globalWorkflows,
-			localWorkflows,
+			globalRules: await this.getRulesFromDirectory(globalRulesDir, globalRulesToggleState),
+			localRules: await this.getRulesFromDirectory(localRulesDir, localRulesToggleState),
+			globalWorkflows: await this.getRulesFromDirectory(globalWorkflowsDir, globalWorkflowToggleState),
+			localWorkflows: await this.getRulesFromDirectory(localWorkflowsDir, localWorkflowToggleState),
 		}
 	}
 
