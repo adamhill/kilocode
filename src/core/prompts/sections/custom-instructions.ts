@@ -210,8 +210,11 @@ async function loadRulesFromDirectory(
 		return null
 	}
 
-	const filePaths = files.map((f) => f.filename)
-	const rulesContent = await getRuleFilesTotalContent(filePaths, rulesDir, toggleState)
+	const rulesContent = await getRuleFilesTotalContent(
+		files.map((f) => f.filename),
+		rulesDir,
+		toggleState,
+	)
 
 	return rulesContent ? `# ${label} from ${rulesDir}:\n${rulesContent}` : null
 }
