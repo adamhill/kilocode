@@ -1499,17 +1499,25 @@ export const webviewMessageHandler = async (provider: ClineProvider, message: We
 			if (filename && typeof isGlobal === "boolean") {
 				try {
 					const workspacePath = getWorkspacePath()
-					if (!workspacePath) {
+					if (!workspacePath && !isGlobal) {
 						vscode.window.showErrorMessage("No workspace folder found")
 						break
 					}
 
 					// Determine the rules directory path
-					const rulesDir = isGlobal
-						? path.join(workspacePath, ".kilocode", "rules")
-						: ruleType === "workflow"
-							? path.join(workspacePath, ".kilocode", "workflows")
-							: path.join(workspacePath, ".kilocode", "rules")
+					let rulesDir: string
+					if (isGlobal) {
+						const homeDir = require("os").homedir()
+						rulesDir =
+							ruleType === "workflow"
+								? path.join(homeDir, ".kilocode", "workflows")
+								: path.join(homeDir, ".kilocode", "rules")
+					} else {
+						rulesDir =
+							ruleType === "workflow"
+								? path.join(workspacePath, ".kilocode", "workflows")
+								: path.join(workspacePath, ".kilocode", "rules")
+					}
 
 					// Ensure the directory exists
 					await fs.mkdir(rulesDir, { recursive: true })

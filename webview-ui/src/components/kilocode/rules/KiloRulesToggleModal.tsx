@@ -203,7 +203,7 @@ const KiloRulesToggleModal: React.FC = () => {
 									}
 									listGap="small"
 									isGlobal={true}
-									ruleType="kilocode"
+									ruleType="rule"
 									showNewRule={true}
 									showNoRules={false}
 								/>
@@ -221,7 +221,7 @@ const KiloRulesToggleModal: React.FC = () => {
 									}
 									listGap="small"
 									isGlobal={false}
-									ruleType="kilocode"
+									ruleType="rule"
 									showNewRule={true}
 									showNoRules={false}
 								/>

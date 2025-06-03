@@ -62,7 +62,7 @@ const NewRuleRow: React.FC<NewRuleRowProps> = ({ isGlobal, ruleType }) => {
 					type: "createRuleFile",
 					isGlobal,
 					filename: finalFilename,
-					ruleType: ruleType || "kilocode",
+					ruleType: ruleType || "rule",
 				})
 			} catch (err) {
 				console.error("Error creating rule file:", err)
