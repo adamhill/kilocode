@@ -76,11 +76,12 @@ const KiloRulesToggleModal: React.FC = () => {
 		})
 	}
 
-	const toggleWorkflow = (_isGlobal: boolean, workflowPath: string, enabled: boolean) => {
+	const toggleWorkflow = (isGlobal: boolean, workflowPath: string, enabled: boolean) => {
 		vscode.postMessage({
 			type: "toggleWorkflow",
 			workflowPath,
 			enabled,
+			isGlobal,
 		})
 	}
 
