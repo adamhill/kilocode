@@ -105,8 +105,8 @@ ${await addCustomInstructions(
 	{
 		language: language ?? formatLanguage(vscode.env.language),
 		rooIgnoreInstructions,
-		localRulesToggleState: context.workspaceState.get("localRules") || {},
-		globalRulesToggleState: context.globalState.get("globalRules") || {},
+		localRulesToggleState: context.workspaceState.get("localRulesToggles") || {},
+		globalRulesToggleState: context.globalState.get("globalRulesToggles") || {},
 	},
 )}`
 
