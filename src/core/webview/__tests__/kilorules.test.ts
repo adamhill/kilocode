@@ -1,4 +1,4 @@
-import { toggleWorkflow, toggleRule, createRule, deleteRule } from "../kilorules"
+import { toggleWorkflow, toggleRule, createRuleFile, deleteRuleFile } from "../kilorules"
 import * as vscode from "vscode"
 import * as fs from "fs/promises"
 import * as path from "path"
@@ -117,7 +117,7 @@ describe("kilorules", () => {
 			;(getWorkspacePath as jest.Mock).mockReturnValue("/workspace")
 			;(fileExistsAtPath as jest.Mock).mockResolvedValue(false)
 
-			await createRule("test-rule.md", true, "rule")
+			await createRuleFile("test-rule.md", true, "rule")
 
 			expect(fs.mkdir).toHaveBeenCalledWith("/home/user/.kilocode/rules", { recursive: true })
 			expect(fs.writeFile).toHaveBeenCalledWith(
@@ -132,7 +132,7 @@ describe("kilorules", () => {
 			;(getWorkspacePath as jest.Mock).mockReturnValue("/workspace")
 			;(fileExistsAtPath as jest.Mock).mockResolvedValue(false)
 
-			await createRule("test-workflow.md", false, "workflow")
+			await createRuleFile("test-workflow.md", false, "workflow")
 
 			expect(fs.mkdir).toHaveBeenCalledWith("/workspace/.kilocode/workflows", { recursive: true })
 			expect(fs.writeFile).toHaveBeenCalledWith(
@@ -147,7 +147,7 @@ describe("kilorules", () => {
 			;(getWorkspacePath as jest.Mock).mockReturnValue("/workspace")
 			;(fileExistsAtPath as jest.Mock).mockResolvedValue(true)
 
-			await createRule("existing-rule.md", false, "rule")
+			await createRuleFile("existing-rule.md", false, "rule")
 
 			expect(vscode.window.showErrorMessage).toHaveBeenCalledWith("File existing-rule.md already exists")
 			expect(fs.writeFile).not.toHaveBeenCalled()
@@ -158,7 +158,7 @@ describe("kilorules", () => {
 		it("should delete file when user confirms", async () => {
 			;(vscode.window.showWarningMessage as jest.Mock).mockResolvedValue("Delete")
 
-			await deleteRule("/path/to/rule.md")
+			await deleteRuleFile("/path/to/rule.md")
 
 			expect(vscode.window.showWarningMessage).toHaveBeenCalledWith(
 				"Are you sure you want to delete rule.md?",
@@ -172,7 +172,7 @@ describe("kilorules", () => {
 		it("should not delete file when user cancels", async () => {
 			;(vscode.window.showWarningMessage as jest.Mock).mockResolvedValue(undefined)
 
-			await deleteRule("/path/to/rule.md")
+			await deleteRuleFile("/path/to/rule.md")
 
 			expect(fs.unlink).not.toHaveBeenCalled()
 		})

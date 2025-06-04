@@ -40,9 +40,8 @@ import { Mode, defaultModeSlug } from "../../shared/modes"
 import { getModels, flushModels } from "../../api/providers/fetchers/modelCache"
 import { GetModelsOptions } from "../../shared/api"
 import { generateSystemPrompt } from "./generateSystemPrompt"
-import { ClineRulesToggles } from "../../shared/cline-rules" // kilocode_change
 import { getCommand } from "../../utils/commands"
-import { toggleWorkflow, toggleRule, createRule as createRuleFile, deleteRule as deleteRuleFile } from "./kilorules"
+import { toggleWorkflow, toggleRule, createRuleFile, deleteRuleFile } from "./kilorules"
 
 const ALLOWED_VSCODE_SETTINGS = new Set(["terminal.integrated.inheritEnv"])
 
