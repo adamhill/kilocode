@@ -79,31 +79,30 @@ export function shouldShowSlashCommandsMenu(text: string, cursorPosition: number
 }
 
 // kilocode_change start
+/**
+ * Helper function to process workflow toggles into SlashCommand objects
+ */
+function processWorkflowToggles(workflowToggles: Record<string, boolean>): SlashCommand[] {
+	return Object.entries(workflowToggles)
+		.filter(([_, enabled]) => enabled)
+		.map(([filePath, _]) => {
+			const fileName = filePath.replace(/^.*[/\\]/, "")
+			return {
+				name: fileName,
+				section: "custom" as const,
+			}
+		})
+}
+
 export function getWorkflowCommands(
 	localWorkflowToggles: Record<string, boolean> = {},
 	globalWorkflowToggles: Record<string, boolean> = {},
 ): SlashCommand[] {
 	// Get enabled local workflows
-	const localWorkflows = Object.entries(localWorkflowToggles)
-		.filter(([_, enabled]) => enabled)
-		.map(([filePath, _]) => {
-			const fileName = filePath.replace(/^.*[/\\]/, "")
-			return {
-				name: fileName,
-				section: "custom" as const,
-			}
-		})
+	const localWorkflows = processWorkflowToggles(localWorkflowToggles)
 
 	// Get enabled global workflows
-	const globalWorkflows = Object.entries(globalWorkflowToggles)
-		.filter(([_, enabled]) => enabled)
-		.map(([filePath, _]) => {
-			const fileName = filePath.replace(/^.*[/\\]/, "")
-			return {
-				name: fileName,
-				section: "custom" as const,
-			}
-		})
+	const globalWorkflows = processWorkflowToggles(globalWorkflowToggles)
 
 	// Local workflows have precedence over global workflows (following Cline's pattern)
 	return [...localWorkflows, ...globalWorkflows]
