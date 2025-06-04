@@ -46,6 +46,7 @@ import type { IndexProgressUpdate } from "../../services/code-index/interfaces/m
 import { fileExistsAtPath } from "../../utils/fs"
 import { setTtsEnabled, setTtsSpeed } from "../../utils/tts"
 import { ContextProxy } from "../config/ContextProxy"
+import { postRulesDataToWebview as postRulesDataToWebviewImpl } from "./kilorules"
 import { ProviderSettingsManager } from "../config/ProviderSettingsManager"
 import { CustomModesManager } from "../config/CustomModesManager"
 import { buildApiHandler } from "../../api"
@@ -1220,63 +1221,9 @@ export class ClineProvider extends EventEmitter<ClineProviderEvents> implements 
 	}
 
 	async postRulesDataToWebview() {
-		const workspacePath = this.cwd
-		if (!workspacePath) {
-			return
-		}
-		const rulesData = await this.getRulesData(workspacePath)
-		this.postMessageToWebview({ type: "rulesData", ...rulesData })
-	}
-
-	private async getRulesData(workspacePath: string) {
-		const globalRulesDir = path.join(os.homedir(), ".kilocode", "rules")
-		const globalWorkflowsDir = path.join(os.homedir(), ".kilocode", "workflows")
-
-		const localRulesDir = path.join(workspacePath, ".kilocode", "rules")
-		const localWorkflowsDir = path.join(workspacePath, ".kilocode", "workflows")
-
-		const globalRulesToggleState =
-			((await this.contextProxy.getGlobalState("globalRulesToggles")) as Record<string, boolean>) || {}
-		const localRulesToggleState =
-			((await this.contextProxy.getWorkspaceState(this.context, "localRulesToggles")) as Record<
-				string,
-				boolean
-			>) || {}
-		const globalWorkflowToggleState =
-			((await this.contextProxy.getGlobalState("globalWorkflowToggles")) as Record<string, boolean>) || {}
-		const localWorkflowToggleState =
-			((await this.contextProxy.getWorkspaceState(this.context, "workflowToggles")) as Record<string, boolean>) ||
-			{}
-
-		return {
-			globalRules: await this.getRulesFromDirectory(globalRulesDir, globalRulesToggleState),
-			localRules: await this.getRulesFromDirectory(localRulesDir, localRulesToggleState),
-			globalWorkflows: await this.getRulesFromDirectory(globalWorkflowsDir, globalWorkflowToggleState),
-			localWorkflows: await this.getRulesFromDirectory(localWorkflowsDir, localWorkflowToggleState),
-		}
-	}
-
-	private async getRulesFromDirectory(
-		dirPath: string,
-		toggleState: Record<string, boolean> = {},
-	): Promise<Record<string, boolean>> {
-		const exists = await fileExistsAtPath(dirPath)
-		if (!exists) {
-			return {}
-		}
-
-		const files = await fs.readdir(dirPath, { withFileTypes: true })
-		const rules: Record<string, boolean> = {}
-
-		for (const file of files) {
-			if (file.isFile() && (file.name.endsWith(".md") || file.name.endsWith(".txt"))) {
-				const filePath = path.join(dirPath, file.name)
-				// Use stored toggle state if available, otherwise default to true
-				rules[filePath] = toggleState[filePath] !== undefined ? toggleState[filePath] : true
-			}
-		}
-
-		return rules
+		await postRulesDataToWebviewImpl(this.cwd, this.contextProxy, this.context, (message) =>
+			this.postMessageToWebview(message),
+		)
 	}
 
 	/**
