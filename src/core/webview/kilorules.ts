@@ -133,10 +133,11 @@ export async function createRule(filename: string, isGlobal: boolean, ruleType: 
 		return
 	}
 
+	const baseFileName = path.basename(filename)
 	const content =
 		ruleType === "workflow"
-			? `# ${filename.replace(/\.[^/.]+$/, "")}\n\nWorkflow description here...\n\n## Steps\n\n1. Step 1\n2. Step 2\n`
-			: `# ${filename.replace(/\.[^/.]+$/, "")}\n\nRule description here...\n\n## Guidelines\n\n- Guideline 1\n- Guideline 2\n`
+			? `# ${baseFileName}\n\nWorkflow description here...\n\n## Steps\n\n1. Step 1\n2. Step 2\n`
+			: `# ${baseFileName}\n\nRule description here...\n\n## Guidelines\n\n- Guideline 1\n- Guideline 2\n`
 
 	await fs.writeFile(filePath, content, "utf8")
 	await openFile(filePath)
