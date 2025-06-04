@@ -344,11 +344,12 @@ export const ExtensionStateContextProvider: React.FC<{ children: React.ReactNode
 		currentCheckpoint,
 		filePaths,
 		openedTabs,
-		// kilocode_change: Rules data
+		// kilocode_change start
 		globalRules,
 		localRules,
 		globalWorkflows,
 		localWorkflows,
+		// kilocode_change end
 		soundVolume: state.soundVolume,
 		ttsSpeed: state.ttsSpeed,
 		fuzzyMatchThreshold: state.fuzzyMatchThreshold,
