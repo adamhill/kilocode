@@ -129,7 +129,7 @@ export interface ExtensionMessage {
 	url?: string // kilocode_change
 	setting?: string
 	value?: any
-	payload?: ProfileDataResponsePayload | BalanceDataResponsePayload // New: Add payload for profile and balance data
+	payload?: ProfileDataResponsePayload | BalanceDataResponsePayload // kilocode_change: Add payload for profile and balance data
 	userInfo?: CloudUserInfo
 	organizationAllowList?: OrganizationAllowList
 	// kilocode_change: Rules data
