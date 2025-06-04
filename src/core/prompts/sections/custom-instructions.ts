@@ -170,10 +170,9 @@ function formatDirectoryContent(dirPath: string, files: Array<{ filename: string
 	)
 }
 
-/**
- * Load rules from a specific directory with toggle state filtering
- */
-async function loadRulesFromDirectory(
+// kilocode_change start: added functions
+
+async function loadEnabledRulesFromDirectory(
 	rulesDir: string,
 	toggleState: Record<string, boolean>,
 	label: string,
@@ -196,22 +195,25 @@ async function loadRulesFromDirectory(
 	return rulesContent ? `# ${label} from ${rulesDir}:\n${rulesContent}` : null
 }
 
-/**
- * Load rule files with toggle state filtering
- */
-export async function loadRuleFilesWithToggles(
+async function loadEnabledRules(
 	cwd: string,
-	localRulesToggleState: Record<string, boolean> = {},
-	globalRulesToggleState: Record<string, boolean> = {},
+	localRulesToggleState: Record<string, boolean>,
+	globalRulesToggleState: Record<string, boolean>,
 ): Promise<string> {
-	const globalRulesDir = path.join(require("os").homedir(), ".kilocode", "rules")
-	const localRulesDir = path.join(cwd, ".kilocode", "rules")
-
-	const globalRulesContent = await loadRulesFromDirectory(globalRulesDir, globalRulesToggleState, "Global Rules")
-	const localRulesContent = await loadRulesFromDirectory(localRulesDir, localRulesToggleState, "Local Rules")
-
+	const globalRulesContent = await loadEnabledRulesFromDirectory(
+		path.join(require("os").homedir(), ".kilocode", "rules"),
+		globalRulesToggleState,
+		"Global Rules",
+	)
+	const localRulesContent = await loadEnabledRulesFromDirectory(
+		path.join(cwd, ".kilocode", "rules"),
+		localRulesToggleState,
+		"Local Rules",
+	)
 	return [globalRulesContent, localRulesContent].filter(Boolean).join("\n\n")
 }
+
+// kilocode_change end
 
 /**
  * Load rule files from the specified directory (legacy function)
@@ -355,11 +357,7 @@ export async function addCustomInstructions(
 	if (options.localRulesToggleState || options.globalRulesToggleState) {
 		const genericRuleContent =
 			(
-				await loadRuleFilesWithToggles(
-					cwd,
-					options.localRulesToggleState || {},
-					options.globalRulesToggleState || {},
-				)
+				await loadEnabledRules(cwd, options.localRulesToggleState || {}, options.globalRulesToggleState || {})
 			)?.trim() ?? ""
 		if (genericRuleContent) {
 			rules.push(genericRuleContent)
