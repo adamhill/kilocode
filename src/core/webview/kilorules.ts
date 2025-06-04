@@ -12,7 +12,7 @@ export interface RulesData {
 	localWorkflows: Record<string, boolean>
 }
 
-export async function getRulesData(
+export async function getEnabledRules(
 	workspacePath: string,
 	contextProxy: ContextProxy,
 	context: vscode.ExtensionContext,
@@ -33,14 +33,14 @@ export async function getRulesData(
 		((await contextProxy.getWorkspaceState(context, "workflowToggles")) as Record<string, boolean>) || {}
 
 	return {
-		globalRules: await getRulesFromDirectory(globalRulesDir, globalRulesToggleState),
-		localRules: await getRulesFromDirectory(localRulesDir, localRulesToggleState),
-		globalWorkflows: await getRulesFromDirectory(globalWorkflowsDir, globalWorkflowToggleState),
-		localWorkflows: await getRulesFromDirectory(localWorkflowsDir, localWorkflowToggleState),
+		globalRules: await getEnabledRulesFromDirectory(globalRulesDir, globalRulesToggleState),
+		localRules: await getEnabledRulesFromDirectory(localRulesDir, localRulesToggleState),
+		globalWorkflows: await getEnabledRulesFromDirectory(globalWorkflowsDir, globalWorkflowToggleState),
+		localWorkflows: await getEnabledRulesFromDirectory(localWorkflowsDir, localWorkflowToggleState),
 	}
 }
 
-export async function getRulesFromDirectory(
+async function getEnabledRulesFromDirectory(
 	dirPath: string,
 	toggleState: Record<string, boolean> = {},
 ): Promise<Record<string, boolean>> {
@@ -55,8 +55,7 @@ export async function getRulesFromDirectory(
 	for (const file of files) {
 		if (file.isFile() && (file.name.endsWith(".md") || file.name.endsWith(".txt"))) {
 			const filePath = path.join(dirPath, file.name)
-			// Use stored toggle state if available, otherwise default to true
-			rules[filePath] = toggleState[filePath] !== undefined ? toggleState[filePath] : true
+			rules[filePath] = toggleState[filePath] ?? true
 		}
 	}
 

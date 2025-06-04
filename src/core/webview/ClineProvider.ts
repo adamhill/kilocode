@@ -53,7 +53,7 @@ import type { IndexProgressUpdate } from "../../services/code-index/interfaces/m
 import { fileExistsAtPath } from "../../utils/fs"
 import { setTtsEnabled, setTtsSpeed } from "../../utils/tts"
 import { ContextProxy } from "../config/ContextProxy"
-import { getRulesData } from "./kilorules"
+import { getEnabledRules } from "./kilorules"
 import { ProviderSettingsManager } from "../config/ProviderSettingsManager"
 import { CustomModesManager } from "../config/CustomModesManager"
 import { buildApiHandler } from "../../api"
@@ -1251,7 +1251,7 @@ export class ClineProvider extends EventEmitter<ClineProviderEvents> implements 
 		if (workspacePath) {
 			this.postMessageToWebview({
 				type: "rulesData",
-				...(await getRulesData(workspacePath, this.contextProxy, this.context)),
+				...(await getEnabledRules(workspacePath, this.contextProxy, this.context)),
 			})
 		}
 	}
