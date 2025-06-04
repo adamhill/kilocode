@@ -6,6 +6,8 @@ import type {
 	ModeConfig,
 	ExperimentId,
 	ClineMessage,
+	OrganizationAllowList,
+	CloudUserInfo,
 } from "@roo-code/types"
 
 import { GitCommit } from "../utils/git"
@@ -73,6 +75,7 @@ export interface ExtensionMessage {
 		| "vsCodeSetting"
 		| "profileDataResponse" // kilocode_change
 		| "balanceDataResponse" // kilocode_change
+		| "authenticatedUser"
 		| "condenseTaskContextResponse"
 		| "singleRouterModelFetchResponse"
 		| "indexingStatusUpdate"
@@ -85,7 +88,8 @@ export interface ExtensionMessage {
 		| "settingsButtonClicked"
 		| "historyButtonClicked"
 		| "promptsButtonClicked"
-		| "profileButtonClicked"
+		| "profileButtonClicked" // kilocode_change
+		| "accountButtonClicked"
 		| "didBecomeVisible"
 		| "focusChatInput" // kilocode_change
 	invoke?: "newChat" | "sendMessage" | "primaryButtonClick" | "secondaryButtonClick" | "setChatBoxMessage"
@@ -126,6 +130,8 @@ export interface ExtensionMessage {
 	setting?: string
 	value?: any
 	payload?: ProfileDataResponsePayload | BalanceDataResponsePayload // New: Add payload for profile and balance data
+	userInfo?: CloudUserInfo
+	organizationAllowList?: OrganizationAllowList
 	// kilocode_change: Rules data
 	globalRules?: Record<string, boolean>
 	localRules?: Record<string, boolean>
@@ -171,6 +177,7 @@ export type ExtensionState = Pick<
 	// | "maxWorkspaceFiles" // Optional in GlobalSettings, required here.
 	// | "showRooIgnoredFiles" // Optional in GlobalSettings, required here.
 	// | "maxReadFileLine" // Optional in GlobalSettings, required here.
+	| "maxConcurrentFileReads" // Optional in GlobalSettings, required here.
 	| "terminalOutputLineLimit"
 	| "terminalShellIntegrationTimeout"
 	| "terminalShellIntegrationDisabled"
@@ -237,6 +244,11 @@ export type ExtensionState = Pick<
 	renderContext: "sidebar" | "editor"
 	settingsImportedAt?: number
 	historyPreviewCollapsed?: boolean
+
+	cloudUserInfo: CloudUserInfo | null
+	organizationAllowList: OrganizationAllowList
+
+	autoCondenseContext: boolean
 	autoCondenseContextPercent: number
 }
 
@@ -265,6 +277,7 @@ export interface ClineSayTool {
 	mode?: string
 	reason?: string
 	isOutsideWorkspace?: boolean
+	additionalFileCount?: number // Number of additional files in the same read_file request
 	search?: string
 	replace?: string
 	useRegex?: boolean
@@ -273,6 +286,13 @@ export interface ClineSayTool {
 	endLine?: number
 	lineNumber?: number
 	query?: string
+	batchFiles?: Array<{
+		path: string
+		lineSnippet: string
+		isOutsideWorkspace?: boolean
+		key: string
+	}>
+	question?: string
 }
 
 // Must keep in sync with system prompt.
