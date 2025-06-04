@@ -201,7 +201,7 @@ export type ExtensionState = Pick<
 	| "customModePrompts"
 	| "customSupportPrompts"
 	| "enhancementApiConfigId"
-	| "workflowToggles" // kilocode_change
+	| "localWorkflowToggles" // kilocode_change
 	| "globalRulesToggles" // kilocode_change
 	| "localRulesToggles" // kilocode_change
 	| "globalWorkflowToggles" // kilocode_change

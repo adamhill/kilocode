@@ -53,7 +53,7 @@ export const globalSettingsSchema = z.object({
 	browserToolEnabled: z.boolean().optional(),
 	browserViewportSize: z.string().optional(),
 	showAutoApproveMenu: z.boolean().optional(), // kilocode_change
-	workflowToggles: z.record(z.string(), z.boolean()).optional(), // kilocode_change
+	localWorkflowToggles: z.record(z.string(), z.boolean()).optional(), // kilocode_change
 	globalRulesToggles: z.record(z.string(), z.boolean()).optional(), // kilocode_change
 	localRulesToggles: z.record(z.string(), z.boolean()).optional(), // kilocode_change
 	globalWorkflowToggles: z.record(z.string(), z.boolean()).optional(), // kilocode_change
@@ -197,7 +197,7 @@ export const GLOBAL_SETTINGS_KEYS = keysOf<GlobalSettings>()([
 	"historyPreviewCollapsed",
 
 	"showAutoApproveMenu", // kilocode_change
-	"workflowToggles", // kilocode_change
+	"localWorkflowToggles", // kilocode_change
 	"globalRulesToggles", // kilocode_change
 	"localRulesToggles", // kilocode_change
 	"globalWorkflowToggles", // kilocode_change

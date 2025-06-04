@@ -40,7 +40,7 @@ export async function getEnabledRules(
 		),
 		localWorkflows: await getEnabledRulesFromDirectory(
 			path.join(workspacePath, workflowsSubfolder),
-			((await contextProxy.getWorkspaceState(context, "workflowToggles")) as Record<string, boolean>) || {},
+			((await contextProxy.getWorkspaceState(context, "localWorkflowToggles")) as Record<string, boolean>) || {},
 		),
 	}
 }
@@ -79,9 +79,10 @@ export async function toggleWorkflow(
 		toggles[workflowPath] = enabled
 		await contextProxy.updateGlobalState("globalWorkflowToggles", toggles)
 	} else {
-		const toggles = ((await contextProxy.getWorkspaceState(context, "workflowToggles")) as ClineRulesToggles) || {}
+		const toggles =
+			((await contextProxy.getWorkspaceState(context, "localWorkflowToggles")) as ClineRulesToggles) || {}
 		toggles[workflowPath] = enabled
-		await contextProxy.updateWorkspaceState(context, "workflowToggles", toggles)
+		await contextProxy.updateWorkspaceState(context, "localWorkflowToggles", toggles)
 	}
 }
 

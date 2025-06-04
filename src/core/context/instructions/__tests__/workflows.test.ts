@@ -60,8 +60,12 @@ describe("refreshWorkflowToggles", () => {
 		expect(mockProxy.updateGlobalState).toHaveBeenCalledWith("globalWorkflowToggles", updatedGlobalToggles)
 
 		// Verify local state operations
-		expect(mockProxy.getWorkspaceState).toHaveBeenCalledWith(mockContext, "workflowToggles")
-		expect(mockProxy.updateWorkspaceState).toHaveBeenCalledWith(mockContext, "workflowToggles", updatedLocalToggles)
+		expect(mockProxy.getWorkspaceState).toHaveBeenCalledWith(mockContext, "localWorkflowToggles")
+		expect(mockProxy.updateWorkspaceState).toHaveBeenCalledWith(
+			mockContext,
+			"localWorkflowToggles",
+			updatedLocalToggles,
+		)
 
 		// Verify synchronizeRuleToggles calls
 		expect(mockSynchronizeRuleToggles).toHaveBeenCalledTimes(2)

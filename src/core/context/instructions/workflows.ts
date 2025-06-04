@@ -12,10 +12,10 @@ async function refreshLocalWorkflowToggles(
 	workingDirectory: string,
 ) {
 	const workflowRulesToggles =
-		((await proxy.getWorkspaceState(context, "workflowToggles")) as ClineRulesToggles) || {}
+		((await proxy.getWorkspaceState(context, "localWorkflowToggles")) as ClineRulesToggles) || {}
 	const workflowsDirPath = path.resolve(workingDirectory, GlobalFileNames.workflows)
 	const updatedWorkflowToggles = await synchronizeRuleToggles(workflowsDirPath, workflowRulesToggles)
-	await proxy.updateWorkspaceState(context, "workflowToggles", updatedWorkflowToggles)
+	await proxy.updateWorkspaceState(context, "localWorkflowToggles", updatedWorkflowToggles)
 	return updatedWorkflowToggles
 }
 

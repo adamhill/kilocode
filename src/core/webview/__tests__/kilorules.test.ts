@@ -79,8 +79,8 @@ describe("kilorules", () => {
 
 			await toggleWorkflow("/path/to/workflow", true, false, mockContextProxy, mockContext)
 
-			expect(mockContextProxy.getWorkspaceState).toHaveBeenCalledWith(mockContext, "workflowToggles")
-			expect(mockContextProxy.updateWorkspaceState).toHaveBeenCalledWith(mockContext, "workflowToggles", {
+			expect(mockContextProxy.getWorkspaceState).toHaveBeenCalledWith(mockContext, "localWorkflowToggles")
+			expect(mockContextProxy.updateWorkspaceState).toHaveBeenCalledWith(mockContext, "localWorkflowToggles", {
 				"/path/to/workflow": true,
 			})
 		})
