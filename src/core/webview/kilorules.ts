@@ -15,16 +15,19 @@ export interface RulesData {
 	localWorkflows: Record<string, boolean>
 }
 
+const rulesSubfolder = path.join(".kilocode", "rules")
+const workflowsSubfolder = path.join(".kilocode", "workflows")
+
 export async function getEnabledRules(
 	workspacePath: string,
 	contextProxy: ContextProxy,
 	context: vscode.ExtensionContext,
 ): Promise<RulesData> {
-	const globalRulesDir = path.join(os.homedir(), ".kilocode", "rules")
-	const globalWorkflowsDir = path.join(os.homedir(), ".kilocode", "workflows")
+	const globalRulesDir = path.join(os.homedir(), rulesSubfolder)
+	const globalWorkflowsDir = path.join(os.homedir(), workflowsSubfolder)
 
-	const localRulesDir = path.join(workspacePath, ".kilocode", "rules")
-	const localWorkflowsDir = path.join(workspacePath, ".kilocode", "workflows")
+	const localRulesDir = path.join(workspacePath, rulesSubfolder)
+	const localWorkflowsDir = path.join(workspacePath, workflowsSubfolder)
 
 	const globalRulesToggleState =
 		((await contextProxy.getGlobalState("globalRulesToggles")) as Record<string, boolean>) || {}
@@ -112,15 +115,12 @@ export async function createRule(filename: string, isGlobal: boolean, ruleType: 
 	let rulesDir: string
 	if (isGlobal) {
 		const homeDir = os.homedir()
-		rulesDir =
-			ruleType === "workflow"
-				? path.join(homeDir, ".kilocode", "workflows")
-				: path.join(homeDir, ".kilocode", "rules")
+		rulesDir = ruleType === "workflow" ? path.join(homeDir, workflowsSubfolder) : path.join(homeDir, rulesSubfolder)
 	} else {
 		rulesDir =
 			ruleType === "workflow"
-				? path.join(workspacePath, ".kilocode", "workflows")
-				: path.join(workspacePath, ".kilocode", "rules")
+				? path.join(workspacePath, workflowsSubfolder)
+				: path.join(workspacePath, rulesSubfolder)
 	}
 
 	await fs.mkdir(rulesDir, { recursive: true })
