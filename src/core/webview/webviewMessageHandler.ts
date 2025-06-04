@@ -42,7 +42,7 @@ import { GetModelsOptions } from "../../shared/api"
 import { generateSystemPrompt } from "./generateSystemPrompt"
 import { ClineRulesToggles } from "../../shared/cline-rules" // kilocode_change
 import { getCommand } from "../../utils/commands"
-import { toggleWorkflow, toggleRule, createRule, deleteRule } from "./kilorules"
+import { toggleWorkflow, toggleRule, createRule as createRuleFile, deleteRule as deleteRuleFile } from "./kilorules"
 
 const ALLOWED_VSCODE_SETTINGS = new Set(["terminal.integrated.inheritEnv"])
 
@@ -1503,7 +1503,7 @@ export const webviewMessageHandler = async (provider: ClineProvider, message: We
 			const { filename, isGlobal, ruleType } = message
 			if (filename && typeof isGlobal === "boolean" && ruleType) {
 				try {
-					await createRule(filename, isGlobal, ruleType)
+					await createRuleFile(filename, isGlobal, ruleType)
 					await provider.postRulesDataToWebview()
 				} catch (error) {
 					console.error("Error creating rule file:", error)
@@ -1517,7 +1517,7 @@ export const webviewMessageHandler = async (provider: ClineProvider, message: We
 			const { rulePath } = message
 			if (rulePath) {
 				try {
-					await deleteRule(rulePath)
+					await deleteRuleFile(rulePath)
 					await provider.postRulesDataToWebview()
 				} catch (error) {
 					console.error("Error deleting rule file:", error)
