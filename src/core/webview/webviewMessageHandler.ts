@@ -1512,11 +1512,11 @@ export const webviewMessageHandler = async (provider: ClineProvider, message: We
 			if (message.filename && typeof message.isGlobal === "boolean" && message.ruleType) {
 				try {
 					await createRuleFile(message.filename, message.isGlobal, message.ruleType)
-					await provider.postRulesDataToWebview()
 				} catch (error) {
 					console.error("Error creating rule file:", error)
-					vscode.window.showErrorMessage(`Failed to create rule file: ${error}`)
+					vscode.window.showErrorMessage("Failed to create rule file.")
 				}
+				await provider.postRulesDataToWebview()
 			}
 			break
 		}
@@ -1525,11 +1525,11 @@ export const webviewMessageHandler = async (provider: ClineProvider, message: We
 			if (message.rulePath) {
 				try {
 					await deleteRuleFile(message.rulePath)
-					await provider.postRulesDataToWebview()
 				} catch (error) {
 					console.error("Error deleting rule file:", error)
-					vscode.window.showErrorMessage(`Failed to delete rule file: ${error}`)
+					vscode.window.showErrorMessage("Failed to delete rule file.")
 				}
+				await provider.postRulesDataToWebview()
 			}
 			break
 		}
