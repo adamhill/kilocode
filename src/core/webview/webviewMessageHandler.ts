@@ -1514,7 +1514,7 @@ export const webviewMessageHandler = async (provider: ClineProvider, message: We
 					await createRuleFile(message.filename, message.isGlobal, message.ruleType)
 				} catch (error) {
 					console.error("Error creating rule file:", error)
-					vscode.window.showErrorMessage("Failed to create rule file.")
+					vscode.window.showErrorMessage(t("kilocode:rules.errors.failedToCreateRuleFile"))
 				}
 				await provider.postRulesDataToWebview()
 			}
@@ -1527,7 +1527,7 @@ export const webviewMessageHandler = async (provider: ClineProvider, message: We
 					await deleteRuleFile(message.rulePath)
 				} catch (error) {
 					console.error("Error deleting rule file:", error)
-					vscode.window.showErrorMessage("Failed to delete rule file.")
+					vscode.window.showErrorMessage(t("kilocode:rules.errors.failedToDeleteRuleFile"))
 				}
 				await provider.postRulesDataToWebview()
 			}

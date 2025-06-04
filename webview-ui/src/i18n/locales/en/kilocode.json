@@ -65,7 +65,9 @@
 		},
 		"errors": {
 			"noWorkspaceFound": "No workspace folder found",
-			"fileAlreadyExists": "File {filename} already exists"
+			"fileAlreadyExists": "File {filename} already exists",
+			"failedToCreateRuleFile": "Failed to create rule file.",
+			"failedToDeleteRuleFile": "Failed to delete rule file."
 		},
 		"templates": {
 			"workflow": {
