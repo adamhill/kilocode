@@ -272,12 +272,14 @@ export async function addCustomInstructions(
 	globalCustomInstructions: string,
 	cwd: string,
 	mode: string,
+	// kilocode_change begin: rule toggles
 	options: {
 		language?: string
 		rooIgnoreInstructions?: string
 		localRulesToggleState?: Record<string, boolean>
 		globalRulesToggleState?: Record<string, boolean>
 	} = {},
+	// kilocode_change end
 ): Promise<string> {
 	const sections = []
 
