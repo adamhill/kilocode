@@ -25,6 +25,26 @@ jest.mock("../../../utils/path")
 jest.mock("os", () => ({
 	homedir: () => "/home/user",
 }))
+jest.mock("../../../i18n", () => ({
+	t: jest.fn((key: string, params?: any) => {
+		const translations: Record<string, string> = {
+			"kilocode.rules.errors.noWorkspaceFound": "No workspace folder found",
+			"kilocode.rules.errors.fileAlreadyExists": `File ${params?.filename} already exists`,
+			"kilocode.rules.templates.workflow.description": "Workflow description here...",
+			"kilocode.rules.templates.workflow.stepsHeader": "## Steps",
+			"kilocode.rules.templates.workflow.step1": "Step 1",
+			"kilocode.rules.templates.workflow.step2": "Step 2",
+			"kilocode.rules.templates.rule.description": "Rule description here...",
+			"kilocode.rules.templates.rule.guidelinesHeader": "## Guidelines",
+			"kilocode.rules.templates.rule.guideline1": "Guideline 1",
+			"kilocode.rules.templates.rule.guideline2": "Guideline 2",
+			"kilocode.rules.actions.delete": "Delete",
+			"kilocode.rules.actions.confirmDelete": `Are you sure you want to delete ${params?.filename}?`,
+			"kilocode.rules.actions.deleted": `Deleted ${params?.filename}`,
+		}
+		return translations[key] || key
+	}),
+}))
 
 const mockContextProxy = {
 	getGlobalState: jest.fn(),

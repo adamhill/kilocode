@@ -7,6 +7,7 @@ import { openFile } from "../../integrations/misc/open-file"
 import { getWorkspacePath } from "../../utils/path"
 import type { ContextProxy } from "../config/ContextProxy"
 import type { ClineRulesToggles } from "../../shared/cline-rules"
+import { t } from "../../i18n"
 
 export interface RulesData {
 	globalRules: Record<string, boolean>
@@ -106,7 +107,7 @@ export async function toggleRule(
 export async function createRule(filename: string, isGlobal: boolean, ruleType: string): Promise<void> {
 	const workspacePath = getWorkspacePath()
 	if (!workspacePath && !isGlobal) {
-		vscode.window.showErrorMessage("No workspace folder found")
+		vscode.window.showErrorMessage(t("kilocode.rules.errors.noWorkspaceFound"))
 		return
 	}
 
@@ -126,30 +127,31 @@ export async function createRule(filename: string, isGlobal: boolean, ruleType: 
 	const filePath = path.join(rulesDir, filename)
 
 	if (await fileExistsAtPath(filePath)) {
-		vscode.window.showErrorMessage(`File ${filename} already exists`)
+		vscode.window.showErrorMessage(t("kilocode.rules.errors.fileAlreadyExists", { filename }))
 		return
 	}
 
 	const baseFileName = path.basename(filename)
 	const content =
 		ruleType === "workflow"
-			? `# ${baseFileName}\n\nWorkflow description here...\n\n## Steps\n\n1. Step 1\n2. Step 2\n`
-			: `# ${baseFileName}\n\nRule description here...\n\n## Guidelines\n\n- Guideline 1\n- Guideline 2\n`
+			? `# ${baseFileName}\n\n${t("kilocode.rules.templates.workflow.description")}\n\n${t("kilocode.rules.templates.workflow.stepsHeader")}\n\n1. ${t("kilocode.rules.templates.workflow.step1")}\n2. ${t("kilocode.rules.templates.workflow.step2")}\n`
+			: `# ${baseFileName}\n\n${t("kilocode.rules.templates.rule.description")}\n\n${t("kilocode.rules.templates.rule.guidelinesHeader")}\n\n- ${t("kilocode.rules.templates.rule.guideline1")}\n- ${t("kilocode.rules.templates.rule.guideline2")}\n`
 
 	await fs.writeFile(filePath, content, "utf8")
 	await openFile(filePath)
 }
 
 export async function deleteRule(rulePath: string): Promise<void> {
-	const deleteAction = "Delete"
+	const deleteAction = t("kilocode.rules.actions.delete")
+	const filename = path.basename(rulePath)
 	const result = await vscode.window.showWarningMessage(
-		`Are you sure you want to delete ${path.basename(rulePath)}?`,
+		t("kilocode.rules.actions.confirmDelete", { filename }),
 		{ modal: true },
 		deleteAction,
 	)
 
 	if (result === deleteAction) {
 		await fs.unlink(rulePath)
-		vscode.window.showInformationMessage(`Deleted ${path.basename(rulePath)}`)
+		vscode.window.showInformationMessage(t("kilocode.rules.actions.deleted", { filename }))
 	}
 }

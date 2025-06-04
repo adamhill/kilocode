@@ -62,6 +62,29 @@
 			"workspaceRules": "Workspace Rules",
 			"globalWorkflows": "Global Workflows",
 			"workspaceWorkflows": "Workspace Workflows"
+		},
+		"errors": {
+			"noWorkspaceFound": "No workspace folder found",
+			"fileAlreadyExists": "File {filename} already exists"
+		},
+		"templates": {
+			"workflow": {
+				"description": "Workflow description here...",
+				"stepsHeader": "## Steps",
+				"step1": "Step 1",
+				"step2": "Step 2"
+			},
+			"rule": {
+				"description": "Rule description here...",
+				"guidelinesHeader": "## Guidelines",
+				"guideline1": "Guideline 1",
+				"guideline2": "Guideline 2"
+			}
+		},
+		"actions": {
+			"delete": "Delete",
+			"confirmDelete": "Are you sure you want to delete {filename}?",
+			"deleted": "Deleted {filename}"
 		}
 	}
 }
