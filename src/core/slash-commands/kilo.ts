@@ -2,6 +2,7 @@
 
 import { ClineRulesToggles } from "../../shared/cline-rules"
 import fs from "fs/promises"
+import path from "path"
 import {
 	newTaskToolResponse,
 	newRuleToolResponse,
@@ -9,20 +10,13 @@ import {
 	condenseToolResponse,
 } from "../prompts/commands"
 
-/**
- * Helper function to process workflow toggles into workflow objects
- */
-function processWorkflowToggles(workflowToggles: ClineRulesToggles) {
+function enabledWorkflowToggles(workflowToggles: ClineRulesToggles) {
 	return Object.entries(workflowToggles)
 		.filter(([_, enabled]) => enabled)
-		.map(([filePath, _]) => {
-			const fileName = filePath.replace(/^.*[/\\]/, "")
-
-			return {
-				fullPath: filePath,
-				fileName: fileName,
-			}
-		})
+		.map(([filePath, _]) => ({
+			fullPath: filePath,
+			fileName: path.basename(filePath),
+		}))
 }
 
 /**
@@ -82,8 +76,8 @@ export async function parseKiloSlashCommands(
 			}
 
 			// in practice we want to minimize this work, so we only do it if theres a possible match
-			const globalWorkflows = processWorkflowToggles(globalWorkflowToggles)
-			const localWorkflows = processWorkflowToggles(localWorkflowToggles)
+			const globalWorkflows = enabledWorkflowToggles(globalWorkflowToggles)
+			const localWorkflows = enabledWorkflowToggles(localWorkflowToggles)
 
 			// local workflows have precedence over global workflows
 			const enabledWorkflows = [...localWorkflows, ...globalWorkflows]
