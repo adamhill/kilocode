@@ -1,6 +1,5 @@
 /* eslint no-misleading-character-class: 0 */
 // kilocode_change: this file was pulled from Cline and adjusted for us
-import path from "path"
 
 import { getAllModes } from "@roo/modes"
 
@@ -84,7 +83,7 @@ function enabledWorkflowToggles(workflowToggles: Record<string, boolean>): Slash
 	return Object.entries(workflowToggles)
 		.filter(([_, enabled]) => enabled)
 		.map(([filePath, _]) => ({
-			name: path.basename(filePath),
+			name: filePath.replace(/^.*[/\\]/, ""),
 			section: "custom",
 		}))
 }
