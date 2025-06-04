@@ -127,8 +127,7 @@ export async function createRule(filename: string, isGlobal: boolean, ruleType: 
 
 	const filePath = path.join(rulesDir, filename)
 
-	const exists = await fileExistsAtPath(filePath)
-	if (exists) {
+	if (await fileExistsAtPath(filePath)) {
 		vscode.window.showErrorMessage(`File ${filename} already exists`)
 		return
 	}
