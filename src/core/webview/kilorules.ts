@@ -134,8 +134,24 @@ export async function createRule(filename: string, isGlobal: boolean, ruleType: 
 	const baseFileName = path.basename(filename)
 	const content =
 		ruleType === "workflow"
-			? `# ${baseFileName}\n\n${t("kilocode.rules.templates.workflow.description")}\n\n${t("kilocode.rules.templates.workflow.stepsHeader")}\n\n1. ${t("kilocode.rules.templates.workflow.step1")}\n2. ${t("kilocode.rules.templates.workflow.step2")}\n`
-			: `# ${baseFileName}\n\n${t("kilocode.rules.templates.rule.description")}\n\n${t("kilocode.rules.templates.rule.guidelinesHeader")}\n\n- ${t("kilocode.rules.templates.rule.guideline1")}\n- ${t("kilocode.rules.templates.rule.guideline2")}\n`
+			? `# ${baseFileName}
+
+${t("kilocode.rules.templates.workflow.description")}
+
+${t("kilocode.rules.templates.workflow.stepsHeader")}
+
+1. ${t("kilocode.rules.templates.workflow.step1")}
+2. ${t("kilocode.rules.templates.workflow.step2")}
+`
+			: `# ${baseFileName}
+
+${t("kilocode.rules.templates.rule.description")}
+
+${t("kilocode.rules.templates.rule.guidelinesHeader")}
+
+- ${t("kilocode.rules.templates.rule.guideline1")}
+- ${t("kilocode.rules.templates.rule.guideline2")}
+`
 
 	await fs.writeFile(filePath, content, "utf8")
 	await openFile(filePath)
