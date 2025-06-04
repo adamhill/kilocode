@@ -23,26 +23,24 @@ export async function getEnabledRules(
 	contextProxy: ContextProxy,
 	context: vscode.ExtensionContext,
 ): Promise<RulesData> {
-	const globalRulesDir = path.join(os.homedir(), rulesSubfolder)
-	const globalWorkflowsDir = path.join(os.homedir(), workflowsSubfolder)
-
-	const localRulesDir = path.join(workspacePath, rulesSubfolder)
-	const localWorkflowsDir = path.join(workspacePath, workflowsSubfolder)
-
-	const globalRulesToggleState =
-		((await contextProxy.getGlobalState("globalRulesToggles")) as Record<string, boolean>) || {}
-	const localRulesToggleState =
-		((await contextProxy.getWorkspaceState(context, "localRulesToggles")) as Record<string, boolean>) || {}
-	const globalWorkflowToggleState =
-		((await contextProxy.getGlobalState("globalWorkflowToggles")) as Record<string, boolean>) || {}
-	const localWorkflowToggleState =
-		((await contextProxy.getWorkspaceState(context, "workflowToggles")) as Record<string, boolean>) || {}
-
+	const homedir = os.homedir()
 	return {
-		globalRules: await getEnabledRulesFromDirectory(globalRulesDir, globalRulesToggleState),
-		localRules: await getEnabledRulesFromDirectory(localRulesDir, localRulesToggleState),
-		globalWorkflows: await getEnabledRulesFromDirectory(globalWorkflowsDir, globalWorkflowToggleState),
-		localWorkflows: await getEnabledRulesFromDirectory(localWorkflowsDir, localWorkflowToggleState),
+		globalRules: await getEnabledRulesFromDirectory(
+			path.join(homedir, rulesSubfolder),
+			((await contextProxy.getGlobalState("globalRulesToggles")) as Record<string, boolean>) || {},
+		),
+		localRules: await getEnabledRulesFromDirectory(
+			path.join(workspacePath, rulesSubfolder),
+			((await contextProxy.getWorkspaceState(context, "localRulesToggles")) as Record<string, boolean>) || {},
+		),
+		globalWorkflows: await getEnabledRulesFromDirectory(
+			path.join(os.homedir(), workflowsSubfolder),
+			((await contextProxy.getGlobalState("globalWorkflowToggles")) as Record<string, boolean>) || {},
+		),
+		localWorkflows: await getEnabledRulesFromDirectory(
+			path.join(workspacePath, workflowsSubfolder),
+			((await contextProxy.getWorkspaceState(context, "workflowToggles")) as Record<string, boolean>) || {},
+		),
 	}
 }
 
