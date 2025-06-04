@@ -356,7 +356,7 @@ export async function addCustomInstructions(
 		rules.push(options.rooIgnoreInstructions)
 	}
 
-	// Add generic rules with toggle state filtering
+	// kilocode_change start: rule toggles
 	if (options.localRulesToggleState || options.globalRulesToggleState) {
 		const genericRuleContent =
 			(
@@ -372,6 +372,7 @@ export async function addCustomInstructions(
 			rules.push(genericRuleContent)
 		}
 	}
+	// kilocode_change end
 
 	if (rules.length > 0) {
 		sections.push(`Rules:\n\n${rules.join("\n\n")}`)
