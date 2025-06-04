@@ -15,7 +15,8 @@ import {
  */
 export async function parseKiloSlashCommands(
 	text: string,
-	workflowToggles: ClineRulesToggles,
+	localWorkflowToggles: ClineRulesToggles,
+	globalWorkflowToggles: ClineRulesToggles,
 ): Promise<{ processedText: string; needsRulesFileCheck: boolean }> {
 	const SUPPORTED_COMMANDS = ["newtask", "newrule", "reportbug", "smol"]
 
@@ -65,7 +66,7 @@ export async function parseKiloSlashCommands(
 			}
 
 			// in practice we want to minimize this work, so we only do it if theres a possible match
-			const enabledWorkflows = Object.entries(workflowToggles)
+			const globalWorkflows = Object.entries(globalWorkflowToggles)
 				.filter(([_, enabled]) => enabled)
 				.map(([filePath, _]) => {
 					const fileName = filePath.replace(/^.*[/\\]/, "")
@@ -75,6 +76,20 @@ export async function parseKiloSlashCommands(
 						fileName: fileName,
 					}
 				})
+
+			const localWorkflows = Object.entries(localWorkflowToggles)
+				.filter(([_, enabled]) => enabled)
+				.map(([filePath, _]) => {
+					const fileName = filePath.replace(/^.*[/\\]/, "")
+
+					return {
+						fullPath: filePath,
+						fileName: fileName,
+					}
+				})
+
+			// local workflows have precedence over global workflows
+			const enabledWorkflows = [...localWorkflows, ...globalWorkflows]
 
 			// Then check if the command matches any enabled workflow filename
 			const matchingWorkflow = enabledWorkflows.find((workflow) => workflow.fileName === commandName)
