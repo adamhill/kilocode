@@ -42,6 +42,7 @@ import { GetModelsOptions } from "../../shared/api"
 import { generateSystemPrompt } from "./generateSystemPrompt"
 import { ClineRulesToggles } from "../../shared/cline-rules" // kilocode_change
 import { getCommand } from "../../utils/commands"
+import { toggleWorkflow, toggleRule, createRuleFile, deleteRuleFile } from "./kilorules"
 
 const ALLOWED_VSCODE_SETTINGS = new Set(["terminal.integrated.inheritEnv"])
 
@@ -1477,22 +1478,8 @@ export const webviewMessageHandler = async (provider: ClineProvider, message: We
 
 		case "toggleWorkflow": {
 			const { workflowPath, enabled, isGlobal } = message
-			if (workflowPath && typeof enabled === "boolean") {
-				if (isGlobal) {
-					const toggles =
-						((await provider.contextProxy.getGlobalState("globalWorkflowToggles")) as ClineRulesToggles) ||
-						{}
-					toggles[workflowPath] = enabled
-					await provider.contextProxy.updateGlobalState("globalWorkflowToggles", toggles)
-				} else {
-					const toggles =
-						((await provider.contextProxy.getWorkspaceState(
-							provider.context,
-							"workflowToggles",
-						)) as ClineRulesToggles) || {}
-					toggles[workflowPath] = enabled
-					await provider.contextProxy.updateWorkspaceState(provider.context, "workflowToggles", toggles)
-				}
+			if (workflowPath && typeof enabled === "boolean" && typeof isGlobal === "boolean") {
+				await toggleWorkflow(workflowPath, enabled, isGlobal, provider.contextProxy, provider.context)
 				await provider.postRulesDataToWebview()
 			}
 			break
@@ -1506,23 +1493,7 @@ export const webviewMessageHandler = async (provider: ClineProvider, message: We
 		case "toggleRule": {
 			const { rulePath, enabled, isGlobal } = message
 			if (rulePath && typeof enabled === "boolean" && typeof isGlobal === "boolean") {
-				if (isGlobal) {
-					const toggles =
-						((await provider.contextProxy.getGlobalState("globalRulesToggles")) as Record<
-							string,
-							boolean
-						>) || {}
-					toggles[rulePath] = enabled
-					await provider.contextProxy.updateGlobalState("globalRulesToggles", toggles)
-				} else {
-					const toggles =
-						((await provider.contextProxy.getWorkspaceState(
-							provider.context,
-							"localRulesToggles",
-						)) as Record<string, boolean>) || {}
-					toggles[rulePath] = enabled
-					await provider.contextProxy.updateWorkspaceState(provider.context, "localRulesToggles", toggles)
-				}
+				await toggleRule(rulePath, enabled, isGlobal, provider.contextProxy, provider.context)
 				await provider.postRulesDataToWebview()
 			}
 			break
@@ -1530,46 +1501,9 @@ export const webviewMessageHandler = async (provider: ClineProvider, message: We
 
 		case "createRuleFile": {
 			const { filename, isGlobal, ruleType } = message
-			if (filename && typeof isGlobal === "boolean") {
+			if (filename && typeof isGlobal === "boolean" && ruleType) {
 				try {
-					const workspacePath = getWorkspacePath()
-					if (!workspacePath && !isGlobal) {
-						vscode.window.showErrorMessage("No workspace folder found")
-						break
-					}
-					let rulesDir: string
-					if (isGlobal) {
-						const homeDir = require("os").homedir()
-						rulesDir =
-							ruleType === "workflow"
-								? path.join(homeDir, ".kilocode", "workflows")
-								: path.join(homeDir, ".kilocode", "rules")
-					} else {
-						rulesDir =
-							ruleType === "workflow"
-								? path.join(workspacePath, ".kilocode", "workflows")
-								: path.join(workspacePath, ".kilocode", "rules")
-					}
-
-					await fs.mkdir(rulesDir, { recursive: true })
-
-					const filePath = path.join(rulesDir, filename)
-
-					const exists = await fileExistsAtPath(filePath)
-					if (exists) {
-						vscode.window.showErrorMessage(`File ${filename} already exists`)
-						break
-					}
-
-					const content =
-						ruleType === "workflow"
-							? `# ${filename.replace(/\.[^/.]+$/, "")}\n\nWorkflow description here...\n\n## Steps\n\n1. Step 1\n2. Step 2\n`
-							: `# ${filename.replace(/\.[^/.]+$/, "")}\n\nRule description here...\n\n## Guidelines\n\n- Guideline 1\n- Guideline 2\n`
-
-					await fs.writeFile(filePath, content, "utf8")
-
-					await openFile(filePath)
-
+					await createRuleFile(filename, isGlobal, ruleType)
 					await provider.postRulesDataToWebview()
 				} catch (error) {
 					console.error("Error creating rule file:", error)
@@ -1583,17 +1517,8 @@ export const webviewMessageHandler = async (provider: ClineProvider, message: We
 			const { rulePath } = message
 			if (rulePath) {
 				try {
-					const result = await vscode.window.showWarningMessage(
-						`Are you sure you want to delete ${path.basename(rulePath)}?`,
-						{ modal: true },
-						"Delete",
-					)
-
-					if (result === "Delete") {
-						await fs.unlink(rulePath)
-						vscode.window.showInformationMessage(`Deleted ${path.basename(rulePath)}`)
-						await provider.postRulesDataToWebview()
-					}
+					await deleteRuleFile(rulePath)
+					await provider.postRulesDataToWebview()
 				} catch (error) {
 					console.error("Error deleting rule file:", error)
 					vscode.window.showErrorMessage(`Failed to delete rule file: ${error}`)

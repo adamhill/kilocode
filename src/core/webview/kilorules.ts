@@ -3,7 +3,10 @@ import * as path from "path"
 import fs from "fs/promises"
 import * as vscode from "vscode"
 import { fileExistsAtPath } from "../../utils/fs"
+import { openFile } from "../../integrations/misc/open-file"
+import { getWorkspacePath } from "../../utils/path"
 import type { ContextProxy } from "../config/ContextProxy"
+import type { ClineRulesToggles } from "../../shared/cline-rules"
 
 export interface RulesData {
 	globalRules: Record<string, boolean>
@@ -60,4 +63,94 @@ async function getEnabledRulesFromDirectory(
 	}
 
 	return rules
+}
+
+export async function toggleWorkflow(
+	workflowPath: string,
+	enabled: boolean,
+	isGlobal: boolean,
+	contextProxy: ContextProxy,
+	context: vscode.ExtensionContext,
+): Promise<void> {
+	if (isGlobal) {
+		const toggles = ((await contextProxy.getGlobalState("globalWorkflowToggles")) as ClineRulesToggles) || {}
+		toggles[workflowPath] = enabled
+		await contextProxy.updateGlobalState("globalWorkflowToggles", toggles)
+	} else {
+		const toggles = ((await contextProxy.getWorkspaceState(context, "workflowToggles")) as ClineRulesToggles) || {}
+		toggles[workflowPath] = enabled
+		await contextProxy.updateWorkspaceState(context, "workflowToggles", toggles)
+	}
+}
+
+export async function toggleRule(
+	rulePath: string,
+	enabled: boolean,
+	isGlobal: boolean,
+	contextProxy: ContextProxy,
+	context: vscode.ExtensionContext,
+): Promise<void> {
+	if (isGlobal) {
+		const toggles = ((await contextProxy.getGlobalState("globalRulesToggles")) as Record<string, boolean>) || {}
+		toggles[rulePath] = enabled
+		await contextProxy.updateGlobalState("globalRulesToggles", toggles)
+	} else {
+		const toggles =
+			((await contextProxy.getWorkspaceState(context, "localRulesToggles")) as Record<string, boolean>) || {}
+		toggles[rulePath] = enabled
+		await contextProxy.updateWorkspaceState(context, "localRulesToggles", toggles)
+	}
+}
+
+export async function createRuleFile(filename: string, isGlobal: boolean, ruleType: string): Promise<void> {
+	const workspacePath = getWorkspacePath()
+	if (!workspacePath && !isGlobal) {
+		vscode.window.showErrorMessage("No workspace folder found")
+		return
+	}
+
+	let rulesDir: string
+	if (isGlobal) {
+		const homeDir = os.homedir()
+		rulesDir =
+			ruleType === "workflow"
+				? path.join(homeDir, ".kilocode", "workflows")
+				: path.join(homeDir, ".kilocode", "rules")
+	} else {
+		rulesDir =
+			ruleType === "workflow"
+				? path.join(workspacePath, ".kilocode", "workflows")
+				: path.join(workspacePath, ".kilocode", "rules")
+	}
+
+	await fs.mkdir(rulesDir, { recursive: true })
+
+	const filePath = path.join(rulesDir, filename)
+
+	const exists = await fileExistsAtPath(filePath)
+	if (exists) {
+		vscode.window.showErrorMessage(`File ${filename} already exists`)
+		return
+	}
+
+	const content =
+		ruleType === "workflow"
+			? `# ${filename.replace(/\.[^/.]+$/, "")}\n\nWorkflow description here...\n\n## Steps\n\n1. Step 1\n2. Step 2\n`
+			: `# ${filename.replace(/\.[^/.]+$/, "")}\n\nRule description here...\n\n## Guidelines\n\n- Guideline 1\n- Guideline 2\n`
+
+	await fs.writeFile(filePath, content, "utf8")
+	await openFile(filePath)
+}
+
+export async function deleteRuleFile(rulePath: string): Promise<void> {
+	const result = await vscode.window.showWarningMessage(
+		`Are you sure you want to delete ${path.basename(rulePath)}?`,
+		{ modal: true },
+		"Delete",
+	)
+
+	if (result === "Delete") {
+		await fs.unlink(rulePath)
+		vscode.window.showInformationMessage(`Deleted ${path.basename(rulePath)}`)
+	}
 }
