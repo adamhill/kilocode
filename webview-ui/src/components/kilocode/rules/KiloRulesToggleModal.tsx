@@ -5,14 +5,12 @@ import { useTranslation } from "react-i18next"
 import styled from "styled-components"
 
 import Tooltip from "../../common/Tooltip"
-import { useExtensionState } from "@/context/ExtensionStateContext"
 import { vscode } from "@/utils/vscode"
 
 import RulesToggleList from "./RulesToggleList"
 
 const KiloRulesToggleModal: React.FC = () => {
 	const { t } = useTranslation()
-	const { workflowToggles: _workflowToggles = {}, setWorkflowToggles: _setWorkflowToggles } = useExtensionState()
 
 	const [isVisible, setIsVisible] = useState(false)
 	const buttonRef = useRef<HTMLDivElement>(null)

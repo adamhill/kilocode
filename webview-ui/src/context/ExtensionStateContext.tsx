@@ -36,7 +36,6 @@ export interface ExtensionStateContextType extends ExtensionState {
 	filePaths: string[]
 	openedTabs: Array<{ label: string; isActive: boolean; path?: string }>
 	// kilocode_change start
-	setWorkflowToggles: (toggles: Record<string, boolean>) => void
 	globalRules: Record<string, boolean>
 	localRules: Record<string, boolean>
 	globalWorkflows: Record<string, boolean>
@@ -435,12 +434,6 @@ export const ExtensionStateContextProvider: React.FC<{ children: React.ReactNode
 		setHistoryPreviewCollapsed: (value) =>
 			setState((prevState) => ({ ...prevState, historyPreviewCollapsed: value })),
 
-		// kilocode_change
-		setWorkflowToggles: (toggles) =>
-			setState((prevState) => ({
-				...prevState,
-				workflowToggles: toggles,
-			})),
 		setAutoCondenseContext: (value) => setState((prevState) => ({ ...prevState, autoCondenseContext: value })),
 		setAutoCondenseContextPercent: (value) =>
 			setState((prevState) => ({ ...prevState, autoCondenseContextPercent: value })),
