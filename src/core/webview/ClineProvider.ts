@@ -46,7 +46,7 @@ import type { IndexProgressUpdate } from "../../services/code-index/interfaces/m
 import { fileExistsAtPath } from "../../utils/fs"
 import { setTtsEnabled, setTtsSpeed } from "../../utils/tts"
 import { ContextProxy } from "../config/ContextProxy"
-import { postRulesDataToWebview as postRulesDataToWebviewImpl } from "./kilorules"
+import { getRulesData } from "./kilorules"
 import { ProviderSettingsManager } from "../config/ProviderSettingsManager"
 import { CustomModesManager } from "../config/CustomModesManager"
 import { buildApiHandler } from "../../api"
@@ -1221,9 +1221,12 @@ export class ClineProvider extends EventEmitter<ClineProviderEvents> implements 
 	}
 
 	async postRulesDataToWebview() {
-		await postRulesDataToWebviewImpl(this.cwd, this.contextProxy, this.context, (message) =>
-			this.postMessageToWebview(message),
-		)
+		const workspacePath = this.cwd
+		if (!workspacePath) {
+			return
+		}
+		const rulesData = await getRulesData(workspacePath, this.contextProxy, this.context)
+		this.postMessageToWebview({ type: "rulesData", ...rulesData })
 	}
 
 	/**

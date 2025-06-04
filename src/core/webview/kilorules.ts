@@ -12,20 +12,6 @@ export interface RulesData {
 	localWorkflows: Record<string, boolean>
 }
 
-export async function postRulesDataToWebview(
-	cwd: string | undefined,
-	contextProxy: ContextProxy,
-	context: vscode.ExtensionContext,
-	postMessageCallback: (message: any) => void,
-): Promise<void> {
-	const workspacePath = cwd
-	if (!workspacePath) {
-		return
-	}
-	const rulesData = await getRulesData(workspacePath, contextProxy, context)
-	postMessageCallback({ type: "rulesData", ...rulesData })
-}
-
 export async function getRulesData(
 	workspacePath: string,
 	contextProxy: ContextProxy,
