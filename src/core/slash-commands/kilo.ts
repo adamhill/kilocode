@@ -10,6 +10,22 @@ import {
 } from "../prompts/commands"
 
 /**
+ * Helper function to process workflow toggles into workflow objects
+ */
+function processWorkflowToggles(workflowToggles: ClineRulesToggles) {
+	return Object.entries(workflowToggles)
+		.filter(([_, enabled]) => enabled)
+		.map(([filePath, _]) => {
+			const fileName = filePath.replace(/^.*[/\\]/, "")
+
+			return {
+				fullPath: filePath,
+				fileName: fileName,
+			}
+		})
+}
+
+/**
  * This file is a duplicate of parseSlashCommands, but it adds a check for the newrule command
  * and processes Kilo-specific slash commands. It should be merged with parseSlashCommands in the future.
  */
@@ -66,27 +82,8 @@ export async function parseKiloSlashCommands(
 			}
 
 			// in practice we want to minimize this work, so we only do it if theres a possible match
-			const globalWorkflows = Object.entries(globalWorkflowToggles)
-				.filter(([_, enabled]) => enabled)
-				.map(([filePath, _]) => {
-					const fileName = filePath.replace(/^.*[/\\]/, "")
-
-					return {
-						fullPath: filePath,
-						fileName: fileName,
-					}
-				})
-
-			const localWorkflows = Object.entries(localWorkflowToggles)
-				.filter(([_, enabled]) => enabled)
-				.map(([filePath, _]) => {
-					const fileName = filePath.replace(/^.*[/\\]/, "")
-
-					return {
-						fullPath: filePath,
-						fileName: fileName,
-					}
-				})
+			const globalWorkflows = processWorkflowToggles(globalWorkflowToggles)
+			const localWorkflows = processWorkflowToggles(localWorkflowToggles)
 
 			// local workflows have precedence over global workflows
 			const enabledWorkflows = [...localWorkflows, ...globalWorkflows]
