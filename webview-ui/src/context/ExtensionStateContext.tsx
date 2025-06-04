@@ -35,12 +35,13 @@ export interface ExtensionStateContextType extends ExtensionState {
 	currentCheckpoint?: string
 	filePaths: string[]
 	openedTabs: Array<{ label: string; isActive: boolean; path?: string }>
-	setWorkflowToggles: (toggles: Record<string, boolean>) => void // kilocode_change
-	// kilocode_change: Rules data
+	// kilocode_change start
+	setWorkflowToggles: (toggles: Record<string, boolean>) => void
 	globalRules: Record<string, boolean>
 	localRules: Record<string, boolean>
 	globalWorkflows: Record<string, boolean>
 	localWorkflows: Record<string, boolean>
+	// kilocode_change start
 	organizationAllowList: OrganizationAllowList
 	maxConcurrentFileReads?: number
 	condensingApiConfigId?: string
@@ -231,11 +232,12 @@ export const ExtensionStateContextProvider: React.FC<{ children: React.ReactNode
 	const [mcpMarketplaceCatalog, setMcpMarketplaceCatalog] = useState<McpMarketplaceCatalog>({ items: [] }) // kilocode_change
 	const [currentCheckpoint, setCurrentCheckpoint] = useState<string>()
 	const [extensionRouterModels, setExtensionRouterModels] = useState<RouterModels | undefined>(undefined)
-	// kilocode_change: Rules data state
+	// kilocode_change start
 	const [globalRules, setGlobalRules] = useState<Record<string, boolean>>({})
 	const [localRules, setLocalRules] = useState<Record<string, boolean>>({})
 	const [globalWorkflows, setGlobalWorkflows] = useState<Record<string, boolean>>({})
 	const [localWorkflows, setLocalWorkflows] = useState<Record<string, boolean>>({})
+	// kilocode_change end
 
 	const setListApiConfigMeta = useCallback(
 		(value: ProviderSettingsEntry[]) => setState((prevState) => ({ ...prevState, listApiConfigMeta: value })),
