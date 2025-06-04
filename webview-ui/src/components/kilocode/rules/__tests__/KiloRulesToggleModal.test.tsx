@@ -18,7 +18,7 @@ jest.mock("react-i18next", () => ({
 				"kilocode:rules.sections.workspaceRules": "Workspace Rules",
 				"kilocode:rules.sections.globalWorkflows": "Global Workflows",
 				"kilocode:rules.sections.workspaceWorkflows": "Workspace Workflows",
-				"common:docs": "Docs",
+				"kilocode:docs": "Docs",
 			}
 			return translations[key] || key
 		},

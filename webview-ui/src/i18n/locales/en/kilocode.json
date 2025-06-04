@@ -44,6 +44,7 @@
 			"termsAndPrivacy": "By continuing, you agree to the <termsLink>Terms of Service</termsLink> and <privacyLink>Privacy Policy.</privacyLink>"
 		}
 	},
+	"docs": "Docs",
 	"rules": {
 		"tooltip": "Manage Kilo Code Rules & Workflows",
 		"ariaLabel": "Kilo Code Rules",

@@ -17,6 +17,5 @@
 	"mermaid": {
 		"loading": "Generating mermaid diagram...",
 		"render_error": "Unable to Render Diagram"
-	},
-	"docs": "Docs"
+	}
 }

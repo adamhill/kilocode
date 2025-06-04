@@ -172,7 +172,7 @@ const KiloRulesToggleModal: React.FC = () => {
 									href="https://docs.kilocode.dev/features/rules"
 									style={{ display: "inline" }}
 									className="text-xs">
-									{t("common:docs")}
+									{t("kilocode:docs")}
 								</VSCodeLink>
 							</p>
 						) : (
@@ -184,7 +184,7 @@ const KiloRulesToggleModal: React.FC = () => {
 									href="https://docs.kilocode.dev/features/workflows"
 									style={{ display: "inline" }}
 									className="text-xs">
-									{t("common:docs")}
+									{t("kilocode:docs")}
 								</VSCodeLink>
 							</p>
 						)}
