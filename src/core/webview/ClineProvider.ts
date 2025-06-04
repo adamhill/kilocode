@@ -1220,14 +1220,17 @@ export class ClineProvider extends EventEmitter<ClineProviderEvents> implements 
 		this.postMessageToWebview({ type: "state", state })
 	}
 
+	// kilocode_change start
 	async postRulesDataToWebview() {
 		const workspacePath = this.cwd
-		if (!workspacePath) {
-			return
+		if (workspacePath) {
+			this.postMessageToWebview({
+				type: "rulesData",
+				...(await getRulesData(workspacePath, this.contextProxy, this.context)),
+			})
 		}
-		const rulesData = await getRulesData(workspacePath, this.contextProxy, this.context)
-		this.postMessageToWebview({ type: "rulesData", ...rulesData })
 	}
+	// kilocode_change end
 
 	/**
 	 * Checks if there is a file-based system prompt override for the given mode
