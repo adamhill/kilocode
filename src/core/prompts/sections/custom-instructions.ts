@@ -216,7 +216,8 @@ async function loadEnabledRules(
 // kilocode_change end
 
 /**
- * Load rule files from the specified directory (legacy function)
+ * Load rule files from the specified directory
+ * kilocode_change: this function is only called when the user hasn't used the rule configuration window
  */
 export async function loadRuleFiles(cwd: string): Promise<string> {
 	// kilocode_change start: add kilocode directory, leave fallback to roo directory
