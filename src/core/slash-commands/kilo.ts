@@ -75,15 +75,10 @@ export async function parseKiloSlashCommands(
 				return { processedText, needsRulesFileCheck: commandName === "newrule" }
 			}
 
-			// in practice we want to minimize this work, so we only do it if theres a possible match
-			const globalWorkflows = enabledWorkflowToggles(globalWorkflowToggles)
-			const localWorkflows = enabledWorkflowToggles(localWorkflowToggles)
-
-			// local workflows have precedence over global workflows
-			const enabledWorkflows = [...localWorkflows, ...globalWorkflows]
-
-			// Then check if the command matches any enabled workflow filename
-			const matchingWorkflow = enabledWorkflows.find((workflow) => workflow.fileName === commandName)
+			const matchingWorkflow = [
+				...enabledWorkflowToggles(localWorkflowToggles),
+				...enabledWorkflowToggles(globalWorkflowToggles),
+			].find((workflow) => workflow.fileName === commandName)
 
 			if (matchingWorkflow) {
 				try {
