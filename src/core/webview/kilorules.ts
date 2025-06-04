@@ -102,7 +102,7 @@ export async function toggleRule(
 	}
 }
 
-export async function createRuleFile(filename: string, isGlobal: boolean, ruleType: string): Promise<void> {
+export async function createRule(filename: string, isGlobal: boolean, ruleType: string): Promise<void> {
 	const workspacePath = getWorkspacePath()
 	if (!workspacePath && !isGlobal) {
 		vscode.window.showErrorMessage("No workspace folder found")
@@ -142,7 +142,7 @@ export async function createRuleFile(filename: string, isGlobal: boolean, ruleTy
 	await openFile(filePath)
 }
 
-export async function deleteRuleFile(rulePath: string): Promise<void> {
+export async function deleteRule(rulePath: string): Promise<void> {
 	const result = await vscode.window.showWarningMessage(
 		`Are you sure you want to delete ${path.basename(rulePath)}?`,
 		{ modal: true },
