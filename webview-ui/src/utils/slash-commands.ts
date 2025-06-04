@@ -79,10 +79,7 @@ export function shouldShowSlashCommandsMenu(text: string, cursorPosition: number
 }
 
 // kilocode_change start
-/**
- * Helper function to process workflow toggles into SlashCommand objects
- */
-function processWorkflowToggles(workflowToggles: Record<string, boolean>): SlashCommand[] {
+function enabledWorkflowToggles(workflowToggles: Record<string, boolean>): SlashCommand[] {
 	return Object.entries(workflowToggles)
 		.filter(([_, enabled]) => enabled)
 		.map(([filePath, _]) => {
@@ -99,10 +96,10 @@ export function getWorkflowCommands(
 	globalWorkflowToggles: Record<string, boolean> = {},
 ): SlashCommand[] {
 	// Get enabled local workflows
-	const localWorkflows = processWorkflowToggles(localWorkflowToggles)
+	const localWorkflows = enabledWorkflowToggles(localWorkflowToggles)
 
 	// Get enabled global workflows
-	const globalWorkflows = processWorkflowToggles(globalWorkflowToggles)
+	const globalWorkflows = enabledWorkflowToggles(globalWorkflowToggles)
 
 	// Local workflows have precedence over global workflows (following Cline's pattern)
 	return [...localWorkflows, ...globalWorkflows]
