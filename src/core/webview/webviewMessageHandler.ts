@@ -1477,9 +1477,14 @@ export const webviewMessageHandler = async (provider: ClineProvider, message: We
 		}
 
 		case "toggleWorkflow": {
-			const { workflowPath, enabled, isGlobal } = message
-			if (workflowPath && typeof enabled === "boolean" && typeof isGlobal === "boolean") {
-				await toggleWorkflow(workflowPath, enabled, isGlobal, provider.contextProxy, provider.context)
+			if (message.workflowPath && typeof message.enabled === "boolean" && typeof message.isGlobal === "boolean") {
+				await toggleWorkflow(
+					message.workflowPath,
+					message.enabled,
+					message.isGlobal,
+					provider.contextProxy,
+					provider.context,
+				)
 				await provider.postRulesDataToWebview()
 			}
 			break
@@ -1491,19 +1496,23 @@ export const webviewMessageHandler = async (provider: ClineProvider, message: We
 		}
 
 		case "toggleRule": {
-			const { rulePath, enabled, isGlobal } = message
-			if (rulePath && typeof enabled === "boolean" && typeof isGlobal === "boolean") {
-				await toggleRule(rulePath, enabled, isGlobal, provider.contextProxy, provider.context)
+			if (message.rulePath && typeof message.enabled === "boolean" && typeof message.isGlobal === "boolean") {
+				await toggleRule(
+					message.rulePath,
+					message.enabled,
+					message.isGlobal,
+					provider.contextProxy,
+					provider.context,
+				)
 				await provider.postRulesDataToWebview()
 			}
 			break
 		}
 
 		case "createRuleFile": {
-			const { filename, isGlobal, ruleType } = message
-			if (filename && typeof isGlobal === "boolean" && ruleType) {
+			if (message.filename && typeof message.isGlobal === "boolean" && message.ruleType) {
 				try {
-					await createRuleFile(filename, isGlobal, ruleType)
+					await createRuleFile(message.filename, message.isGlobal, message.ruleType)
 					await provider.postRulesDataToWebview()
 				} catch (error) {
 					console.error("Error creating rule file:", error)
@@ -1514,10 +1523,9 @@ export const webviewMessageHandler = async (provider: ClineProvider, message: We
 		}
 
 		case "deleteRuleFile": {
-			const { rulePath } = message
-			if (rulePath) {
+			if (message.rulePath) {
 				try {
-					await deleteRuleFile(rulePath)
+					await deleteRuleFile(message.rulePath)
 					await provider.postRulesDataToWebview()
 				} catch (error) {
 					console.error("Error deleting rule file:", error)
