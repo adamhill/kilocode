@@ -39,6 +39,7 @@ describe("getWorkflowCommands", () => {
 	it("should extract filename correctly from different path formats", () => {
 		const localWorkflowToggles = {
 			"unix/path/workflow.md": true,
+			"windows\\path\\workflow2.md": true,
 			"simple-name.md": true,
 		}
 
