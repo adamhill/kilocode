@@ -1,5 +1,6 @@
 /* eslint no-misleading-character-class: 0 */
 // kilocode_change: this file was pulled from Cline and adjusted for us
+import path from "path"
 
 import { getAllModes } from "@roo/modes"
 
@@ -82,27 +83,17 @@ export function shouldShowSlashCommandsMenu(text: string, cursorPosition: number
 function enabledWorkflowToggles(workflowToggles: Record<string, boolean>): SlashCommand[] {
 	return Object.entries(workflowToggles)
 		.filter(([_, enabled]) => enabled)
-		.map(([filePath, _]) => {
-			const fileName = filePath.replace(/^.*[/\\]/, "")
-			return {
-				name: fileName,
-				section: "custom" as const,
-			}
-		})
+		.map(([filePath, _]) => ({
+			name: path.basename(filePath),
+			section: "custom",
+		}))
 }
 
 export function getWorkflowCommands(
 	localWorkflowToggles: Record<string, boolean> = {},
 	globalWorkflowToggles: Record<string, boolean> = {},
 ): SlashCommand[] {
-	// Get enabled local workflows
-	const localWorkflows = enabledWorkflowToggles(localWorkflowToggles)
-
-	// Get enabled global workflows
-	const globalWorkflows = enabledWorkflowToggles(globalWorkflowToggles)
-
-	// Local workflows have precedence over global workflows (following Cline's pattern)
-	return [...localWorkflows, ...globalWorkflows]
+	return [...enabledWorkflowToggles(localWorkflowToggles), ...enabledWorkflowToggles(globalWorkflowToggles)]
 }
 // kilocode_change end
 
