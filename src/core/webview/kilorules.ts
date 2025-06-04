@@ -143,13 +143,14 @@ export async function createRule(filename: string, isGlobal: boolean, ruleType: 
 }
 
 export async function deleteRule(rulePath: string): Promise<void> {
+	const deleteAction = "Delete"
 	const result = await vscode.window.showWarningMessage(
 		`Are you sure you want to delete ${path.basename(rulePath)}?`,
 		{ modal: true },
-		"Delete",
+		deleteAction,
 	)
 
-	if (result === "Delete") {
+	if (result === deleteAction) {
 		await fs.unlink(rulePath)
 		vscode.window.showInformationMessage(`Deleted ${path.basename(rulePath)}`)
 	}
