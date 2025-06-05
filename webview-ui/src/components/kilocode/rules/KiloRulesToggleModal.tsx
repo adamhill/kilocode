@@ -31,12 +31,10 @@ const KiloRulesToggleModal: React.FC = () => {
 
 	useEffect(() => {
 		if (isVisible) {
-			// Request rules refresh from the extension
 			vscode.postMessage({ type: "refreshRules" })
 		}
 	}, [isVisible])
 
-	// Listen for rules data from the extension
 	useEffect(() => {
 		const handleMessage = (event: MessageEvent) => {
 			const message = event.data
@@ -52,7 +50,6 @@ const KiloRulesToggleModal: React.FC = () => {
 		return () => window.removeEventListener("message", handleMessage)
 	}, [])
 
-	// Handle toggle rule
 	const toggleRule = (isGlobal: boolean, rulePath: string, enabled: boolean) => {
 		vscode.postMessage({
 			type: "toggleRule",
@@ -71,12 +68,10 @@ const KiloRulesToggleModal: React.FC = () => {
 		})
 	}
 
-	// Close modal when clicking outside
 	useClickAway(modalRef, () => {
 		setIsVisible(false)
 	})
 
-	// Calculate positions for modal and arrow
 	useEffect(() => {
 		if (isVisible && buttonRef.current) {
 			const buttonRect = buttonRef.current.getBoundingClientRect()
@@ -125,7 +120,6 @@ const KiloRulesToggleModal: React.FC = () => {
 						}}
 					/>
 
-					{/* Tabs container */}
 					<div
 						style={{
 							display: "flex",
@@ -149,7 +143,6 @@ const KiloRulesToggleModal: React.FC = () => {
 						</div>
 					</div>
 
-					{/* Description text */}
 					<div className="text-xs text-[var(--vscode-descriptionForeground)] mb-4">
 						{currentView === "rules" ? (
 							<p>
@@ -178,7 +171,6 @@ const KiloRulesToggleModal: React.FC = () => {
 
 					{currentView === "rules" ? (
 						<>
-							{/* Global Rules Section */}
 							<div className="mb-3">
 								<div className="text-sm font-normal mb-2">
 									{t("kilocode:rules.sections.globalRules")}
@@ -196,7 +188,6 @@ const KiloRulesToggleModal: React.FC = () => {
 								/>
 							</div>
 
-							{/* Local Rules Section */}
 							<div style={{ marginBottom: -10 }}>
 								<div className="text-sm font-normal mb-2">
 									{t("kilocode:rules.sections.workspaceRules")}
@@ -216,7 +207,6 @@ const KiloRulesToggleModal: React.FC = () => {
 						</>
 					) : (
 						<>
-							{/* Global Workflows Section */}
 							<div className="mb-3">
 								<div className="text-sm font-normal mb-2">
 									{t("kilocode:rules.sections.globalWorkflows")}
@@ -234,7 +224,6 @@ const KiloRulesToggleModal: React.FC = () => {
 								/>
 							</div>
 
-							{/* Local Workflows Section */}
 							<div style={{ marginBottom: -10 }}>
 								<div className="text-sm font-normal mb-2">
 									{t("kilocode:rules.sections.workspaceWorkflows")}
