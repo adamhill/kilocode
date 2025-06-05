@@ -83,11 +83,6 @@
 				"guideline1": "Guideline 1",
 				"guideline2": "Guideline 2"
 			}
-		},
-		"actions": {
-			"delete": "Delete",
-			"confirmDelete": "Are you sure you want to delete {filename}?",
-			"deleted": "Deleted {filename}"
 		}
 	}
 }
