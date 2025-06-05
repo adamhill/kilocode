@@ -9,6 +9,11 @@ import { vscode } from "@/utils/vscode"
 
 import RulesToggleList from "./RulesToggleList"
 
+const sortedRules = (data: Record<string, unknown> | undefined) =>
+	Object.entries(data || {})
+		.map(([path, enabled]): [string, boolean] => [path, enabled as boolean])
+		.sort(([a], [b]) => a.localeCompare(b))
+
 const KiloRulesToggleModal: React.FC = () => {
 	const { t } = useTranslation()
 
@@ -36,27 +41,10 @@ const KiloRulesToggleModal: React.FC = () => {
 		const handleMessage = (event: MessageEvent) => {
 			const message = event.data
 			if (message.type === "rulesData") {
-				// Format rules for display
-				const localRulesData = Object.entries(message.localRules || {})
-					.map(([path, enabled]): [string, boolean] => [path, enabled as boolean])
-					.sort(([a], [b]) => a.localeCompare(b))
-
-				const globalRulesData = Object.entries(message.globalRules || {})
-					.map(([path, enabled]): [string, boolean] => [path, enabled as boolean])
-					.sort(([a], [b]) => a.localeCompare(b))
-
-				const localWorkflowsData = Object.entries(message.localWorkflows || {})
-					.map(([path, enabled]): [string, boolean] => [path, enabled as boolean])
-					.sort(([a], [b]) => a.localeCompare(b))
-
-				const globalWorkflowsData = Object.entries(message.globalWorkflows || {})
-					.map(([path, enabled]): [string, boolean] => [path, enabled as boolean])
-					.sort(([a], [b]) => a.localeCompare(b))
-
-				setLocalRules(localRulesData)
-				setGlobalRules(globalRulesData)
-				setLocalWorkflows(localWorkflowsData)
-				setGlobalWorkflows(globalWorkflowsData)
+				setLocalRules(sortedRules(message.localRules))
+				setGlobalRules(sortedRules(message.globalRules))
+				setLocalWorkflows(sortedRules(message.localWorkflows))
+				setGlobalWorkflows(sortedRules(message.globalWorkflows))
 			}
 		}
 
