@@ -9,12 +9,12 @@
 	"rules": {
 		"actions": {
 			"delete": "Delete",
-			"confirmDelete": "Are you sure you want to delete {filename}?",
-			"deleted": "Deleted {filename}"
+			"confirmDelete": "Are you sure you want to delete {{filename}}?",
+			"deleted": "Deleted {{filename}}"
 		},
 		"errors": {
 			"noWorkspaceFound": "No workspace folder found",
-			"fileAlreadyExists": "File {filename} already exists",
+			"fileAlreadyExists": "File {{filename}} already exists",
 			"failedToCreateRuleFile": "Failed to create rule file.",
 			"failedToDeleteRuleFile": "Failed to delete rule file."
 		},
