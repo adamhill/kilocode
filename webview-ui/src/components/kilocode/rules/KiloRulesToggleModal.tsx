@@ -150,14 +150,14 @@ const KiloRulesToggleModal: React.FC = () => {
 								gap: "1px",
 								borderBottom: "1px solid var(--vscode-panel-border)",
 							}}>
-							<TabButton isActive={currentView === "rules"} onClick={() => setCurrentView("rules")}>
+							<StyledTabButton isActive={currentView === "rules"} onClick={() => setCurrentView("rules")}>
 								{t("kilocode:rules.tabs.rules")}
-							</TabButton>
-							<TabButton
+							</StyledTabButton>
+							<StyledTabButton
 								isActive={currentView === "workflows"}
 								onClick={() => setCurrentView("workflows")}>
 								{t("kilocode:rules.tabs.workflows")}
-							</TabButton>
+							</StyledTabButton>
 						</div>
 					</div>
 
@@ -286,19 +286,5 @@ const StyledTabButton = styled.button<{ isActive: boolean }>`
 		color: var(--vscode-foreground);
 	}
 `
-
-export const TabButton = ({
-	children,
-	isActive,
-	onClick,
-}: {
-	children: React.ReactNode
-	isActive: boolean
-	onClick: () => void
-}) => (
-	<StyledTabButton isActive={isActive} onClick={onClick}>
-		{children}
-	</StyledTabButton>
-)
 
 export default KiloRulesToggleModal
