@@ -1,3 +1,5 @@
+// kilocode addition, similar to cline's Tooltip
+
 import React, { useState } from "react"
 
 interface TooltipProps {
