@@ -44,50 +44,5 @@
 			"description": "Cadastrar-se no Kilo Code oferece créditos gratuitos para começar. Use seus créditos para explorar nossos recursos, experimentar os modelos mais recentes e melhores, e vivenciar os benefícios do Kilo Code sem compromisso.",
 			"termsAndPrivacy": "Ao continuar, você concorda com os <termsLink>Termos de Serviço</termsLink> e a <privacyLink>Política de Privacidade.</privacyLink>"
 		}
-	},
-	"docs": "Documentação",
-	"rules": {
-		"tooltip": "Gerenciar Regras e Workflows do Kilo Code",
-		"ariaLabel": "Regras do Kilo Code",
-		"tabs": {
-			"rules": "Regras",
-			"workflows": "Workflows"
-		},
-		"description": {
-			"rules": "As regras permitem que você forneça ao Kilo Code orientações em nível de sistema. Pense nelas como uma forma persistente de incluir contexto e preferências para seus projetos ou globalmente para cada conversa.",
-			"workflows": "Os workflows permitem que você defina uma série de etapas para guiar o Kilo Code através de um conjunto repetitivo de tarefas, como implantar um serviço ou enviar um PR. Para invocar um workflow, digite",
-			"workflowsInChat": "no chat."
-		},
-		"sections": {
-			"globalRules": "Regras Globais",
-			"workspaceRules": "Regras do Espaço de Trabalho",
-			"globalWorkflows": "Workflows Globais",
-			"workspaceWorkflows": "Workflows do Espaço de Trabalho"
-		},
-		"errors": {
-			"noWorkspaceFound": "Nenhuma pasta de espaço de trabalho encontrada",
-			"fileAlreadyExists": "O arquivo {filename} já existe",
-			"failedToCreateRuleFile": "Falha ao criar arquivo de regra.",
-			"failedToDeleteRuleFile": "Falha ao excluir arquivo de regra."
-		},
-		"templates": {
-			"workflow": {
-				"description": "Descrição do workflow aqui...",
-				"stepsHeader": "## Etapas",
-				"step1": "Etapa 1",
-				"step2": "Etapa 2"
-			},
-			"rule": {
-				"description": "Descrição da regra aqui...",
-				"guidelinesHeader": "## Diretrizes",
-				"guideline1": "Diretriz 1",
-				"guideline2": "Diretriz 2"
-			}
-		},
-		"actions": {
-			"delete": "Excluir",
-			"confirmDelete": "Tem certeza de que deseja excluir {filename}?",
-			"deleted": "{filename} excluído"
-		}
 	}
 }

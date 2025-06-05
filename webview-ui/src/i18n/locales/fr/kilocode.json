@@ -44,50 +44,5 @@
 			"description": "S'inscrire à Kilo Code vous donne des crédits gratuits pour commencer. Utilisez vos crédits pour explorer nos fonctionnalités, essayer les modèles les plus récents et les meilleurs, et découvrir les avantages de Kilo Code sans engagement.",
 			"termsAndPrivacy": "En continuant, vous acceptez les <termsLink>Conditions de Service</termsLink> et la <privacyLink>Politique de Confidentialité.</privacyLink>"
 		}
-	},
-	"docs": "Documentation",
-	"rules": {
-		"tooltip": "Gérer les Règles et Workflows de Kilo Code",
-		"ariaLabel": "Règles de Kilo Code",
-		"tabs": {
-			"rules": "Règles",
-			"workflows": "Workflows"
-		},
-		"description": {
-			"rules": "Les règles te permettent de fournir à Kilo Code des directives au niveau système. Pense à elles comme un moyen persistant d'inclure du contexte et des préférences pour tes projets ou globalement pour chaque conversation.",
-			"workflows": "Les workflows te permettent de définir une série d'étapes pour guider Kilo Code à travers un ensemble répétitif de tâches, comme déployer un service ou soumettre une PR. Pour invoquer un workflow, tape",
-			"workflowsInChat": "dans le chat."
-		},
-		"sections": {
-			"globalRules": "Règles Globales",
-			"workspaceRules": "Règles de l'Espace de Travail",
-			"globalWorkflows": "Workflows Globaux",
-			"workspaceWorkflows": "Workflows de l'Espace de Travail"
-		},
-		"errors": {
-			"noWorkspaceFound": "Aucun dossier d'espace de travail trouvé",
-			"fileAlreadyExists": "Le fichier {filename} existe déjà",
-			"failedToCreateRuleFile": "Échec de la création du fichier de règle.",
-			"failedToDeleteRuleFile": "Échec de la suppression du fichier de règle."
-		},
-		"templates": {
-			"workflow": {
-				"description": "Description du workflow ici...",
-				"stepsHeader": "## Étapes",
-				"step1": "Étape 1",
-				"step2": "Étape 2"
-			},
-			"rule": {
-				"description": "Description de la règle ici...",
-				"guidelinesHeader": "## Directives",
-				"guideline1": "Directive 1",
-				"guideline2": "Directive 2"
-			}
-		},
-		"actions": {
-			"delete": "Supprimer",
-			"confirmDelete": "Es-tu sûr de vouloir supprimer {filename} ?",
-			"deleted": "{filename} supprimé"
-		}
 	}
 }

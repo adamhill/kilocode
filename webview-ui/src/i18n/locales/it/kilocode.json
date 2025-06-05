@@ -44,50 +44,5 @@
 			"description": "Registrandoti a Kilo Code ottieni crediti gratuiti per iniziare. Usa i tuoi crediti per esplorare le nostre funzionalità, provare i modelli più recenti e migliori, e sperimentare i vantaggi di Kilo Code senza impegno.",
 			"termsAndPrivacy": "Continuando, accetti i <termsLink>Termini di Servizio</termsLink> e la <privacyLink>Politica sulla Privacy.</privacyLink>"
 		}
-	},
-	"docs": "Documentazione",
-	"rules": {
-		"tooltip": "Gestisci Regole e Workflow di Kilo Code",
-		"ariaLabel": "Regole di Kilo Code",
-		"tabs": {
-			"rules": "Regole",
-			"workflows": "Workflow"
-		},
-		"description": {
-			"rules": "Le regole ti permettono di fornire a Kilo Code indicazioni a livello di sistema. Pensale come un modo persistente per includere contesto e preferenze per i tuoi progetti o globalmente per ogni conversazione.",
-			"workflows": "I workflow ti permettono di definire una serie di passaggi per guidare Kilo Code attraverso un insieme ripetitivo di attività, come distribuire un servizio o inviare una PR. Per invocare un workflow, digita",
-			"workflowsInChat": "nella chat."
-		},
-		"sections": {
-			"globalRules": "Regole Globali",
-			"workspaceRules": "Regole dell'Area di Lavoro",
-			"globalWorkflows": "Workflow Globali",
-			"workspaceWorkflows": "Workflow dell'Area di Lavoro"
-		},
-		"errors": {
-			"noWorkspaceFound": "Nessuna cartella dell'area di lavoro trovata",
-			"fileAlreadyExists": "Il file {filename} esiste già",
-			"failedToCreateRuleFile": "Impossibile creare il file delle regole.",
-			"failedToDeleteRuleFile": "Impossibile eliminare il file delle regole."
-		},
-		"templates": {
-			"workflow": {
-				"description": "Descrizione del workflow qui...",
-				"stepsHeader": "## Passaggi",
-				"step1": "Passaggio 1",
-				"step2": "Passaggio 2"
-			},
-			"rule": {
-				"description": "Descrizione della regola qui...",
-				"guidelinesHeader": "## Linee Guida",
-				"guideline1": "Linea Guida 1",
-				"guideline2": "Linea Guida 2"
-			}
-		},
-		"actions": {
-			"delete": "Elimina",
-			"confirmDelete": "Sei sicuro di voler eliminare {filename}?",
-			"deleted": "{filename} eliminato"
-		}
 	}
 }

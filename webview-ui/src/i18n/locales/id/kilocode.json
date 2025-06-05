@@ -44,50 +44,5 @@
 			"description": "Mendaftar dengan Kilo Code memberi kamu kredit gratis untuk memulai. Gunakan kredit kamu untuk menjelajahi fitur kami, mencoba model terbaru dan terbaik, dan merasakan manfaat Kilo Code tanpa komitmen.",
 			"termsAndPrivacy": "Dengan melanjutkan, kamu menyetujui <termsLink>Syarat Layanan</termsLink> dan <privacyLink>Kebijakan Privasi.</privacyLink>"
 		}
-	},
-	"docs": "Dokumentasi",
-	"rules": {
-		"tooltip": "Kelola Aturan & Workflow Kilo Code",
-		"ariaLabel": "Aturan Kilo Code",
-		"tabs": {
-			"rules": "Aturan",
-			"workflows": "Workflow"
-		},
-		"description": {
-			"rules": "Aturan memungkinkan kamu memberikan panduan tingkat sistem kepada Kilo Code. Anggap mereka sebagai cara persisten untuk menyertakan konteks dan preferensi untuk proyek kamu atau secara global untuk setiap percakapan.",
-			"workflows": "Workflow memungkinkan kamu mendefinisikan serangkaian langkah untuk memandu Kilo Code melalui serangkaian tugas berulang, seperti men-deploy layanan atau mengirim PR. Untuk memanggil workflow, ketik",
-			"workflowsInChat": "di chat."
-		},
-		"sections": {
-			"globalRules": "Aturan Global",
-			"workspaceRules": "Aturan Workspace",
-			"globalWorkflows": "Workflow Global",
-			"workspaceWorkflows": "Workflow Workspace"
-		},
-		"errors": {
-			"noWorkspaceFound": "Tidak ditemukan folder workspace",
-			"fileAlreadyExists": "File {filename} sudah ada",
-			"failedToCreateRuleFile": "Gagal membuat file aturan.",
-			"failedToDeleteRuleFile": "Gagal menghapus file aturan."
-		},
-		"templates": {
-			"workflow": {
-				"description": "Deskripsi workflow di sini...",
-				"stepsHeader": "## Langkah-langkah",
-				"step1": "Langkah 1",
-				"step2": "Langkah 2"
-			},
-			"rule": {
-				"description": "Deskripsi aturan di sini...",
-				"guidelinesHeader": "## Panduan",
-				"guideline1": "Panduan 1",
-				"guideline2": "Panduan 2"
-			}
-		},
-		"actions": {
-			"delete": "Hapus",
-			"confirmDelete": "Apakah kamu yakin ingin menghapus {filename}?",
-			"deleted": "{filename} dihapus"
-		}
 	}
 }

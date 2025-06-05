@@ -44,50 +44,5 @@
 			"description": "Kilo Code'a kaydolmak size başlamak için ücretsiz krediler verir. Özelliklerimizi keşfetmek, en yeni ve en iyi modelleri denemek ve herhangi bir taahhüt olmadan Kilo Code'un avantajlarını deneyimlemek için kredilerinizi kullanın.",
 			"termsAndPrivacy": "Devam ederek <termsLink>Hizmet Şartları</termsLink> ve <privacyLink>Gizlilik Politikası</privacyLink>'nı kabul etmiş olursunuz."
 		}
-	},
-	"docs": "Belgeler",
-	"rules": {
-		"tooltip": "Kilo Code Kuralları ve İş Akışlarını Yönet",
-		"ariaLabel": "Kilo Code Kuralları",
-		"tabs": {
-			"rules": "Kurallar",
-			"workflows": "İş Akışları"
-		},
-		"description": {
-			"rules": "Kurallar, Kilo Code'a sistem düzeyinde rehberlik sağlamanı sağlar. Onları projeleriniz için veya her konuşma için global olarak bağlam ve tercihleri dahil etmenin kalıcı bir yolu olarak düşün.",
-			"workflows": "İş akışları, bir hizmeti dağıtmak veya PR göndermek gibi tekrarlayan görevler kümesi boyunca Kilo Code'u yönlendirmek için bir dizi adım tanımlamanı sağlar. Bir iş akışını çağırmak için şunu yaz",
-			"workflowsInChat": "sohbette."
-		},
-		"sections": {
-			"globalRules": "Global Kurallar",
-			"workspaceRules": "Çalışma Alanı Kuralları",
-			"globalWorkflows": "Global İş Akışları",
-			"workspaceWorkflows": "Çalışma Alanı İş Akışları"
-		},
-		"errors": {
-			"noWorkspaceFound": "Çalışma alanı klasörü bulunamadı",
-			"fileAlreadyExists": "{filename} dosyası zaten mevcut",
-			"failedToCreateRuleFile": "Kural dosyası oluşturulamadı.",
-			"failedToDeleteRuleFile": "Kural dosyası silinemedi."
-		},
-		"templates": {
-			"workflow": {
-				"description": "İş akışı açıklaması burada...",
-				"stepsHeader": "## Adımlar",
-				"step1": "Adım 1",
-				"step2": "Adım 2"
-			},
-			"rule": {
-				"description": "Kural açıklaması burada...",
-				"guidelinesHeader": "## Yönergeler",
-				"guideline1": "Yönerge 1",
-				"guideline2": "Yönerge 2"
-			}
-		},
-		"actions": {
-			"delete": "Sil",
-			"confirmDelete": "{filename} dosyasını silmek istediğinden emin misin?",
-			"deleted": "{filename} silindi"
-		}
 	}
 }
