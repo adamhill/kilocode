@@ -8,6 +8,7 @@ import { getWorkspacePath } from "../../utils/path"
 import type { ContextProxy } from "../config/ContextProxy"
 import type { ClineRulesToggles } from "../../shared/cline-rules"
 import { t } from "../../i18n"
+import { GlobalFileNames } from "../../shared/globalFileNames"
 
 export interface RulesData {
 	globalRules: Record<string, boolean>
@@ -15,9 +16,6 @@ export interface RulesData {
 	globalWorkflows: Record<string, boolean>
 	localWorkflows: Record<string, boolean>
 }
-
-const rulesSubfolder = path.join(".kilocode", "rules")
-const workflowsSubfolder = path.join(".kilocode", "workflows")
 
 export async function getEnabledRules(
 	workspacePath: string,
@@ -27,19 +25,19 @@ export async function getEnabledRules(
 	const homedir = os.homedir()
 	return {
 		globalRules: await getEnabledRulesFromDirectory(
-			path.join(homedir, rulesSubfolder),
+			path.join(homedir, GlobalFileNames.kiloRules),
 			((await contextProxy.getGlobalState("globalRulesToggles")) as Record<string, boolean>) || {},
 		),
 		localRules: await getEnabledRulesFromDirectory(
-			path.join(workspacePath, rulesSubfolder),
+			path.join(workspacePath, GlobalFileNames.kiloRules),
 			((await contextProxy.getWorkspaceState(context, "localRulesToggles")) as Record<string, boolean>) || {},
 		),
 		globalWorkflows: await getEnabledRulesFromDirectory(
-			path.join(os.homedir(), workflowsSubfolder),
+			path.join(os.homedir(), GlobalFileNames.workflows),
 			((await contextProxy.getGlobalState("globalWorkflowToggles")) as Record<string, boolean>) || {},
 		),
 		localWorkflows: await getEnabledRulesFromDirectory(
-			path.join(workspacePath, workflowsSubfolder),
+			path.join(workspacePath, GlobalFileNames.workflows),
 			((await contextProxy.getWorkspaceState(context, "localWorkflowToggles")) as Record<string, boolean>) || {},
 		),
 	}
@@ -115,12 +113,15 @@ export async function createRuleFile(filename: string, isGlobal: boolean, ruleTy
 	let rulesDir: string
 	if (isGlobal) {
 		const homeDir = os.homedir()
-		rulesDir = ruleType === "workflow" ? path.join(homeDir, workflowsSubfolder) : path.join(homeDir, rulesSubfolder)
+		rulesDir =
+			ruleType === "workflow"
+				? path.join(homeDir, GlobalFileNames.workflows)
+				: path.join(homeDir, GlobalFileNames.kiloRules)
 	} else {
 		rulesDir =
 			ruleType === "workflow"
-				? path.join(workspacePath, workflowsSubfolder)
-				: path.join(workspacePath, rulesSubfolder)
+				? path.join(workspacePath, GlobalFileNames.workflows)
+				: path.join(workspacePath, GlobalFileNames.kiloRules)
 	}
 
 	await fs.mkdir(rulesDir, { recursive: true })
