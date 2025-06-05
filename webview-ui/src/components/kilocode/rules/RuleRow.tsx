@@ -13,32 +13,6 @@ const RuleRow: React.FC<{
 	// Get the filename from the path for display
 	const displayName = rulePath.split(win32Path ? "\\" : "/").pop() || rulePath
 
-	const getRuleTypeIcon = () => {
-		switch (ruleType) {
-			case "workflow":
-				return (
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						width="16"
-						height="16"
-						viewBox="0 0 24 24"
-						style={{ verticalAlign: "middle" }}>
-						<g fill="currentColor" stroke="currentColor" strokeWidth="1">
-							<path d="M6 18L16 5L14 18H6z" fill="currentColor" />
-							<line x1="14" y1="18" x2="16" y2="5" strokeWidth="1.5" />
-							<path
-								d="M4 19h12c0.5 0 1-0.3 1-1s-0.3-1-1-1H4c-0.5 0-1 0.3-1 1s0.3 1 1 1z"
-								fill="currentColor"
-							/>
-							<line x1="14" y1="13" x2="16" y2="9" strokeWidth="1" />
-						</g>
-					</svg>
-				)
-			default:
-				return null
-		}
-	}
-
 	const handleEditClick = () => {
 		vscode.postMessage({
 			type: "openFile",
@@ -64,7 +38,6 @@ const RuleRow: React.FC<{
 				<span
 					className="flex-1 overflow-hidden break-all whitespace-normal flex items-center mr-1"
 					title={rulePath}>
-					{getRuleTypeIcon() && <span className="mr-1.5">{getRuleTypeIcon()}</span>}
 					<span className="ph-no-capture">{displayName}</span>
 				</span>
 
