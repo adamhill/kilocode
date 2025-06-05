@@ -31,14 +31,7 @@ const RulesToggleList = ({
 			{rules.length > 0 ? (
 				<>
 					{rules.map(([rulePath, enabled]) => (
-						<RuleRow
-							key={rulePath}
-							rulePath={rulePath}
-							enabled={enabled}
-							isGlobal={isGlobal}
-							toggleRule={toggleRule}
-							ruleType={ruleType}
-						/>
+						<RuleRow key={rulePath} rulePath={rulePath} enabled={enabled} toggleRule={toggleRule} />
 					))}
 					{showNewRule && <NewRuleRow isGlobal={isGlobal} ruleType={ruleType} />}
 				</>

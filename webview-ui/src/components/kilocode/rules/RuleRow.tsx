@@ -4,10 +4,8 @@ import { vscode } from "@/utils/vscode"
 const RuleRow: React.FC<{
 	rulePath: string
 	enabled: boolean
-	isGlobal: boolean
-	ruleType: string
 	toggleRule: (rulePath: string, enabled: boolean) => void
-}> = ({ rulePath, enabled, isGlobal, toggleRule, ruleType }) => {
+}> = ({ rulePath, enabled, toggleRule }) => {
 	// Check if the path type is Windows
 	const win32Path = /^[a-zA-Z]:\\/.test(rulePath)
 	// Get the filename from the path for display
@@ -23,9 +21,7 @@ const RuleRow: React.FC<{
 	const handleDeleteClick = () => {
 		vscode.postMessage({
 			type: "deleteRuleFile",
-			rulePath: rulePath,
-			isGlobal: isGlobal,
-			ruleType: ruleType || "kilocode",
+			rulePath,
 		})
 	}
 
