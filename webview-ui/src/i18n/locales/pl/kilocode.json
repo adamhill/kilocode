@@ -44,5 +44,50 @@
 			"description": "Rejestracja w Kilo Code daje Ci darmowe kredyty na start. Użyj swoich kredytów, aby poznać nasze funkcje, wypróbować najnowsze i najlepsze modele oraz doświadczyć korzyści z Kilo Code bez zobowiązań.",
 			"termsAndPrivacy": "Kontynuując, zgadzasz się na <termsLink>Warunki Usługi</termsLink> i <privacyLink>Politykę Prywatności.</privacyLink>"
 		}
+	},
+	"docs": "Dokumentacja",
+	"rules": {
+		"tooltip": "Zarządzaj Regułami i Przepływami Pracy Kilo Code",
+		"ariaLabel": "Reguły Kilo Code",
+		"tabs": {
+			"rules": "Reguły",
+			"workflows": "Przepływy Pracy"
+		},
+		"description": {
+			"rules": "Reguły pozwalają ci dostarczyć Kilo Code wskazówki na poziomie systemu. Myśl o nich jako o trwałym sposobie na włączenie kontekstu i preferencji dla twoich projektów lub globalnie dla każdej rozmowy.",
+			"workflows": "Przepływy pracy pozwalają ci zdefiniować serię kroków, aby poprowadzić Kilo Code przez powtarzalny zestaw zadań, takich jak wdrażanie usługi lub przesyłanie PR. Aby wywołać przepływ pracy, wpisz",
+			"workflowsInChat": "w czacie."
+		},
+		"sections": {
+			"globalRules": "Reguły Globalne",
+			"workspaceRules": "Reguły Obszaru Roboczego",
+			"globalWorkflows": "Globalne Przepływy Pracy",
+			"workspaceWorkflows": "Przepływy Pracy Obszaru Roboczego"
+		},
+		"errors": {
+			"noWorkspaceFound": "Nie znaleziono folderu obszaru roboczego",
+			"fileAlreadyExists": "Plik {filename} już istnieje",
+			"failedToCreateRuleFile": "Nie udało się utworzyć pliku reguły.",
+			"failedToDeleteRuleFile": "Nie udało się usunąć pliku reguły."
+		},
+		"templates": {
+			"workflow": {
+				"description": "Opis przepływu pracy tutaj...",
+				"stepsHeader": "## Kroki",
+				"step1": "Krok 1",
+				"step2": "Krok 2"
+			},
+			"rule": {
+				"description": "Opis reguły tutaj...",
+				"guidelinesHeader": "## Wytyczne",
+				"guideline1": "Wytyczna 1",
+				"guideline2": "Wytyczna 2"
+			}
+		},
+		"actions": {
+			"delete": "Usuń",
+			"confirmDelete": "Czy na pewno chcesz usunąć {filename}?",
+			"deleted": "Usunięto {filename}"
+		}
 	}
 }

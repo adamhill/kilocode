@@ -44,5 +44,50 @@
 			"description": "Aanmelden bij Kilo Code geeft u gratis credits om te beginnen. Gebruik uw credits om onze functies te verkennen, de nieuwste en beste modellen uit te proberen, en de voordelen van Kilo Code te ervaren zonder verplichtingen.",
 			"termsAndPrivacy": "Door verder te gaan, gaat u akkoord met de <termsLink>Servicevoorwaarden</termsLink> en het <privacyLink>Privacybeleid.</privacyLink>"
 		}
+	},
+	"docs": "Documentatie",
+	"rules": {
+		"tooltip": "Kilo Code Regels & Workflows beheren",
+		"ariaLabel": "Kilo Code Regels",
+		"tabs": {
+			"rules": "Regels",
+			"workflows": "Workflows"
+		},
+		"description": {
+			"rules": "Regels stellen je in staat om Kilo Code systeemniveau begeleiding te geven. Zie ze als een persistente manier om context en voorkeuren voor je projecten of globaal voor elke conversatie op te nemen.",
+			"workflows": "Workflows stellen je in staat om een reeks stappen te definiëren om Kilo Code door een repetitieve set taken te leiden, zoals het deployen van een service of het indienen van een PR. Om een workflow aan te roepen, typ",
+			"workflowsInChat": "in de chat."
+		},
+		"sections": {
+			"globalRules": "Globale Regels",
+			"workspaceRules": "Werkruimte Regels",
+			"globalWorkflows": "Globale Workflows",
+			"workspaceWorkflows": "Werkruimte Workflows"
+		},
+		"errors": {
+			"noWorkspaceFound": "Geen werkruimte map gevonden",
+			"fileAlreadyExists": "Bestand {filename} bestaat al",
+			"failedToCreateRuleFile": "Kon regelbestand niet aanmaken.",
+			"failedToDeleteRuleFile": "Kon regelbestand niet verwijderen."
+		},
+		"templates": {
+			"workflow": {
+				"description": "Workflow beschrijving hier...",
+				"stepsHeader": "## Stappen",
+				"step1": "Stap 1",
+				"step2": "Stap 2"
+			},
+			"rule": {
+				"description": "Regel beschrijving hier...",
+				"guidelinesHeader": "## Richtlijnen",
+				"guideline1": "Richtlijn 1",
+				"guideline2": "Richtlijn 2"
+			}
+		},
+		"actions": {
+			"delete": "Verwijderen",
+			"confirmDelete": "Weet je zeker dat je {filename} wilt verwijderen?",
+			"deleted": "{filename} verwijderd"
+		}
 	}
 }

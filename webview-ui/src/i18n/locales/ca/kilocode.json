@@ -44,5 +44,50 @@
 	},
 	"newTaskPreview": {
 		"task": "Tasca"
+	},
+	"docs": "Documentació",
+	"rules": {
+		"tooltip": "Gestionar Regles i Fluxos de Treball de Kilo Code",
+		"ariaLabel": "Regles de Kilo Code",
+		"tabs": {
+			"rules": "Regles",
+			"workflows": "Fluxos de Treball"
+		},
+		"description": {
+			"rules": "Les regles et permeten proporcionar a Kilo Code orientació a nivell de sistema. Pensa en elles com una manera persistent d'incloure context i preferències per als teus projectes o globalment per a cada conversa.",
+			"workflows": "Els fluxos de treball et permeten definir una sèrie de passos per guiar Kilo Code a través d'un conjunt repetitiu de tasques, com desplegar un servei o enviar un PR. Per invocar un flux de treball, escriu",
+			"workflowsInChat": "al xat."
+		},
+		"sections": {
+			"globalRules": "Regles Globals",
+			"workspaceRules": "Regles de l'Espai de Treball",
+			"globalWorkflows": "Fluxos de Treball Globals",
+			"workspaceWorkflows": "Fluxos de Treball de l'Espai de Treball"
+		},
+		"errors": {
+			"noWorkspaceFound": "No s'ha trobat cap carpeta d'espai de treball",
+			"fileAlreadyExists": "L'arxiu {filename} ja existeix",
+			"failedToCreateRuleFile": "Error en crear l'arxiu de regla.",
+			"failedToDeleteRuleFile": "Error en eliminar l'arxiu de regla."
+		},
+		"templates": {
+			"workflow": {
+				"description": "Descripció del flux de treball aquí...",
+				"stepsHeader": "## Passos",
+				"step1": "Pas 1",
+				"step2": "Pas 2"
+			},
+			"rule": {
+				"description": "Descripció de la regla aquí...",
+				"guidelinesHeader": "## Directrius",
+				"guideline1": "Directriu 1",
+				"guideline2": "Directriu 2"
+			}
+		},
+		"actions": {
+			"delete": "Eliminar",
+			"confirmDelete": "Estàs segur que vols eliminar {filename}?",
+			"deleted": "{filename} eliminat"
+		}
 	}
 }

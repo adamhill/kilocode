@@ -44,5 +44,50 @@
 			"description": "註冊 Kilo Code 可獲得免費積分開始使用。使用你的積分探索我們的功能，試用最新最好的模型，無需承諾即可體驗 Kilo Code 的優勢。",
 			"termsAndPrivacy": "繼續即表示你同意<termsLink>服務條款</termsLink>和<privacyLink>隱私政策</privacyLink>。"
 		}
+	},
+	"docs": "文件",
+	"rules": {
+		"tooltip": "管理 Kilo Code 規則和工作流程",
+		"ariaLabel": "Kilo Code 規則",
+		"tabs": {
+			"rules": "規則",
+			"workflows": "工作流程"
+		},
+		"description": {
+			"rules": "規則允許你為 Kilo Code 提供系統層級的指導。將它們視為為你的專案或全域為每次對話包含上下文和偏好的持久方式。",
+			"workflows": "工作流程允許你定義一系列步驟來指導 Kilo Code 完成重複性任務集，例如部署服務或提交 PR。要調用工作流程，請輸入",
+			"workflowsInChat": "在聊天中。"
+		},
+		"sections": {
+			"globalRules": "全域規則",
+			"workspaceRules": "工作區規則",
+			"globalWorkflows": "全域工作流程",
+			"workspaceWorkflows": "工作區工作流程"
+		},
+		"errors": {
+			"noWorkspaceFound": "未找到工作區資料夾",
+			"fileAlreadyExists": "檔案 {filename} 已存在",
+			"failedToCreateRuleFile": "建立規則檔案失敗。",
+			"failedToDeleteRuleFile": "刪除規則檔案失敗。"
+		},
+		"templates": {
+			"workflow": {
+				"description": "工作流程描述在這裡...",
+				"stepsHeader": "## 步驟",
+				"step1": "步驟 1",
+				"step2": "步驟 2"
+			},
+			"rule": {
+				"description": "規則描述在這裡...",
+				"guidelinesHeader": "## 指導原則",
+				"guideline1": "指導原則 1",
+				"guideline2": "指導原則 2"
+			}
+		},
+		"actions": {
+			"delete": "刪除",
+			"confirmDelete": "你確定要刪除 {filename} 嗎？",
+			"deleted": "已刪除 {filename}"
+		}
 	}
 }
