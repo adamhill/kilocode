@@ -10,6 +10,7 @@ const BottomControls: React.FC = () => {
 		vscode.postMessage({ type: "showFeedbackOptions" })
 	}
 
+	// kilocode_change start: added KiloRulesToggleModal
 	return (
 		<div className="flex flex-row justify-end w-auto h-[30px] mx-3.5 mb-1">
 			<div className="flex items-center gap-1">
@@ -23,6 +24,7 @@ const BottomControls: React.FC = () => {
 			</div>
 		</div>
 	)
+	// kilocode_change end
 }
 
 export default BottomControls
