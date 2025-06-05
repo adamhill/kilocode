@@ -167,7 +167,7 @@ const KiloRulesToggleModal: React.FC = () => {
 							<p>
 								{t("kilocode:rules.description.rules")}{" "}
 								<VSCodeLink
-									href="https://docs.kilocode.dev/features/rules"
+									href="https://kilocode.ai/docs/advanced-usage/rules"
 									style={{ display: "inline" }}
 									className="text-xs">
 									{t("kilocode:docs")}
@@ -179,7 +179,7 @@ const KiloRulesToggleModal: React.FC = () => {
 								<span className="text-[var(--vscode-foreground)] font-bold">/workflow-name</span>{" "}
 								{t("kilocode:rules.description.workflowsInChat")}{" "}
 								<VSCodeLink
-									href="https://docs.kilocode.dev/features/workflows"
+									href="https://kilocode.ai/docs/advanced-usage/workflows"
 									style={{ display: "inline" }}
 									className="text-xs">
 									{t("kilocode:docs")}
