@@ -7,7 +7,7 @@ import styled from "styled-components"
 import Tooltip from "../../common/Tooltip"
 import { vscode } from "@/utils/vscode"
 
-import RulesToggleList from "./RulesToggleList"
+import RulesWorkflowsSection from "./RulesWorkflowsSection"
 
 const sortedRules = (data: Record<string, unknown> | undefined) =>
 	Object.entries(data || {})
@@ -169,79 +169,21 @@ const KiloRulesToggleModal: React.FC = () => {
 						)}
 					</div>
 
-					{currentView === "rules" ? (
-						<>
-							<div className="mb-3">
-								<div className="text-sm font-normal mb-2">
-									{t("kilocode:rules.sections.globalRules")}
-								</div>
-								<RulesToggleList
-									rules={globalRules}
-									toggleRule={(rulePath: string, enabled: boolean) =>
-										toggleRule(true, rulePath, enabled)
-									}
-									listGap="small"
-									isGlobal={true}
-									ruleType="rule"
-									showNewRule={true}
-									showNoRules={false}
-								/>
-							</div>
-
-							<div style={{ marginBottom: -10 }}>
-								<div className="text-sm font-normal mb-2">
-									{t("kilocode:rules.sections.workspaceRules")}
-								</div>
-								<RulesToggleList
-									rules={localRules}
-									toggleRule={(rulePath: string, enabled: boolean) =>
-										toggleRule(false, rulePath, enabled)
-									}
-									listGap="small"
-									isGlobal={false}
-									ruleType="rule"
-									showNewRule={true}
-									showNoRules={false}
-								/>
-							</div>
-						</>
-					) : (
-						<>
-							<div className="mb-3">
-								<div className="text-sm font-normal mb-2">
-									{t("kilocode:rules.sections.globalWorkflows")}
-								</div>
-								<RulesToggleList
-									rules={globalWorkflows}
-									toggleRule={(rulePath: string, enabled: boolean) =>
-										toggleWorkflow(true, rulePath, enabled)
-									}
-									listGap="small"
-									isGlobal={true}
-									ruleType="workflow"
-									showNewRule={true}
-									showNoRules={false}
-								/>
-							</div>
-
-							<div style={{ marginBottom: -10 }}>
-								<div className="text-sm font-normal mb-2">
-									{t("kilocode:rules.sections.workspaceWorkflows")}
-								</div>
-								<RulesToggleList
-									rules={localWorkflows}
-									toggleRule={(rulePath: string, enabled: boolean) =>
-										toggleWorkflow(false, rulePath, enabled)
-									}
-									listGap="small"
-									isGlobal={false}
-									ruleType="workflow"
-									showNewRule={true}
-									showNoRules={false}
-								/>
-							</div>
-						</>
-					)}
+					<RulesWorkflowsSection
+						type={currentView}
+						globalItems={currentView === "rules" ? globalRules : globalWorkflows}
+						localItems={currentView === "rules" ? localRules : localWorkflows}
+						toggleGlobal={(path: string, enabled: boolean) =>
+							currentView === "rules"
+								? toggleRule(true, path, enabled)
+								: toggleWorkflow(true, path, enabled)
+						}
+						toggleLocal={(path: string, enabled: boolean) =>
+							currentView === "rules"
+								? toggleRule(false, path, enabled)
+								: toggleWorkflow(false, path, enabled)
+						}
+					/>
 				</div>
 			)}
 		</div>
