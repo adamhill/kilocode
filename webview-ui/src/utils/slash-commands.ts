@@ -2,6 +2,7 @@
 // kilocode_change: this file was pulled from Cline and adjusted for us
 
 import { getAllModes } from "@roo/modes"
+import { basename } from "./kilocode/path-webview"
 
 export interface SlashCommand {
 	name: string
@@ -83,7 +84,7 @@ function enabledWorkflowToggles(workflowToggles: Record<string, boolean>): Slash
 	return Object.entries(workflowToggles)
 		.filter(([_, enabled]) => enabled)
 		.map(([filePath, _]) => ({
-			name: filePath.replace(/^.*[/\\]/, ""),
+			name: basename(filePath),
 			section: "custom",
 		}))
 }

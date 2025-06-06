@@ -1,16 +1,12 @@
 import { VSCodeButton } from "@vscode/webview-ui-toolkit/react"
 import { vscode } from "@/utils/vscode"
+import { basename } from "@/utils/kilocode/path-webview"
 
 const RuleRow: React.FC<{
 	rulePath: string
 	enabled: boolean
 	toggleRule: (rulePath: string, enabled: boolean) => void
 }> = ({ rulePath, enabled, toggleRule }) => {
-	// Check if the path type is Windows
-	const win32Path = /^[a-zA-Z]:\\/.test(rulePath)
-	// Get the filename from the path for display
-	const displayName = rulePath.split(win32Path ? "\\" : "/").pop() || rulePath
-
 	const handleEditClick = () => {
 		vscode.postMessage({
 			type: "openFile",
@@ -34,7 +30,7 @@ const RuleRow: React.FC<{
 				<span
 					className="flex-1 overflow-hidden break-all whitespace-normal flex items-center mr-1"
 					title={rulePath}>
-					<span className="ph-no-capture">{displayName}</span>
+					<span className="ph-no-capture">{basename(rulePath)}</span>
 				</span>
 
 				{/* Toggle Switch */}
