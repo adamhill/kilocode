@@ -1402,7 +1402,11 @@ const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 				{/* kilocode_change: position tweaked, rtl support */}
 				<div className="absolute bottom-2 end-2 z-30">
 					{/* kilocode_change start */}
-					<IndexingStatusBadge className={cn({ hidden: containerWidth < 235 })} />
+					<IndexingStatusBadge
+						className={cn({
+							"sr-only": containerWidth < 235, // kilocode_change: use sr-only instead of hidden for screen reader accessibility
+						})}
+					/>
 					<StandardTooltip content="Add Context (@)">
 						<button
 							aria-label="Add Context (@)"
