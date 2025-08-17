@@ -5,7 +5,7 @@ import { useAppTranslation } from "@/i18n/TranslationContext"
 // Using custom dropdown, no VSCode toolkit dropdown
 import { ProfileDataResponsePayload, WebviewMessage, UserOrganizationWithApiKey } from "@roo/WebviewMessage"
 
-export const OrganizationSelector = () => {
+export const OrganizationSelector = ({ className }: { className?: string }) => {
 	const [organizations, setOrganizations] = useState<UserOrganizationWithApiKey[]>([])
 	const { apiConfiguration, currentApiConfigName } = useExtensionState()
 	// const [selectedOrgId, setSelectedOrgId] = useState<string | undefined>(apiConfiguration?.kilocodeOrganizationId)
@@ -101,7 +101,7 @@ export const OrganizationSelector = () => {
 	if (!organizations.length) return null
 
 	return (
-		<div className="mb-6">
+		<div className={className}>
 			<div className="relative" ref={containerRef}>
 				<button
 					type="button"
@@ -136,7 +136,7 @@ export const OrganizationSelector = () => {
 				</button>
 
 				{isOpen && (
-					<div className="absolute z-20 mt-1 w-full max-h-60 overflow-auto rounded border border-[var(--vscode-dropdown-border)] bg-[var(--vscode-dropdown-background)] shadow">
+					<div className="absolute z-20 mt-1 right-0 w-max min-w-full max-h-60 overflow-auto rounded border border-[var(--vscode-dropdown-border)] bg-[var(--vscode-dropdown-background)] shadow">
 						<div role="listbox" aria-label={t("kilocode:profile.organization")}>
 							<button
 								type="button"
