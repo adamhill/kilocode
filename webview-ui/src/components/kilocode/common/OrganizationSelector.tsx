@@ -8,10 +8,10 @@ import { ProfileDataResponsePayload, WebviewMessage, UserOrganizationWithApiKey 
 export const OrganizationSelector = () => {
 	const [organizations, setOrganizations] = useState<UserOrganizationWithApiKey[]>([])
 	const { apiConfiguration, currentApiConfigName } = useExtensionState()
-	const [selectedOrgId, setSelectedOrgId] = useState<string>(apiConfiguration?.kilocodeOrganizationId ?? "personal")
+	// const [selectedOrgId, setSelectedOrgId] = useState<string | undefined>(apiConfiguration?.kilocodeOrganizationId)
 	const { t } = useAppTranslation()
 	const [isOpen, setIsOpen] = useState(false)
-	const selectedOrg = organizations.find((o) => o.id === selectedOrgId)
+	const selectedOrg = organizations.find((o) => o.id === apiConfiguration?.kilocodeOrganizationId)
 	const containerRef = useRef<HTMLDivElement>(null)
 
 	useEffect(() => {
@@ -19,18 +19,20 @@ export const OrganizationSelector = () => {
 			if (e.key === "Escape") setIsOpen(false)
 		}
 		window.addEventListener("keydown", onKeyDown)
-		return () => window.removeEventListener("keydown", onKeyDown)
-	}, [])
 
-	useEffect(() => {
 		const onMouseDown = (e: MouseEvent) => {
 			if (!containerRef.current) return
 			if (!containerRef.current.contains(e.target as Node)) {
 				setIsOpen(false)
 			}
 		}
-		document.addEventListener("mousedown", onMouseDown)
-		return () => document.removeEventListener("mousedown", onMouseDown)
+
+		window.addEventListener("mousedown", onMouseDown)
+
+		return () => {
+			window.removeEventListener("keydown", onKeyDown)
+			window.removeEventListener("mousedown", onMouseDown)
+		}
 	}, [])
 
 	useEffect(() => {
@@ -60,13 +62,12 @@ export const OrganizationSelector = () => {
 		}
 
 		window.addEventListener("message", handleMessage)
-		return () => {
-			window.removeEventListener("message", handleMessage)
-		}
+
+		return () => window.removeEventListener("message", handleMessage)
 	}, [apiConfiguration?.kilocodeToken])
 
-	useEffect(() => {
-		if (selectedOrgId === "personal") {
+	const setSelectedOrganization = (organization: UserOrganizationWithApiKey | null) => {
+		if (organization === null) {
 			// Switch back to personal account - clear organization token
 			vscode.postMessage({
 				type: "upsertApiConfiguration",
@@ -83,34 +84,24 @@ export const OrganizationSelector = () => {
 				},
 			})
 		} else {
-			const org = organizations.find((o) => o.id === selectedOrgId)
-			if (org) {
-				vscode.postMessage({
-					type: "upsertApiConfiguration",
-					text: currentApiConfigName,
-					apiConfiguration: {
-						...apiConfiguration,
-						kilocodeOrganizationId: org.id,
-					},
-				})
-				vscode.postMessage({
-					type: "fetchBalanceDataRequest",
-					values: {
-						apiKey: org.apiKey,
-					},
-				})
-			}
+			vscode.postMessage({
+				type: "upsertApiConfiguration",
+				text: currentApiConfigName,
+				apiConfiguration: {
+					...apiConfiguration,
+					kilocodeOrganizationId: organization.id,
+				},
+			})
+			vscode.postMessage({
+				type: "fetchBalanceDataRequest",
+			})
 		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [organizations, selectedOrgId])
+	}
 
 	if (!organizations.length) return null
 
 	return (
 		<div className="mb-6">
-			<label className="text-sm text-[var(--vscode-descriptionForeground)] block mb-2">
-				{t("kilocode:profile.organization")}
-			</label>
 			<div className="relative" ref={containerRef}>
 				<button
 					type="button"
@@ -150,9 +141,9 @@ export const OrganizationSelector = () => {
 							<button
 								type="button"
 								role="option"
-								aria-selected={selectedOrgId === "personal"}
+								aria-selected={!selectedOrg || selectedOrg.id === "personal"}
 								onClick={() => {
-									setSelectedOrgId("personal")
+									setSelectedOrganization(null)
 									setIsOpen(false)
 								}}
 								className="flex w-full cursor-pointer items-center justify-between gap-2 px-3 py-2 text-left hover:bg-[var(--vscode-list-hoverBackground)] text-[var(--vscode-foreground)]">
@@ -164,9 +155,9 @@ export const OrganizationSelector = () => {
 									key={org.id}
 									type="button"
 									role="option"
-									aria-selected={selectedOrgId === org.id}
+									aria-selected={selectedOrg?.id === org.id}
 									onClick={() => {
-										setSelectedOrgId(org.id)
+										setSelectedOrganization(org)
 										setIsOpen(false)
 									}}
 									className="flex w-full cursor-pointer items-center justify-between gap-2 px-3 py-2 text-left hover:bg-[var(--vscode-list-hoverBackground)] text-[var(--vscode-foreground)]">
