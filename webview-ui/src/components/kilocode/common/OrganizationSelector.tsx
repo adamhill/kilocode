@@ -118,7 +118,7 @@ export const OrganizationSelector = ({ className, showLabel = false }: { classNa
 							? `${selectedOrg.name} – ${selectedOrg.role.toUpperCase()}`
 							: t("kilocode:profile.personal")
 					}
-					className="w-full cursor-pointer border border-[var(--vscode-dropdown-border)] bg-[var(--vscode-dropdown-background)] text-[var(--vscode-dropdown-foreground)] rounded px-3 py-1.5 flex items-center justify-between gap-2 focus:outline-none focus:ring-1 focus:ring-[var(--vscode-focusBorder)]">
+					className="w-full cursor-pointer border border-[var(--vscode-dropdown-border)] bg-[var(--vscode-dropdown-background)] text-[var(--vscode-dropdown-foreground)] rounded px-3 py-1.5 flex items-center justify-between gap-2 focus:outline-none focus:ring-1 focus:ring-[var(--vscode-focusBorder)] opacity-90 hover:opacity-100 hover:bg-[rgba(255,255,255,0.03)] hover:border-[rgba(255,255,255,0.15)] transition-all duration-150">
 					<span className="truncate">{selectedOrg ? selectedOrg.name : t("kilocode:profile.personal")}</span>
 					<span className="flex items-center gap-2 shrink-0">
 						{selectedOrg && (
