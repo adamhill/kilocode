@@ -118,7 +118,7 @@ export const OrganizationSelector = ({ className, showLabel = false }: { classNa
 							? `${selectedOrg.name} – ${selectedOrg.role.toUpperCase()}`
 							: t("kilocode:profile.personal")
 					}
-					className="w-full cursor-pointer border border-[var(--vscode-dropdown-border)] bg-[var(--vscode-dropdown-background)] text-[var(--vscode-dropdown-foreground)] rounded px-3 py-2 flex items-center justify-between gap-2 focus:outline-none focus:ring-1 focus:ring-[var(--vscode-focusBorder)]">
+					className="w-full cursor-pointer border border-[var(--vscode-dropdown-border)] bg-[var(--vscode-dropdown-background)] text-[var(--vscode-dropdown-foreground)] rounded px-3 py-1.5 flex items-center justify-between gap-2 focus:outline-none focus:ring-1 focus:ring-[var(--vscode-focusBorder)]">
 					<span className="truncate">{selectedOrg ? selectedOrg.name : t("kilocode:profile.personal")}</span>
 					<span className="flex items-center gap-2 shrink-0">
 						{selectedOrg && (
@@ -153,7 +153,7 @@ export const OrganizationSelector = ({ className, showLabel = false }: { classNa
 									setSelectedOrganization(null)
 									setIsOpen(false)
 								}}
-								className="flex w-full cursor-pointer items-center justify-between gap-2 px-3 py-2 text-left hover:bg-[var(--vscode-list-hoverBackground)] text-[var(--vscode-foreground)]">
+								className="flex w-full cursor-pointer items-center justify-between gap-2 px-3 py-1.5 text-left hover:bg-[var(--vscode-list-hoverBackground)] text-[var(--vscode-foreground)]">
 								<span className="truncate">{t("kilocode:profile.personal")}</span>
 							</button>
 
@@ -167,7 +167,7 @@ export const OrganizationSelector = ({ className, showLabel = false }: { classNa
 										setSelectedOrganization(org)
 										setIsOpen(false)
 									}}
-									className="flex w-full cursor-pointer items-center justify-between gap-2 px-3 py-2 text-left hover:bg-[var(--vscode-list-hoverBackground)] text-[var(--vscode-foreground)]">
+									className="flex w-full cursor-pointer items-center justify-between gap-2 px-3 py-1.5 text-left hover:bg-[var(--vscode-list-hoverBackground)] text-[var(--vscode-foreground)]">
 									<span className="truncate">{org.name}</span>
 									<span className="ml-2 shrink-0 rounded-full px-2 py-0.5 text-[10px] uppercase tracking-wide bg-[var(--vscode-badge-background)] text-[var(--vscode-badge-foreground)]">
 										{org.role.toUpperCase()}
