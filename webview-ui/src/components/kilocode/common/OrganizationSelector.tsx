@@ -2,13 +2,11 @@ import { useState, useEffect, useRef } from "react"
 import { vscode } from "@/utils/vscode"
 import { useExtensionState } from "@/context/ExtensionStateContext"
 import { useAppTranslation } from "@/i18n/TranslationContext"
-// Using custom dropdown, no VSCode toolkit dropdown
 import { ProfileDataResponsePayload, WebviewMessage, UserOrganizationWithApiKey } from "@roo/WebviewMessage"
 
 export const OrganizationSelector = ({ className, showLabel = false }: { className?: string; showLabel?: boolean }) => {
 	const [organizations, setOrganizations] = useState<UserOrganizationWithApiKey[]>([])
 	const { apiConfiguration, currentApiConfigName } = useExtensionState()
-	// const [selectedOrgId, setSelectedOrgId] = useState<string | undefined>(apiConfiguration?.kilocodeOrganizationId)
 	const { t } = useAppTranslation()
 	const [isOpen, setIsOpen] = useState(false)
 	const selectedOrg = organizations.find((o) => o.id === apiConfiguration?.kilocodeOrganizationId)
