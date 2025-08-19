@@ -192,13 +192,20 @@ export class OpenRouterHandler extends BaseProvider implements SingleCompletionH
 
 				const delta = chunk.choices[0]?.delta
 
-				if (delta && "reasoning" in delta && delta.reasoning && typeof delta.reasoning === "string") {
+				if (
+					delta /* kilocode_change */ &&
+					"reasoning" in delta &&
+					delta.reasoning &&
+					typeof delta.reasoning === "string"
+				) {
 					yield { type: "reasoning", text: delta.reasoning }
 				}
 
+				// kilocode_change start
 				if (delta && "reasoning_content" in delta && typeof delta.reasoning_content === "string") {
 					yield { type: "reasoning", text: delta.reasoning_content }
 				}
+				// kilocode_change end
 
 				if (delta?.content) {
 					yield { type: "text", text: delta.content }
