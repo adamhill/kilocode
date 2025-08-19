@@ -2,4 +2,4 @@
 "kilo-code": patch
 ---
 
-OpenRouter inference providers that don't support the advertised context window are now automatically ignored.
+OpenRouter inference providers whose context window is smaller than that of the top provider for a particular model are now automatically ignored. They can still be used by selecting them specifically in the Provider Routing settings.
