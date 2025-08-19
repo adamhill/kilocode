@@ -98,7 +98,7 @@ export class OpenRouterHandler extends BaseProvider implements SingleCompletionH
 
 	getIgnoredProviders(model: ModelInfo): string[] | undefined {
 		const endpoints = Object.entries(this.endpoints)
-		const ignoredProviders = Object.entries(this.endpoints)
+		const ignoredProviders = endpoints
 			.filter((endpoint) => endpoint[1].contextWindow < model.contextWindow)
 			.map((endpoint) => endpoint[0])
 		if (ignoredProviders.length > 0 && ignoredProviders.length < endpoints.length) {
