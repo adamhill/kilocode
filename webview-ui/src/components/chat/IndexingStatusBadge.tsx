@@ -125,19 +125,27 @@ export const IndexingStatusBadge: React.FC<IndexingStatusBadgeProps> = ({ classN
 						"cursor-pointer",
 						className,
 					)}
-					aria-label={getTooltipText()}>
+					aria-label={getTooltipText()}
+					aria-describedby="indexing-status-description">
+					{" "}
+					{/* kilocode_change: add describedby for better context */}
 					{/* File search icon */}
 					<Database className="w-4 h-4 text-vscode-foreground" />
-
 					{/* Status dot badge */}
 					<span
 						className={cn(
 							"absolute top-1 right-1 w-1.5 h-1.5 rounded-full transition-colors duration-200",
 							getStatusColorClass(),
 						)}
+						aria-hidden="true" // kilocode_change: hide decorative element from screen readers
 					/>
 				</button>
 			</CodeIndexPopover>
+			{/* kilocode_change start: Add live region for status announcements */}
+			<div id="indexing-status-description" aria-live="polite" aria-atomic="true" className="sr-only">
+				{getTooltipText()}
+			</div>
+			{/* kilocode_change end */}
 			{showTooltip && (
 				<div
 					className={cn(
