@@ -181,7 +181,7 @@ const openAiSchema = baseProviderSettingsSchema.extend({
 const ollamaSchema = baseProviderSettingsSchema.extend({
 	ollamaModelId: z.string().optional(),
 	ollamaBaseUrl: z.string().optional(),
-	ollamaApiKey: z.string().optional(),
+	ollamaApiKey: z.string().optional(), // kilocode_change
 })
 
 const vsCodeLmSchema = baseProviderSettingsSchema.extend({
