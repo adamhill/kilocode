@@ -196,6 +196,10 @@ export class OpenRouterHandler extends BaseProvider implements SingleCompletionH
 					yield { type: "reasoning", text: delta.reasoning }
 				}
 
+				if (delta && "reasoning_content" in delta && typeof delta.reasoning_content === "string") {
+					yield { type: "reasoning", text: delta.reasoning_content }
+				}
+
 				if (delta?.content) {
 					yield { type: "text", text: delta.content }
 				}
