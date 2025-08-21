@@ -43,6 +43,13 @@ export class LmStudioHandler extends BaseProvider implements SingleCompletionHan
 			...convertToOpenAiMessages(messages),
 		]
 
+		// kilocode_change: Ensure we never send completely empty message arrays
+		if (openAiMessages.length === 0) {
+			console.warn("[LM Studio] No messages to send, adding default system message")
+			openAiMessages.push({ role: "system", content: "You are a helpful AI assistant." })
+		}
+		// kilocode_change end
+
 		// -------------------------
 		// Track token usage
 		// -------------------------
@@ -79,8 +86,17 @@ export class LmStudioHandler extends BaseProvider implements SingleCompletionHan
 		let assistantText = ""
 
 		try {
+			// kilocode_change: Ensure model ID is not empty to prevent malformed requests
+			const model = this.getModel()
+			if (!model.id || model.id.trim() === "") {
+				throw new Error("LM Studio model ID is not configured. Please select a model in the settings.")
+			}
+			
+			console.log(`[LM Studio] Creating chat completion with model: ${model.id}, messages count: ${openAiMessages.length}`)
+			// kilocode_change end
+
 			const params: OpenAI.Chat.ChatCompletionCreateParamsStreaming & { draft_model?: string } = {
-				model: this.getModel().id,
+				model: model.id,
 				messages: openAiMessages,
 				temperature: this.options.modelTemperature ?? LMSTUDIO_DEFAULT_TEMPERATURE,
 				stream: true,
@@ -153,9 +169,16 @@ export class LmStudioHandler extends BaseProvider implements SingleCompletionHan
 
 	async completePrompt(prompt: string): Promise<string> {
 		try {
+			// kilocode_change: Ensure model ID is not empty to prevent malformed requests
+			const model = this.getModel()
+			if (!model.id || model.id.trim() === "") {
+				throw new Error("LM Studio model ID is not configured. Please select a model in the settings.")
+			}
+			// kilocode_change end
+
 			// Create params object with optional draft model
 			const params: any = {
-				model: this.getModel().id,
+				model: model.id,
 				messages: [{ role: "user", content: prompt }],
 				temperature: this.options.modelTemperature ?? LMSTUDIO_DEFAULT_TEMPERATURE,
 				stream: false,
