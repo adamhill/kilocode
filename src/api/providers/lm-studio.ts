@@ -25,12 +25,14 @@ export class LmStudioHandler extends BaseProvider implements SingleCompletionHan
 	constructor(options: ApiHandlerOptions) {
 		super()
 		this.options = options
+		// kilocode_change: Temporarily remove custom fetch to test if it's causing empty request bodies
 		this.client = new OpenAI({
 			baseURL: (this.options.lmStudioBaseUrl || "http://localhost:1234") + "/v1",
 			apiKey: "noop",
 			timeout: LMSTUDIO_TIMEOUT_MS, // kilocode_change
-			fetch: fetchWithTimeout(LMSTUDIO_TIMEOUT_MS), // kilocode_change
+			// fetch: fetchWithTimeout(LMSTUDIO_TIMEOUT_MS), // kilocode_change - temporarily disabled
 		})
+		// kilocode_change end
 	}
 
 	override async *createMessage(
@@ -93,6 +95,7 @@ export class LmStudioHandler extends BaseProvider implements SingleCompletionHan
 			}
 			
 			console.log(`[LM Studio] Creating chat completion with model: ${model.id}, messages count: ${openAiMessages.length}`)
+			console.log(`[LM Studio] OpenAI messages:`, JSON.stringify(openAiMessages, null, 2))
 			// kilocode_change end
 
 			const params: OpenAI.Chat.ChatCompletionCreateParamsStreaming & { draft_model?: string } = {
@@ -101,6 +104,14 @@ export class LmStudioHandler extends BaseProvider implements SingleCompletionHan
 				temperature: this.options.modelTemperature ?? LMSTUDIO_DEFAULT_TEMPERATURE,
 				stream: true,
 			}
+
+			// kilocode_change: Add comprehensive debugging for request params
+			console.log(`[LM Studio] Request params:`, JSON.stringify(params, null, 2))
+			console.log(`[LM Studio] OpenAI client config:`, {
+				baseURL: this.client.baseURL,
+				timeout: LMSTUDIO_TIMEOUT_MS
+			})
+			// kilocode_change end
 
 			if (this.options.lmStudioSpeculativeDecodingEnabled && this.options.lmStudioDraftModelId) {
 				params.draft_model = this.options.lmStudioDraftModelId
