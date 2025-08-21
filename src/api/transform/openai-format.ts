@@ -28,6 +28,14 @@ export function convertToOpenAiMessages(
 							acc.toolMessages.push(part)
 						} else if (part.type === "text" || part.type === "image") {
 							acc.nonToolMessages.push(part)
+						} else {
+							// kilocode_change: Handle unknown content types gracefully
+							console.warn(`[LM Studio] Unknown content type in user message: ${part.type}`)
+							// If the unknown content has text, treat it as text content
+							if ((part as any).text) {
+								acc.nonToolMessages.push({ type: "text", text: (part as any).text })
+							}
+							// kilocode_change end
 						} // user cannot send tool_use messages
 						return acc
 					},
@@ -98,6 +106,14 @@ export function convertToOpenAiMessages(
 							return { type: "text", text: part.text }
 						}),
 					})
+				} else if (toolMessages.length === 0) {
+					// kilocode_change: Ensure we don't lose user messages completely
+					console.warn("[LM Studio] User message had no processable content, adding placeholder")
+					openAiMessages.push({
+						role: "user",
+						content: "[Message content could not be processed]"
+					})
+					// kilocode_change end
 				}
 			} else if (anthropicMessage.role === "assistant") {
 				const { nonToolMessages, toolMessages } = anthropicMessage.content.reduce<{
@@ -109,6 +125,14 @@ export function convertToOpenAiMessages(
 							acc.toolMessages.push(part)
 						} else if (part.type === "text" || part.type === "image") {
 							acc.nonToolMessages.push(part)
+						} else {
+							// kilocode_change: Handle unknown content types gracefully
+							console.warn(`[LM Studio] Unknown content type in assistant message: ${part.type}`)
+							// If the unknown content has text, treat it as text content
+							if ((part as any).text) {
+								acc.nonToolMessages.push({ type: "text", text: (part as any).text })
+							}
+							// kilocode_change end
 						} // assistant cannot send tool_result messages
 						return acc
 					},
@@ -126,6 +150,11 @@ export function convertToOpenAiMessages(
 							return part.text
 						})
 						.join("\n")
+				} else if (toolMessages.length === 0) {
+					// kilocode_change: Ensure assistant messages aren't completely empty
+					console.warn("[LM Studio] Assistant message had no processable content, adding placeholder")
+					content = "[Assistant response could not be processed]"
+					// kilocode_change end
 				}
 
 				// Process tool use messages
