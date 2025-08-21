@@ -35,6 +35,7 @@ import {
 	WandSparkles,
 	SendHorizontal,
 	Paperclip, // kilocode_change
+	Mic,
 } from "lucide-react"
 import { IndexingStatusBadge } from "./IndexingStatusBadge"
 import { cn } from "@/lib/utils"
@@ -1009,6 +1010,21 @@ const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 		)
 
 		const [isTtsPlaying, setIsTtsPlaying] = useState(false)
+		const [isRecording, setIsRecording] = useState(false)
+
+		const handleMicrophoneClick = useCallback(() => {
+			if (isRecording) {
+				// Stop recording
+				setIsRecording(false)
+				// For now, just log the action - actual voice recording would need backend integration
+				console.log("Stopping voice recording")
+			} else {
+				// Start recording
+				setIsRecording(true)
+				// For now, just log the action - actual voice recording would need backend integration
+				console.log("Starting voice recording")
+			}
+		}, [isRecording])
 
 		useEvent("message", (event: MessageEvent) => {
 			const message: ExtensionMessage = event.data
@@ -1437,6 +1453,25 @@ const ChatTextArea = forwardRef<HTMLTextAreaElement, ChatTextAreaProps>(
 									"opacity-40 cursor-not-allowed grayscale-[30%] hover:bg-transparent hover:border-[rgba(255,255,255,0.08)] active:bg-transparent",
 							)}>
 							<Paperclip className={cn("w-4", "h-4", { hidden: containerWidth < 235 })} />
+						</button>
+					</StandardTooltip>
+					<StandardTooltip content={isRecording ? "Stop Recording" : "Start Voice Recording"}>
+						<button
+							aria-label={isRecording ? "Stop Recording" : "Start Voice Recording"}
+							onClick={handleMicrophoneClick}
+							className={cn(
+								"relative inline-flex items-center justify-center",
+								"bg-transparent border-none p-1.5",
+								"rounded-md min-w-[28px] min-h-[28px]",
+								"opacity-60 hover:opacity-100 text-vscode-descriptionForeground hover:text-vscode-foreground",
+								"transition-all duration-150",
+								"hover:bg-[rgba(255,255,255,0.03)] hover:border-[rgba(255,255,255,0.15)]",
+								"focus:outline-none focus-visible:ring-1 focus-visible:ring-vscode-focusBorder",
+								"active:bg-[rgba(255,255,255,0.1)]",
+								"cursor-pointer",
+								isRecording && "text-red-500 hover:text-red-400",
+							)}>
+							<Mic className={cn("w-4 h-4", isRecording && "animate-pulse")} />
 						</button>
 					</StandardTooltip>
 					{!isEditMode && (
