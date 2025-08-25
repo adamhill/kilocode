@@ -128,4 +128,69 @@ describe("convertToOpenAiMessages", () => {
 		expect(toolMessage.tool_call_id).toBe("weather-123")
 		expect(toolMessage.content).toBe("Current temperature in London: 20°C")
 	})
+
+	// kilocode_change: Add tests for empty content arrays to prevent LM Studio issue
+	it("should handle user messages with empty content array", () => {
+		const anthropicMessages: Anthropic.Messages.MessageParam[] = [
+			{
+				role: "user",
+				content: [],
+			},
+		]
+
+		const openAiMessages = convertToOpenAiMessages(anthropicMessages)
+		expect(openAiMessages).toHaveLength(1)
+		expect(openAiMessages[0]).toEqual({
+			role: "user",
+			content: "",
+		})
+	})
+
+	it("should handle assistant messages with empty content array", () => {
+		const anthropicMessages: Anthropic.Messages.MessageParam[] = [
+			{
+				role: "assistant",
+				content: [],
+			},
+		]
+
+		const openAiMessages = convertToOpenAiMessages(anthropicMessages)
+		expect(openAiMessages).toHaveLength(1)
+		expect(openAiMessages[0]).toEqual({
+			role: "assistant",
+			content: "",
+		})
+	})
+
+	it("should handle mixed messages with some empty content arrays", () => {
+		const anthropicMessages: Anthropic.Messages.MessageParam[] = [
+			{
+				role: "user",
+				content: "Hello",
+			},
+			{
+				role: "assistant",
+				content: [],
+			},
+			{
+				role: "user",
+				content: [],
+			},
+		]
+
+		const openAiMessages = convertToOpenAiMessages(anthropicMessages)
+		expect(openAiMessages).toHaveLength(3)
+		expect(openAiMessages[0]).toEqual({
+			role: "user",
+			content: "Hello",
+		})
+		expect(openAiMessages[1]).toEqual({
+			role: "assistant",
+			content: "",
+		})
+		expect(openAiMessages[2]).toEqual({
+			role: "user",
+			content: "",
+		})
+	})
 })
