@@ -13,3 +13,7 @@ A collection of quick tips to help you get the most out of Kilo Code.
 - When using Debug mode, ask Kilo to "start a new task in Debug mode with all of the necessary context needed to figure out X" so that the debugging process uses its own context window and doesn't pollute the main task
 - Add your own tips by clicking "Edit this page" below!
 - To manage large files and reduce context/resource usage, adjust the `File read auto-truncate threshold` setting. This setting controls the number of lines read from a file in one batch. Lower values can improve performance when working with very large files, but may require more read operations. You can find this setting in the Kilo Code settings under 'Advanced Settings'.
+
+| Browser Tab | Auto-Approve Tab | Display Tab |
+|---------|---------|---------|
+| [![KiloCode Demo 1](https://img.youtube.com/vi/VMPKXt8k050/maxresdefault.jpg)](https://youtube.com/shorts/VMPKXt8k050?feature=shared) | [![KiloCode Demo 2](https://img.youtube.com/vi/NBccFnYDQ-k/maxresdefault.jpg)](https://youtube.com/shorts/NBccFnYDQ-k?feature=shared) | [![KiloCode Demo 3](https://img.youtube.com/vi/qYrT2pbfS7E/maxresdefault.jpg)](https://youtube.com/shorts/qYrT2pbfS7E?feature=shared) |
