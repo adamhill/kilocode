@@ -10,6 +10,8 @@ Auto-approve settings speed up your workflow by eliminating repetitive confirmat
 2. Select which actions Kilo Code can perform without asking permission
 3. Use the master toggle (leftmost checkbox) to quickly enable/disable all permissions
 
+[![KiloCode Task Timeline](https://img.youtube.com/vi/NBccFnYDQ-k/maxresdefault.jpg)](https://youtube.com/shorts/NBccFnYDQ-k?feature=shared)
+
 ## Auto-Approve Toolbar
 
 <img src="/docs/img/auto-approving-actions/auto-approving-actions.png" alt="Auto-approve toolbar collapsed state" width="600" />
