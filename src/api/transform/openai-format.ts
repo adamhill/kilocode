@@ -98,6 +98,12 @@ export function convertToOpenAiMessages(
 							return { type: "text", text: part.text }
 						}),
 					})
+				} else if (toolMessages.length === 0) {
+					// kilocode_change: If no non-tool messages and no tool messages, create empty user message to maintain conversation flow
+					openAiMessages.push({
+						role: "user",
+						content: "",
+					})
 				}
 			} else if (anthropicMessage.role === "assistant") {
 				const { nonToolMessages, toolMessages } = anthropicMessage.content.reduce<{
@@ -126,6 +132,9 @@ export function convertToOpenAiMessages(
 							return part.text
 						})
 						.join("\n")
+				} else if (toolMessages.length === 0) {
+					// kilocode_change: If no non-tool messages and no tool messages, provide empty content to maintain valid message format
+					content = ""
 				}
 
 				// Process tool use messages
