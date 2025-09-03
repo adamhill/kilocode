@@ -70,10 +70,6 @@ Optimizing for different project scales:
 
 **Performance Degradation**: Model effectiveness typically drops significantly beyond 400-500K tokens, regardless of advertised limits. Plan context usage accordingly.
 
-## Cost vs Performance Positioning
-
-<iframe src="./assets/model-selection-graphs.html" width="100%" height="800px"></iframe>
-
 ## Community Choice
 
 The AI model landscape changes quicky to stay up to date [**👉 check Kilo Code Community Favorites on OpenRouter**](https://openrouter.ai/apps?url=https%3A%2F%2Fkilocode.ai%2F)
