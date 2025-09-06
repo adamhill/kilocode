@@ -128,4 +128,67 @@ describe("convertToOpenAiMessages", () => {
 		expect(toolMessage.tool_call_id).toBe("weather-123")
 		expect(toolMessage.content).toBe("Current temperature in London: 20°C")
 	})
+
+	// kilocode_change: Add test for LM Studio regression fix
+	it("should handle unknown content types gracefully", () => {
+		const anthropicMessages: Anthropic.Messages.MessageParam[] = [
+			{
+				role: "user",
+				content: [
+					{
+						type: "unknown_content_type" as any,
+						data: "some data",
+					},
+				],
+			},
+		]
+
+		const openAiMessages = convertToOpenAiMessages(anthropicMessages)
+		expect(openAiMessages).toHaveLength(1)
+		expect(openAiMessages[0].role).toBe("user")
+		expect(openAiMessages[0].content).toBe("[Message content could not be processed]")
+	})
+
+	it("should handle unknown content types with text property", () => {
+		const anthropicMessages: Anthropic.Messages.MessageParam[] = [
+			{
+				role: "user",
+				content: [
+					{
+						type: "unknown_content_type_with_text" as any,
+						text: "Hello from unknown type!",
+					},
+				],
+			},
+		]
+
+		const openAiMessages = convertToOpenAiMessages(anthropicMessages)
+		expect(openAiMessages).toHaveLength(1)
+		expect(openAiMessages[0].role).toBe("user")
+		
+		const content = openAiMessages[0].content as Array<{ type: string; text: string }>
+		expect(Array.isArray(content)).toBe(true)
+		expect(content).toHaveLength(1)
+		expect(content[0]).toEqual({ type: "text", text: "Hello from unknown type!" })
+	})
+
+	it("should handle assistant messages with unknown content types", () => {
+		const anthropicMessages: Anthropic.Messages.MessageParam[] = [
+			{
+				role: "assistant",
+				content: [
+					{
+						type: "unknown_assistant_content" as any,
+						data: "some data",
+					},
+				],
+			},
+		]
+
+		const openAiMessages = convertToOpenAiMessages(anthropicMessages)
+		expect(openAiMessages).toHaveLength(1)
+		expect(openAiMessages[0].role).toBe("assistant")
+		expect(openAiMessages[0].content).toBe("[Assistant response could not be processed]")
+	})
+	// kilocode_change end
 })
