@@ -70,6 +70,7 @@ const sidebars: SidebarsConfig = {
 								"providers/requesty",
 								"providers/unbound",
 								"providers/v0",
+								"providers/virtual-quota-fallback",
 								"providers/vscode-lm",
 								"providers/xai",
 							],

@@ -46,7 +46,7 @@ Before configuring this provider, you must have at least one other API provider 
 
 6.  **Add More Providers:** Repeat steps 3-5 to build your complete fallback chain. You can add as many profiles as you have configured.
 
-<img src="/docs/img/providers/virtualQuotaFallbackConfig.png" alt="virtuaQuotaFallback configuration in Kilo Code settings" width="600" />
+<img src="/docs/img/providers/virtualQuotaFullConfig.png" alt="virtuaQuotaFallback configuration in Kilo Code settings" width="600" />
 
 ## Usage Monitoring
 
