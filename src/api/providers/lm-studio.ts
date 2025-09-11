@@ -27,12 +27,14 @@ export class LmStudioHandler extends BaseProvider implements SingleCompletionHan
 	constructor(options: ApiHandlerOptions) {
 		super()
 		this.options = options
+		// kilocode_change: Temporarily remove custom fetch to test if it's causing empty request bodies
 		this.client = new OpenAI({
 			baseURL: (this.options.lmStudioBaseUrl || "http://localhost:1234") + "/v1",
 			apiKey: "noop",
 			timeout: LMSTUDIO_TIMEOUT_MS, // kilocode_change
-			fetch: fetchWithTimeout(LMSTUDIO_TIMEOUT_MS), // kilocode_change
+			// fetch: fetchWithTimeout(LMSTUDIO_TIMEOUT_MS), // kilocode_change - temporarily disabled
 		})
+		// kilocode_change end
 	}
 
 	override async *createMessage(
@@ -44,6 +46,13 @@ export class LmStudioHandler extends BaseProvider implements SingleCompletionHan
 			{ role: "system", content: systemPrompt },
 			...convertToOpenAiMessages(messages),
 		]
+
+		// kilocode_change: Ensure we never send completely empty message arrays
+		if (openAiMessages.length === 0) {
+			console.warn("[LM Studio] No messages to send, adding default system message")
+			openAiMessages.push({ role: "system", content: "You are a helpful AI assistant." })
+		}
+		// kilocode_change end
 
 		// -------------------------
 		// Track token usage
@@ -81,12 +90,30 @@ export class LmStudioHandler extends BaseProvider implements SingleCompletionHan
 		let assistantText = ""
 
 		try {
+			// kilocode_change: Ensure model ID is not empty to prevent malformed requests
+			const model = this.getModel()
+			if (!model.id || model.id.trim() === "") {
+				throw new Error("LM Studio model ID is not configured. Please select a model in the settings.")
+			}
+			
+			console.log(`[LM Studio] Creating chat completion with model: ${model.id}, messages count: ${openAiMessages.length}`)
+			console.log(`[LM Studio] OpenAI messages:`, JSON.stringify(openAiMessages, null, 2))
+			// kilocode_change end
+
 			const params: OpenAI.Chat.ChatCompletionCreateParamsStreaming & { draft_model?: string } = {
-				model: this.getModel().id,
+				model: model.id,
 				messages: openAiMessages,
 				temperature: this.options.modelTemperature ?? LMSTUDIO_DEFAULT_TEMPERATURE,
 				stream: true,
 			}
+
+			// kilocode_change: Add comprehensive debugging for request params
+			console.log(`[LM Studio] Request params:`, JSON.stringify(params, null, 2))
+			console.log(`[LM Studio] OpenAI client config:`, {
+				baseURL: this.client.baseURL,
+				timeout: LMSTUDIO_TIMEOUT_MS
+			})
+			// kilocode_change end
 
 			if (this.options.lmStudioSpeculativeDecodingEnabled && this.options.lmStudioDraftModelId) {
 				params.draft_model = this.options.lmStudioDraftModelId
@@ -160,9 +187,16 @@ export class LmStudioHandler extends BaseProvider implements SingleCompletionHan
 
 	async completePrompt(prompt: string): Promise<string> {
 		try {
+			// kilocode_change: Ensure model ID is not empty to prevent malformed requests
+			const model = this.getModel()
+			if (!model.id || model.id.trim() === "") {
+				throw new Error("LM Studio model ID is not configured. Please select a model in the settings.")
+			}
+			// kilocode_change end
+
 			// Create params object with optional draft model
 			const params: any = {
-				model: this.getModel().id,
+				model: model.id,
 				messages: [{ role: "user", content: prompt }],
 				temperature: this.options.modelTemperature ?? LMSTUDIO_DEFAULT_TEMPERATURE,
 				stream: false,
