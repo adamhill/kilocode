@@ -35,8 +35,9 @@ body:
       placeholder: |
         1) Environment/setup (OS, Kilo version, shell)
         2) IDE details Visual Studio Code or JetBrains IDE name (Rider, IntelliJ etc...)
-        3) List actions exactly (clicks, text entered, commands)
+        3) List actions exactly (clicks, text entered, Settings page)
         4) What did you observe after each step
+        Screengrabs and short videos would be helpful for UI bugs
     validations:
       required: true
 
