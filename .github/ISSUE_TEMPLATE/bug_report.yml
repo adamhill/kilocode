@@ -23,7 +23,7 @@ body:
     attributes:
       label: Who's affected and when
       description: Who sees this and in what situation? Keep it non-technical.
-      placeholder: 'Ex: "This happens when I try to edit the prompt in the Chat area"'
+      placeholder: This happens when I try to edit the prompt in the Chat area
     validations:
       required: true
 
@@ -34,9 +34,9 @@ body:
       description: Number your steps, write clearly
       placeholder: |
         1) Environment/setup (OS, Kilo version, shell)
-        2) IDE: IDE details Visual Studio Code or JetBrains IDE name (Rider, IntelliJ etc...)
-        3) List exact actions (clicks, text entered, commands)
-        4) What you observed after each step
+        2) IDE details Visual Studio Code or JetBrains IDE name (Rider, IntelliJ etc...)
+        3) List actions exactly (clicks, text entered, commands)
+        4) What did you observe after each step
     validations:
       required: true
 
@@ -44,7 +44,7 @@ body:
     id: expected
     attributes:
       label: What did you expect to happen?
-      placeholder: e.g., "The dropdown shows all the models"
+      placeholder: The dropdown shows all the models
     validations:
       required: true
 
@@ -52,7 +52,7 @@ body:
     id: actual
     attributes:
       label: What actually happened
-      placeholder: e.g., "The dropdown did not show any Anthropic models"
+      placeholder: The dropdown did not show any Anthropic models
     validations:
       required: true
 
@@ -61,13 +61,13 @@ body:
     attributes:
       label: What variations did you try? (optional)
       description: Different IDE's, Insiders, EAP, devices, providers, or settings experimented with.
-      placeholder: e.g., "Tried this flow in PHPStorm, it works in there"
+      placeholder: Tried this flow in PHPStorm, it works in there
 
   - type: input
     id: version
     attributes:
       label: App Version
-      description: What version of Kilo are you using?
+      description: What version of kilocode are you using?
       placeholder: 4.96.1
     validations:
       required: true
