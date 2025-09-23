@@ -162,7 +162,7 @@ body:
       placeholder: "java.lang.Throwable: [ERROR]: [\"Error fetching OpenRouter model endpoints: {\n  \\\"stack\\\": \\\"AxiosError: Request failed with status"
       render: shell
 
-  type: textarea
+  - type: textarea
     id: MCPs
     attributes:
       label: MCP Json Configuration (optional)
