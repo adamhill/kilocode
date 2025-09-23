@@ -1,16 +1,166 @@
 name: Bug Report
-description: File a bug report
-type: "Bug"
+description: Report a broken behavior in plain language with minimal reproduction steps
+labels: ["bug"]
+title: "[BUG] "
 body:
-    - type: textarea
-      id: description
-      attributes:
-          label: Description
-          description: |
-            Which app version are you using (e.g. v3.3.1)?
-            Which API Provider are you using (e.g. Kilo, OpenRouter, Anthropic)?
-            Which Model are you using (e.g. Claude 3.7 Sonnet)?
-            Steps to reproduce?
-            Relevant API request output?
-            Additional context?
-            Screenshots?
+  - type: markdown
+    attributes:
+      value: |
+        Search existing issues first, please and thank you.
+        https://github.com/Kilo-Org/kilocode/issues
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Simple problem statement (a few sentences)
+      description: Describe what went wrong in simple language.
+      placeholder: 'Ex: "Trying to read the file the Model went into a loop"'
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Who's affected and when
+      description: Who sees this and in what situation? Keep it non-technical.
+      placeholder: 'Ex: "This happens when I try to edit the prompt in the Chat area"'
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce the behavior
+      description: Number your steps, write clearly
+      placeholder: |
+        1) Environment/setup (OS, Kilo version, shell)
+        2) IDE: IDE details Visual Studio Code or JetBrains IDE name (Rider, IntelliJ etc...)
+        3) List exact actions (clicks, text entered, commands)
+        4) What you observed after each step
+    validations:
+      required: true
+
+  - type: input
+    id: expected
+    attributes:
+      label: What did you expect to happen?
+      placeholder: e.g., "The dropdown shows all the models"
+    validations:
+      required: true
+
+  - type: input
+    id: actual
+    attributes:
+      label: What actually happened
+      placeholder: e.g., "The dropdown did not show any Anthropic models"
+    validations:
+      required: true
+
+  - type: textarea
+    id: variations
+    attributes:
+      label: What variations did you try? (optional)
+      description: Different IDE's, Insiders, EAP, devices, providers, or settings experimented with.
+      placeholder: e.g., "Tried this flow in PHPStorm, it works in there"
+
+  - type: input
+    id: version
+    attributes:
+      label: App Version
+      description: What version of Kilo are you using? (e.g., v4.96.1)
+    validations:
+      required: true
+      
+- type: dropdown
+    id: jetbrainsIDE
+    attributes:
+      label: API Provider (optional)
+      options:
+         - Rider
+         - IntelliJ
+         - PyCharm
+         - PHPStorm
+         - RustRover
+         - CLion
+         - DataSpell
+         - Webstorm
+         - Fleet
+         - DataGrip
+         - RubyMine
+         - GoLand
+         - MPS
+         
+- type: input
+    id: version
+    attributes:
+      label: JetBrains Version
+      description: What version of the Jetbrains IDE are you using? (e.g., 2025.2.1)
+    validations:
+      required: true
+      
+- type: dropdown
+    id: jetbrainsChannel
+    attributes:
+      label: Jetbrains Channel
+      options:
+          - Relase
+          - EAP
+          
+  - type: dropdown
+    id: provider
+    attributes:
+      label: Provider (optional)
+      options:
+        - Kilo Provider
+        - Anthropic
+        - AWS Bedrock
+        - Chutes AI
+        - DeepSeek
+        - Featherless AI
+        - Fireworks AI
+        - Glama
+        - Google Gemini
+        - Google Vertex AI
+        - Groq
+        - Human Relay Provider
+        - LiteLLM
+        - LM Studio
+        - Mistral AI
+        - Ollama
+        - OpenAI
+        - OpenAI Compatible
+        - OpenRouter
+        - Requesty
+        - SambaNova
+        - Unbound
+        - VS Code Language Model API
+        - xAI (Grok)
+        - Not Applicable / Other
+
+  - type: input
+    id: model
+    attributes:
+      label: Model Used (optional)
+      description: Exact model name (e.g., GPT-5). Use N/A if it doesnt matter.
+
+  - type: textarea
+    id: task-dump
+    attributes:
+      label: Task Export
+      description: Task
+      placeholder: Put your Task Export here in needed
+      render: xml
+      
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs or errors (optional)
+      description: Paste relevant output or errors. Triple backticks (```) please for formatting.
+      render: shell
+      
+  - type: textarea
+    id: MCPs
+    attributes:
+      label: MCP Json Configuration (optional)
+      description: Paste your MCP configurations, global and project json, if applicable. Remember to remove your keys and PAT tokens.
+      render: json
