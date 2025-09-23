@@ -14,7 +14,7 @@ body:
     attributes:
       label: Simple problem statement (a few sentences)
       description: Describe what went wrong in simple language.
-      placeholder: Trying to read the file, and the Model went into a loop, until the repition trigger stopped it.
+      placeholder: Trying to read the file, and the Model went into a loop, until the repetition trigger stopped it.
     validations:
       required: true
 
@@ -72,43 +72,43 @@ body:
       placeholder: 4.96.1
     validations:
       required: true
-      
+
   - type: dropdown
     id: jetbrainsIDE
     attributes:
       label: JetBrains IDE
       options:
-         - Rider
-         - IntelliJ
-         - PyCharm
-         - PHPStorm
-         - RustRover
-         - CLion
-         - DataSpell
-         - Webstorm
-         - Fleet
-         - DataGrip
-         - RubyMine
-         - GoLand
-         - MPS
-         
+        - Rider
+        - IntelliJ
+        - PyCharm
+        - PHPStorm
+        - RustRover
+        - CLion
+        - DataSpell
+        - Webstorm
+        - Fleet
+        - DataGrip
+        - RubyMine
+        - GoLand
+        - MPS
+
   - type: input
     id: jetbrains-version
     attributes:
       label: JetBrains Version
-      description: What version of the Jetbrains IDE are you using?
+      description: What version of the JetBrains IDE are you using?
       placeholder: 2025.2.0
     validations:
       required: true
-      
+
   - type: dropdown
     id: jetbrainsChannel
     attributes:
       label: Jetbrains Channel
       options:
-          - Release
-          - EAP
-          
+        - Release
+        - EAP
+
   - type: dropdown
     id: provider
     attributes:
@@ -144,7 +144,7 @@ body:
     id: model
     attributes:
       label: Model Used (optional)
-      description: Exact model name (e.g., GPT-5). Use N/A if it doesnt matter.
+      description: Exact model name (e.g., GPT-5). Use N/A if it doesn't matter.
 
   - type: textarea
     id: task-dump
@@ -153,15 +153,15 @@ body:
       description: Task
       placeholder: Put your Task Export here if needed
       render: xml
-      
+
   - type: textarea
     id: logs
     attributes:
       label: Relevant logs or errors (optional)
       description: Paste relevant output or errors. Triple backticks (```) please for formatting.
-      placeholder: "java.lang.Throwable: [ERROR]: ["Error fetching OpenRouter model endpoints: {\n  \"stack\": \"AxiosError: Request failed with status"
+      placeholder: "java.lang.Throwable: [ERROR]: [\"Error fetching OpenRouter model endpoints: {\n  \\\"stack\\\": \\\"AxiosError: Request failed with status"
       render: shell
-      
+
   - type: textarea
     id: MCPs
     attributes:
