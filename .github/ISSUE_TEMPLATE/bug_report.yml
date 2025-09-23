@@ -1,7 +1,7 @@
 name: Bug Report
 description: Report a broken behavior in plain language with minimal reproduction steps
 labels: ["bug"]
-title: "[BUG] "
+title: "(BUG)"
 body:
   - type: markdown
     attributes:
@@ -67,14 +67,15 @@ body:
     id: version
     attributes:
       label: App Version
-      description: What version of Kilo are you using? (e.g., v4.96.1)
+      description: What version of Kilo are you using?
+      placeholder: 4.96.1
     validations:
       required: true
       
   - type: dropdown
     id: jetbrainsIDE
     attributes:
-      label: API Provider (optional)
+      label: JetBrains IDE
       options:
          - Rider
          - IntelliJ
@@ -94,7 +95,8 @@ body:
     id: jetbrains-version
     attributes:
       label: JetBrains Version
-      description: What version of the Jetbrains IDE are you using? (e.g., 2025.2.1)
+      description: What version of the Jetbrains IDE are you using?
+      placeholder: 2025.2.0
     validations:
       required: true
       
