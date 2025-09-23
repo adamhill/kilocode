@@ -14,7 +14,7 @@ body:
     attributes:
       label: Simple problem statement (a few sentences)
       description: Describe what went wrong in simple language.
-      placeholder: 'Ex: "Trying to read the file the Model went into a loop"'
+      placeholder: Trying to read the file, and the Model went into a loop, until the repition trigger stopped it.
     validations:
       required: true
 
