@@ -71,7 +71,7 @@ body:
     validations:
       required: true
       
-- type: dropdown
+  - type: dropdown
     id: jetbrainsIDE
     attributes:
       label: API Provider (optional)
@@ -90,20 +90,20 @@ body:
          - GoLand
          - MPS
          
-- type: input
-    id: version
+  - type: input
+    id: jetbrains-version
     attributes:
       label: JetBrains Version
       description: What version of the Jetbrains IDE are you using? (e.g., 2025.2.1)
     validations:
       required: true
       
-- type: dropdown
+  - type: dropdown
     id: jetbrainsChannel
     attributes:
       label: Jetbrains Channel
       options:
-          - Relase
+          - Release
           - EAP
           
   - type: dropdown
