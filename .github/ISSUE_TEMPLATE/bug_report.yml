@@ -162,19 +162,21 @@ body:
       placeholder: "java.lang.Throwable: [ERROR]: [\"Error fetching OpenRouter model endpoints: {\n  \\\"stack\\\": \\\"AxiosError: Request failed with status"
       render: shell
 
-  - type: textarea
+  type: textarea
     id: MCPs
     attributes:
       label: MCP Json Configuration (optional)
       description: Paste your MCP configurations, global and project json, if applicable. Remember to remove your keys and PAT tokens.
-      placeholder: `"{
-  "mcpServers": {
-    "microsoft.docs.mcp": {
-      "type": "streamable-http",
-      "url": "https://learn.microsoft.com/api/mcp",
-      "alwaysAllow": [
-        "microsoft_docs_search"
-      ],
-      "disabled": true
-    },"`
+      placeholder: |
+        {
+          "mcpServers": {
+            "microsoft.docs.mcp": {
+              "type": "streamable-http",
+              "url": "https://learn.microsoft.com/api/mcp",
+              "alwaysAllow": [
+                "microsoft_docs_search"
+              ],
+              "disabled": true
+            },
+        }
       render: json
