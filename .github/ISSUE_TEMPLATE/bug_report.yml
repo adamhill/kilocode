@@ -151,7 +151,7 @@ body:
     attributes:
       label: Task Export
       description: Task
-      placeholder: Put your Task Export here in needed
+      placeholder: Put your Task Export here if needed
       render: xml
       
   - type: textarea
@@ -159,6 +159,7 @@ body:
     attributes:
       label: Relevant logs or errors (optional)
       description: Paste relevant output or errors. Triple backticks (```) please for formatting.
+      placeholder: "java.lang.Throwable: [ERROR]: ["Error fetching OpenRouter model endpoints: {\n  \"stack\": \"AxiosError: Request failed with status"
       render: shell
       
   - type: textarea
