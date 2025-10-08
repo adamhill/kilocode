@@ -24,23 +24,9 @@ You can report any bugs or feedbacks by chatting with us in our [Discord server]
 
 ## Supported Models
 
-Kilo Code supports the following OVHCloud AI Endpoints models:
+Kilo Code will automatically fetch our models from our API. It will be up-to-date.
 
-- gpt-oss-120b
-- gpt-oss-20b
-- Qwen2.5-VL-72B-Instruct
-- llava-next-mistral-7b
-- Meta-Llama-3_3-70B-Instruct
-- Qwen2.5-Coder-32B-Instruct
-- Mixtral-8x7B-Instruct-v0.1
-- Meta-Llama-3_1-70B-Instruct
-- Mistral-Small-3.2-24B-Instruct-2506
-- DeepSeek-R1-Distill-Llama-70B
-- Llama-3.1-8B-Instruct
-- Mistral-7B-Instruct-v0.3
-- Mistral-Nemo-Instruct-2407
-- Qwen3-32B
-- mamba-codestral-7B-v0.1
+You can browse our [catalog](https://endpoints.ai.cloud.ovh.net/catalog) to see a detail of all our models.
 
 ## Configuration in Kilo Code
 
