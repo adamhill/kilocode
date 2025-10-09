@@ -83,17 +83,6 @@ If using Cursor, go to **Settings** > **Cursor Settings** > **Tab**, and toggle 
 
 
 
-## Advanced Settings
-
-### Provider Configuration
-
-By default, autocomplete uses your main Kilo Code/OpenRouter/Mistral credentials with the Codestral model.
-This model is recommended as it strikes an optimal balance between performance speed and capability.
-However, you can:
-
-- **Use custom provider**: Toggle this option to use a different AI provider specifically for autocomplete
-- **Select different models**: Choose models optimized for speed vs. quality based on your needs
-
 ## Best Practices
 
 1. **Balance speed and quality**: Faster models provide quicker suggestions but may be less accurate
