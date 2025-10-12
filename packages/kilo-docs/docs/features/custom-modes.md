@@ -13,7 +13,7 @@ Each mode—including custom ones—features **Sticky Models**. This means Kilo 
 - **Experimentation:** Safely experiment with different prompts and configurations without affecting other modes
 - **Team Collaboration:** Share custom modes with your team to standardize workflows
 
-<img src="/img/custom-modes/custom-modes.png" alt="Overview of custom modes interface" width="600" />
+<img src="/docs/img/custom-modes/custom-modes.png" alt="Overview of custom modes interface" width="600" />
 
 _Kilo Code's interface for creating and managing custom modes._
 
