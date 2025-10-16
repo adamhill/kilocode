@@ -16,6 +16,8 @@ Effective team management in Kilo for Enterprise ensures optimal AI usage, cost 
 4. **Select initial role** (Member, Admin, or Owner)
 5. Click **Send Invitation**
 
+<img width="619" height="311" alt="invite-member" src="https://github.com/user-attachments/assets/a3ca0391-8a61-457f-b38b-11f03b219b4f" />
+
 <!-- ## Setting Usage Limits
 
 ### Daily Spending Limits
