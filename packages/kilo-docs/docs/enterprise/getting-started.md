@@ -41,12 +41,16 @@ Plus:
 1. Visit [app.kilocode.ai](https://app.kilocode.ai/)
 2. Sign up using your company email
 3. Click **Organizations** in the left sidebar and then **Create New Organization**
+<img width="800" alt="create-team" src="https://github.com/user-attachments/assets/ddda129e-2dde-49a4-beac-e93d9f566e31" />
+
 
 ### Step 2: Subscribe to Enterprise
 
 1. Enter your organization name
 2. Select your initial seat count
 3. Complete checkout process
+<img width="800" alt="Subscribe to Enterprise" src="https://github.com/user-attachments/assets/f030555d-ad2e-4e0f-a7e6-19fb407fe112" />
+
 
 ### Step 3: Invite Your Team
 
@@ -57,6 +61,8 @@ Plus:
     - **Owner** - Full administrative access
     - **Admin** - Enterprise management without billing
     - **Member** - Standard usage access
+<img width="619" height="311" alt="invite-member" src="https://github.com/user-attachments/assets/b53c60aa-c888-4e46-b5dd-988c826968f4" />
+
 
 ### Step 4: Team Members Install Extension
 
@@ -73,6 +79,8 @@ Team members receive invitation emails with these steps:
 - **Real-time usage tracking** in your dashboard
 - **Transparent billing** - see exactly what each request costs
 - **Enterprise analytics** - understand usage patterns and optimization opportunities
+<img width="800" height="935" alt="usage-details (1)" src="https://github.com/user-attachments/assets/26e949cb-9a4c-4415-b11f-0027d9a5b750" />
+
 
 ## First Steps for Your Business
 
