@@ -2,11 +2,11 @@
 sidebar_label: Dashboard Overview
 ---
 
----
-
 # Enterprise Dashboard
 
 The Kilo for Enterpirse dashboard provides complete visibility into your team's AI usage, costs, and management— as well as controls for limiting models and monitoring audit logs.
+<img width="850" alt="Enterpise-Dashboard" src="https://github.com/user-attachments/assets/aff03c3b-21c5-4985-84a3-fbe8c94f4055" />
+
 
 ## Dashboard Navigation
 
