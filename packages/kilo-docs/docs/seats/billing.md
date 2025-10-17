@@ -4,15 +4,21 @@ sidebar_label: Billing & Credits
 
 # Billing & Credits
 
-Kilo for Enterprise uses a transparent, two-part billing system: a monthly subscription per seat, plus pay-as-you-go AI credits with zero markup.
+Kilo Seats uses a transparent, two-part billing system: a monthly subscription per seat, plus pay-as-you-go AI credits with zero markup.
 
 ## Understanding the Billing Model
 
 ### Monthly Subscription
 
+**Enterprise:**
 - **$299 per user per month** for platform access
-- **Billed** on your signup anniversary
+- Billed on your signup anniversary
 - **Includes** dashboard access, team management, model limitation, SSO, and all platform features
+
+**Teams:**
+- **$29 per user per month** for platform access
+- Billed monthly on your signup anniversary
+- Includes dashboard access, team management, and all platform features
 
 ### AI Credits System
 
