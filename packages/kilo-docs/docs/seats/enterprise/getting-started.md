@@ -28,8 +28,8 @@ Plus:
 - **Dedicated support channels** for private, direct communication
 
 ## Before You Begin
+It'll be helpful to have:
 
-- Company email address (recommended for easier team management)
 - Approximate team size for initial seat planning
 - Credit card for billing setup
 - VS Code installed for team members
@@ -39,7 +39,7 @@ Plus:
 ### Step 1: Create Your Organization
 
 1. Visit [app.kilocode.ai](https://app.kilocode.ai/)
-2. Sign up using your company email
+2. Sign up using your company email. Or start a trial by signing with Github or Google, and we can change it to an enterprise email later!
 3. Click **Organizations** in the left sidebar and then **Create New Organization**
 <img width="800" alt="create-team" src="https://github.com/user-attachments/assets/ddda129e-2dde-49a4-beac-e93d9f566e31" />
 
