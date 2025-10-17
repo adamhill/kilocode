@@ -4,7 +4,7 @@ sidebar_label: Usage Analytics & Reporting
 
 # Usage Analytics & Reporting
 
-Kilo for Enterprise provides detailed usage analytics to help you monitor and understand your organization’s AI usage patterns, costs, and activity through the Kilo Code API provider.
+Kilo for Enterprise & Teams provides detailed usage analytics to help you monitor and understand your organization’s AI usage patterns, costs, and activity through the Kilo Code API provider.
 
 ## Analytics Dashboard Overview
 
@@ -18,20 +18,20 @@ This usage overview includes all of your usage of the Kilo Code API provider. It
 
 The dashboard displays five key metrics at the top:
 
-- **Total Spent** - Total cost for the selected time period
-- **Total Requests** - Number of API requests made
-- **Avg Cost per Request** - Average cost per individual request
-- **Total Tokens** - Total tokens processed (input + output)
-- **Active Users** - Number of team members who made requests
+* **Total Spent** - Total cost for the selected time period
+* **Total Requests** - Number of API requests made
+* **Avg Cost per Request** - Average cost per individual request
+* **Total Tokens** - Total tokens processed (input + output)
+* **Active Users** - Number of team members who made requests
 
 ## Time Period Filters
 
 Select from four time period options to view usage data:
 
-- **Past Week** - Last 7 days of usage
-- **Past Month** - Last 30 days of usage
-- **Past Year** - Last 365 days of usage
-- **All** - Complete usage history
+* **Past Week** - Last 7 days of usage
+* **Past Month** - Last 30 days of usage
+* **Past Year** - Last 365 days of usage
+* **All** - Complete usage history
 
 ## Usage View Options
 
@@ -39,8 +39,8 @@ Select from four time period options to view usage data:
 
 Use the **"Only my usage"** toggle to filter the data:
 
-- **Enabled** - Shows only your personal usage data
-- **Disabled** - Shows team-wide usage data for all members
+* **Enabled** - Shows only your personal usage data
+* **Disabled** - Shows team-wide usage data for all members
 
 ### Data Breakdown Views
 
@@ -50,11 +50,11 @@ Choose between two data presentation formats:
 
 Shows usage aggregated by date with columns:
 
-- **DATE** - The specific date
-- **COST** - Total spending for that date
-- **REQUESTS** - Number of API requests made
-- **TOKENS** - Total tokens processed (hover to show input vs. output tokens)
-- **USERS** - Number of active users that date
+* **DATE** - The specific date
+* **COST** - Total spending for that date
+* **REQUESTS** - Number of API requests made
+* **TOKENS** - Total tokens processed (hover to show input vs. output tokens)
+* **USERS** - Number of active users that date
 
 When viewing team data, you can click on any date row to expand and see individual user breakdowns for that day, showing each team member's usage, cost, requests, and tokens.
 
@@ -62,14 +62,18 @@ When viewing team data, you can click on any date row to expand and see individu
 
 Shows detailed usage broken down by AI model and date with columns:
 
-- **DATE** - The specific date
-- **MODEL** - The AI model used (e.g., anthropic/claude-sonnet-4, openai/gpt-4)
-- **COST** - Cost for that model on that date
-- **REQUESTS** - Number of requests to that model
-- **TOKENS** - Tokens processed by that model (hover to show input vs. output tokens)
-- **USERS** - Number of users who used that model
+* **DATE** - The specific date
+* **MODEL** - The AI model used (e.g., anthropic/claude-sonnet-4, openai/gpt-4)
+* **COST** - Cost for that model on that date
+* **REQUESTS** - Number of requests to that model
+* **TOKENS** - Tokens processed by that model (hover to show input vs. output tokens)
+* **USERS** - Number of users who used that model
 
 Click on any row to expand and see which specific team members used that model on that date, along with their individual usage statistics.
+
+### By Project View
+
+You can also view usage **by project**, which is automatically pulled from the repository name. Alternatively, you can configure or override the project name at the repository level via the `.kilocode/config.json` file.
 
 ## Understanding the Data
 
@@ -77,31 +81,31 @@ Click on any row to expand and see which specific team members used that model o
 
 The analytics track usage across different AI models, showing the specific model identifiers such as:
 
-- `anthropic/claude-sonnet-4`
-- `openai/gpt-5`
-- `x-ai/grok-code-fast-1`
-- `mistralai/codestral-2508`
+* `anthropic/claude-sonnet-4`
+* `openai/gpt-5`
+* `x-ai/grok-code-fast-1`
+* `mistralai/codestral-2508`
 
 ### User Attribution
 
 When viewing team data, you can see:
 
-- Individual team member usage within expanded rows
-- Email addresses for user identification
-- Per-user cost, request, and token breakdowns
+* Individual team member usage within expanded rows
+* Email addresses for user identification
+* Per-user cost, request, and token breakdowns
 
 ### Cost Tracking
 
 All costs are displayed in USD with detailed precision, helping you:
 
-- Monitor spending patterns over time
-- Identify high-usage periods or models
-- Track individual team member contributions to costs
+* Monitor spending patterns over time
+* Identify high-usage periods or models
+* Track individual team member contributions to costs
 
 ## Next Steps
 
-- [Manage team billing settings](/teams/billing)
-- [Configure team roles and permissions](/teams/roles-permissions)
-- [Learn about team roles and permissions](/teams/roles-permissions)
+* [Manage team billing settings](/teams/billing)
+* [Configure team roles and permissions](/teams/roles-permissions)
+* [Learn about team roles and permissions](/teams/roles-permissions)
 
 The usage analytics provide the insights needed to optimize your team's AI usage while maintaining visibility into costs and activity patterns.
