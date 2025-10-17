@@ -55,6 +55,7 @@ Every member has one of three roles that determine their access level and capabi
 | Change member roles              | ✅    | ✅\*           | ❌     |
 | Manage seat count                | ✅    | ❌             | ❌     |
 | View team composition            | ✅    | ✅             | ✅     |
+| View audit logs                  | ✅    | ✅             | ✅     |
 | **Usage Controls**               |
 | Model/provider limitation        | ✅    | ✅             | ❌     |    
 | Set daily usage limits           | ✅    | ✅             | ❌     |
