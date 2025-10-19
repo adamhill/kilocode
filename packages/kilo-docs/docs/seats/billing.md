@@ -11,11 +11,13 @@ Kilo Seats uses a transparent, two-part billing system: a monthly subscription p
 ### Monthly Subscription
 
 **Enterprise:**
+
 - **$299 per user per month** for platform access
 - Billed on your signup anniversary
 - **Includes** dashboard access, team management, model limitation, SSO, and all platform features
 
 **Teams:**
+
 - **$29 per user per month** for platform access
 - Billed monthly on your signup anniversary
 - Includes dashboard access, team management, and all platform features
@@ -118,8 +120,8 @@ If payment fails repeatedly:
 
 ## Next Steps
 
-- [Explore usage analytics](/teams/analytics)
-- [Learn about team roles and permissions](/teams/roles-permissions)
-- [Learn about team management](/teams/team-management)
+- [Explore usage analytics](/seats/analytics)
+- [Learn about team roles and permissions](/seats/roles-permissions)
+- [Learn about team management](/seats/team-management)
 
 Transparent billing ensures you always know exactly what you're paying for, with no hidden fees or surprise charges.

@@ -104,8 +104,7 @@ All costs are displayed in USD with detailed precision, helping you:
 
 ## Next Steps
 
-- [Manage team billing settings](/teams/billing)
-- [Configure team roles and permissions](/teams/roles-permissions)
-- [Learn about team roles and permissions](/teams/roles-permissions)
+- [Manage team billing settings](/seats/billing)
+- [Configure team roles and permissions](/seats/roles-permissions)
 
 The usage analytics provide the insights needed to optimize your team's AI usage while maintaining visibility into costs and activity patterns.

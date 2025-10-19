@@ -43,7 +43,7 @@ Switch to **Kilo for Teams** or **Kilo for Enterprise** from other AI coding too
 - **Comprehensive analytics** - Understand team usage patterns
 - **Open source extension** - No vendor lock-in
 - **Consistent quality** - No hidden model downgrades
-- **Enterprise controls** *(Enterprise only)* - SSO, audit logs, and advanced configuration options
+- **Enterprise controls** _(Enterprise only)_ - SSO, audit logs, and advanced configuration options
 
 ### Migration Process
 
@@ -77,14 +77,14 @@ Switch to **Kilo for Teams** or **Kilo for Enterprise** from other AI coding too
 
 ### Cursor Feature Mapping
 
-| Cursor Feature         | Kilo for Teams / Enterprise Equivalent             |
-| ---------------------- | -------------------------------------------------- |
-| AI Chat                | Chat interface with multiple modes                 |
-| Code Generation        | Code mode with advanced tools                      |
-| Code Editing           | Fast edits and surgical modifications              |
-| Codebase Understanding | Codebase indexing and search                       |
+| Cursor Feature         | Kilo for Teams / Enterprise Equivalent                         |
+| ---------------------- | -------------------------------------------------------------- |
+| AI Chat                | Chat interface with multiple modes                             |
+| Code Generation        | Code mode with advanced tools                                  |
+| Code Editing           | Fast edits and surgical modifications                          |
+| Codebase Understanding | Codebase indexing and search                                   |
 | Team Management        | Comprehensive team dashboard (Enterprise adds SSO, audit logs) |
-| Usage Analytics        | Detailed usage and cost analytics                  |
+| Usage Analytics        | Detailed usage and cost analytics                              |
 
 ## Migrating from GitHub Copilot
 
@@ -103,7 +103,7 @@ Switch to **Kilo for Teams** or **Kilo for Enterprise** from other AI coding too
 - **Transparent pricing** - See exact costs for every request
 - **Provider flexibility** - Switch providers or use your own API keys
 - **Extensive customization** - Custom modes and team policies
-- **Enterprise-level governance** *(Enterprise only)* - Model filtering, audit logging, and compliance support
+- **Enterprise-level governance** _(Enterprise only)_ - Model filtering, audit logging, and compliance support
 
 ### Migration Strategy
 
@@ -130,13 +130,13 @@ Switch to **Kilo for Teams** or **Kilo for Enterprise** from other AI coding too
 
 ### GitHub Copilot Feature Comparison
 
-| GitHub Copilot   | Kilo for Teams / Enterprise           | Advantage              |
-| ---------------- | ------------------------------------- | ---------------------- |
-| Code suggestions | AI-powered code generation            | ✅ More model choices  |
-| Chat interface   | Multi-mode chat system                | ✅ Specialized modes   |
-| Team admin       | Comprehensive team management         | ✅ Enterprise adds audit logs |
-| Usage insights   | Detailed usage and cost tracking      | ✅ Transparent pricing |
-| Model selection  | 18+ AI providers and models           | ✅ No vendor lock-in   |
+| GitHub Copilot   | Kilo for Teams / Enterprise      | Advantage                     |
+| ---------------- | -------------------------------- | ----------------------------- |
+| Code suggestions | AI-powered code generation       | ✅ More model choices         |
+| Chat interface   | Multi-mode chat system           | ✅ Specialized modes          |
+| Team admin       | Comprehensive team management    | ✅ Enterprise adds audit logs |
+| Usage insights   | Detailed usage and cost tracking | ✅ Transparent pricing        |
+| Model selection  | 18+ AI providers and models      | ✅ No vendor lock-in          |
 
 ## Migrating from Other AI Coding Tools
 
@@ -144,47 +144,47 @@ Switch to **Kilo for Teams** or **Kilo for Enterprise** from other AI coding too
 
 **From Tabnine**
 
-- **Benefit:** More advanced AI models and team features  
-- **Process:** Export settings, migrate team, configure advanced features  
+- **Benefit:** More advanced AI models and team features
+- **Process:** Export settings, migrate team, configure advanced features
 - **Timeline:** 1-2 weeks for full transition
 
 **From CodeWhisperer**
 
-- **Benefit:** Escape AWS ecosystem lock-in, better team management  
-- **Process:** Parallel usage, gradual migration, team training  
+- **Benefit:** Escape AWS ecosystem lock-in, better team management
+- **Process:** Parallel usage, gradual migration, team training
 - **Timeline:** 2-3 weeks for enterprise teams
 
 **From Replit AI**
 
-- **Benefit:** Use in VS Code instead of web-based IDE  
-- **Process:** Export projects, set up local development, team onboarding  
+- **Benefit:** Use in VS Code instead of web-based IDE
+- **Process:** Export projects, set up local development, team onboarding
 - **Timeline:** 3-4 weeks including development environment setup
 
 ### Universal Migration Checklist
 
 **Pre-Migration Planning**
 
-- [ ] Audit current AI coding tool usage  
-- [ ] Identify team members and their roles  
-- [ ] Calculate current costs vs. Kilo pricing  
-- [ ] Plan migration timeline and milestones  
-- [ ] Prepare team communication and training  
+- [ ] Audit current AI coding tool usage
+- [ ] Identify team members and their roles
+- [ ] Calculate current costs vs. Kilo pricing
+- [ ] Plan migration timeline and milestones
+- [ ] Prepare team communication and training
 
 **Migration Execution**
 
-- [ ] Set up Kilo for Teams or Enterprise organization  
-- [ ] Configure team settings and policies  
-- [ ] Invite team members and assign roles  
-- [ ] Install Kilo Code extension across team  
-- [ ] Start with pilot projects or non-critical work  
+- [ ] Set up Kilo for Teams or Enterprise organization
+- [ ] Configure team settings and policies
+- [ ] Invite team members and assign roles
+- [ ] Install Kilo Code extension across team
+- [ ] Start with pilot projects or non-critical work
 
 **Post-Migration Optimization**
 
-- [ ] Monitor usage patterns and costs  
-- [ ] Optimize team settings based on analytics  
-- [ ] Train team on advanced features  
-- [ ] Cancel previous AI coding tool subscriptions  
-- [ ] Document new workflows and best practices  
+- [ ] Monitor usage patterns and costs
+- [ ] Optimize team settings based on analytics
+- [ ] Train team on advanced features
+- [ ] Cancel previous AI coding tool subscriptions
+- [ ] Document new workflows and best practices
 
 ## Cost Comparison Analysis
 
@@ -192,33 +192,33 @@ Switch to **Kilo for Teams** or **Kilo for Enterprise** from other AI coding too
 
 **Subscription Models Hide True Costs**
 
-- Monthly fees regardless of actual usage  
-- No visibility into per-request costs  
-- Rate limiting forces inefficient workflows  
-- Model switching without notification  
+- Monthly fees regardless of actual usage
+- No visibility into per-request costs
+- Rate limiting forces inefficient workflows
+- Model switching without notification
 
 **Kilo Transparent Pricing**
 
-- Pay exactly what AI providers charge  
-- See cost of every request in real-time  
-- No rate limiting or usage restrictions  
-- Choose optimal models for each task  
+- Pay exactly what AI providers charge
+- See cost of every request in real-time
+- No rate limiting or usage restrictions
+- Choose optimal models for each task
 
 ### ROI Calculation Framework
 
 **Current Tool Analysis**
 
-1. **Monthly subscription costs** × team size  
-2. **Hidden productivity losses** from rate limiting  
-3. **Opportunity costs** from limited model access  
-4. **Management overhead** from poor team visibility  
+1. **Monthly subscription costs** × team size
+2. **Hidden productivity losses** from rate limiting
+3. **Opportunity costs** from limited model access
+4. **Management overhead** from poor team visibility
 
 **Kilo Benefits**
 
-1. **Transparent AI costs** (typically 30-50% lower)  
-2. **Productivity gains** from no rate limiting  
-3. **Better outcomes** from optimal model selection  
-4. **Reduced management time** with comprehensive analytics  
+1. **Transparent AI costs** (typically 30-50% lower)
+2. **Productivity gains** from no rate limiting
+3. **Better outcomes** from optimal model selection
+4. **Reduced management time** with comprehensive analytics
 
 ## Team Training and Adoption
 
@@ -226,47 +226,47 @@ Switch to **Kilo for Teams** or **Kilo for Enterprise** from other AI coding too
 
 **Week 1: Basics**
 
-- Kilo Code extension installation and setup  
-- Basic chat interface and mode usage  
-- Understanding transparent pricing model  
-- Team dashboard overview  
+- Kilo Code extension installation and setup
+- Basic chat interface and mode usage
+- Understanding transparent pricing model
+- Team dashboard overview
 
 **Week 2: Advanced Features**
 
-- Custom modes and specialized workflows  
-- Advanced tools and automation  
-- Team collaboration features  
-- Usage optimization strategies  
+- Custom modes and specialized workflows
+- Advanced tools and automation
+- Team collaboration features
+- Usage optimization strategies
 
 **Week 3: Team Optimization**
 
-- Analytics review and insights  
-- Cost optimization techniques  
-- Workflow integration and best practices  
-- Advanced team management features  
+- Analytics review and insights
+- Cost optimization techniques
+- Workflow integration and best practices
+- Advanced team management features
 
 ### Adoption Best Practices
 
 **Start Small**
 
-- Begin with volunteer early adopters  
-- Use for non-critical projects initially  
-- Gather feedback and iterate  
-- Expand gradually across team  
+- Begin with volunteer early adopters
+- Use for non-critical projects initially
+- Gather feedback and iterate
+- Expand gradually across team
 
 **Provide Support**
 
-- Dedicated migration support channel  
-- Regular check-ins with team members  
-- Documentation and training resources  
-- Quick resolution of issues and questions  
+- Dedicated migration support channel
+- Regular check-ins with team members
+- Documentation and training resources
+- Quick resolution of issues and questions
 
 **Measure Success**
 
-- Track usage adoption rates  
-- Monitor cost savings and efficiency gains  
-- Collect team satisfaction feedback  
-- Document success stories and best practices  
+- Track usage adoption rates
+- Monitor cost savings and efficiency gains
+- Collect team satisfaction feedback
+- Document success stories and best practices
 
 ## Common Migration Challenges
 
@@ -274,64 +274,64 @@ Switch to **Kilo for Teams** or **Kilo for Enterprise** from other AI coding too
 
 **Extension Conflicts**
 
-- **Issue:** Multiple AI coding extensions interfering  
-- **Solution:** Disable old extensions during transition  
-- **Prevention:** Staged migration with clear timelines  
+- **Issue:** Multiple AI coding extensions interfering
+- **Solution:** Disable old extensions during transition
+- **Prevention:** Staged migration with clear timelines
 
 **Workflow Disruption**
 
-- **Issue:** Team productivity dip during transition  
-- **Solution:** Parallel usage period with gradual migration  
-- **Prevention:** Comprehensive training and support  
+- **Issue:** Team productivity dip during transition
+- **Solution:** Parallel usage period with gradual migration
+- **Prevention:** Comprehensive training and support
 
 **Settings Migration**
 
-- **Issue:** Lost customizations from previous tools  
-- **Solution:** Document and recreate important settings  
-- **Prevention:** Settings audit before migration  
+- **Issue:** Lost customizations from previous tools
+- **Solution:** Document and recreate important settings
+- **Prevention:** Settings audit before migration
 
 ### Organizational Challenges
 
 **Change Resistance**
 
-- **Issue:** Team members reluctant to switch tools  
-- **Solution:** Demonstrate clear benefits and provide training  
-- **Prevention:** Involve team in migration planning  
+- **Issue:** Team members reluctant to switch tools
+- **Solution:** Demonstrate clear benefits and provide training
+- **Prevention:** Involve team in migration planning
 
 **Budget Approval**
 
-- **Issue:** Finance team concerns about new tool costs  
-- **Solution:** Provide detailed cost comparison and ROI analysis  
-- **Prevention:** Transparent pricing documentation  
+- **Issue:** Finance team concerns about new tool costs
+- **Solution:** Provide detailed cost comparison and ROI analysis
+- **Prevention:** Transparent pricing documentation
 
 **Timeline Pressure**
 
-- **Issue:** Pressure to migrate quickly without proper planning  
-- **Solution:** Phased migration approach with clear milestones  
-- **Prevention:** Realistic timeline planning with buffer time  
+- **Issue:** Pressure to migrate quickly without proper planning
+- **Solution:** Phased migration approach with clear milestones
+- **Prevention:** Realistic timeline planning with buffer time
 
 ## Migration Support
 
 ### Professional Migration Services
 
-- **Migration planning** and timeline development  
-- **Team training** and onboarding support  
-- **Custom integration** development  
-- **Ongoing optimization** consulting  
+- **Migration planning** and timeline development
+- **Team training** and onboarding support
+- **Custom integration** development
+- **Ongoing optimization** consulting
 
 ### Self-Service Resources
 
-- **Migration guides** for specific tools  
-- **Video tutorials** for common migration scenarios  
-- **Community support** through Discord and forums  
-- **Documentation** and best practices  
+- **Migration guides** for specific tools
+- **Video tutorials** for common migration scenarios
+- **Community support** through Discord and forums
+- **Documentation** and best practices
 
 ### Getting Migration Help
 
-- **Email:** migrations@kilocode.ai  
-- **Discord:** Join our migration support channel  
-- **Consultation:** Schedule free migration planning call  
-- **Documentation:** Comprehensive migration guides  
+- **Email:** migrations@kilocode.ai
+- **Discord:** Join our migration support channel
+- **Consultation:** Schedule free migration planning call
+- **Documentation:** Comprehensive migration guides
 
 ## Success Stories
 
@@ -340,26 +340,26 @@ Switch to **Kilo for Teams** or **Kilo for Enterprise** from other AI coding too
 **Previous:** Cursor Pro subscriptions  
 **Challenge:** High costs with limited visibility  
 **Result:** 40% cost reduction with better team insights  
-**Timeline:** 3-week migration with zero productivity loss  
+**Timeline:** 3-week migration with zero productivity loss
 
 ### Enterprise Development Team (100+ developers)
 
 **Previous:** GitHub Copilot Enterprise  
 **Challenge:** Limited model choice and team management  
 **Result:** Improved code quality and team collaboration  
-**Timeline:** 6-week phased migration across multiple teams  
+**Timeline:** 6-week phased migration across multiple teams
 
 ### Startup Engineering Team (8 developers)
 
 **Previous:** Multiple individual AI tool subscriptions  
 **Challenge:** Expense report chaos and no team coordination  
 **Result:** Centralized billing and improved team efficiency  
-**Timeline:** 1-week migration with immediate benefits  
+**Timeline:** 1-week migration with immediate benefits
 
 ## Next Steps
 
-- [Get started with your team](/teams/getting-started)  
-- [Explore team management features](/teams/team-management)  
-- [Understand billing and pricing](/seats/billing)  
+- [Get started with your team](/seats/getting-started)
+- [Explore team management features](/seats/team-management)
+- [Understand billing and pricing](/seats/billing)
 
 Ready to make the switch? Contact our migration team at migrations@kilocode.ai to plan your transition to transparent AI coding.

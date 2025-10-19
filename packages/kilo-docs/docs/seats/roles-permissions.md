@@ -57,7 +57,7 @@ Every member has one of three roles that determine their access level and capabi
 | View team composition            | ✅    | ✅             | ✅     |
 | View audit logs                  | ✅    | ✅             | ✅     |
 | **Usage Controls**               |
-| Model/provider limitation        | ✅    | ✅             | ❌     |    
+| Model/provider limitation        | ✅    | ✅             | ❌     |
 | Set daily usage limits           | ✅    | ✅             | ❌     |
 | View all usage statistics        | ✅    | ✅             | ❌     |
 | View personal usage              | ✅    | ✅             | ✅     |
@@ -177,8 +177,8 @@ Every member has one of three roles that determine their access level and capabi
 
 ## Next Steps
 
-- [Learn about dashboard features](/enterprise/dashboard)
-- [Set up team management policies](/enterprise/team-management)
-- [Configure billing and credits](/enterprise/billing)
+- [Learn about dashboard features](/seats/dashboard)
+- [Set up team management policies](/seats/team-management)
+- [Configure billing and credits](/seats/billing)
 
 Understanding roles and permissions ensures your team operates securely and efficiently with clear accountability.
