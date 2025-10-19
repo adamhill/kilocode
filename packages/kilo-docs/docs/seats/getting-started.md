@@ -71,7 +71,7 @@ Team members receive invitation emails with these steps:
 
 ## Getting Support
 
-You can find the dedicated Teams support methods directly on your Organaization's page.
+You can find the dedicated Teams support methods directly on your Organization's page.
 
 ## Next Steps
 
