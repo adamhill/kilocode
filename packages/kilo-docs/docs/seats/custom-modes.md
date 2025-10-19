@@ -1,7 +1,8 @@
-# Custom Modes
+---
+sidebar_label: Custom Modes
+---
 
-**Available for:** Enterprise & Team plans
-**Permissions:** Admins and Owners
+# Custom Modes
 
 Custom Modes let you create tailored versions of Kilo’s built-in [modes](/basic-usage/using-modes) for your organization. You can also adjust the settings for Kilo Code's original default modes. You can define a mode’s purpose, behavior, and tool access — helping Kilo adapt to your team’s unique workflows.
 
@@ -9,17 +10,16 @@ For example, Admins and Owners can extend these by creating **Custom Modes** wit
 
 <img width="900" height="925" alt="Custom Modes Tab" src="https://github.com/user-attachments/assets/183a6d7e-c072-4774-be5b-7653a3fe93fb" />
 
-
 ## Creating a Custom Mode
 
 1. Go to **Enterprise/Team Dashboard → Custom Modes**.
 2. Click **Create New Mode**.
-3. Optionally select a **template** (e.g. *User Story Creator*, *Project Research*, *DevOps*).
+3. Optionally select a **template** (e.g. _User Story Creator_, _Project Research_, _DevOps_).
 4. Fill in the following fields:
 
 | Field                              | Description                                                                                          |
 | ---------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| **Mode Name**                      | Display name for the new mode (e.g. *Security Reviewer*).                                            |
+| **Mode Name**                      | Display name for the new mode (e.g. _Security Reviewer_).                                            |
 | **Mode Slug**                      | A short identifier used internally (e.g. `security-reviewer`).                                       |
 | **Role Definition**                | Describe Kilo’s role and personality for this mode. Shapes how it reasons and responds.              |
 | **Short Description**              | A brief summary shown in the mode selector.                                                          |
@@ -35,5 +35,5 @@ Your new mode appears under **Custom Modes** in the Modes dashboard.
 
 ## Managing Custom Modes
 
-* **Edit:** Click the edit icon to update any field or tool permissions.
-* **Delete:** Click the 🗑️ icon to permanently remove the mode.
+- **Edit:** Click the edit icon to update any field or tool permissions.
+- **Delete:** Click the 🗑️ icon to permanently remove the mode.

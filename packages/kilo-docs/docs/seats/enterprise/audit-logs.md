@@ -1,11 +1,12 @@
 ---
-sidebar_label: Audit Logs
+sidebar_label: Audit Logs (Enterprise Only)
 ---
 
-# Audit Logs
+# Audit Logs (Enterprise Only)
 
-Audit Logs record key actions that occur within your organization, including user activity, workspace changes, and model or settings updates.
-Admins can search and filter logs to review access patterns and ensure compliance.
+Audit Logs record key actions that occur in the management of your Kilo seats, including user logins, adding or removing models, providers, and modes, and role changes.
+
+Owners and Admins can search and filter logs to review access patterns and ensure compliance.
 
 ## Viewing Audit Logs
 
@@ -16,17 +17,15 @@ Use filters to narrow down results by action, user, or date range.
 
 <img width="900" height="551" alt="Audit-log-dashboard" src="https://github.com/user-attachments/assets/41fcf43f-4a47-4f47-a3d9-02d20a6427a6" />
 
-
 ## Filters
 
-| Filter               | Description                                                                                                                                                                                                                                                                            |
-| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Actions**          | Choose one or more events to view. Options include: <br> - `user login` / `logout` <br> - `user invite`, `accept invite`, `revoke invite` <br> - `settings change` <br> - `purchase credits` <br> - `member remove`, `member change role` <br> - `sso set domain`, `sso remove domain` |
-| **Actor Email**      | Filter by the user who performed the action.                                                                                                                                                                                                                                           |
-| **Start / End Date** | Specify a date and time range to view logs within that period.                                                                                                                                                                                                                         |
+| Filter               | Description                                                                                                                                                                                                                                                                                        |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Actions**          | Choose one or more events to view. Options include: <br /> - `user login` / `logout` <br /> - `user invite`, `accept invite`, `revoke invite` <br /> - `settings change` <br /> - `purchase credits` <br /> - `member remove`, `member change role` <br /> - `sso set domain`, `sso remove domain` |
+| **Actor Email**      | Filter by the user who performed the action.                                                                                                                                                                                                                                                       |
+| **Start / End Date** | Specify a date and time range to view logs within that period.                                                                                                                                                                                                                                     |
 
 Multiple filters can be used together for precise auditing.
-
 
 ## Log Details
 

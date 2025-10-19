@@ -98,35 +98,22 @@ const sidebars: SidebarsConfig = {
 		},
 		{
 			type: "category",
-			label: "Kilo Seats",
+			label: "Kilo for Teams & Enterprise",
 			items: [
-				"seats/teams",
-				{
-					type: "category",
-					label: "Kilo for Teams",
-					items: [
-						"seats/teams/getting-started",
-						"seats/teams/dashboard",
-						],
-				},
-				"seats/enterprise",
-				{
-					type: "category",
-					label: "Kilo for Enterprise",
-					items: [
-						"seats/enterprise/getting-started",
-						"seats/enterprise/dashboard",
-						"seats/enterprise/SSO",
-						"seats/enterprise/model-access",
-						"seats/enterprise/audit-logs",
-						]
-				}
+				"seats/about",
+				"seats/getting-started",
+				"seats/dashboard",
 				"seats/analytics",
-				"seats/custom-modes",
 				"seats/team-management",
 				"seats/roles-permissions",
-				"seats/billing"
-				"seats/migration"
+				"seats/custom-modes",
+				"seats/billing",
+				{
+					type: "category",
+					label: "Enterprise-Only Features",
+					items: ["seats/enterprise/SSO", "seats/enterprise/model-access", "seats/enterprise/audit-logs"],
+				},
+				"seats/migration",
 			],
 		},
 		{
