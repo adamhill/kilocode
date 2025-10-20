@@ -161,7 +161,7 @@ const config: Config = {
 					// Deleted seats page
 					{
 						to: "/seats/team-management",
-						from: ["/seats/roles-permissions"],
+						from: ["/seats/team-management"],
 					},
 				],
 			},

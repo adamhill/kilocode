@@ -81,5 +81,5 @@ If payment fails repeatedly:
 ## Next Steps
 
 - [Explore usage analytics](/seats/analytics)
-- [Learn about team roles and permissions](/seats/roles-permissions)
+- [Learn about team roles and permissions](/seats/team-management)
 - [Learn about team management](/seats/team-management)

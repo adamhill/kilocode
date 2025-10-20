@@ -54,6 +54,6 @@ The Organization tab shows:
 
 - [Understand billing and credits](/seats/billing)
 - [Explore usage analytics](/seats/analytics)
-- [Learn about team roles and permissions](/seats/roles-permissions)
+- [Learn about team roles and permissions](/seats/team-management)
 
 Effective team management ensures your organization maximizes the benefits of AI-assisted development while maintaining cost control and security.
