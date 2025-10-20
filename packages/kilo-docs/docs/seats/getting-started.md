@@ -4,7 +4,7 @@ sidebar_label: Getting Started
 
 # Get Started with Kilo Seats in 10 Minutes
 
-Seats for Kilo in the Teams or Enterprise subscription brings transparent AI coding to your entire engineering organization. No markup on AI costs, no vendor lock-in, complete usage visibility.
+seats for Kilo in the Teams or Enterprise subscription brings transparent AI coding to your entire engineering organization. No markup on AI costs, no vendor lock-in, complete usage visibility.
 
 ## Before You Begin
 

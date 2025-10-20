@@ -4,7 +4,15 @@ sidebar_label: Billing & Credits
 
 # Billing & Credits
 
-Kilo Seats uses a transparent, two-part billing system: a monthly subscription per seat, plus pay-as-you-go AI credits with zero markup.
+Kilo seats uses a transparent, two-part billing system: a monthly subscription per seat, plus pay-as-you-go model credits with zero markup.
+
+:::note
+
+Kilo Code seats purchases of Teams or Enterprise are separate from model provider credits.
+
+No credits are included with a Teams or Enterprise purchase.
+
+:::
 
 ## Understanding the Billing Model
 

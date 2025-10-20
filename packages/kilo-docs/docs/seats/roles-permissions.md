@@ -4,7 +4,7 @@ sidebar_label: Roles & Permissions
 
 # Roles & Permissions
 
-Kilo Seats (both Teams & Enterprise) uses a three-tier role system designed for clear responsibility separation and secure team management.
+Kilo seats (both Teams & Enterprise) uses a three-tier role system designed for clear responsibility separation and secure team management.
 
 ## Role Overview
 
