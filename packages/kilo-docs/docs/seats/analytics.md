@@ -79,7 +79,7 @@ Project names are automatically parsed from the project's `.git/config` for the 
 
 For example, if the following were in your `.git/config`:
 
-```{terminal}
+```bash
 [remote "origin"]
     url = git@github.com:example-co/example-repo.git
     fetch = +refs/heads/*:refs/remotes/origin/*
@@ -91,11 +91,11 @@ You can also manually override the project name in the `.kilocode/config.json` f
 
 To set the project identifier to `my-project`, create a `.kilocode/config.json` file with the following contents:
 
-```{json}
+```json
 {
-  "project": {
-    "id": "my-project"
-  }
+	"project": {
+		"id": "my-project"
+	}
 }
 ```
 
