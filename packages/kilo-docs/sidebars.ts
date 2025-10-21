@@ -202,6 +202,7 @@ const sidebars: SidebarsConfig = {
 				"features/tools/write-to-file",
 			],
 		},
+		"cli",
 	],
 }
 
