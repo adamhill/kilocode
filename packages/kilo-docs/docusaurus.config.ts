@@ -166,8 +166,8 @@ const config: Config = {
 
 					// Kilo credits, not tokens
 					{
-						to: "basic-usage/adding-credits",
-						from: ["basic-usage/adding-tokens"],
+						to: "/basic-usage/adding-credits",
+						from: ["/basic-usage/adding-tokens"],
 					},
 				],
 			},
