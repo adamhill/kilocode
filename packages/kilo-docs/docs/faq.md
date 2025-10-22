@@ -51,7 +51,7 @@ You can also use Kilo Code with a [local model](advanced-usage/local-models) or 
 
 If you choose to pay for models via Kilo Code, you do so by buying Kilo Credits. You can [buy Kilo Credits](basic-usage/adding-credits.md) securely via Stripe with a credit card. We do not charge a markup on Kilo Credits. $1 you give us is $1 in Kilo Credits.
 
-Model usage is metered by the providers in terms of different kinds of tokens.When you use a model, we debit your Kilo credits by the amount the provider charges us -- with no markup.
+Model usage is metered by the providers in terms of different kinds of tokens. When you use a model, we debit your Kilo credits by the amount the provider charges us -- with no markup.
 
 You can use any models you like as long as you have credits in your account. When you run out of credits, you can add more. It's that simple!
 
