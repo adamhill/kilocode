@@ -163,6 +163,12 @@ const config: Config = {
 						to: "/seats/team-management",
 						from: ["/seats/team-management"],
 					},
+
+					// Deleted seats page
+					{
+						to: "basic-usage/adding-credits",
+						from: ["basic-usage/adding-tokens"],
+					},
 				],
 			},
 		],
