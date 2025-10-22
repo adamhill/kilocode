@@ -45,7 +45,7 @@ The Kilo Code extension itself is free and open-source. In order for Kilo Code t
 
 There are some models available for free. The set of free models if constantly changing based on provider pricing decisions.
 
-You can also use Kilo Code with a [local model](advanced-usage/local-models) or "Bring Your Own API" for [another model provider](getting-started/connecting-api-provider) (like [Anthropic](providers/anthropic), [OpenAI](providers/openai), [OpenRouter](providers/openrouter), [Requesty](providers/requesty), etc.).
+You can also use Kilo Code with a [local model](advanced-usage/local-models) or "Bring Your Own API Key" for [another model provider](getting-started/connecting-api-provider) (like [Anthropic](providers/anthropic), [OpenAI](providers/openai), [OpenRouter](providers/openrouter), [Requesty](providers/requesty), etc.).
 
 ### How do I pay for model usage via Kilo Code?
 
