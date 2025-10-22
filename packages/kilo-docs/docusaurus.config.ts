@@ -164,7 +164,7 @@ const config: Config = {
 						from: ["/seats/team-management"],
 					},
 
-					// Deleted seats page
+					// Kilo credits, not tokens
 					{
 						to: "basic-usage/adding-credits",
 						from: ["basic-usage/adding-tokens"],
