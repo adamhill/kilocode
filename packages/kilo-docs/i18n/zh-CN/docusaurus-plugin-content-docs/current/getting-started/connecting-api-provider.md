@@ -8,11 +8,12 @@ Kilo Code 需要 AI 模型提供商的 API 密钥才能运行。
 
 我们推荐以下选项来访问强大的 **Claude 4 Sonnet** 模型：
 
-- **Kilo Code API 提供商（推荐）：** 以有竞争力的价格提供对 OpenRouter 可用的所有模型的访问权限，并提供免费积分以供入门。 [查看定价](https://kilocode.ai/pricing)
+- **Kilo Code API 提供商（推荐）：** 以有竞争力的价格提供对 OpenRouter 可用的所有模型的访问权限，并提供免费积分以供入门。 [查看定价](https://kilo.ai/pricing)
 - **OpenRouter：** 通过单个 API 密钥提供对多个 AI 模型的访问权限。 [查看定价](https://openrouter.ai/models?order=pricing-low-to-high)。
 - **Anthropic：** 直接访问 Claude 模型。需要 API 访问批准，并且可能[根据您的层级有速率限制](https://docs.anthropic.com/en/api/rate-limits#requirements-to-advance-tier)。有关详细信息，请参阅 [Anthropic 的定价页面](https://www.anthropic.com/pricing#anthropic-api)。
 
 ## 使用 Kilo Code 提供商
+
 默认情况下，当您安装 Kilo Code 扩展时，系统会提示您在 [Kilo Code 提供商](/providers/kilocode)中登录或创建帐户。
 
 这将引导您完成帐户设置并*自动*正确配置 Kilo Code 以帮助您入门。如果您更喜欢使用其他提供商，则需要按照以下说明手动获取您的 API 密钥。
@@ -36,7 +37,7 @@ LLM路由器让您可以通过一个API密钥访问多个AI模型，简化了成
 
 <img src="/docs/img/connecting-api-provider/connecting-api-provider-4.png" alt="OpenRouter API密钥页面" width="600" />
 
-*OpenRouter仪表板，带有"创建密钥"按钮。命名您的密钥并在创建后复制它。*
+_OpenRouter仪表板，带有"创建密钥"按钮。命名您的密钥并在创建后复制它。_
 
 ##### Requesty
 
@@ -47,7 +48,7 @@ LLM路由器让您可以通过一个API密钥访问多个AI模型，简化了成
 
 <img src="/docs/img/connecting-api-provider/connecting-api-provider-7.png" alt="Requesty API管理页面" width="600" />
 
-*Requesty API管理页面，带有"创建API密钥"按钮。立即复制您的密钥 - 它只会显示一次。*
+_Requesty API管理页面，带有"创建API密钥"按钮。立即复制您的密钥 - 它只会显示一次。_
 
 #### 选项2：直接提供商
 
@@ -62,7 +63,7 @@ LLM路由器让您可以通过一个API密钥访问多个AI模型，简化了成
 
 <img src="/docs/img/connecting-api-provider/connecting-api-provider-5.png" alt="Anthropic控制台API密钥部分" width="600" />
 
-*Anthropic控制台API密钥部分，带有"创建密钥"按钮。命名您的密钥，设置过期时间，并立即复制它。*
+_Anthropic控制台API密钥部分，带有"创建密钥"按钮。命名您的密钥，设置过期时间，并立即复制它。_
 
 ##### OpenAI
 
@@ -73,7 +74,7 @@ LLM路由器让您可以通过一个API密钥访问多个AI模型，简化了成
 
 <img src="/docs/img/connecting-api-provider/connecting-api-provider-6.png" alt="OpenAI API密钥页面" width="600" />
 
-*OpenAI平台，带有"创建新密钥"按钮。命名您的密钥并在创建后立即复制它。*
+_OpenAI平台，带有"创建新密钥"按钮。命名您的密钥并在创建后立即复制它。_
 
 ### 在VS Code中配置Kilo Code
 
