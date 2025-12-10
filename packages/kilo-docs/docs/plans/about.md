@@ -25,8 +25,9 @@ No credits are included with a Teams or Enterprise plan purchase.
 - **Centralized billing** - one invoice for your whole team
 - **Complete transparency** - see every request, cost, and usage pattern
 - **Team management** - roles, permissions, and usage controls
+- **AI Adoption Score** - see how well your team is using AI to accelerate development
 
-**Cost:** $29 per user per month
+**Cost:** $15 per user per month
 
 ## What You Get from Kilo Enterprise
 
@@ -38,4 +39,4 @@ No credits are included with a Teams or Enterprise plan purchase.
 - **SLA commitments** for support issues
 - **Dedicated support channels** for private, direct communication
 
-**Cost:** $299 per user per month
+**Cost:** $150 per user per month
