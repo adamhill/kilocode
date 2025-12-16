@@ -25,7 +25,7 @@ const config: Config = {
 	favicon: "img/favicon.ico",
 
 	// Set the production url of your site here
-	url: "https://kilocode.ai",
+	url: "https://kilo.ai",
 	// Set the /<baseUrl>/ pathname under which your site is served
 	// For GitHub pages deployment, it is often '/<projectName>/'
 	baseUrl: "/docs",
@@ -207,6 +207,15 @@ const config: Config = {
 					{
 						to: "/plans/migration",
 						from: ["/seats/migration"],
+					},
+					// Contributing page relocation
+					{
+						to: "/contributing",
+						from: ["/extending/contributing-to-kilo"],
+					},
+					{
+						to: "/contributing/development-environment",
+						from: ["/extending/development-environment"],
 					},
 				],
 			},
