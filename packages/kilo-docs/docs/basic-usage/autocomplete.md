@@ -16,8 +16,6 @@ Autocomplete analyzes your code context and provides:
 - **Contextual suggestions** based on your surrounding code
 - **Multi-line completions** for complex code structures
 
-The feature uses your selected AI provider to generate intelligent suggestions that match your coding style and project context.
-
 ## Triggering Options
 
 ### Pause to Complete
@@ -64,16 +62,48 @@ This is ideal for:
 
 You can customize this keyboard shortcut as well in your VS Code settings.
 
-## Advanced Settings
+## Provider and Model Selection
 
-### Provider Configuration
+Autocomplete currently uses **Codestral** (by Mistral AI) as the underlying model. This model is specifically optimized for code completion tasks and provides fast, high-quality suggestions.
 
-By default, autocomplete uses your main Kilo Code/OpenRouter/Mistral credentials with the Codestral model.
-This model is recommended as it strikes an optimal balance between performance speed and capability.
-However, you can:
+### How the Provider is Chosen
 
-- **Use custom provider**: Toggle this option to use a different AI provider specifically for autocomplete
-- **Select different models**: Choose models optimized for speed vs. quality based on your needs
+Kilo Code automatically selects a provider for autocomplete in the following priority order:
+
+- **Mistral** (using `codestral-latest`)
+- **Kilo Code** (using `mistralai/codestral-2508`)
+- **OpenRouter** (using `mistralai/codestral-2508`)
+- **Requesty** (using `mistral/codestral-latest`)
+- **Bedrock** (using `mistral.codestral-2508-v1:0`)
+- **Hugging Face** (using `mistralai/Codestral-22B-v0.1`)
+- **LiteLLM** (using `codestral/codestral-latest`)
+- **LM Studio** (using `mistralai/codestral-22b-v0.1`)
+- **Ollama** (using `codestral:latest`)
+  `
+
+:::note
+**Model Selection is Currently Fixed**: At this time, you cannot freely choose a different model for autocomplete. The feature is designed to work specifically with Codestral, which is optimized for Fill-in-the-Middle (FIM) completions. Support for additional models may be added in future releases.
+:::
+
+## Disable Rival Autocomplete
+
+We recommend disabling rival autocompletes to optimize your experience with Kilo Code. To disable GitHub Copilot autocomplete in VSCode, go to **Settings** and navigate to **GitHub** > **Copilot: Advanced** (or search for 'copilot').
+
+Then, toggle to 'disabled':
+
+<img
+  src="https://github.com/user-attachments/assets/60c69417-1d1c-4a48-9820-5390c30ae25c"
+  alt="Disable GitHub Copilot in VSCode"
+  width="800"
+/>
+
+If using Cursor, go to **Settings** > **Cursor Settings** > **Tab**, and toggle off 'Cursor Tab':
+
+<img
+  src="https://github.com/user-attachments/assets/fd2eeae2-f770-40ca-8a72-a9d5a1c17d47"
+  alt="Disable Cursor autocomplete"
+  width="800"
+/>
 
 ## Best Practices
 
