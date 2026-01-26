@@ -47,7 +47,7 @@ export function createKilo(options: KiloProviderOptions = {}): SDK {
 
   // Create custom fetch wrapper to add dynamic headers
   const originalFetch = options.fetch ?? fetch
-  const wrappedFetch: typeof fetch = async (input, init) => {
+  const wrappedFetch = async (input: RequestInfo | URL, init?: RequestInit) => {
     const headers = new Headers(init?.headers)
 
     // Add custom headers
@@ -71,6 +71,6 @@ export function createKilo(options: KiloProviderOptions = {}): SDK {
     baseURL: openRouterUrl,
     apiKey: apiKey ?? ANONYMOUS_API_KEY,
     headers: customHeaders,
-    fetch: wrappedFetch,
+    fetch: wrappedFetch as typeof fetch,
   })
 }

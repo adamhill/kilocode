@@ -43,7 +43,7 @@ export function createKiloDebug(options: KiloProviderOptions = {}): SDK {
 
   // Create custom fetch wrapper to add dynamic headers
   const originalFetch = options.fetch ?? fetch
-  const wrappedFetch: typeof fetch = async (input, init) => {
+  const wrappedFetch = async (input: RequestInfo | URL, init?: RequestInit) => {
     console.log("\n🚀 [KILO DEBUG] Making request:")
     console.log("  - URL:", String(input))
     console.log("  - Method:", init?.method || "GET")
@@ -104,6 +104,6 @@ export function createKiloDebug(options: KiloProviderOptions = {}): SDK {
     baseURL: openRouterUrl,
     apiKey: apiKey ?? ANONYMOUS_API_KEY,
     headers: customHeaders,
-    fetch: wrappedFetch,
+    fetch: wrappedFetch as typeof fetch,
   })
 }
