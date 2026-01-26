@@ -8,9 +8,11 @@ import { useTheme, tint } from "@tui/context/theme"
 // ~ = shadow top only (▀ with fg=shadow)
 const SHADOW_MARKER = /[_^~]/
 
+// kilocode_change start
 const LOGO_LEFT = [`              `, `█▄▀ ▀ █   █▀▀█`, `█_▀ █ █__ █__█`, `▀~▀ ▀ ▀▀▀ ▀▀▀▀`]
 
 const LOGO_RIGHT = [`              `, `   █▀▀▀ █   ▀`, `   █___ █__ █`, `   ▀▀▀▀ ▀▀▀ ▀`]
+// kilocode_change end
 
 export function Logo() {
   const { theme } = useTheme()
