@@ -1,6 +1,27 @@
 # Kilocode Change Markers
 
-When modifying shared code (files that exist in upstream opencode), use `kilocode_change` markers to identify Kilo Code-specific changes.
+To minimize merge conflicts when syncing with upstream, mark Kilo Code-specific changes in shared code with `kilocode_change` comments.
+
+**Single line:**
+
+```typescript
+const value = 42 // kilocode_change
+```
+
+**Multi-line:**
+
+```typescript
+// kilocode_change start
+const foo = 1
+const bar = 2
+// kilocode_change end
+```
+
+**New files:**
+
+```typescript
+// kilocode_change - new file
+```
 
 ## When markers are NOT needed
 

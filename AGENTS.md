@@ -86,34 +86,3 @@ Tests MUST test actual implementation, do not duplicate logic into a test.
 ## Fork Merge Process
 
 Kilo CLI is a fork of [opencode](https://github.com/anomalyco/opencode).
-
-## kilocode_change Markers
-
-To minimize merge conflicts when syncing with upstream, mark Kilo Code-specific changes in shared code with `kilocode_change` comments.
-
-**Single line:**
-
-```typescript
-const value = 42 // kilocode_change
-```
-
-**Multi-line:**
-
-```typescript
-// kilocode_change start
-const foo = 1
-const bar = 2
-// kilocode_change end
-```
-
-**New files:**
-
-```typescript
-// kilocode_change - new file
-```
-
-### When markers are NOT needed
-
-Code in these directories is Kilo Code-specific and doesn't need markers:
-
-- Any path containing `kilocode` in filename or directory name
