@@ -254,6 +254,38 @@
         "typescript": "catalog:",
       },
     },
+    "packages/kilo-auth-plugin": {
+      "name": "@opencode-ai/kilo-auth-plugin",
+      "version": "1.0.0",
+      "dependencies": {
+        "@clack/prompts": "1.0.0-alpha.1",
+        "@opencode-ai/kilo-provider": "workspace:*",
+        "@opencode-ai/plugin": "workspace:*",
+        "@opencode-ai/sdk": "workspace:*",
+        "open": "10.1.2",
+      },
+      "devDependencies": {
+        "@tsconfig/node22": "catalog:",
+        "@types/node": "catalog:",
+        "@typescript/native-preview": "catalog:",
+        "typescript": "catalog:",
+      },
+    },
+    "packages/kilo-provider": {
+      "name": "@opencode-ai/kilo-provider",
+      "version": "1.0.0",
+      "dependencies": {
+        "@openrouter/ai-sdk-provider": "1.5.2",
+        "ai": "catalog:",
+        "zod": "catalog:",
+      },
+      "devDependencies": {
+        "@tsconfig/node22": "catalog:",
+        "@types/node": "catalog:",
+        "@typescript/native-preview": "catalog:",
+        "typescript": "catalog:",
+      },
+    },
     "packages/opencode": {
       "name": "opencode",
       "version": "1.1.36",
@@ -291,6 +323,8 @@
         "@octokit/graphql": "9.0.2",
         "@octokit/rest": "catalog:",
         "@openauthjs/openauth": "catalog:",
+        "@opencode-ai/kilo-auth-plugin": "workspace:*",
+        "@opencode-ai/kilo-provider": "workspace:*",
         "@opencode-ai/plugin": "workspace:*",
         "@opencode-ai/script": "workspace:*",
         "@opencode-ai/sdk": "workspace:*",
@@ -1206,6 +1240,10 @@
     "@opencode-ai/enterprise": ["@opencode-ai/enterprise@workspace:packages/enterprise"],
 
     "@opencode-ai/function": ["@opencode-ai/function@workspace:packages/function"],
+
+    "@opencode-ai/kilo-auth-plugin": ["@opencode-ai/kilo-auth-plugin@workspace:packages/kilo-auth-plugin"],
+
+    "@opencode-ai/kilo-provider": ["@opencode-ai/kilo-provider@workspace:packages/kilo-provider"],
 
     "@opencode-ai/plugin": ["@opencode-ai/plugin@workspace:packages/plugin"],
 

@@ -5,6 +5,7 @@ import z from "zod"
 import { Installation } from "../installation"
 import { Flag } from "../flag/flag"
 import { lazy } from "@/util/lazy"
+import { ModelCache } from "./model-cache" // kilocode_change
 
 // Try to import bundled snapshot (generated at build time)
 // Falls back to undefined in dev mode when snapshot doesn't exist
@@ -100,7 +101,30 @@ export namespace ModelsDev {
 
   export async function get() {
     const result = await Data()
-    return result as Record<string, Provider>
+    // kilocode_change start
+    const providers = result as Record<string, Provider>
+
+    // Inject kilo provider with dynamic model fetching
+    if (!providers["kilo"]) {
+      const kiloModels = await ModelCache.fetch("kilo").catch(() => ({}))
+
+      providers["kilo"] = {
+        id: "kilo",
+        name: "Kilo Gateway",
+        env: [],
+        api: "https://api.kilo.ai/api/openrouter/",
+        npm: "@opencode-ai/kilo-provider",
+        models: kiloModels,
+      }
+
+      // Trigger background refresh if models are empty or stale
+      if (Object.keys(kiloModels).length === 0) {
+        ModelCache.refresh("kilo").catch(() => {})
+      }
+    }
+
+    return providers
+    // kilocode_change end
   }
 
   export async function refresh() {
