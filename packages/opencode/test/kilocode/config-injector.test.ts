@@ -59,6 +59,54 @@ describe("KilocodeConfigInjector", () => {
       expect(result.warnings[0]).toContain("code")
       expect(result.warnings[0]).toContain("skipped")
     })
+
+    test("includes workflows as commands in config", async () => {
+      await using tmp = await tmpdir({
+        init: async (dir) => {
+          const workflowsDir = path.join(dir, ".kilocode", "workflows")
+          await Bun.write(
+            path.join(workflowsDir, "code-review.md"),
+            "# Code Review\n\nPerform a code review.\n\n## Steps\n\n1. Review",
+          )
+        },
+      })
+
+      const result = await KilocodeConfigInjector.buildConfig({ projectDir: tmp.path, skipGlobalPaths: true })
+      const config = JSON.parse(result.configJson)
+
+      expect(config.command).toBeDefined()
+      expect(config.command["code-review"]).toBeDefined()
+      expect(config.command["code-review"].template).toContain("# Code Review")
+      expect(config.command["code-review"].description).toBe("Perform a code review.")
+    })
+
+    test("includes both modes and workflows in config", async () => {
+      await using tmp = await tmpdir({
+        init: async (dir) => {
+          // Add a custom mode
+          await Bun.write(
+            path.join(dir, ".kilocodemodes"),
+            `customModes:
+  - slug: translate
+    name: Translate
+    roleDefinition: You are a translator
+    groups:
+      - read`,
+          )
+          // Add a workflow
+          const workflowsDir = path.join(dir, ".kilocode", "workflows")
+          await Bun.write(path.join(workflowsDir, "deploy.md"), "# Deploy\n\nDeploy the app.")
+        },
+      })
+
+      const result = await KilocodeConfigInjector.buildConfig({ projectDir: tmp.path, skipGlobalPaths: true })
+      const config = JSON.parse(result.configJson)
+
+      expect(config.agent).toBeDefined()
+      expect(config.agent.translate).toBeDefined()
+      expect(config.command).toBeDefined()
+      expect(config.command["deploy"]).toBeDefined()
+    })
   })
 
   describe("getEnvVars", () => {
