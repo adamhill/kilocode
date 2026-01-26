@@ -226,7 +226,7 @@ export namespace LLM {
             }
           : input.model.providerID !== "anthropic"
             ? {
-                "User-Agent": `opencode/${Installation.VERSION}`,
+                "User-Agent": `kilo/${Installation.VERSION}`, // kilocode_change
               }
             : undefined),
         ...input.model.headers,
