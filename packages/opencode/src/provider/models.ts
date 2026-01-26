@@ -113,7 +113,7 @@ export namespace ModelsDev {
         name: "Kilo Gateway",
         env: [],
         api: "https://api.kilo.ai/api/openrouter/",
-        npm: "@opencode-ai/kilo-provider",
+        npm: "@kilocode/kilo-gateway",
         models: kiloModels,
       }
 

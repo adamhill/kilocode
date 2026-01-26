@@ -90,6 +90,7 @@ export const dict = {
   "dialog.provider.group.popular": "Populære",
   "dialog.provider.group.other": "Andre",
   "dialog.provider.tag.recommended": "Anbefalt",
+  "dialog.provider.kilo.note": "Tilgang til 500+ AI-modeller",
   "dialog.provider.anthropic.note": "Koble til med Claude Pro/Max eller API-nøkkel",
   "dialog.provider.openai.note": "Koble til med ChatGPT Pro/Plus eller API-nøkkel",
   "dialog.provider.copilot.note": "Koble til med Copilot eller API-nøkkel",

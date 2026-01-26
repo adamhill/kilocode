@@ -36,6 +36,10 @@ import type {
   GlobalEventResponses,
   GlobalHealthResponses,
   InstanceDisposeResponses,
+  KiloOrganizationSetErrors,
+  KiloOrganizationSetResponses,
+  KiloProfileErrors,
+  KiloProfileResponses,
   LspStatusResponses,
   McpAddErrors,
   McpAddResponses,
@@ -2057,6 +2061,71 @@ export class Provider extends HeyApiClient {
   }
 }
 
+export class Organization extends HeyApiClient {
+  /**
+   * Update Kilo Gateway organization
+   *
+   * Switch to a different Kilo Gateway organization
+   */
+  public set<ThrowOnError extends boolean = false>(
+    parameters?: {
+      directory?: string
+      organizationId?: string | null
+    },
+    options?: Options<never, ThrowOnError>,
+  ) {
+    const params = buildClientParams(
+      [parameters],
+      [
+        {
+          args: [
+            { in: "query", key: "directory" },
+            { in: "body", key: "organizationId" },
+          ],
+        },
+      ],
+    )
+    return (options?.client ?? this.client).post<KiloOrganizationSetResponses, KiloOrganizationSetErrors, ThrowOnError>(
+      {
+        url: "/kilo/organization",
+        ...options,
+        ...params,
+        headers: {
+          "Content-Type": "application/json",
+          ...options?.headers,
+          ...params.headers,
+        },
+      },
+    )
+  }
+}
+
+export class Kilo extends HeyApiClient {
+  /**
+   * Get Kilo Gateway profile
+   *
+   * Fetch user profile and organizations from Kilo Gateway
+   */
+  public profile<ThrowOnError extends boolean = false>(
+    parameters?: {
+      directory?: string
+    },
+    options?: Options<never, ThrowOnError>,
+  ) {
+    const params = buildClientParams([parameters], [{ args: [{ in: "query", key: "directory" }] }])
+    return (options?.client ?? this.client).get<KiloProfileResponses, KiloProfileErrors, ThrowOnError>({
+      url: "/kilo/profile",
+      ...options,
+      ...params,
+    })
+  }
+
+  private _organization?: Organization
+  get organization(): Organization {
+    return (this._organization ??= new Organization({ client: this.client }))
+  }
+}
+
 export class Find extends HeyApiClient {
   /**
    * Find text
@@ -3179,6 +3248,11 @@ export class OpencodeClient extends HeyApiClient {
   private _provider?: Provider
   get provider(): Provider {
     return (this._provider ??= new Provider({ client: this.client }))
+  }
+
+  private _kilo?: Kilo
+  get kilo(): Kilo {
+    return (this._kilo ??= new Kilo({ client: this.client }))
   }
 
   private _find?: Find

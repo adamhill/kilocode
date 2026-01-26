@@ -254,29 +254,16 @@
         "typescript": "catalog:",
       },
     },
-    "packages/kilo-auth-plugin": {
-      "name": "@opencode-ai/kilo-auth-plugin",
+    "packages/kilo-gateway": {
+      "name": "@kilocode/kilo-gateway",
       "version": "1.0.0",
       "dependencies": {
         "@clack/prompts": "1.0.0-alpha.1",
-        "@opencode-ai/kilo-provider": "workspace:*",
         "@opencode-ai/plugin": "workspace:*",
         "@opencode-ai/sdk": "workspace:*",
-        "open": "10.1.2",
-      },
-      "devDependencies": {
-        "@tsconfig/node22": "catalog:",
-        "@types/node": "catalog:",
-        "@typescript/native-preview": "catalog:",
-        "typescript": "catalog:",
-      },
-    },
-    "packages/kilo-provider": {
-      "name": "@opencode-ai/kilo-provider",
-      "version": "1.0.0",
-      "dependencies": {
         "@openrouter/ai-sdk-provider": "1.5.2",
         "ai": "catalog:",
+        "open": "10.1.2",
         "zod": "catalog:",
       },
       "devDependencies": {
@@ -319,12 +306,11 @@
         "@gitlab/gitlab-ai-provider": "3.3.1",
         "@hono/standard-validator": "0.1.5",
         "@hono/zod-validator": "catalog:",
+        "@kilocode/kilo-gateway": "workspace:*",
         "@modelcontextprotocol/sdk": "1.25.2",
         "@octokit/graphql": "9.0.2",
         "@octokit/rest": "catalog:",
         "@openauthjs/openauth": "catalog:",
-        "@opencode-ai/kilo-auth-plugin": "workspace:*",
-        "@opencode-ai/kilo-provider": "workspace:*",
         "@opencode-ai/plugin": "workspace:*",
         "@opencode-ai/script": "workspace:*",
         "@opencode-ai/sdk": "workspace:*",
@@ -1147,6 +1133,8 @@
 
     "@kilocode/cli": ["@kilocode/cli@workspace:packages/opencode"],
 
+    "@kilocode/kilo-gateway": ["@kilocode/kilo-gateway@workspace:packages/kilo-gateway"],
+
     "@kobalte/core": ["@kobalte/core@0.13.11", "", { "dependencies": { "@floating-ui/dom": "^1.5.1", "@internationalized/date": "^3.4.0", "@internationalized/number": "^3.2.1", "@kobalte/utils": "^0.9.1", "@solid-primitives/props": "^3.1.8", "@solid-primitives/resize-observer": "^2.0.26", "solid-presence": "^0.1.8", "solid-prevent-scroll": "^0.1.4" }, "peerDependencies": { "solid-js": "^1.8.15" } }, "sha512-hK7TYpdib/XDb/r/4XDBFaO9O+3ZHz4ZWryV4/3BfES+tSQVgg2IJupDnztKXB0BqbSRy/aWlHKw1SPtNPYCFQ=="],
 
     "@kobalte/utils": ["@kobalte/utils@0.9.1", "", { "dependencies": { "@solid-primitives/event-listener": "^2.2.14", "@solid-primitives/keyed": "^1.2.0", "@solid-primitives/map": "^0.4.7", "@solid-primitives/media": "^2.2.4", "@solid-primitives/props": "^3.1.8", "@solid-primitives/refs": "^1.0.5", "@solid-primitives/utils": "^6.2.1" }, "peerDependencies": { "solid-js": "^1.8.8" } }, "sha512-eeU60A3kprIiBDAfv9gUJX1tXGLuZiKMajUfSQURAF2pk4ZoMYiqIzmrMBvzcxP39xnYttgTyQEVLwiTZnrV4w=="],
@@ -1242,10 +1230,6 @@
     "@opencode-ai/enterprise": ["@opencode-ai/enterprise@workspace:packages/enterprise"],
 
     "@opencode-ai/function": ["@opencode-ai/function@workspace:packages/function"],
-
-    "@opencode-ai/kilo-auth-plugin": ["@opencode-ai/kilo-auth-plugin@workspace:packages/kilo-auth-plugin"],
-
-    "@opencode-ai/kilo-provider": ["@opencode-ai/kilo-provider@workspace:packages/kilo-provider"],
 
     "@opencode-ai/plugin": ["@opencode-ai/plugin@workspace:packages/plugin"],
 

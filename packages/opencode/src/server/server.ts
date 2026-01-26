@@ -29,6 +29,7 @@ import { FileRoutes } from "./routes/file"
 import { ConfigRoutes } from "./routes/config"
 import { ExperimentalRoutes } from "./routes/experimental"
 import { ProviderRoutes } from "./routes/provider"
+import { createKiloRoutes } from "@kilocode/kilo-gateway" // kilocode_change
 import { lazy } from "../util/lazy"
 import { InstanceBootstrap } from "../project/bootstrap"
 import { Storage } from "../storage/storage"
@@ -159,6 +160,21 @@ export namespace Server {
         .route("/permission", PermissionRoutes())
         .route("/question", QuestionRoutes())
         .route("/provider", ProviderRoutes())
+        // kilocode_change start - Kilo Gateway routes
+        .route(
+          "/kilo",
+          createKiloRoutes({
+            Hono,
+            describeRoute,
+            validator,
+            resolver,
+            errors,
+            Auth,
+            lazy,
+            z,
+          }),
+        )
+        // kilocode_change end
         .route("/", FileRoutes())
         .route("/mcp", McpRoutes())
         .route("/tui", TuiRoutes())

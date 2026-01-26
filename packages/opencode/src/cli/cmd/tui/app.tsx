@@ -36,6 +36,7 @@ import { ArgsProvider, useArgs, type Args } from "./context/args"
 import open from "open"
 import { writeHeapSnapshot } from "v8"
 import { PromptRefProvider, usePromptRef } from "./context/prompt"
+import { registerKiloCommands } from "@kilocode/kilo-gateway" // kilocode_change
 
 async function getTerminalBackgroundColor(): Promise<"dark" | "light"> {
   // can't set raw mode if not a TTY
@@ -571,6 +572,8 @@ function App() {
       },
     },
   ])
+
+  registerKiloCommands(useSDK) // kilocode_change
 
   createEffect(() => {
     const currentModel = local.model.current()

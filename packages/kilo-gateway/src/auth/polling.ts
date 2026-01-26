@@ -1,4 +1,4 @@
-import type { PollOptions, PollResult } from "./types.js"
+import type { PollOptions, PollResult } from "../types.js"
 
 /**
  * Generic polling utility with timeout and progress tracking

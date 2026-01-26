@@ -1,17 +1,19 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
-  "name": "@opencode-ai/kilo-provider",
+  "name": "@kilocode/kilo-gateway",
   "version": "1.0.0",
   "type": "module",
   "license": "MIT",
-  "description": "KiloCode provider for OpenCode AI SDK",
+  "description": "Unified Kilo Gateway package for OpenCode - authentication, provider, and API integration",
   "keywords": [
     "kilo",
     "kilocode",
     "opencode",
+    "auth",
+    "plugin",
+    "provider",
     "ai",
-    "llm",
-    "provider"
+    "llm"
   ],
   "exports": {
     ".": "./src/index.ts"
@@ -24,8 +26,12 @@
     "build": "tsc"
   },
   "dependencies": {
+    "@opencode-ai/plugin": "workspace:*",
+    "@opencode-ai/sdk": "workspace:*",
     "@openrouter/ai-sdk-provider": "1.5.2",
+    "@clack/prompts": "1.0.0-alpha.1",
     "ai": "catalog:",
+    "open": "10.1.2",
     "zod": "catalog:"
   },
   "devDependencies": {
@@ -33,5 +39,21 @@
     "@types/node": "catalog:",
     "typescript": "catalog:",
     "@typescript/native-preview": "catalog:"
+  },
+  "peerDependencies": {
+    "solid-js": "*",
+    "@opentui/core": "*",
+    "@opentui/solid": "*"
+  },
+  "peerDependenciesMeta": {
+    "solid-js": {
+      "optional": true
+    },
+    "@opentui/core": {
+      "optional": true
+    },
+    "@opentui/solid": {
+      "optional": true
+    }
   }
 }

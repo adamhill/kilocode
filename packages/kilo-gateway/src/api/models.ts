@@ -1,7 +1,7 @@
 import { z } from "zod"
-import { getKiloUrlFromToken } from "./auth"
-import { DEFAULT_HEADERS } from "./headers"
-import { KILO_OPENROUTER_BASE, MODELS_FETCH_TIMEOUT_MS } from "./constants"
+import { getKiloUrlFromToken } from "../auth/token.js"
+import { DEFAULT_HEADERS } from "../headers.js"
+import { KILO_OPENROUTER_BASE, MODELS_FETCH_TIMEOUT_MS } from "./constants.js"
 
 /**
  * OpenRouter model schema

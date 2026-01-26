@@ -13,8 +13,10 @@ import { DialogModel } from "./dialog-model"
 import { useKeyboard } from "@opentui/solid"
 import { Clipboard } from "@tui/util/clipboard"
 import { useToast } from "../ui/toast"
+import { KiloAutoMethod } from "@kilocode/kilo-gateway" // kilocode_change
 
 const PROVIDER_PRIORITY: Record<string, number> = {
+  kilo: -1, // kilocode_change - Kilo Gateway at top
   opencode: 0,
   anthropic: 1,
   "github-copilot": 2,
@@ -37,6 +39,7 @@ export function createDialogProviderOptions() {
           title: provider.name,
           value: provider.id,
           description: {
+            kilo: "(Recommended)", // kilocode_change
             opencode: "(Recommended)",
             anthropic: "(Claude Max or API key)",
             openai: "(ChatGPT Plus/Pro or API key)",
@@ -86,14 +89,30 @@ export function createDialogProviderOptions() {
                 ))
               }
               if (result.data?.method === "auto") {
-                dialog.replace(() => (
-                  <AutoMethod
-                    providerID={provider.id}
-                    title={method.label}
-                    index={index}
-                    authorization={result.data!}
-                  />
-                ))
+                // kilocode_change start - Use custom handler for Kilo Gateway
+                if (provider.id === "kilo") {
+                  dialog.replace(() => (
+                    <KiloAutoMethod
+                      providerID={provider.id}
+                      title={method.label}
+                      index={index}
+                      authorization={result.data!}
+                      useSDK={useSDK}
+                      useTheme={useTheme}
+                      DialogModel={DialogModel}
+                    />
+                  ))
+                } else {
+                  dialog.replace(() => (
+                    <AutoMethod
+                      providerID={provider.id}
+                      title={method.label}
+                      index={index}
+                      authorization={result.data!}
+                    />
+                  ))
+                }
+                // kilocode_change end
               }
             }
             if (method.type === "api") {

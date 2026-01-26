@@ -87,6 +87,7 @@ export const dict = {
   "dialog.provider.group.popular": "Popularne",
   "dialog.provider.group.other": "Inne",
   "dialog.provider.tag.recommended": "Zalecane",
+  "dialog.provider.kilo.note": "Dostęp do ponad 500 modeli AI",
   "dialog.provider.anthropic.note": "Połącz z Claude Pro/Max lub kluczem API",
   "dialog.provider.openai.note": "Połącz z ChatGPT Pro/Plus lub kluczem API",
   "dialog.provider.copilot.note": "Połącz z Copilot lub kluczem API",

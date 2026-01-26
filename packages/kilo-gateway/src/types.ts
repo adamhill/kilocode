@@ -1,5 +1,54 @@
+// kilocode_change - Kilo Gateway types
 import type { Provider as SDK } from "ai"
 import type { LanguageModelV2 } from "@openrouter/ai-sdk-provider"
+
+// ============================================================================
+// Authentication Types
+// ============================================================================
+
+export interface DeviceAuthInitiateResponse {
+  code: string
+  verificationUrl: string
+  expiresIn: number
+}
+
+export interface DeviceAuthPollResponse {
+  status: "pending" | "approved" | "denied" | "expired"
+  token?: string
+  userEmail?: string
+}
+
+export interface Organization {
+  id: string
+  name: string
+  role: string
+}
+
+export interface KilocodeProfile {
+  email: string
+  name?: string
+  organizations?: Organization[]
+}
+
+export interface KilocodeBalance {
+  balance: number
+}
+
+export interface PollOptions<T> {
+  interval: number
+  maxAttempts: number
+  pollFn: () => Promise<PollResult<T>>
+}
+
+export interface PollResult<T> {
+  continue: boolean
+  data?: T
+  error?: Error
+}
+
+// ============================================================================
+// Provider Types
+// ============================================================================
 
 /**
  * Options for creating a Kilo provider instance
@@ -109,3 +158,6 @@ export interface ProviderInfo {
   options: Record<string, any>
   models: Record<string, any>
 }
+
+// Re-export LanguageModelV2 for convenience
+export type { LanguageModelV2 }
