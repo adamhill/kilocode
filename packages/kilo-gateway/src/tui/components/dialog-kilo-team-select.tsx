@@ -25,7 +25,7 @@ export function DialogKiloTeamSelect(props: DialogKiloTeamSelectProps) {
       title="Select Team"
       options={options}
       current={props.currentOrgId || null}
-      onSelect={async (option) => {
+      onSelect={async (option: any) => {
         await props.onSelect(option.value)
       }}
     />

@@ -42,7 +42,7 @@ export function DialogKiloOrganization(props: DialogKiloOrganizationProps) {
       title={`Select Account (${props.userEmail})`}
       options={options}
       current={defaultSelection}
-      onSelect={async (option) => {
+      onSelect={async (option: any) => {
         const orgId = option.value
 
         // Update auth to include organization ID using server endpoint

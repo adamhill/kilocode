@@ -42,7 +42,7 @@ export function KiloAutoMethod(props: KiloAutoMethodProps) {
   const [status, setStatus] = createSignal<"waiting" | "fetching" | "error">("waiting")
   const [tokenForOrgSelection, setTokenForOrgSelection] = createSignal<string | null>(null)
 
-  useKeyboard((evt) => {
+  useKeyboard((evt: any) => {
     if (evt.name === "c" && !evt.ctrl && !evt.meta) {
       const code = props.authorization.instructions.match(/[A-Z0-9]{4}-[A-Z0-9]{4}/)?.[0] ?? props.authorization.url
       Clipboard.copy(code)

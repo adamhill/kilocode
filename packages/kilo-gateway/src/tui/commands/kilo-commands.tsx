@@ -1,4 +1,3 @@
-// kilocode_change - Kilo Gateway TUI commands
 /**
  * Kilo Gateway Commands for TUI
  *
@@ -11,7 +10,7 @@ import { useDialog } from "@tui/ui/dialog"
 import { useToast } from "@tui/ui/toast"
 import { DialogAlert } from "@tui/ui/dialog-alert"
 import { createMemo } from "solid-js"
-import { formatProfileInfo } from "../../api/profile.js"
+import { formatProfileInfo } from "../helpers.js"
 import type { Organization } from "../../types.js"
 import { DialogKiloTeamSelect } from "../components/dialog-kilo-team-select.js"
 
