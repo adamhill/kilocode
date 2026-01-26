@@ -1,5 +1,7 @@
 import { Config } from "../config/config"
 import { ModesMigrator } from "./modes-migrator"
+import { RulesMigrator } from "./rules-migrator" // kilocode_change
+import { WorkflowsMigrator } from "./workflows-migrator"
 
 export namespace KilocodeConfigInjector {
   export interface InjectionResult {
@@ -12,10 +14,15 @@ export namespace KilocodeConfigInjector {
     globalSettingsDir?: string
     /** Skip reading from global paths (VSCode storage, home dir). Used for testing. */
     skipGlobalPaths?: boolean
+    /** Include rules migration. Defaults to true. */
+    includeRules?: boolean
   }): Promise<InjectionResult> {
     const warnings: string[] = []
 
-    // Migrate custom modes only
+    // Build config object
+    const config: Partial<Config.Info> = {}
+
+    // Migrate custom modes
     const modesMigration = await ModesMigrator.migrate(options)
 
     // Log skipped default modes (for debugging)
@@ -23,12 +30,34 @@ export namespace KilocodeConfigInjector {
       warnings.push(`Mode '${skipped.slug}' skipped: ${skipped.reason}`)
     }
 
-    // Build config object
-    const config: Partial<Config.Info> = {}
-
     if (Object.keys(modesMigration.agents).length > 0) {
       config.agent = modesMigration.agents
     }
+
+    // Migrate workflows to commands
+    const workflowsMigration = await WorkflowsMigrator.migrate(options)
+
+    warnings.push(...workflowsMigration.warnings)
+
+    if (Object.keys(workflowsMigration.commands).length > 0) {
+      config.command = workflowsMigration.commands
+    }
+
+    // kilocode_change start - Rules migration
+    if (options.includeRules !== false) {
+      const rulesMigration = await RulesMigrator.migrate({
+        projectDir: options.projectDir,
+        includeGlobal: !options.skipGlobalPaths,
+        includeModeSpecific: true,
+      })
+
+      warnings.push(...rulesMigration.warnings)
+
+      if (rulesMigration.instructions.length > 0) {
+        config.instructions = rulesMigration.instructions
+      }
+    }
+    // kilocode_change end
 
     return {
       configJson: JSON.stringify(config),

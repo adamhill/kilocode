@@ -1,3 +1,5 @@
 export { ModesMigrator } from "./modes-migrator"
+export { RulesMigrator } from "./rules-migrator"
+export { WorkflowsMigrator } from "./workflows-migrator"
 export { McpMigrator } from "./mcp-migrator"
 export { KilocodeConfigInjector } from "./config-injector"
