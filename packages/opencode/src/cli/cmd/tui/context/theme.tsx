@@ -16,7 +16,7 @@ import flexoki from "./theme/flexoki.json" with { type: "json" }
 import github from "./theme/github.json" with { type: "json" }
 import gruvbox from "./theme/gruvbox.json" with { type: "json" }
 import kanagawa from "./theme/kanagawa.json" with { type: "json" }
-import kilocode from "./theme/kilocode.json" with { type: "json" } // kilocode_change
+import kilo from "./theme/kilo.json" with { type: "json" } // kilocode_change
 import material from "./theme/material.json" with { type: "json" }
 import matrix from "./theme/matrix.json" with { type: "json" }
 import mercury from "./theme/mercury.json" with { type: "json" }
@@ -153,7 +153,7 @@ export const DEFAULT_THEMES: Record<string, ThemeJson> = {
   github,
   gruvbox,
   kanagawa,
-  kilocode,
+  kilo, // kilocode_change
   material,
   matrix,
   mercury,
@@ -287,7 +287,7 @@ export const { use: useTheme, provider: ThemeProvider } = createSimpleContext({
     const [store, setStore] = createStore({
       themes: DEFAULT_THEMES,
       mode: kv.get("theme_mode", props.mode),
-      active: (sync.data.config.theme ?? kv.get("theme", "kilocode")) as string,
+      active: (sync.data.config.theme ?? kv.get("theme", "kilo")) as string, // kilocode_change
       ready: false,
     })
 
@@ -307,7 +307,7 @@ export const { use: useTheme, provider: ThemeProvider } = createSimpleContext({
           )
         })
         .catch(() => {
-          setStore("active", "kilocode")
+          setStore("active", "kilo") // kilocode_change
         })
         .finally(() => {
           if (store.active !== "system") {
@@ -330,7 +330,7 @@ export const { use: useTheme, provider: ThemeProvider } = createSimpleContext({
             if (store.active === "system") {
               setStore(
                 produce((draft) => {
-                  draft.active = "kilocode"
+                  draft.active = "kilo" // kilocode_change
                   draft.ready = true
                 }),
               )
@@ -355,7 +355,7 @@ export const { use: useTheme, provider: ThemeProvider } = createSimpleContext({
     })
 
     const values = createMemo(() => {
-      return resolveTheme(store.themes[store.active] ?? store.themes.kilocode, store.mode)
+      return resolveTheme(store.themes[store.active] ?? store.themes.kilo, store.mode)
     })
 
     const syntax = createMemo(() => generateSyntax(values()))
