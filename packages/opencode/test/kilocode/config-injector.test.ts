@@ -2,6 +2,7 @@ import { test, expect, describe } from "bun:test"
 import { KilocodeConfigInjector } from "../../src/kilocode/config-injector"
 import { tmpdir } from "../fixture/fixture"
 import path from "path"
+import fs from "fs/promises"
 
 describe("KilocodeConfigInjector", () => {
   describe("buildConfig", () => {
@@ -59,6 +60,91 @@ describe("KilocodeConfigInjector", () => {
       expect(result.warnings[0]).toContain("code")
       expect(result.warnings[0]).toContain("skipped")
     })
+
+    // kilocode_change start - Rules migration tests
+    test("includes rules in config", async () => {
+      await using tmp = await tmpdir({
+        init: async (dir) => {
+          await fs.mkdir(path.join(dir, ".kilocode", "rules"), { recursive: true })
+          await Bun.write(path.join(dir, ".kilocode", "rules", "main.md"), "# Rules")
+        },
+      })
+
+      const result = await KilocodeConfigInjector.buildConfig({
+        projectDir: tmp.path,
+        skipGlobalPaths: true,
+      })
+      const config = JSON.parse(result.configJson)
+
+      expect(config.instructions).toBeDefined()
+      expect(config.instructions).toHaveLength(1)
+      expect(config.instructions[0]).toContain("main.md")
+    })
+
+    test("skips rules when includeRules is false", async () => {
+      await using tmp = await tmpdir({
+        init: async (dir) => {
+          await fs.mkdir(path.join(dir, ".kilocode", "rules"), { recursive: true })
+          await Bun.write(path.join(dir, ".kilocode", "rules", "main.md"), "# Rules")
+        },
+      })
+
+      const result = await KilocodeConfigInjector.buildConfig({
+        projectDir: tmp.path,
+        skipGlobalPaths: true,
+        includeRules: false,
+      })
+      const config = JSON.parse(result.configJson)
+
+      expect(config.instructions).toBeUndefined()
+    })
+
+    test("combines modes and rules in config", async () => {
+      await using tmp = await tmpdir({
+        init: async (dir) => {
+          // Add custom mode
+          await Bun.write(
+            path.join(dir, ".kilocodemodes"),
+            `customModes:
+  - slug: translate
+    name: Translate
+    roleDefinition: You are a translator
+    groups:
+      - read`,
+          )
+          // Add rules
+          await fs.mkdir(path.join(dir, ".kilocode", "rules"), { recursive: true })
+          await Bun.write(path.join(dir, ".kilocode", "rules", "main.md"), "# Rules")
+        },
+      })
+
+      const result = await KilocodeConfigInjector.buildConfig({
+        projectDir: tmp.path,
+        skipGlobalPaths: true,
+      })
+      const config = JSON.parse(result.configJson)
+
+      expect(config.agent).toBeDefined()
+      expect(config.agent.translate).toBeDefined()
+      expect(config.instructions).toBeDefined()
+      expect(config.instructions).toHaveLength(1)
+    })
+
+    test("adds warnings for legacy rule files", async () => {
+      await using tmp = await tmpdir({
+        init: async (dir) => {
+          await Bun.write(path.join(dir, ".kilocoderules"), "# Legacy rules")
+        },
+      })
+
+      const result = await KilocodeConfigInjector.buildConfig({
+        projectDir: tmp.path,
+        skipGlobalPaths: true,
+      })
+
+      expect(result.warnings.some((w) => w.includes("Legacy"))).toBe(true)
+    })
+    // kilocode_change end
   })
 
   describe("getEnvVars", () => {
