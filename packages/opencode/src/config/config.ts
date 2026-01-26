@@ -28,6 +28,7 @@ import { existsSync } from "fs"
 import { Bus } from "@/bus"
 import { GlobalBus } from "@/bus/global"
 import { Event } from "../server/event"
+import { ModesMigrator } from "../kilocode/modes-migrator" // kilocode_change
 
 export namespace Config {
   const log = Log.create({ service: "config" })
@@ -94,6 +95,26 @@ export namespace Config {
       result = mergeConfigConcatArrays(result, JSON.parse(Flag.OPENCODE_CONFIG_CONTENT))
       log.debug("loaded custom config from OPENCODE_CONFIG_CONTENT")
     }
+
+    // kilocode_change start - Load Kilocode custom modes
+    try {
+      const kilocodeMigration = await ModesMigrator.migrate({
+        projectDir: Instance.directory,
+      })
+      if (Object.keys(kilocodeMigration.agents).length > 0) {
+        result = mergeConfigConcatArrays(result, { agent: kilocodeMigration.agents })
+        log.debug("loaded kilocode custom modes", {
+          count: Object.keys(kilocodeMigration.agents).length,
+          modes: Object.keys(kilocodeMigration.agents),
+        })
+      }
+      for (const skipped of kilocodeMigration.skipped) {
+        log.debug("skipped kilocode mode", { slug: skipped.slug, reason: skipped.reason })
+      }
+    } catch (err) {
+      log.warn("failed to load kilocode modes", { error: err })
+    }
+    // kilocode_change end
 
     result.agent = result.agent || {}
     result.mode = result.mode || {}
