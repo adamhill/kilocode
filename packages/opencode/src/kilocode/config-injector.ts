@@ -1,5 +1,6 @@
 import { Config } from "../config/config"
 import { ModesMigrator } from "./modes-migrator"
+import { RulesMigrator } from "./rules-migrator" // kilocode_change
 import { WorkflowsMigrator } from "./workflows-migrator"
 
 export namespace KilocodeConfigInjector {
@@ -13,6 +14,8 @@ export namespace KilocodeConfigInjector {
     globalSettingsDir?: string
     /** Skip reading from global paths (VSCode storage, home dir). Used for testing. */
     skipGlobalPaths?: boolean
+    /** Include rules migration. Defaults to true. */
+    includeRules?: boolean
   }): Promise<InjectionResult> {
     const warnings: string[] = []
 
@@ -39,6 +42,22 @@ export namespace KilocodeConfigInjector {
     if (Object.keys(workflowsMigration.commands).length > 0) {
       config.command = workflowsMigration.commands
     }
+
+    // kilocode_change start - Rules migration
+    if (options.includeRules !== false) {
+      const rulesMigration = await RulesMigrator.migrate({
+        projectDir: options.projectDir,
+        includeGlobal: !options.skipGlobalPaths,
+        includeModeSpecific: true,
+      })
+
+      warnings.push(...rulesMigration.warnings)
+
+      if (rulesMigration.instructions.length > 0) {
+        config.instructions = rulesMigration.instructions
+      }
+    }
+    // kilocode_change end
 
     return {
       configJson: JSON.stringify(config),

@@ -29,6 +29,7 @@ import { Bus } from "@/bus"
 import { GlobalBus } from "@/bus/global"
 import { Event } from "../server/event"
 import { ModesMigrator } from "../kilocode/modes-migrator" // kilocode_change
+import { RulesMigrator } from "../kilocode/rules-migrator" // kilocode_change
 import { WorkflowsMigrator } from "../kilocode/workflows-migrator" // kilocode_change
 
 export namespace Config {
@@ -86,6 +87,25 @@ export namespace Config {
       }
     } catch (err) {
       log.warn("failed to load kilocode workflows", { error: err })
+    }
+
+    // Load Kilocode rules (legacy fallback)
+    try {
+      const kilocodeRules = await RulesMigrator.migrate({
+        projectDir: Instance.directory,
+      })
+      if (kilocodeRules.instructions.length > 0) {
+        result = mergeConfigConcatArrays(result, { instructions: kilocodeRules.instructions })
+        log.debug("loaded kilocode rules", {
+          count: kilocodeRules.instructions.length,
+          files: kilocodeRules.instructions,
+        })
+      }
+      for (const warning of kilocodeRules.warnings) {
+        log.debug("kilocode rules warning", { warning })
+      }
+    } catch (err) {
+      log.warn("failed to load kilocode rules", { error: err })
     }
     // kilocode_change end
 
