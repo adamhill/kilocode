@@ -16,7 +16,8 @@
     "llm"
   ],
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./tui": "./src/tui.ts"
   },
   "files": [
     "dist"

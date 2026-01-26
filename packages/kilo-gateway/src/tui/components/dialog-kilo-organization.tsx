@@ -6,9 +6,7 @@
  * Pre-selects the first organization by default.
  */
 
-import { DialogSelect } from "@tui/ui/dialog-select"
-import { useDialog } from "@tui/ui/dialog"
-import { useSync } from "@tui/context/sync"
+import { getTUIDependencies } from "../context.js"
 import type { Organization } from "../../types.js"
 import { getOrganizationOptions, getDefaultOrganizationSelection } from "../helpers.js"
 
@@ -27,8 +25,9 @@ interface DialogKiloOrganizationProps {
 }
 
 export function DialogKiloOrganization(props: DialogKiloOrganizationProps) {
-  const dialog = useDialog()
-  const sync = useSync()
+  const deps = getTUIDependencies()
+  const dialog = deps.useDialog()
+  const sync = deps.useSync()
   const sdk = props.useSDK()
 
   // Get formatted options with current markers
@@ -38,7 +37,7 @@ export function DialogKiloOrganization(props: DialogKiloOrganizationProps) {
   const defaultSelection = getDefaultOrganizationSelection(props.organizations)
 
   return (
-    <DialogSelect
+    <deps.DialogSelect
       title={`Select Account (${props.userEmail})`}
       options={options}
       current={defaultSelection}

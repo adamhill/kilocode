@@ -15,7 +15,6 @@ type Validator = any
 type Resolver = any
 type Errors = any
 type Auth = any
-type Lazy = any
 type Z = any
 
 interface KiloRoutesDeps {
@@ -25,7 +24,6 @@ interface KiloRoutesDeps {
   resolver: Resolver
   errors: Errors
   Auth: Auth
-  lazy: Lazy
   z: Z
 }
 
@@ -40,7 +38,6 @@ interface KiloRoutesDeps {
  * import z from "zod"
  * import { errors } from "../error"
  * import { Auth } from "../../auth"
- * import { lazy } from "../../util/lazy"
  *
  * export const KiloRoutes = createKiloRoutes({
  *   Hono,
@@ -49,13 +46,12 @@ interface KiloRoutesDeps {
  *   resolver,
  *   errors,
  *   Auth,
- *   lazy,
  *   z,
  * })
  * ```
  */
 export function createKiloRoutes(deps: KiloRoutesDeps) {
-  const { Hono, describeRoute, validator, resolver, errors, Auth, lazy, z } = deps
+  const { Hono, describeRoute, validator, resolver, errors, Auth, z } = deps
 
   const Organization = z.object({
     id: z.string(),
@@ -78,87 +74,85 @@ export function createKiloRoutes(deps: KiloRoutesDeps) {
     balance: Balance.nullable(),
   })
 
-  return lazy(() =>
-    new Hono()
-      .get(
-        "/profile",
-        describeRoute({
-          summary: "Get Kilo Gateway profile",
-          description: "Fetch user profile and organizations from Kilo Gateway",
-          operationId: "kilo.profile",
-          responses: {
-            200: {
-              description: "Profile data",
-              content: {
-                "application/json": {
-                  schema: resolver(ProfileWithBalance),
-                },
+  return new Hono()
+    .get(
+      "/profile",
+      describeRoute({
+        summary: "Get Kilo Gateway profile",
+        description: "Fetch user profile and organizations from Kilo Gateway",
+        operationId: "kilo.profile",
+        responses: {
+          200: {
+            description: "Profile data",
+            content: {
+              "application/json": {
+                schema: resolver(ProfileWithBalance),
               },
             },
-            ...errors(400, 401),
           },
-        }),
-        async (c: any) => {
-          // Get Kilo auth
-          const auth = await Auth.get("kilo")
-
-          if (!auth || auth.type !== "oauth") {
-            return c.json({ error: "Not authenticated with Kilo Gateway" }, 401)
-          }
-
-          const token = auth.access
-
-          // Fetch profile and balance in parallel
-          const [profile, balance] = await Promise.all([fetchProfile(token), fetchBalance(token)])
-
-          return c.json({ profile, balance })
+          ...errors(400, 401),
         },
-      )
-      .post(
-        "/organization",
-        describeRoute({
-          summary: "Update Kilo Gateway organization",
-          description: "Switch to a different Kilo Gateway organization",
-          operationId: "kilo.organization.set",
-          responses: {
-            200: {
-              description: "Organization updated successfully",
-              content: {
-                "application/json": {
-                  schema: resolver(z.boolean()),
-                },
+      }),
+      async (c: any) => {
+        // Get Kilo auth
+        const auth = await Auth.get("kilo")
+
+        if (!auth || auth.type !== "oauth") {
+          return c.json({ error: "Not authenticated with Kilo Gateway" }, 401)
+        }
+
+        const token = auth.access
+
+        // Fetch profile and balance in parallel
+        const [profile, balance] = await Promise.all([fetchProfile(token), fetchBalance(token)])
+
+        return c.json({ profile, balance })
+      },
+    )
+    .post(
+      "/organization",
+      describeRoute({
+        summary: "Update Kilo Gateway organization",
+        description: "Switch to a different Kilo Gateway organization",
+        operationId: "kilo.organization.set",
+        responses: {
+          200: {
+            description: "Organization updated successfully",
+            content: {
+              "application/json": {
+                schema: resolver(z.boolean()),
               },
             },
-            ...errors(400, 401),
           },
-        }),
-        validator(
-          "json",
-          z.object({
-            organizationId: z.string().nullable(),
-          }),
-        ),
-        async (c: any) => {
-          const { organizationId } = c.req.valid("json")
-
-          // Get current Kilo auth
-          const auth = await Auth.get("kilo")
-
-          if (!auth || auth.type !== "oauth") {
-            return c.json({ error: "Not authenticated with Kilo Gateway" }, 401)
-          }
-
-          // Update auth with new organization ID
-          await Auth.set("kilo", {
-            type: "oauth",
-            refresh: auth.refresh,
-            access: auth.access,
-            expires: auth.expires,
-            ...(organizationId && { accountId: organizationId }),
-          })
-
-          return c.json(true)
+          ...errors(400, 401),
         },
+      }),
+      validator(
+        "json",
+        z.object({
+          organizationId: z.string().nullable(),
+        }),
       ),
-  )
+      async (c: any) => {
+        const { organizationId } = c.req.valid("json")
+
+        // Get current Kilo auth
+        const auth = await Auth.get("kilo")
+
+        if (!auth || auth.type !== "oauth") {
+          return c.json({ error: "Not authenticated with Kilo Gateway" }, 401)
+        }
+
+        // Update auth with new organization ID
+        await Auth.set("kilo", {
+          type: "oauth",
+          refresh: auth.refresh,
+          access: auth.access,
+          expires: auth.expires,
+          ...(organizationId && { accountId: organizationId }),
+        })
+
+        return c.json(true)
+      },
+    )
 }

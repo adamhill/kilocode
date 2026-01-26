@@ -6,7 +6,7 @@
  * Marks the current team with "→ (current)" indicator.
  */
 
-import { DialogSelect } from "@tui/ui/dialog-select"
+import { getTUIDependencies } from "../context.js"
 import type { Organization } from "../../types.js"
 import { getOrganizationOptions } from "../helpers.js"
 
@@ -17,11 +17,12 @@ interface DialogKiloTeamSelectProps {
 }
 
 export function DialogKiloTeamSelect(props: DialogKiloTeamSelectProps) {
+  const deps = getTUIDependencies()
   // Get formatted options with current markers
   const options = getOrganizationOptions(props.organizations, props.currentOrgId || undefined)
 
   return (
-    <DialogSelect
+    <deps.DialogSelect
       title="Select Team"
       options={options}
       current={props.currentOrgId || null}

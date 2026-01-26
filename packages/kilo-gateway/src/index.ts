@@ -35,22 +35,15 @@ export {
 export { fetchKiloModels } from "./api/models.js"
 
 // ============================================================================
-// TUI Helpers
-// ============================================================================
-export { formatProfileInfo, getOrganizationOptions, getDefaultOrganizationSelection } from "./tui/helpers.js"
-
-// ============================================================================
-// TUI Components (optional - requires solid-js and @opentui/*)
-// ============================================================================
-export { registerKiloCommands } from "./tui/commands/kilo-commands.js"
-export { DialogKiloTeamSelect } from "./tui/components/dialog-kilo-team-select.js"
-export { DialogKiloOrganization } from "./tui/components/dialog-kilo-organization.js"
-export { KiloAutoMethod } from "./tui/components/dialog-kilo-auto-method.js"
-
-// ============================================================================
 // Server Routes (optional - requires hono and OpenCode dependencies)
 // ============================================================================
 export { createKiloRoutes } from "./server/routes.js"
+
+// ============================================================================
+// Note: TUI exports moved to separate entry point
+// ============================================================================
+// For TUI components and commands, import from "@kilocode/kilo-gateway/tui"
+// This avoids circular dependencies with opencode TUI infrastructure
 
 // ============================================================================
 // Types

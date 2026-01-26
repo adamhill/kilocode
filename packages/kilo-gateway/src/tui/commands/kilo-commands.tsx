@@ -4,12 +4,8 @@
  * Provides /profile and /teams commands that are only visible when connected to Kilo Gateway.
  */
 
-import { useCommandDialog } from "@tui/component/dialog-command"
-import { useSync } from "@tui/context/sync"
-import { useDialog } from "@tui/ui/dialog"
-import { useToast } from "@tui/ui/toast"
-import { DialogAlert } from "@tui/ui/dialog-alert"
 import { createMemo } from "solid-js"
+import { getTUIDependencies } from "../context.js"
 import { formatProfileInfo } from "../helpers.js"
 import type { Organization } from "../../types.js"
 import { DialogKiloTeamSelect } from "../components/dialog-kilo-team-select.js"
@@ -25,11 +21,13 @@ type SDK = any
  * @param useSDK - OpenCode's useSDK hook (passed from TUI context)
  */
 export function registerKiloCommands(useSDK: () => UseSDK) {
-  const command = useCommandDialog()
-  const sync = useSync()
-  const dialog = useDialog()
+  const deps = getTUIDependencies()
+  const command = deps.useCommandDialog()
+  const sync = deps.useSync()
+  const dialog = deps.useDialog()
   const sdk = useSDK()
-  const toast = useToast()
+  const toast = deps.useToast()
+  const DialogAlert = deps.DialogAlert
 
   // Only show Kilo commands when connected to Kilo Gateway
   const isKiloConnected = createMemo(() => {

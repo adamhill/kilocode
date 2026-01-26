@@ -13,7 +13,7 @@ import { DialogModel } from "./dialog-model"
 import { useKeyboard } from "@opentui/solid"
 import { Clipboard } from "@tui/util/clipboard"
 import { useToast } from "../ui/toast"
-import { KiloAutoMethod } from "@kilocode/kilo-gateway" // kilocode_change
+import { KiloAutoMethod } from "@kilocode/kilo-gateway/tui" // kilocode_change
 
 const PROVIDER_PRIORITY: Record<string, number> = {
   kilo: -1, // kilocode_change - Kilo Gateway at top
