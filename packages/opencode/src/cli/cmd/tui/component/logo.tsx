@@ -1,6 +1,7 @@
 import { TextAttributes, RGBA } from "@opentui/core"
 import { For, type JSX } from "solid-js"
 import { useTheme, tint } from "@tui/context/theme"
+import { KiloLogo } from "./kilo-logo" // kilocode_change
 
 // Shadow markers (rendered chars in parens):
 // _ = full shadow cell (space with bg=shadow)
@@ -8,15 +9,15 @@ import { useTheme, tint } from "@tui/context/theme"
 // ~ = shadow top only (▀ with fg=shadow)
 const SHADOW_MARKER = /[_^~]/
 
-// kilocode_change start
-const LOGO_LEFT = [`              `, `█▄▀ ▀ █   █▀▀█`, `█_▀ █ █__ █__█`, `▀~▀ ▀ ▀▀▀ ▀▀▀▀`]
+const LOGO_LEFT = [`                   `, `█▀▀█ █▀▀█ █▀▀█ █▀▀▄`, `█__█ █__█ █^^^ █__█`, `▀▀▀▀ █▀▀▀ ▀▀▀▀ ▀~~▀`]
 
-const LOGO_RIGHT = [`              `, `   █▀▀▀ █   ▀`, `   █___ █__ █`, `   ▀▀▀▀ ▀▀▀ ▀`]
-// kilocode_change end
+const LOGO_RIGHT = [`             ▄     `, `█▀▀▀ █▀▀█ █▀▀█ █▀▀█`, `█___ █__█ █__█ █^^^`, `▀▀▀▀ ▀▀▀▀ ▀▀▀▀ ▀▀▀▀`]
 
 export function Logo() {
+  // kilocode_change start
+  return <KiloLogo />
+  // kilocode_change end
   const { theme } = useTheme()
-  const yellow = RGBA.fromHex("#F8F675")
 
   const renderLine = (line: string, fg: RGBA, bold: boolean): JSX.Element[] => {
     const shadow = tint(theme.background, fg, 0.25)
@@ -81,8 +82,8 @@ export function Logo() {
       <For each={LOGO_LEFT}>
         {(line, index) => (
           <box flexDirection="row" gap={1}>
-            <box flexDirection="row">{renderLine(line, yellow, false)}</box>
-            <box flexDirection="row">{renderLine(LOGO_RIGHT[index()], yellow, true)}</box>
+            <box flexDirection="row">{renderLine(line, theme.textMuted, false)}</box>
+            <box flexDirection="row">{renderLine(LOGO_RIGHT[index()], theme.text, true)}</box>
           </box>
         )}
       </For>
