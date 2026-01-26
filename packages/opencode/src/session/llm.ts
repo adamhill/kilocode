@@ -24,6 +24,7 @@ import { SystemPrompt } from "./system"
 import { Flag } from "@/flag/flag"
 import { PermissionNext } from "@/permission/next"
 import { Auth } from "@/auth"
+import { DEFAULT_HEADERS } from "@/kilocode/const" // kilocode_change
 
 export namespace LLM {
   const log = Log.create({ service: "llm" })
@@ -225,9 +226,7 @@ export namespace LLM {
               "x-opencode-client": Flag.OPENCODE_CLIENT,
             }
           : input.model.providerID !== "anthropic"
-            ? {
-                "User-Agent": `kilo/${Installation.VERSION}`, // kilocode_change
-              }
+            ? DEFAULT_HEADERS // kilocode_change
             : undefined),
         ...input.model.headers,
         ...headers,
