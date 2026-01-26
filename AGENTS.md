@@ -114,10 +114,6 @@ const bar = 2
 
 ### When markers are NOT needed
 
-Code in these paths is Kilo Code-specific and does NOT need `kilocode_change` markers:
+Code in these directories is Kilo Code-specific and doesn't need markers:
 
-- `packages/opencode/src/kilocode/` - All files in this directory
-- `packages/opencode/test/kilocode/` - All test files for kilocode
-- Any other path containing `kilocode` in filename or directory name
-
-These paths are entirely Kilo Code additions and won't conflict with upstream.
+- Any path containing `kilocode` in filename or directory name

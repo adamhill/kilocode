@@ -51,30 +51,8 @@ export namespace Config {
 
     // Load remote/well-known config first as the base layer (lowest precedence)
     // This allows organizations to provide default configs that users can override
-    let result: Info = {}
-
-    // kilocode_change start - Load Kilocode MCP servers (lowest precedence, can be overridden by any opencode config)
-    try {
-      const kilocodeMcpMigration = await McpMigrator.migrate({
-        projectDir: Instance.directory,
-      })
-      if (Object.keys(kilocodeMcpMigration.mcp).length > 0) {
-        result = { mcp: kilocodeMcpMigration.mcp }
-        log.debug("loaded kilocode MCP servers", {
-          count: Object.keys(kilocodeMcpMigration.mcp).length,
-          servers: Object.keys(kilocodeMcpMigration.mcp),
-        })
-      }
-      for (const skipped of kilocodeMcpMigration.skipped) {
-        log.debug("skipped kilocode MCP server", { name: skipped.name, reason: skipped.reason })
-      }
-      for (const warning of kilocodeMcpMigration.warnings) {
-        log.warn("kilocode MCP migration warning", { warning })
-      }
-    } catch (err) {
-      log.warn("failed to load kilocode MCP servers", { error: err })
-    }
-    // kilocode_change end
+    const kilocodeMcp = await McpMigrator.loadMcpConfig(Instance.directory) // kilocode_change
+    let result: Info = Object.keys(kilocodeMcp).length > 0 ? { mcp: kilocodeMcp } : {}
 
     for (const [key, value] of Object.entries(auth)) {
       if (value.type === "wellknown") {

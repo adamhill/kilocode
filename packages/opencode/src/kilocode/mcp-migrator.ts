@@ -2,8 +2,11 @@ import * as fs from "fs/promises"
 import * as path from "path"
 import os from "os"
 import { Config } from "../config/config"
+import { Log } from "../util/log"
 
 export namespace McpMigrator {
+  const log = Log.create({ service: "kilocode.mcp-migrator" })
+
   // Kilocode MCP server structure
   export interface KilocodeMcpServer {
     command: string
@@ -132,5 +135,35 @@ export namespace McpMigrator {
     }
 
     return { mcp, warnings, skipped }
+  }
+
+  /**
+   * Load Kilocode MCP servers and return them as an opencode config partial.
+   * This function handles all logging internally, so callers just need to merge the result.
+   */
+  export async function loadMcpConfig(projectDir: string): Promise<Record<string, Config.Mcp>> {
+    try {
+      const result = await migrate({ projectDir })
+
+      if (Object.keys(result.mcp).length > 0) {
+        log.debug("loaded kilocode MCP servers", {
+          count: Object.keys(result.mcp).length,
+          servers: Object.keys(result.mcp),
+        })
+      }
+
+      for (const skipped of result.skipped) {
+        log.debug("skipped kilocode MCP server", { name: skipped.name, reason: skipped.reason })
+      }
+
+      for (const warning of result.warnings) {
+        log.warn("kilocode MCP migration warning", { warning })
+      }
+
+      return result.mcp
+    } catch (err) {
+      log.warn("failed to load kilocode MCP servers", { error: err })
+      return {}
+    }
   }
 }
