@@ -268,15 +268,18 @@ export const AuthLoginCommand = cmd({
           return filtered
         })
 
+        // kilocode_change start
         const priority: Record<string, number> = {
-          opencode: 0,
-          anthropic: 1,
-          "github-copilot": 2,
-          openai: 3,
-          google: 4,
-          openrouter: 5,
-          vercel: 6,
+          kilo: 0,
+          opencode: 1,
+          anthropic: 2,
+          "github-copilot": 3,
+          openai: 4,
+          google: 5,
+          openrouter: 6,
+          vercel: 7,
         }
+        // kilocode_change end
         let provider = await prompts.autocomplete({
           message: "Select provider",
           maxItems: 8,
@@ -292,6 +295,7 @@ export const AuthLoginCommand = cmd({
                 label: x.name,
                 value: x.id,
                 hint: {
+                  kilo: "recommended", // kilocode_change
                   opencode: "recommended",
                   anthropic: "Claude Max or API key",
                   openai: "ChatGPT Plus/Pro or API key",

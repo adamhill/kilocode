@@ -25,6 +25,7 @@ import { createOpenAI } from "@ai-sdk/openai"
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible"
 import { createOpenRouter, type LanguageModelV2 } from "@openrouter/ai-sdk-provider"
 import { createOpenaiCompatible as createGitHubCopilotOpenAICompatible } from "./sdk/openai-compatible/src"
+import { createKilo } from "@opencode-ai/kilo-provider" // kilocode_change
 import { createXai } from "@ai-sdk/xai"
 import { createMistral } from "@ai-sdk/mistral"
 import { createGroq } from "@ai-sdk/groq"
@@ -63,6 +64,7 @@ export namespace Provider {
     "@ai-sdk/openai": createOpenAI,
     "@ai-sdk/openai-compatible": createOpenAICompatible,
     "@openrouter/ai-sdk-provider": createOpenRouter,
+    "@opencode-ai/kilo-provider": createKilo, // kilocode_change
     "@ai-sdk/xai": createXai,
     "@ai-sdk/mistral": createMistral,
     "@ai-sdk/groq": createGroq,
@@ -504,6 +506,31 @@ export namespace Provider {
         },
       }
     },
+    // kilocode_change start
+    kilo: async (input) => {
+      const hasKey = await (async () => {
+        const env = Env.all()
+        if (input.env.some((item) => env[item])) return true
+        if (await Auth.get(input.id)) return true
+        const config = await Config.get()
+        if (config.provider?.["kilo"]?.options?.apiKey) return true
+        if (config.provider?.["kilo"]?.options?.kilocodeToken) return true
+        return false
+      })()
+
+      if (!hasKey) {
+        for (const [key, value] of Object.entries(input.models)) {
+          if (value.cost.input === 0) continue
+          delete input.models[key]
+        }
+      }
+
+      return {
+        autoload: Object.keys(input.models).length > 0,
+        options: hasKey ? {} : { apiKey: "anonymous" },
+      }
+    },
+    // kilocode_change end
   }
 
   export const Model = z

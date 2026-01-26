@@ -5,7 +5,7 @@ import { Config } from "../../config/config"
 import { Provider } from "../../provider/provider"
 import { ModelsDev } from "../../provider/models"
 import { ProviderAuth } from "../../provider/auth"
-import { mapValues } from "remeda"
+import { mapValues, pickBy } from "remeda" // kilocode_change
 import { errors } from "../error"
 import { lazy } from "../../util/lazy"
 
@@ -52,11 +52,18 @@ export const ProviderRoutes = lazy(() =>
           mapValues(filteredProviders, (x) => Provider.fromModelsDevProvider(x)),
           connected,
         )
+        // kilocode_change start: Filter out providers with no models to prevent crashes
+        const validProviders = pickBy(providers, (item) => Object.keys(item.models).length > 0)
+
         return c.json({
-          all: Object.values(providers),
-          default: mapValues(providers, (item) => Provider.sort(Object.values(item.models))[0].id),
+          all: Object.values(validProviders),
+          default: mapValues(validProviders, (item) => {
+            const sorted = Provider.sort(Object.values(item.models))
+            return sorted[0]?.id ?? ""
+          }),
           connected: Object.keys(connected),
         })
+        // kilocode_change end
       },
     )
     .get(
