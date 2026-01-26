@@ -4,23 +4,12 @@ import * as fs from "fs/promises"
 import * as path from "path"
 import os from "os"
 import type { Config } from "../config/config"
+import { Filesystem } from "../util/filesystem"
+import { KilocodePaths } from "./paths"
 
 export namespace WorkflowsMigrator {
   const KILOCODE_WORKFLOWS_DIR = ".kilocode/workflows"
   const GLOBAL_WORKFLOWS_DIR = path.join(os.homedir(), ".kilocode", "workflows")
-
-  // Get platform-specific VSCode global storage path (same as modes-migrator)
-  function getVSCodeGlobalStoragePath(): string {
-    const home = os.homedir()
-    switch (process.platform) {
-      case "darwin":
-        return path.join(home, "Library", "Application Support", "Code", "User", "globalStorage", "kilocode.kilo-code")
-      case "win32":
-        return path.join(process.env.APPDATA || path.join(home, "AppData", "Roaming"), "Code", "User", "globalStorage", "kilocode.kilo-code")
-      default: // linux
-        return path.join(home, ".config", "Code", "User", "globalStorage", "kilocode.kilo-code")
-    }
-  }
 
   export interface KilocodeWorkflow {
     name: string
@@ -32,11 +21,6 @@ export namespace WorkflowsMigrator {
   export interface MigrationResult {
     commands: Record<string, Config.Command>
     warnings: string[]
-  }
-
-  async function directoryExists(dirPath: string): Promise<boolean> {
-    const stat = await fs.stat(dirPath).catch(() => null)
-    return stat?.isDirectory() ?? false
   }
 
   async function findWorkflowFiles(dir: string): Promise<string[]> {
@@ -66,7 +50,7 @@ export namespace WorkflowsMigrator {
   }
 
   async function loadWorkflowsFromDir(dir: string, source: "global" | "project"): Promise<KilocodeWorkflow[]> {
-    if (!(await directoryExists(dir))) return []
+    if (!(await Filesystem.isDir(dir))) return []
     const files = await findWorkflowFiles(dir)
     const workflows: KilocodeWorkflow[] = []
     for (const file of files) {
@@ -86,7 +70,7 @@ export namespace WorkflowsMigrator {
 
     if (!skipGlobalPaths) {
       // 1. VSCode extension global storage (primary location for global workflows)
-      const vscodeWorkflowsDir = path.join(getVSCodeGlobalStoragePath(), "workflows")
+      const vscodeWorkflowsDir = path.join(KilocodePaths.vscodeGlobalStorage(), "workflows")
       workflows.push(...(await loadWorkflowsFromDir(vscodeWorkflowsDir, "global")))
 
       // 2. Home directory ~/.kilocode/workflows (fallback/alternative location)
