@@ -30,6 +30,7 @@ import { GlobalBus } from "@/bus/global"
 import { Event } from "../server/event"
 import { ModesMigrator } from "../kilocode/modes-migrator" // kilocode_change
 import { RulesMigrator } from "../kilocode/rules-migrator" // kilocode_change
+import { WorkflowsMigrator } from "../kilocode/workflows-migrator" // kilocode_change
 
 export namespace Config {
   const log = Log.create({ service: "config" })
@@ -49,9 +50,67 @@ export namespace Config {
   export const state = Instance.state(async () => {
     const auth = await Auth.all()
 
-    // Load remote/well-known config first as the base layer (lowest precedence)
-    // This allows organizations to provide default configs that users can override
+    // kilocode_change start - Load Kilocode configs first (lowest precedence)
+    // This ensures Opencode native configs always take precedence over legacy Kilocode configs
     let result: Info = {}
+
+    // Load Kilocode custom modes (legacy fallback)
+    try {
+      const kilocodeMigration = await ModesMigrator.migrate({
+        projectDir: Instance.directory,
+      })
+      if (Object.keys(kilocodeMigration.agents).length > 0) {
+        result = mergeConfigConcatArrays(result, { agent: kilocodeMigration.agents })
+        log.debug("loaded kilocode custom modes", {
+          count: Object.keys(kilocodeMigration.agents).length,
+          modes: Object.keys(kilocodeMigration.agents),
+        })
+      }
+      for (const skipped of kilocodeMigration.skipped) {
+        log.debug("skipped kilocode mode", { slug: skipped.slug, reason: skipped.reason })
+      }
+    } catch (err) {
+      log.warn("failed to load kilocode modes", { error: err })
+    }
+
+    // Load Kilocode workflows as commands (legacy fallback)
+    try {
+      const workflowsMigration = await WorkflowsMigrator.migrate({
+        projectDir: Instance.directory,
+      })
+      if (Object.keys(workflowsMigration.commands).length > 0) {
+        result = mergeConfigConcatArrays(result, { command: workflowsMigration.commands })
+        log.debug("loaded kilocode workflows as commands", {
+          count: Object.keys(workflowsMigration.commands).length,
+          commands: Object.keys(workflowsMigration.commands),
+        })
+      }
+    } catch (err) {
+      log.warn("failed to load kilocode workflows", { error: err })
+    }
+
+    // Load Kilocode rules (legacy fallback)
+    try {
+      const kilocodeRules = await RulesMigrator.migrate({
+        projectDir: Instance.directory,
+      })
+      if (kilocodeRules.instructions.length > 0) {
+        result = mergeConfigConcatArrays(result, { instructions: kilocodeRules.instructions })
+        log.debug("loaded kilocode rules", {
+          count: kilocodeRules.instructions.length,
+          files: kilocodeRules.instructions,
+        })
+      }
+      for (const warning of kilocodeRules.warnings) {
+        log.debug("kilocode rules warning", { warning })
+      }
+    } catch (err) {
+      log.warn("failed to load kilocode rules", { error: err })
+    }
+    // kilocode_change end
+
+    // Load remote/well-known config (overrides Kilocode legacy configs)
+    // This allows organizations to provide default configs that users can override
     for (const [key, value] of Object.entries(auth)) {
       if (value.type === "wellknown") {
         process.env[value.key] = value.token
@@ -96,46 +155,6 @@ export namespace Config {
       result = mergeConfigConcatArrays(result, JSON.parse(Flag.OPENCODE_CONFIG_CONTENT))
       log.debug("loaded custom config from OPENCODE_CONFIG_CONTENT")
     }
-
-    // kilocode_change start - Load Kilocode custom modes
-    try {
-      const kilocodeMigration = await ModesMigrator.migrate({
-        projectDir: Instance.directory,
-      })
-      if (Object.keys(kilocodeMigration.agents).length > 0) {
-        result = mergeConfigConcatArrays(result, { agent: kilocodeMigration.agents })
-        log.debug("loaded kilocode custom modes", {
-          count: Object.keys(kilocodeMigration.agents).length,
-          modes: Object.keys(kilocodeMigration.agents),
-        })
-      }
-      for (const skipped of kilocodeMigration.skipped) {
-        log.debug("skipped kilocode mode", { slug: skipped.slug, reason: skipped.reason })
-      }
-    } catch (err) {
-      log.warn("failed to load kilocode modes", { error: err })
-    }
-    // kilocode_change end
-
-    // kilocode_change start - Load Kilocode rules
-    try {
-      const kilocodeRules = await RulesMigrator.migrate({
-        projectDir: Instance.directory,
-      })
-      if (kilocodeRules.instructions.length > 0) {
-        result = mergeConfigConcatArrays(result, { instructions: kilocodeRules.instructions })
-        log.debug("loaded kilocode rules", {
-          count: kilocodeRules.instructions.length,
-          files: kilocodeRules.instructions,
-        })
-      }
-      for (const warning of kilocodeRules.warnings) {
-        log.debug("kilocode rules warning", { warning })
-      }
-    } catch (err) {
-      log.warn("failed to load kilocode rules", { error: err })
-    }
-    // kilocode_change end
 
     result.agent = result.agent || {}
     result.mode = result.mode || {}
