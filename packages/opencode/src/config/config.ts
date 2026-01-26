@@ -31,6 +31,7 @@ import { Event } from "../server/event"
 import { ModesMigrator } from "../kilocode/modes-migrator" // kilocode_change
 import { RulesMigrator } from "../kilocode/rules-migrator" // kilocode_change
 import { WorkflowsMigrator } from "../kilocode/workflows-migrator" // kilocode_change
+import { McpMigrator } from "../kilocode/mcp-migrator" // kilocode_change
 
 export namespace Config {
   const log = Log.create({ service: "config" })
@@ -106,6 +107,12 @@ export namespace Config {
       }
     } catch (err) {
       log.warn("failed to load kilocode rules", { error: err })
+    }
+
+    // Load Kilocode MCP servers (legacy fallback)
+    const kilocodeMcp = await McpMigrator.loadMcpConfig(Instance.directory)
+    if (Object.keys(kilocodeMcp).length > 0) {
+      result = mergeConfigConcatArrays(result, { mcp: kilocodeMcp })
     }
     // kilocode_change end
 
