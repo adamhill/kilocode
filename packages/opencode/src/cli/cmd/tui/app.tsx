@@ -584,6 +584,7 @@ function App() {
     useDialog: useDialog,
     useToast: useToast,
     useTheme: useTheme,
+    useSDK: useSDK,
     DialogAlert: DialogAlert,
     DialogSelect: DialogSelect,
     Link: Link,
@@ -594,7 +595,7 @@ function App() {
   registerKiloCommands(useSDK)
   // kilocode_change end
 
-// kilocode_change - Delete OpenRouter Alert
+  // kilocode_change - Delete OpenRouter Alert
   sdk.event.on(TuiEvent.CommandExecute.type, (evt) => {
     command.trigger(evt.properties.command)
   })
