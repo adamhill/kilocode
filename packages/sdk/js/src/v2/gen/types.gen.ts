@@ -4085,6 +4085,42 @@ export type KiloOrganizationSetResponses = {
 
 export type KiloOrganizationSetResponse = KiloOrganizationSetResponses[keyof KiloOrganizationSetResponses]
 
+export type KiloNotificationsData = {
+  body?: never
+  path?: never
+  query?: {
+    directory?: string
+  }
+  url: "/kilo/notifications"
+}
+
+export type KiloNotificationsErrors = {
+  /**
+   * Bad request
+   */
+  400: BadRequestError
+}
+
+export type KiloNotificationsError = KiloNotificationsErrors[keyof KiloNotificationsErrors]
+
+export type KiloNotificationsResponses = {
+  /**
+   * Notifications list
+   */
+  200: Array<{
+    id: string
+    title: string
+    message: string
+    action?: {
+      actionText: string
+      actionURL: string
+    }
+    showIn?: Array<string>
+  }>
+}
+
+export type KiloNotificationsResponse = KiloNotificationsResponses[keyof KiloNotificationsResponses]
+
 export type FindTextData = {
   body?: never
   path?: never

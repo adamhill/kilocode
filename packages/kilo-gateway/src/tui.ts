@@ -25,3 +25,10 @@ export { registerKiloCommands } from "./tui/commands/kilo-commands.js"
 export { DialogKiloTeamSelect } from "./tui/components/dialog-kilo-team-select.js"
 export { DialogKiloOrganization } from "./tui/components/dialog-kilo-organization.js"
 export { KiloAutoMethod } from "./tui/components/dialog-kilo-auto-method.js"
+export { NotificationBanner } from "./tui/components/notification-banner.js"
+export { DialogKiloNotifications } from "./tui/components/dialog-kilo-notifications.js"
+
+// ============================================================================
+// Re-exported Types
+// ============================================================================
+export type { KilocodeNotification } from "./api/notifications.js"
