@@ -39,6 +39,8 @@ import { createVercel } from "@ai-sdk/vercel"
 import { createGitLab } from "@gitlab/gitlab-ai-provider"
 import { ProviderTransform } from "./transform"
 
+import { DEFAULT_HEADERS } from "@/kilocode/const" // kilocode_change
+
 export namespace Provider {
   const log = Log.create({ service: "provider" })
 
@@ -322,10 +324,7 @@ export namespace Provider {
       return {
         autoload: false,
         options: {
-          headers: {
-            "HTTP-Referer": "https://opencode.ai/",
-            "X-Title": "opencode",
-          },
+          headers: DEFAULT_HEADERS, // kilocode_change
         },
       }
     },
@@ -333,10 +332,7 @@ export namespace Provider {
       return {
         autoload: false,
         options: {
-          headers: {
-            "http-referer": "https://opencode.ai/",
-            "x-title": "opencode",
-          },
+          headers: DEFAULT_HEADERS, // kilocode_change
         },
       }
     },
@@ -400,10 +396,7 @@ export namespace Provider {
       return {
         autoload: false,
         options: {
-          headers: {
-            "HTTP-Referer": "https://opencode.ai/",
-            "X-Title": "opencode",
-          },
+          headers: DEFAULT_HEADERS, // kilocode_change
         },
       }
     },
@@ -468,8 +461,7 @@ export namespace Provider {
             // Cloudflare AI Gateway uses cf-aig-authorization for authenticated gateways
             // This enables Unified Billing where Cloudflare handles upstream provider auth
             ...(apiToken ? { "cf-aig-authorization": `Bearer ${apiToken}` } : {}),
-            "HTTP-Referer": "https://opencode.ai/",
-            "X-Title": "opencode",
+            ...DEFAULT_HEADERS, // kilocode_change
           },
           // Custom fetch to handle parameter transformation and auth
           fetch: async (input: RequestInfo | URL, init?: RequestInit) => {
