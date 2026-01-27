@@ -12,13 +12,16 @@ export namespace ShareNext {
   const log = Log.create({ service: "share-next" })
 
   async function url() {
-    return Config.get().then((x) => x.enterprise?.url ?? "https://opncd.ai")
+    return Config.get().then((x) => x.enterprise?.url ?? "http://localhost:3000")
   }
 
   const disabled = process.env["OPENCODE_DISABLE_SHARE"] === "true" || process.env["OPENCODE_DISABLE_SHARE"] === "1"
 
   export async function init() {
     if (disabled) return
+    Bus.subscribe(Session.Event.Created, async (evt) => {
+      await create(evt.properties.info.id)
+    })
     Bus.subscribe(Session.Event.Updated, async (evt) => {
       await sync(evt.properties.info.id, [
         {
@@ -66,9 +69,9 @@ export namespace ShareNext {
   }
 
   export async function create(sessionID: string) {
-    if (disabled) return { id: "", url: "", secret: "" }
-    log.info("creating share", { sessionID })
-    const result = await fetch(`${await url()}/api/share`, {
+    if (disabled) return { id: "", ingestUrl: "", secret: "" }
+    log.info("creating session", { sessionID })
+    const result = await fetch(`${await url()}/api/opencode/session`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -76,17 +79,25 @@ export namespace ShareNext {
       body: JSON.stringify({ sessionID: sessionID }),
     })
       .then((x) => x.json())
-      .then((x) => x as { id: string; url: string; secret: string })
+      .then((x) => x as { id: string; ingestUrl: string; secret: string })
     await Storage.write(["session_share", sessionID], result)
     fullSync(sessionID)
     return result
+  }
+
+  export async function share(sessionID: string) {
+    if (disabled) return { url: "" }
+    log.info("creating share", { sessionID })
+
+    return { url: "" }
   }
 
   function get(sessionID: string) {
     return Storage.read<{
       id: string
       secret: string
-      url: string
+      url?: string
+      ingestUrl: string
     }>(["session_share", sessionID])
   }
 
@@ -135,7 +146,7 @@ export namespace ShareNext {
       const share = await get(sessionID).catch(() => undefined)
       if (!share) return
 
-      await fetch(`${await url()}/api/share/${share.id}/sync`, {
+      await fetch(share.ingestUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -254,7 +254,7 @@ export namespace Session {
       throw new Error("Sharing is disabled in configuration")
     }
     const { ShareNext } = await import("@/share/share-next")
-    const share = await ShareNext.create(id)
+    const share = await ShareNext.share(id)
     await update(
       id,
       (draft) => {
