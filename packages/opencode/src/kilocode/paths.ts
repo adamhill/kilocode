@@ -1,5 +1,6 @@
 import * as path from "path"
 import os from "os"
+import { Filesystem } from "../util/filesystem"
 
 export namespace KilocodePaths {
   /**
@@ -29,5 +30,60 @@ export namespace KilocodePaths {
   /** Global Kilocode directory in user home: ~/.kilocode */
   export function globalDir(): string {
     return path.join(os.homedir(), ".kilocode")
+  }
+
+  /**
+   * Discover Kilocode directories containing skills.
+   * Returns parent directories (.kilocode/) for glob pattern "skills/[*]/SKILL.md".
+   *
+   * - Walks up from projectDir to worktreeRoot for .kilocode/
+   * - Includes global ~/.kilocode/
+   * - Includes VSCode extension global storage
+   *
+   * Does NOT copy/migrate skills - just provides paths for discovery.
+   * Skills remain in their original locations and can be managed independently
+   * by the Kilo VSCode extension.
+   */
+  export async function skillDirectories(opts: {
+    projectDir: string
+    worktreeRoot: string
+    skipGlobalPaths?: boolean
+  }): Promise<string[]> {
+    const directories: string[] = []
+
+    // 1. Walk up from project dir to worktree root for .kilocode/
+    // Returns .kilocode/ directories (not .kilocode/skills/) because
+    // the glob pattern "skills/[*]/SKILL.md" is applied from the parent
+    const projectDirs = await Array.fromAsync(
+      Filesystem.up({
+        targets: [".kilocode"],
+        start: opts.projectDir,
+        stop: opts.worktreeRoot,
+      }),
+    )
+    for (const dir of projectDirs) {
+      const skillsDir = path.join(dir, "skills")
+      if (await Filesystem.isDir(skillsDir)) {
+        directories.push(dir) // Return parent (.kilocode/), not skills/
+      }
+    }
+
+    if (!opts.skipGlobalPaths) {
+      // 2. Global ~/.kilocode/
+      const global = globalDir()
+      const globalSkills = path.join(global, "skills")
+      if (await Filesystem.isDir(globalSkills)) {
+        directories.push(global) // Return parent, not skills/
+      }
+
+      // 3. VSCode extension global storage (marketplace-installed skills)
+      const vscode = vscodeGlobalStorage()
+      const vscodeSkills = path.join(vscode, "skills")
+      if (await Filesystem.isDir(vscodeSkills)) {
+        directories.push(vscode) // Return parent, not skills/
+      }
+    }
+
+    return directories
   }
 }
