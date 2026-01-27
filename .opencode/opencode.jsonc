@@ -4,7 +4,6 @@
   // "enterprise": {
   //   "url": "https://enterprise.dev.opencode.ai",
   // },
-  "instructions": [".opencode/agent/kilocode-markers.md"],
   "provider": {
     "opencode": {
       "options": {},
