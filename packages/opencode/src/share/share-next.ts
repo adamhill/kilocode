@@ -1,3 +1,4 @@
+// kilocode_change pretty much completely refactored
 import { Bus } from "@/bus"
 import { Config } from "@/config/config"
 import { ulid } from "ulid"
@@ -6,25 +7,17 @@ import { Session } from "@/session"
 import { MessageV2 } from "@/session/message-v2"
 import { Storage } from "@/storage/storage"
 import { Log } from "@/util/log"
+import { Auth } from "@/auth"
 import type * as SDK from "@opencode-ai/sdk/v2"
 
 export namespace ShareNext {
   const log = Log.create({ service: "share-next" })
 
-  async function url() {
-    return Config.get().then((x) => x.enterprise?.url ?? "http://localhost:8787")
-  }
-
-  export async function kilocodeConfig() {
-    return Config.get().then((x) => x.provider?.["kilo"])
-  }
-
   export async function kilocodeToken() {
-    const cfg = await kilocodeConfig()
-    const token = cfg?.options?.kilocodeToken
-    if (typeof token === "string" && token.length > 0) return token
-    const apiKey = cfg?.options?.apiKey
-    if (typeof apiKey === "string" && apiKey.length > 0) return apiKey
+    const auth = await Auth.get("kilo")
+    if (auth?.type === "api" && auth.key.length > 0) return auth.key
+    if (auth?.type === "oauth" && auth.access.length > 0) return auth.access
+    if (auth?.type === "wellknown" && auth.token.length > 0) return auth.token
     return undefined
   }
 
@@ -38,7 +31,7 @@ export namespace ShareNext {
     const token = await kilocodeToken()
     if (!token) return undefined
 
-    const base = await url()
+    const base = await Config.get().then((x) => x.enterprise?.url ?? "http://localhost:8787")
     const baseHeaders: Record<string, string> = {
       "Content-Type": "application/json",
       Authorization: `bearer ${token}`,
@@ -62,9 +55,6 @@ export namespace ShareNext {
   const disabled = process.env["OPENCODE_DISABLE_SHARE"] === "true" || process.env["OPENCODE_DISABLE_SHARE"] === "1"
 
   export async function init() {
-    const client = await getClient()
-    if (!client) return
-
     Bus.subscribe(Session.Event.Created, async (evt) => {
       await create(evt.properties.info.id)
     })
@@ -121,7 +111,7 @@ export namespace ShareNext {
 
   export async function create(sessionId: string) {
     const client = await getClient()
-    if (!client) return { id: "", ingestUrl: "" }
+    if (!client) return { id: "", ingestPath: "" }
 
     log.info("creating session", { sessionId })
 
@@ -131,7 +121,7 @@ export namespace ShareNext {
         body: JSON.stringify({ sessionId }),
       })
       .then((x) => x.json())
-      .then((x) => x as { id: string; ingestUrl: string })
+      .then((x) => x as { id: string; ingestPath: string })
 
     await Storage.write(["session_share", sessionId], result)
 
@@ -152,7 +142,7 @@ export namespace ShareNext {
     return Storage.read<{
       id: string
       url?: string
-      ingestUrl: string
+      ingestPath: string
     }>(["session_share", sessionId])
   }
 
@@ -208,7 +198,7 @@ export namespace ShareNext {
       const client = await getClient()
       if (!client) return
 
-      await client.fetch(share.ingestUrl, {
+      await client.fetch(`${client.url}${share.ingestPath}`, {
         method: "POST",
         body: JSON.stringify({
           data: Array.from(queued.data.values()),
