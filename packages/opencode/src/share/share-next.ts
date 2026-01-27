@@ -12,7 +12,7 @@ export namespace ShareNext {
   const log = Log.create({ service: "share-next" })
 
   async function url() {
-    return Config.get().then((x) => x.enterprise?.url ?? "http://localhost:3000")
+    return Config.get().then((x) => x.enterprise?.url ?? "http://localhost:8787")
   }
 
   const disabled = process.env["OPENCODE_DISABLE_SHARE"] === "true" || process.env["OPENCODE_DISABLE_SHARE"] === "1"
@@ -68,37 +68,42 @@ export namespace ShareNext {
     })
   }
 
-  export async function create(sessionID: string) {
-    if (disabled) return { id: "", ingestUrl: "", secret: "" }
-    log.info("creating session", { sessionID })
-    const result = await fetch(`${await url()}/api/opencode/session`, {
+  export async function create(sessionId: string) {
+    if (disabled) return { id: "", ingestUrl: "" }
+
+    log.info("creating session", { sessionId })
+
+    const result = await fetch(`${await url()}/api/session`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ sessionID: sessionID }),
+      body: JSON.stringify({ sessionId }),
     })
       .then((x) => x.json())
-      .then((x) => x as { id: string; ingestUrl: string; secret: string })
-    await Storage.write(["session_share", sessionID], result)
-    fullSync(sessionID)
+      .then((x) => x as { id: string; ingestUrl: string })
+
+    await Storage.write(["session_share", sessionId], result)
+
+    fullSync(sessionId)
+
     return result
   }
 
-  export async function share(sessionID: string) {
+  export async function share(sessionId: string) {
     if (disabled) return { url: "" }
-    log.info("creating share", { sessionID })
+
+    log.info("creating share", { sessionId })
 
     return { url: "" }
   }
 
-  function get(sessionID: string) {
+  function get(sessionId: string) {
     return Storage.read<{
       id: string
-      secret: string
       url?: string
       ingestUrl: string
-    }>(["session_share", sessionID])
+    }>(["session_share", sessionId])
   }
 
   type Data =
@@ -124,9 +129,9 @@ export namespace ShareNext {
       }
 
   const queue = new Map<string, { timeout: NodeJS.Timeout; data: Map<string, Data> }>()
-  async function sync(sessionID: string, data: Data[]) {
+  async function sync(sessionId: string, data: Data[]) {
     if (disabled) return
-    const existing = queue.get(sessionID)
+    const existing = queue.get(sessionId)
     if (existing) {
       for (const item of data) {
         existing.data.set("id" in item ? (item.id as string) : ulid(), item)
@@ -140,10 +145,12 @@ export namespace ShareNext {
     }
 
     const timeout = setTimeout(async () => {
-      const queued = queue.get(sessionID)
+      const queued = queue.get(sessionId)
       if (!queued) return
-      queue.delete(sessionID)
-      const share = await get(sessionID).catch(() => undefined)
+
+      queue.delete(sessionId)
+
+      const share = await get(sessionId).catch(() => undefined)
       if (!share) return
 
       await fetch(share.ingestUrl, {
@@ -152,43 +159,45 @@ export namespace ShareNext {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          secret: share.secret,
           data: Array.from(queued.data.values()),
         }),
       })
     }, 1000)
-    queue.set(sessionID, { timeout, data: dataMap })
+    queue.set(sessionId, { timeout, data: dataMap })
   }
 
-  export async function remove(sessionID: string) {
+  export async function remove(sessionId: string) {
     if (disabled) return
-    log.info("removing share", { sessionID })
-    const share = await get(sessionID)
+
+    log.info("removing share", { sessionId })
+
+    const share = await get(sessionId)
     if (!share) return
+
     await fetch(`${await url()}/api/share/${share.id}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        secret: share.secret,
-      }),
     })
-    await Storage.remove(["session_share", sessionID])
+
+    await Storage.remove(["session_share", sessionId])
   }
 
-  async function fullSync(sessionID: string) {
-    log.info("full sync", { sessionID })
-    const session = await Session.get(sessionID)
-    const diffs = await Session.diff(sessionID)
-    const messages = await Array.fromAsync(MessageV2.stream(sessionID))
+  async function fullSync(sessionId: string) {
+    log.info("full sync", { sessionId })
+
+    const session = await Session.get(sessionId)
+    const diffs = await Session.diff(sessionId)
+    const messages = await Array.fromAsync(MessageV2.stream(sessionId))
     const models = await Promise.all(
       messages
         .filter((m) => m.info.role === "user")
         .map((m) => (m.info as SDK.UserMessage).model)
         .map((m) => Provider.getModel(m.providerID, m.modelID).then((m) => m)),
     )
-    await sync(sessionID, [
+
+    await sync(sessionId, [
       {
         type: "session",
         data: session,
