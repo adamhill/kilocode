@@ -146,7 +146,15 @@ export namespace ShareNext {
       .then((x) => x.json())
       .then((x) => x as { public_id: string })
 
-    return { url: `http://localhost:3000/s/${result.public_id}` }
+    const current = (await Storage.read(["session_share", sessionId])) as Awaited<ReturnType<typeof get>>
+    const url = `http://localhost:3000/s/${result.public_id}`
+
+    await Storage.write(["session_share", sessionId], {
+      ...current,
+      url,
+    })
+
+    return { url }
   }
 
   function get(sessionId: string) {
