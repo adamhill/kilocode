@@ -72,6 +72,7 @@ export function createKiloRoutes(deps: KiloRoutesDeps) {
   const ProfileWithBalance = z.object({
     profile: Profile,
     balance: Balance.nullable(),
+    currentOrgId: z.string().nullable(),
   })
 
   return new Hono()
@@ -102,11 +103,16 @@ export function createKiloRoutes(deps: KiloRoutesDeps) {
         }
 
         const token = auth.access
+        const currentOrgId = auth.accountId ?? null
 
         // Fetch profile and balance in parallel
-        const [profile, balance] = await Promise.all([fetchProfile(token), fetchBalance(token)])
+        // Pass organizationId to fetchBalance to get team balance when in org context
+        const [profile, balance] = await Promise.all([
+          fetchProfile(token),
+          fetchBalance(token, currentOrgId ?? undefined),
+        ])
 
-        return c.json({ profile, balance })
+        return c.json({ profile, balance, currentOrgId })
       },
     )
     .post(
