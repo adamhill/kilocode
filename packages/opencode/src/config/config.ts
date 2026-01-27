@@ -1154,10 +1154,9 @@ export namespace Config {
           chatMaxRetries: z.number().optional().describe("Number of retries for chat completions on failure"),
           disable_paste_summary: z.boolean().optional(),
           batch_tool: z.boolean().optional().describe("Enable the batch tool"),
-          openTelemetry: z
-            .boolean()
-            .optional()
-            .describe("Enable OpenTelemetry spans for AI SDK calls (using the 'experimental_telemetry' flag)"),
+          // kilocode_change start - enable telemetry by default
+          openTelemetry: z.boolean().default(true).describe("Enable telemetry. Set to false to opt-out."),
+          // kilocode_change end
           primary_tools: z
             .array(z.string())
             .optional()

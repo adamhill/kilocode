@@ -26,6 +26,12 @@ import { EOL } from "os"
 import { WebCommand } from "./cli/cmd/web"
 import { PrCommand } from "./cli/cmd/pr"
 import { SessionCommand } from "./cli/cmd/session"
+// kilocode_change start - Import telemetry
+import { Telemetry } from "@kilocode/kilo-telemetry"
+import { Global } from "./global"
+import { Config } from "./config/config"
+import { Auth } from "./auth"
+// kilocode_change end
 
 process.on("unhandledRejection", (e) => {
   Log.Default.error("rejection", {
@@ -74,6 +80,24 @@ const cli = yargs(hideBin(process.argv))
       version: Installation.VERSION,
       args: process.argv.slice(2),
     })
+
+    // kilocode_change start - Initialize telemetry
+    const globalCfg = await Config.getGlobal()
+    await Telemetry.init({
+      dataPath: Global.Path.data,
+      version: Installation.VERSION,
+      enabled: globalCfg.experimental?.openTelemetry !== false,
+    })
+    Telemetry.trackCliStart()
+
+    // Update identity if Kilo auth exists
+    const kiloAuth = await Auth.get("kilo")
+    if (kiloAuth) {
+      const token = kiloAuth.type === "oauth" ? kiloAuth.access : kiloAuth.key
+      const accountId = kiloAuth.type === "oauth" ? kiloAuth.accountId : undefined
+      await Telemetry.updateIdentity(token, accountId)
+    }
+    // kilocode_change end
   })
   .usage("\n" + UI.logo())
   .completion("completion", "generate shell completion script")
@@ -151,6 +175,12 @@ try {
   }
   process.exitCode = 1
 } finally {
+  // kilocode_change start - Track CLI exit and shutdown telemetry
+  const exitCode = typeof process.exitCode === "number" ? process.exitCode : undefined
+  Telemetry.trackCliExit(exitCode)
+  await Telemetry.shutdown()
+  // kilocode_change end
+
   // Some subprocesses don't react properly to SIGTERM and similar signals.
   // Most notably, some docker-container-based MCP servers don't handle such signals unless
   // run using `docker run --init`.
