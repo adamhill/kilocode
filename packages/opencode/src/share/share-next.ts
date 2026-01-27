@@ -15,13 +15,60 @@ export namespace ShareNext {
     return Config.get().then((x) => x.enterprise?.url ?? "http://localhost:8787")
   }
 
+  export async function kilocodeConfig() {
+    return Config.get().then((x) => x.provider?.["kilo"])
+  }
+
+  export async function kilocodeToken() {
+    const cfg = await kilocodeConfig()
+    const token = cfg?.options?.kilocodeToken
+    if (typeof token === "string" && token.length > 0) return token
+    const apiKey = cfg?.options?.apiKey
+    if (typeof apiKey === "string" && apiKey.length > 0) return apiKey
+    return undefined
+  }
+
+  type Client = {
+    url: string
+    fetch: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>
+  }
+
+  async function getClient(): Promise<Client | undefined> {
+    if (disabled) return undefined
+    const token = await kilocodeToken()
+    if (!token) return undefined
+
+    const base = await url()
+    const baseHeaders: Record<string, string> = {
+      "Content-Type": "application/json",
+      Authorization: `bearer ${token}`,
+    }
+
+    const withHeaders = (init?: RequestInit) => {
+      const headers = new Headers(init?.headers)
+      for (const [k, v] of Object.entries(baseHeaders)) headers.set(k, v)
+      return {
+        ...init,
+        headers,
+      } satisfies RequestInit
+    }
+
+    return {
+      url: base,
+      fetch: (input, init) => fetch(input, withHeaders(init)),
+    }
+  }
+
   const disabled = process.env["OPENCODE_DISABLE_SHARE"] === "true" || process.env["OPENCODE_DISABLE_SHARE"] === "1"
 
   export async function init() {
-    if (disabled) return
+    const client = await getClient()
+    if (!client) return
+
     Bus.subscribe(Session.Event.Created, async (evt) => {
       await create(evt.properties.info.id)
     })
+
     Bus.subscribe(Session.Event.Updated, async (evt) => {
       await sync(evt.properties.info.id, [
         {
@@ -30,6 +77,7 @@ export namespace ShareNext {
         },
       ])
     })
+
     Bus.subscribe(MessageV2.Event.Updated, async (evt) => {
       await sync(evt.properties.info.sessionID, [
         {
@@ -37,6 +85,7 @@ export namespace ShareNext {
           data: evt.properties.info,
         },
       ])
+
       if (evt.properties.info.role === "user") {
         await sync(evt.properties.info.sessionID, [
           {
@@ -50,6 +99,7 @@ export namespace ShareNext {
         ])
       }
     })
+
     Bus.subscribe(MessageV2.Event.PartUpdated, async (evt) => {
       await sync(evt.properties.part.sessionID, [
         {
@@ -58,6 +108,7 @@ export namespace ShareNext {
         },
       ])
     })
+
     Bus.subscribe(Session.Event.Diff, async (evt) => {
       await sync(evt.properties.sessionID, [
         {
@@ -69,17 +120,16 @@ export namespace ShareNext {
   }
 
   export async function create(sessionId: string) {
-    if (disabled) return { id: "", ingestUrl: "" }
+    const client = await getClient()
+    if (!client) return { id: "", ingestUrl: "" }
 
     log.info("creating session", { sessionId })
 
-    const result = await fetch(`${await url()}/api/session`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ sessionId }),
-    })
+    const result = await client
+      .fetch(`${client.url}/api/session`, {
+        method: "POST",
+        body: JSON.stringify({ sessionId }),
+      })
       .then((x) => x.json())
       .then((x) => x as { id: string; ingestUrl: string })
 
@@ -130,7 +180,9 @@ export namespace ShareNext {
 
   const queue = new Map<string, { timeout: NodeJS.Timeout; data: Map<string, Data> }>()
   async function sync(sessionId: string, data: Data[]) {
-    if (disabled) return
+    const client = await getClient()
+    if (!client) return
+
     const existing = queue.get(sessionId)
     if (existing) {
       for (const item of data) {
@@ -153,11 +205,11 @@ export namespace ShareNext {
       const share = await get(sessionId).catch(() => undefined)
       if (!share) return
 
-      await fetch(share.ingestUrl, {
+      const client = await getClient()
+      if (!client) return
+
+      await client.fetch(share.ingestUrl, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
         body: JSON.stringify({
           data: Array.from(queued.data.values()),
         }),
@@ -167,18 +219,16 @@ export namespace ShareNext {
   }
 
   export async function remove(sessionId: string) {
-    if (disabled) return
+    const client = await getClient()
+    if (!client) return
 
     log.info("removing share", { sessionId })
 
     const share = await get(sessionId)
     if (!share) return
 
-    await fetch(`${await url()}/api/share/${share.id}`, {
+    await client.fetch(`${client.url}/api/share/${share.id}`, {
       method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
     })
 
     await Storage.remove(["session_share", sessionId])
