@@ -26,10 +26,6 @@ export function formatProfileInfo(
     content += `Email: ${profile.email}\n`
   }
 
-  if (balance && balance.balance !== undefined && balance.balance !== null) {
-    content += `Balance: $${balance.balance.toFixed(2)}\n`
-  }
-
   // Show current organization
   if (currentOrgId && profile.organizations) {
     const currentOrg = profile.organizations.find((org) => org.id === currentOrgId)
@@ -39,6 +35,16 @@ export function formatProfileInfo(
   } else {
     content += `Team: Personal\n`
   }
+
+  if (balance && balance.balance !== undefined && balance.balance !== null) {
+    content += `Balance: $${balance.balance.toFixed(2)}\n`
+  }
+
+  // Add usage details link
+  const usageUrl = currentOrgId
+    ? `https://app.kilo.ai/organizations/${currentOrgId}/usage-details`
+    : "https://app.kilo.ai/usage"
+  content += `\nUsage Details: ${usageUrl}`
 
   return content
 }

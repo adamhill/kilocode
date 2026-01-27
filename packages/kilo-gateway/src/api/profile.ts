@@ -20,8 +20,19 @@ export async function fetchProfile(token: string): Promise<KilocodeProfile> {
     throw new Error(`Failed to fetch profile: ${response.status}`)
   }
 
-  const data = await response.json()
-  return data as KilocodeProfile
+  const data = (await response.json()) as {
+    user?: { email?: string; name?: string }
+    email?: string
+    name?: string
+    organizations?: Organization[]
+  }
+  // Backend returns { user: { email, name, ... }, organizations }
+  // Transform to flat KilocodeProfile structure
+  return {
+    email: data.user?.email ?? data.email ?? "",
+    name: data.user?.name ?? data.name,
+    organizations: data.organizations,
+  }
 }
 
 /**
@@ -31,23 +42,28 @@ export const getKiloProfile = fetchProfile
 
 /**
  * Fetch user balance from Kilo API
+ * @param token - Authentication token
+ * @param organizationId - Optional organization ID for team balance
  */
-export async function fetchBalance(token: string): Promise<KilocodeBalance | null> {
+export async function fetchBalance(token: string, organizationId?: string): Promise<KilocodeBalance | null> {
   try {
-    const response = await fetch(`${KILO_API_BASE}/api/balance`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-    })
+    const headers: Record<string, string> = {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    }
+    if (organizationId) {
+      headers["x-kilocode-organizationid"] = organizationId
+    }
+
+    const response = await fetch(`${KILO_API_BASE}/api/profile/balance`, { headers })
 
     if (!response.ok) {
       console.warn(`Failed to fetch balance: ${response.status}`)
       return null
     }
 
-    const data = await response.json()
-    return data as KilocodeBalance
+    const data = (await response.json()) as { balance?: number }
+    return { balance: data.balance ?? 0 }
   } catch (error) {
     console.warn("Error fetching balance:", error)
     return null

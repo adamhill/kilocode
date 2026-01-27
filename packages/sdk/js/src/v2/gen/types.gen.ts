@@ -4050,6 +4050,7 @@ export type KiloProfileResponses = {
     balance: {
       balance: number
     } | null
+    currentOrgId: string | null
   }
 }
 

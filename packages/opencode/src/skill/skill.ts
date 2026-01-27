@@ -10,6 +10,7 @@ import { Filesystem } from "@/util/filesystem"
 import { Flag } from "@/flag/flag"
 import { Bus } from "@/bus"
 import { Session } from "@/session"
+import { KilocodePaths } from "../kilocode/paths" // kilocode_change
 
 export namespace Skill {
   const log = Log.create({ service: "skill" })
@@ -38,8 +39,10 @@ export namespace Skill {
     }),
   )
 
+  // Used for .opencode/ directories (supports both skill/ and skills/)
   const OPENCODE_SKILL_GLOB = new Bun.Glob("{skill,skills}/**/SKILL.md")
-  const CLAUDE_SKILL_GLOB = new Bun.Glob("skills/**/SKILL.md")
+  // Used for .claude/ and .kilocode/ directories (only skills/)
+  const SKILLS_DIR_GLOB = new Bun.Glob("skills/**/SKILL.md")
 
   export const state = Instance.state(async () => {
     const skills: Record<string, Info> = {}
@@ -92,7 +95,7 @@ export namespace Skill {
     if (!Flag.OPENCODE_DISABLE_CLAUDE_CODE_SKILLS) {
       for (const dir of claudeDirs) {
         const matches = await Array.fromAsync(
-          CLAUDE_SKILL_GLOB.scan({
+          SKILLS_DIR_GLOB.scan({
             cwd: dir,
             absolute: true,
             onlyFiles: true,
@@ -109,6 +112,32 @@ export namespace Skill {
         }
       }
     }
+
+    // kilocode_change start - Scan Kilocode skill directories
+    // Scanned before OpenCode so that OpenCode skills take precedence (last one wins)
+    const kilocodeSkillDirs = await KilocodePaths.skillDirectories({
+      projectDir: Instance.directory,
+      worktreeRoot: Instance.worktree,
+    })
+    for (const dir of kilocodeSkillDirs) {
+      const matches = await Array.fromAsync(
+        SKILLS_DIR_GLOB.scan({
+          cwd: dir,
+          absolute: true,
+          onlyFiles: true,
+          followSymlinks: true,
+          dot: true,
+        }),
+      ).catch((error) => {
+        log.error("failed .kilocode directory scan for skills", { dir, error })
+        return []
+      })
+
+      for (const match of matches) {
+        await addSkill(match)
+      }
+    }
+    // kilocode_change end
 
     // Scan .opencode/skill/ directories
     for (const dir of await Config.directories()) {

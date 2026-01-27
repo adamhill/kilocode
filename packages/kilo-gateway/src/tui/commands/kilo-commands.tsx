@@ -6,9 +6,9 @@
 
 import { createMemo } from "solid-js"
 import { getTUIDependencies } from "../context.js"
-import { formatProfileInfo } from "../helpers.js"
 import type { Organization } from "../../types.js"
 import { DialogKiloTeamSelect } from "../components/dialog-kilo-team-select.js"
+import { DialogKiloProfile } from "../components/dialog-kilo-profile.js"
 
 // These types are OpenCode-internal and imported at runtime
 type UseSDK = any
@@ -59,17 +59,10 @@ export function registerKiloCommands(useSDK: () => UseSDK) {
             return
           }
 
-          const { profile, balance } = response.data
+          const { profile, balance, currentOrgId } = response.data
 
-          // Get current organization ID from auth
-          // We need to extract this from the stored auth
-          // For now, let's just show without the current org marker
-          const currentOrgId = undefined // TODO: Extract from auth
-
-          // Format profile info using centralized formatter
-          const content = formatProfileInfo(profile, balance, currentOrgId)
-
-          dialog.replace(() => <DialogAlert title="Kilo Gateway Profile" message={content} />)
+          // Show profile dialog with clickable usage link
+          dialog.replace(() => <DialogKiloProfile profile={profile} balance={balance} currentOrgId={currentOrgId} />)
         } catch (error) {
           dialog.replace(() => <DialogAlert title="Error" message={`Failed to fetch profile: ${error}`} />)
         }
@@ -100,7 +93,7 @@ export function registerKiloCommands(useSDK: () => UseSDK) {
             return
           }
 
-          const { profile } = response.data
+          const { profile, currentOrgId } = response.data
 
           if (!profile.organizations || profile.organizations.length === 0) {
             dialog.replace(() => (
@@ -111,9 +104,6 @@ export function registerKiloCommands(useSDK: () => UseSDK) {
             ))
             return
           }
-
-          // Get current organization ID
-          const currentOrgId = undefined // TODO: Extract from auth
 
           // Show team selection dialog
           dialog.replace(() => (

@@ -1,8 +1,9 @@
 import * as fs from "fs/promises"
 import * as path from "path"
-import os from "os"
 import { Config } from "../config/config"
 import { Log } from "../util/log"
+import { Filesystem } from "../util/filesystem"
+import { KilocodePaths } from "./paths"
 
 export namespace McpMigrator {
   const log = Log.create({ service: "kilocode.mcp-migrator" })
@@ -26,34 +27,8 @@ export namespace McpMigrator {
     skipped: Array<{ name: string; reason: string }>
   }
 
-  // Platform-specific VSCode global storage path
-  function getVSCodeGlobalStoragePath(): string {
-    const home = os.homedir()
-    switch (process.platform) {
-      case "darwin":
-        return path.join(home, "Library", "Application Support", "Code", "User", "globalStorage", "kilocode.kilo-code")
-      case "win32":
-        return path.join(
-          process.env.APPDATA || path.join(home, "AppData", "Roaming"),
-          "Code",
-          "User",
-          "globalStorage",
-          "kilocode.kilo-code",
-        )
-      default:
-        return path.join(home, ".config", "Code", "User", "globalStorage", "kilocode.kilo-code")
-    }
-  }
-
-  async function fileExists(filePath: string): Promise<boolean> {
-    return fs
-      .access(filePath)
-      .then(() => true)
-      .catch(() => false)
-  }
-
   export async function readMcpSettings(filepath: string): Promise<KilocodeMcpSettings | null> {
-    if (!(await fileExists(filepath))) return null
+    if (!(await Filesystem.exists(filepath))) return null
 
     const content = await fs.readFile(filepath, "utf-8")
     return JSON.parse(content) as KilocodeMcpSettings
@@ -88,7 +63,7 @@ export namespace McpMigrator {
 
     if (!options?.skipGlobalPaths) {
       // 1. VSCode extension global storage (primary location for global MCP settings)
-      const vscodeSettingsPath = path.join(getVSCodeGlobalStoragePath(), "settings", "mcp_settings.json")
+      const vscodeSettingsPath = path.join(KilocodePaths.vscodeGlobalStorage(), "settings", "mcp_settings.json")
       const vscodeSettings = await readMcpSettings(vscodeSettingsPath)
       if (vscodeSettings?.mcpServers) {
         for (const [name, server] of Object.entries(vscodeSettings.mcpServers)) {
