@@ -3,6 +3,7 @@ import * as fs from "fs/promises"
 import * as path from "path"
 import os from "os"
 import { Config } from "../config/config"
+import { KilocodePaths } from "./paths"
 
 export namespace ModesMigrator {
   // Kilocode mode structure
@@ -105,19 +106,6 @@ export namespace ModesMigrator {
     skipped: Array<{ slug: string; reason: string }>
   }
 
-  // Get platform-specific VSCode global storage path
-  function getVSCodeGlobalStoragePath(): string {
-    const home = os.homedir()
-    switch (process.platform) {
-      case "darwin":
-        return path.join(home, "Library", "Application Support", "Code", "User", "globalStorage", "kilocode.kilo-code")
-      case "win32":
-        return path.join(process.env.APPDATA || path.join(home, "AppData", "Roaming"), "Code", "User", "globalStorage", "kilocode.kilo-code")
-      default: // linux
-        return path.join(home, ".config", "Code", "User", "globalStorage", "kilocode.kilo-code")
-    }
-  }
-
   export async function migrate(options: {
     projectDir: string
     globalSettingsDir?: string
@@ -134,7 +122,7 @@ export namespace ModesMigrator {
 
     if (!options.skipGlobalPaths) {
       // 1. VSCode extension global storage (primary location for global modes)
-      const vscodeGlobalPath = path.join(getVSCodeGlobalStoragePath(), "settings", "custom_modes.yaml")
+      const vscodeGlobalPath = path.join(KilocodePaths.vscodeGlobalStorage(), "settings", "custom_modes.yaml")
       allModes.push(...(await readModesFile(vscodeGlobalPath)))
 
       // 2. CLI global settings (fallback/alternative location)
