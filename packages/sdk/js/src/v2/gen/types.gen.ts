@@ -1808,7 +1808,7 @@ export type Config = {
      */
     batch_tool?: boolean
     /**
-     * Enable OpenTelemetry spans for AI SDK calls (using the 'experimental_telemetry' flag)
+     * Enable telemetry. Set to false to opt-out.
      */
     openTelemetry?: boolean
     /**
