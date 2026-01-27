@@ -133,9 +133,20 @@ export namespace ShareNext {
   export async function share(sessionId: string) {
     if (disabled) return { url: "" }
 
+    const client = await getClient()
+    if (!client) return { url: "" }
+
     log.info("creating share", { sessionId })
 
-    return { url: "" }
+    const result = await client
+      .fetch(`${client.url}/api/session/${sessionId}/share`, {
+        method: "POST",
+        body: JSON.stringify({ sessionId }),
+      })
+      .then((x) => x.json())
+      .then((x) => x as { public_id: string })
+
+    return { url: `http://localhost:3000/s/${result.public_id}` }
   }
 
   function get(sessionId: string) {
