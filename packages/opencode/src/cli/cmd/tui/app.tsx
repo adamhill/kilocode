@@ -583,11 +583,13 @@ function App() {
     useSync: useSync,
     useDialog: useDialog,
     useToast: useToast,
+    useTheme: useTheme,
     DialogAlert: DialogAlert,
     DialogSelect: DialogSelect,
     Link: Link,
     Clipboard: Clipboard,
     useKeyboard: useKeyboard,
+    TextAttributes: TextAttributes,
   })
   registerKiloCommands(useSDK)
   // kilocode_change end

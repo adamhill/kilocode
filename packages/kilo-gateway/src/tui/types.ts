@@ -9,6 +9,7 @@ export interface TUIDependencies {
   useSync: () => any
   useDialog: () => any
   useToast: () => any
+  useTheme: () => any
 
   // UI Components
   DialogAlert: any
@@ -18,4 +19,5 @@ export interface TUIDependencies {
   // Utilities
   Clipboard: any
   useKeyboard: any
+  TextAttributes: any
 }
