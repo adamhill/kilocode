@@ -143,11 +143,7 @@ export function DialogModel(props: { providerID?: string }) {
             }
             // kilocode_change start - Show "Recommended" category for recommended Kilo models
             const isKiloRecommended = provider.id === "kilo" && KILO_RECOMMENDED_MODELS.includes(model)
-            const category = connected()
-              ? isKiloRecommended
-                ? "Recommended"
-                : provider.name
-              : undefined
+            const category = connected() ? (isKiloRecommended ? "Recommended" : provider.name) : undefined
             // kilocode_change end
             return {
               value,
