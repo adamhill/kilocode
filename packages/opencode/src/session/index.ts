@@ -270,7 +270,7 @@ export namespace Session {
   export const unshare = fn(Identifier.schema("session"), async (id) => {
     // Use ShareNext to remove the share (same as share function uses ShareNext to create)
     const { ShareNext } = await import("@/share/share-next")
-    await ShareNext.remove(id)
+    await ShareNext.unshare(id)
     await update(
       id,
       (draft) => {

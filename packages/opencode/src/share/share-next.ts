@@ -136,7 +136,7 @@ export namespace ShareNext {
     const client = await getClient()
     if (!client) return { url: "" }
 
-    log.info("creating share", { sessionId })
+    log.info("sharing", { sessionId })
 
     const result = await client
       .fetch(`${client.url}/api/session/${sessionId}/share`, {
@@ -155,6 +155,26 @@ export namespace ShareNext {
     })
 
     return { url }
+  }
+
+  export async function unshare(sessionId: string) {
+    if (disabled) return
+
+    const client = await getClient()
+    if (!client) return
+
+    log.info("unsharing", { sessionId })
+
+    const result = await client.fetch(`${client.url}/api/session/${sessionId}/unshare`, {
+      method: "POST",
+      body: JSON.stringify({ sessionId }),
+    })
+
+    const current = (await Storage.read(["session_share", sessionId])) as Awaited<ReturnType<typeof get>>
+
+    delete current.url
+
+    await Storage.write(["session_share", sessionId], current)
   }
 
   function get(sessionId: string) {
