@@ -86,3 +86,55 @@ Tests MUST test actual implementation, do not duplicate logic into a test.
 ## Fork Merge Process
 
 Kilo CLI is a fork of [opencode](https://github.com/anomalyco/opencode).
+
+### Minimizing Merge Conflicts
+
+We regularly merge upstream changes from opencode. To minimize merge conflicts and keep the sync process smooth:
+
+1. **Prefer `kilocode` directories** - Place Kilo-specific code in dedicated directories whenever possible:
+   - `packages/opencode/src/kilocode/` - Kilo-specific source code
+   - `packages/opencode/test/kilocode/` - Kilo-specific tests
+   - `packages/kilo-gateway/` - The Kilo Gateway package
+
+2. **Minimize changes to shared files** - When you must modify files that exist in upstream opencode, keep changes as small and isolated as possible.
+
+3. **Use `kilocode_change` markers** - When modifying shared code, mark your changes with `kilocode_change` comments so they can be easily identified during merges.
+
+4. **Avoid restructuring upstream code** - Don't refactor or reorganize code that comes from opencode unless absolutely necessary.
+
+The goal is to keep our diff from upstream as small as possible, making regular merges straightforward and reducing the risk of conflicts.
+
+### Kilocode Change Markers
+
+To minimize merge conflicts when syncing with upstream, mark Kilo Code-specific changes in shared code with `kilocode_change` comments.
+
+**Single line:**
+
+```typescript
+const value = 42 // kilocode_change
+```
+
+**Multi-line:**
+
+```typescript
+// kilocode_change start
+const foo = 1
+const bar = 2
+// kilocode_change end
+```
+
+**New files:**
+
+```typescript
+// kilocode_change - new file
+```
+
+#### When markers are NOT needed
+
+Code in these paths is Kilo Code-specific and does NOT need `kilocode_change` markers:
+
+- `packages/opencode/src/kilocode/` - All files in this directory
+- `packages/opencode/test/kilocode/` - All test files for kilocode
+- Any other path containing `kilocode` in filename or directory name
+
+These paths are entirely Kilo Code additions and won't conflict with upstream.
