@@ -31,7 +31,7 @@ export namespace ShareNext {
     const token = await kilocodeToken()
     if (!token) return undefined
 
-    const base = await Config.get().then((x) => x.enterprise?.url ?? "http://localhost:8787")
+    const base = await Config.get().then((x) => x.enterprise?.url ?? "https://ingest.kilosessions.ai")
     const baseHeaders: Record<string, string> = {
       "Content-Type": "application/json",
       Authorization: `bearer ${token}`,
@@ -147,7 +147,7 @@ export namespace ShareNext {
       .then((x) => x as { public_id: string })
 
     const current = (await Storage.read(["session_share", sessionId])) as Awaited<ReturnType<typeof get>>
-    const url = `http://localhost:3000/s/${result.public_id}`
+    const url = `https://app.kilo.ai/s/${result.public_id}`
 
     await Storage.write(["session_share", sessionId], {
       ...current,
