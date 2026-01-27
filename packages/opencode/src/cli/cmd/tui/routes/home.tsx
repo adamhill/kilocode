@@ -1,5 +1,5 @@
 import { Prompt, type PromptRef } from "@tui/component/prompt"
-import { createMemo, createSignal, Match, onMount, Show, Switch } from "solid-js"
+import { createMemo, Match, onMount, Show, Switch } from "solid-js"
 import { useTheme } from "@tui/context/theme"
 import { useKeybind } from "@tui/context/keybind"
 import { Logo } from "../component/logo"
@@ -14,9 +14,7 @@ import { usePromptRef } from "../context/prompt"
 import { Installation } from "@/installation"
 import { useKV } from "../context/kv"
 import { useCommandDialog } from "../component/dialog-command"
-import { useSDK } from "../context/sdk"
-import { useDialog } from "../ui/dialog" // kilocode_change
-import { NotificationBanner, DialogKiloNotifications, type KilocodeNotification } from "@kilocode/kilo-gateway/tui" // kilocode_change
+import { KiloNews } from "@kilocode/kilo-gateway/tui" // kilocode_change
 
 // TODO: what is the best way to do this?
 let once = false
@@ -24,7 +22,6 @@ let once = false
 export function Home() {
   const sync = useSync()
   const kv = useKV()
-  const sdk = useSDK() // kilocode_change
   const { theme } = useTheme()
   const route = useRouteData("home")
   const promptRef = usePromptRef()
@@ -45,38 +42,6 @@ export function Home() {
     if (isFirstTimeUser()) return false
     return !tipsHidden()
   })
-
-  // kilocode_change start - Kilo notifications
-  const [notifications, setNotifications] = createSignal<KilocodeNotification[]>([])
-  const isKiloConnected = createMemo(() => sync.data.provider_next.connected.includes("kilo"))
-  const dialog = useDialog()
-
-  const openNotificationsDialog = () => {
-    const items = notifications()
-    if (items.length > 0) {
-      dialog.replace(() => <DialogKiloNotifications notifications={items} />)
-    }
-  }
-
-  onMount(async () => {
-    // Wait for sync to complete
-    await new Promise<void>((resolve) => {
-      const check = () => {
-        if (sync.status === "complete") resolve()
-        else setTimeout(check, 100)
-      }
-      check()
-    })
-
-    if (!isKiloConnected()) return
-
-    const result = await sdk.client.kilo.notifications()
-    const items = result.data
-    if (items && items.length > 0) {
-      setNotifications(items)
-    }
-  })
-  // kilocode_change end
 
   command.register(() => [
     {
@@ -141,19 +106,12 @@ export function Home() {
             hint={Hint}
           />
         </box>
+        {/* kilocode_change - KiloNews added */}
         <box width="100%" maxWidth={75} alignItems="center" paddingTop={2} gap={1}>
-          {/* kilocode_change start - Show notification banner and tips */}
-          <Show when={notifications().length > 0}>
-            <NotificationBanner
-              notification={notifications()[0]}
-              totalCount={notifications().length}
-              onClick={openNotificationsDialog}
-            />
-          </Show>
+          <KiloNews />
           <Show when={showTips()}>
             <Tips />
           </Show>
-          {/* kilocode_change end */}
         </box>
         <Toast />
       </box>
