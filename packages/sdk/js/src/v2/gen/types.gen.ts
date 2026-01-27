@@ -4015,6 +4015,75 @@ export type ProviderOauthCallbackResponses = {
 
 export type ProviderOauthCallbackResponse = ProviderOauthCallbackResponses[keyof ProviderOauthCallbackResponses]
 
+export type KiloProfileData = {
+  body?: never
+  path?: never
+  query?: {
+    directory?: string
+  }
+  url: "/kilo/profile"
+}
+
+export type KiloProfileErrors = {
+  /**
+   * Bad request
+   */
+  400: BadRequestError
+}
+
+export type KiloProfileError = KiloProfileErrors[keyof KiloProfileErrors]
+
+export type KiloProfileResponses = {
+  /**
+   * Profile data
+   */
+  200: {
+    profile: {
+      email: string
+      name?: string
+      organizations?: Array<{
+        id: string
+        name: string
+        role: string
+      }>
+    }
+    balance: {
+      balance: number
+    } | null
+  }
+}
+
+export type KiloProfileResponse = KiloProfileResponses[keyof KiloProfileResponses]
+
+export type KiloOrganizationSetData = {
+  body?: {
+    organizationId: string | null
+  }
+  path?: never
+  query?: {
+    directory?: string
+  }
+  url: "/kilo/organization"
+}
+
+export type KiloOrganizationSetErrors = {
+  /**
+   * Bad request
+   */
+  400: BadRequestError
+}
+
+export type KiloOrganizationSetError = KiloOrganizationSetErrors[keyof KiloOrganizationSetErrors]
+
+export type KiloOrganizationSetResponses = {
+  /**
+   * Organization updated successfully
+   */
+  200: boolean
+}
+
+export type KiloOrganizationSetResponse = KiloOrganizationSetResponses[keyof KiloOrganizationSetResponses]
+
 export type FindTextData = {
   body?: never
   path?: never

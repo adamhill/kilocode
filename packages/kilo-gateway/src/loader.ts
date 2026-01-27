@@ -1,4 +1,4 @@
-import type { CustomLoaderResult, ProviderInfo } from "./types"
+import type { CustomLoaderResult, ProviderInfo } from "./types.js"
 
 /**
  * Custom loader function for the kilo provider

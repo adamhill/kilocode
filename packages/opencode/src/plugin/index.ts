@@ -11,7 +11,7 @@ import { CodexAuthPlugin } from "./codex"
 import { Session } from "../session"
 import { NamedError } from "@opencode-ai/util/error"
 import { CopilotAuthPlugin } from "./copilot"
-import { KiloAuthPlugin } from "@opencode-ai/kilo-auth-plugin" // kilocode_change
+import { KiloAuthPlugin } from "@kilocode/kilo-gateway" // kilocode_change
 
 export namespace Plugin {
   const log = Log.create({ service: "plugin" })

@@ -9,7 +9,7 @@ import {
   DEFAULT_EDITOR_NAME,
   ENV_EDITOR_NAME,
   TESTER_SUPPRESS_VALUE,
-} from "./constants"
+} from "./api/constants.js"
 
 /**
  * Header constants for KiloCode API requests

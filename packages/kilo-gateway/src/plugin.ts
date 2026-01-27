@@ -1,12 +1,13 @@
 import type { Plugin } from "@opencode-ai/plugin"
-import { authenticateWithDeviceAuth } from "./device-auth.js"
-import { KILO_API_BASE, TOKEN_EXPIRATION_MS } from "./constants.js"
+import { authenticateWithDeviceAuthTUI } from "./auth/device-auth-tui.js"
 
 /**
  * Kilo Gateway Authentication Plugin
  *
  * Provides device authorization flow for Kilo Gateway
  * to integrate with OpenCode's auth system.
+ *
+ * This version uses the TUI-compatible flow that works with both CLI and TUI contexts.
  */
 export const KiloAuthPlugin: Plugin = async (ctx) => {
   return {
@@ -46,27 +47,9 @@ export const KiloAuthPlugin: Plugin = async (ctx) => {
           type: "oauth",
           label: "Kilo Gateway (Device Authorization)",
           async authorize() {
-            // Execute the device auth flow
-            const result = await authenticateWithDeviceAuth()
-
-            // Return in the format expected by OpenCode
-            return {
-              url: KILO_API_BASE,
-              instructions: "Authenticated successfully with Kilo Gateway",
-              method: "auto",
-              async callback() {
-                // Store using OAuth format to include organization ID
-                // accountId field stores the organization ID
-                return {
-                  type: "success",
-                  provider: "kilo",
-                  refresh: result.token, // Store token here too for redundancy
-                  access: result.token, // Primary token storage
-                  expires: Date.now() + TOKEN_EXPIRATION_MS,
-                  ...(result.organizationId && { accountId: result.organizationId }),
-                }
-              },
-            }
+            // Use the TUI-compatible version that returns immediately
+            // This works with both TUI dialogs and Web UI
+            return await authenticateWithDeviceAuthTUI()
           },
         },
       ],

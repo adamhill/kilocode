@@ -1,13 +1,22 @@
 /**
- * Kilo Provider Configuration Constants
+ * Kilo Gateway Configuration Constants
  * Centralized configuration for all API endpoints, headers, and settings
  */
 
 /** Base URL for Kilo API */
-export const KILO_API_BASE = "https://api.kilo.ai/api/"
+export const KILO_API_BASE = "https://api.kilo.ai"
 
 /** Default base URL for OpenRouter-compatible endpoint */
 export const KILO_OPENROUTER_BASE = "https://api.kilo.ai/api/openrouter"
+
+/** Device auth polling interval in milliseconds */
+export const POLL_INTERVAL_MS = 3000
+
+/** Default model to use as fallback */
+export const DEFAULT_MODEL = "anthropic/claude-sonnet-4"
+
+/** Token expiration duration in milliseconds (1 year) */
+export const TOKEN_EXPIRATION_MS = 365 * 24 * 60 * 60 * 1000
 
 /** User-Agent header value for requests */
 export const USER_AGENT = "opencode-kilo-provider"

@@ -1,5 +1,5 @@
 // kilocode_change new file
-import { fetchKiloModels } from "@opencode-ai/kilo-provider"
+import { fetchKiloModels } from "@kilocode/kilo-gateway"
 import { Config } from "../config/config"
 import { Auth } from "../auth"
 import { Env } from "../env"

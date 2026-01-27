@@ -1,9 +1,9 @@
 import { createOpenRouter } from "@openrouter/ai-sdk-provider"
 import type { Provider as SDK } from "ai"
-import type { KiloProviderOptions } from "./types"
-import { getKiloUrlFromToken, getApiKey } from "./auth"
-import { buildKiloHeaders, DEFAULT_HEADERS } from "./headers"
-import { KILO_API_BASE, ANONYMOUS_API_KEY } from "./constants"
+import type { KiloProviderOptions } from "./types.js"
+import { getKiloUrlFromToken, getApiKey } from "./auth/token.js"
+import { buildKiloHeaders, DEFAULT_HEADERS } from "./headers.js"
+import { KILO_API_BASE, ANONYMOUS_API_KEY } from "./api/constants.js"
 
 /**
  * Debug version of createKilo with extensive logging
@@ -43,7 +43,7 @@ export function createKiloDebug(options: KiloProviderOptions = {}): SDK {
 
   // Create custom fetch wrapper to add dynamic headers
   const originalFetch = options.fetch ?? fetch
-  const wrappedFetch = async (input: RequestInfo | URL, init?: RequestInit) => {
+  const wrappedFetch = async (input: string | URL | Request, init?: RequestInit) => {
     console.log("\n🚀 [KILO DEBUG] Making request:")
     console.log("  - URL:", String(input))
     console.log("  - Method:", init?.method || "GET")

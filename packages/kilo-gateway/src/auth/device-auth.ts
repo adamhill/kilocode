@@ -1,9 +1,19 @@
+/**
+ * LEGACY CLI VERSION - NOT CURRENTLY USED
+ *
+ * This file contains the original CLI-based device authorization flow using @clack/prompts.
+ * It has been replaced by device-auth-tui.ts which provides a universal flow compatible
+ * with both CLI and TUI contexts.
+ *
+ * Kept for reference and potential future use.
+ */
+
 import open from "open"
 import { spinner } from "@clack/prompts"
-import type { DeviceAuthInitiateResponse, DeviceAuthPollResponse } from "./types.js"
+import type { DeviceAuthInitiateResponse, DeviceAuthPollResponse } from "../types.js"
 import { poll, formatTimeRemaining } from "./polling.js"
-import { getKiloProfile, getKiloDefaultModel, promptOrganizationSelection } from "./profile.js"
-import { KILO_API_BASE, POLL_INTERVAL_MS } from "./constants.js"
+import { getKiloProfile, getKiloDefaultModel, promptOrganizationSelection } from "../api/profile.js"
+import { KILO_API_BASE, POLL_INTERVAL_MS } from "../api/constants.js"
 
 /**
  * Initiate device authorization flow

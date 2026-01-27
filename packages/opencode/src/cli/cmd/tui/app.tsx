@@ -29,6 +29,8 @@ import { DialogAlert } from "./ui/dialog-alert"
 import { ToastProvider, useToast } from "./ui/toast"
 import { ExitProvider, useExit } from "./context/exit"
 import { Session as SessionApi } from "@/session"
+import { DialogSelect } from "./ui/dialog-select"
+import { Link } from "./ui/link"
 import { TuiEvent } from "./event"
 import { KVProvider, useKV } from "./context/kv"
 import { Provider } from "@/provider/provider"
@@ -36,6 +38,7 @@ import { ArgsProvider, useArgs, type Args } from "./context/args"
 import open from "open"
 import { writeHeapSnapshot } from "v8"
 import { PromptRefProvider, usePromptRef } from "./context/prompt"
+import { registerKiloCommands, initializeTUIDependencies } from "@kilocode/kilo-gateway/tui" // kilocode_change
 
 async function getTerminalBackgroundColor(): Promise<"dark" | "light"> {
   // can't set raw mode if not a TTY
@@ -571,6 +574,21 @@ function App() {
       },
     },
   ])
+
+  // kilocode_change start - Initialize TUI dependencies for kilo-gateway
+  initializeTUIDependencies({
+    useCommandDialog: useCommandDialog,
+    useSync: useSync,
+    useDialog: useDialog,
+    useToast: useToast,
+    DialogAlert: DialogAlert,
+    DialogSelect: DialogSelect,
+    Link: Link,
+    Clipboard: Clipboard,
+    useKeyboard: useKeyboard,
+  })
+  registerKiloCommands(useSDK)
+  // kilocode_change end
 
   createEffect(() => {
     const currentModel = local.model.current()
