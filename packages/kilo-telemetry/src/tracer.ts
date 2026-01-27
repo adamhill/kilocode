@@ -3,8 +3,8 @@ import { SimpleSpanProcessor } from "@opentelemetry/sdk-trace-base"
 import { Resource } from "@opentelemetry/resources"
 import { ATTR_SERVICE_NAME, ATTR_SERVICE_VERSION } from "@opentelemetry/semantic-conventions"
 import type { Tracer } from "@opentelemetry/api"
-import { trace } from "@opentelemetry/api"
 import { PostHogSpanExporter } from "./otel-exporter.js"
+import { Client } from "./client.js"
 
 let provider: NodeTracerProvider | null = null
 let exporter: PostHogSpanExporter | null = null
@@ -14,7 +14,12 @@ export namespace TracerSetup {
   export function init(options: { version: string; enabled: boolean }): Tracer {
     if (tracer) return tracer
 
-    exporter = new PostHogSpanExporter({ appVersion: options.version })
+    const client = Client.getClient()
+    if (!client) {
+      throw new Error("PostHog client not initialized. Call Client.init() first.")
+    }
+
+    exporter = new PostHogSpanExporter(client, { appVersion: options.version })
     exporter.setEnabled(options.enabled)
 
     provider = new NodeTracerProvider({

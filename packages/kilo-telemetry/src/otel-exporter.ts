@@ -1,11 +1,8 @@
 import type { SpanExporter, ReadableSpan } from "@opentelemetry/sdk-trace-base"
 import type { ExportResult } from "@opentelemetry/core"
 import { ExportResultCode } from "@opentelemetry/core"
-import { PostHog } from "posthog-node"
+import type { PostHog } from "posthog-node"
 import { Identity } from "./identity.js"
-
-const POSTHOG_API_KEY = "phc_GK2Pxl0HPj5ZPfwhLRjXrtdz8eD7e9MKnXiFrOqnB6z"
-const POSTHOG_HOST = "https://us.i.posthog.com"
 
 /**
  * Sensitive attributes that should never be sent to PostHog.
@@ -44,11 +41,8 @@ export class PostHogSpanExporter implements SpanExporter {
   private appName = "kilo-cli"
   private appVersion = "unknown"
 
-  constructor(options?: { appVersion?: string }) {
-    this.client = new PostHog(POSTHOG_API_KEY, {
-      host: POSTHOG_HOST,
-      disableGeoip: false,
-    })
+  constructor(client: PostHog, options?: { appVersion?: string }) {
+    this.client = client
     if (options?.appVersion) {
       this.appVersion = options.appVersion
     }
@@ -216,12 +210,11 @@ export class PostHogSpanExporter implements SpanExporter {
   }
 
   async shutdown(): Promise<void> {
+    // Only flush, don't shutdown - the shared client is managed by Client namespace
     await this.client.flush()
-    await this.client.shutdown()
   }
 
   async forceFlush(): Promise<void> {
-    // Flush any pending events to PostHog
     await this.client.flush()
   }
 }

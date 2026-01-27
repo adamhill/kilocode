@@ -16,6 +16,10 @@ export namespace Client {
     })
   }
 
+  export function getClient(): PostHog | null {
+    return client
+  }
+
   export function setEnabled(value: boolean) {
     enabled = value
     if (!client) return
@@ -40,6 +44,27 @@ export namespace Client {
         ...properties,
         ...(orgId && { kilocodeOrganizationId: orgId }),
       },
+    })
+  }
+
+  export function identify(distinctId: string, properties?: Record<string, unknown>) {
+    if (!enabled || !client) return
+
+    client.capture({
+      distinctId,
+      event: "$identify",
+      properties: {
+        $set: properties,
+      },
+    })
+  }
+
+  export function alias(distinctId: string, aliasId: string) {
+    if (!enabled || !client) return
+
+    client.alias({
+      distinctId,
+      alias: aliasId,
     })
   }
 

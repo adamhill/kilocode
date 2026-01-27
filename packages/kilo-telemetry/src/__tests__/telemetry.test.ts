@@ -4,6 +4,18 @@ import { TelemetryEvent } from "../events.js"
 import { PostHogSpanExporter } from "../otel-exporter.js"
 import { ExportResultCode } from "@opentelemetry/core"
 import type { ReadableSpan } from "@opentelemetry/sdk-trace-base"
+import type { PostHog } from "posthog-node"
+
+function createMockPostHogClient(): PostHog {
+  return {
+    capture: () => {},
+    alias: () => {},
+    flush: async () => {},
+    shutdown: async () => {},
+    optIn: () => {},
+    optOut: () => {},
+  } as unknown as PostHog
+}
 
 describe("Identity", () => {
   beforeEach(() => {
@@ -102,7 +114,7 @@ describe("PostHogSpanExporter", () => {
   }
 
   test("export returns success when disabled", () => {
-    const exporter = new PostHogSpanExporter()
+    const exporter = new PostHogSpanExporter(createMockPostHogClient())
     exporter.setEnabled(false)
 
     const span = createMockSpan("ai.generateText", { "ai.model.id": "gpt-4" })
@@ -119,7 +131,7 @@ describe("PostHogSpanExporter", () => {
   test("sensitive attributes are not included in exported properties", () => {
     // This test verifies the filtering logic by checking the SENSITIVE_ATTRIBUTES set
     // and the mapAttributes method behavior through the export function
-    const exporter = new PostHogSpanExporter()
+    const exporter = new PostHogSpanExporter(createMockPostHogClient())
 
     // Create a span with both safe and sensitive attributes
     const span = createMockSpan("ai.generateText", {

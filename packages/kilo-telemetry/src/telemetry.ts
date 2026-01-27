@@ -55,7 +55,22 @@ export namespace Telemetry {
   }
 
   export async function updateIdentity(token: string | null, accountId?: string): Promise<void> {
+    const previousId = Identity.getDistinctId()
     await Identity.updateFromKiloAuth(token, accountId)
+
+    const email = Identity.getUserId()
+    if (email && previousId && email !== previousId) {
+      // Identify the user with their email and properties
+      Client.identify(email, {
+        ...(accountId && { kilocodeOrganizationId: accountId }),
+        appName: props.appName,
+        appVersion: props.appVersion,
+        platform: props.platform,
+      })
+
+      // Link the anonymous machineId to the authenticated email
+      Client.alias(email, previousId)
+    }
   }
 
   export function track(event: TelemetryEvent, properties?: Record<string, unknown>) {

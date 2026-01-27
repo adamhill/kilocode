@@ -88,15 +88,15 @@ const cli = yargs(hideBin(process.argv))
       version: Installation.VERSION,
       enabled: globalCfg.experimental?.openTelemetry !== false,
     })
-    Telemetry.trackCliStart()
 
-    // Update identity if Kilo auth exists
     const kiloAuth = await Auth.get("kilo")
     if (kiloAuth) {
       const token = kiloAuth.type === "oauth" ? kiloAuth.access : kiloAuth.key
       const accountId = kiloAuth.type === "oauth" ? kiloAuth.accountId : undefined
       await Telemetry.updateIdentity(token, accountId)
     }
+
+    Telemetry.trackCliStart()
     // kilocode_change end
   })
   .usage("\n" + UI.logo())
