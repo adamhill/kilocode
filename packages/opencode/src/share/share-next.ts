@@ -1,4 +1,4 @@
-// kilocode_change pretty much completely refactored
+// kilocode_change pretty much completely refactored - @iscekic for conflicts
 import { Bus } from "@/bus"
 import { Config } from "@/config/config"
 import { ulid } from "ulid"
@@ -10,6 +10,9 @@ import { Log } from "@/util/log"
 import { Auth } from "@/auth"
 import type * as SDK from "@kilocode/sdk/v2" // kilocode_change
 
+/**
+ * Even though this is called "share-next", this is where we handle session stuff.
+ */
 export namespace ShareNext {
   const log = Log.create({ service: "share-next" })
 
@@ -55,8 +58,9 @@ export namespace ShareNext {
   const disabled = process.env["KILO_DISABLE_SHARE"] === "true" || process.env["KILO_DISABLE_SHARE"] === "1"
 
   export async function init() {
-    Bus.subscribe(Session.Event.Created, async (evt) => {
-      await create(evt.properties.info.id)
+    Bus.subscribe(Session.Event.Created, (evt) => {
+      const sessionId = evt.properties.info.id
+      void create(sessionId).catch((error) => log.error("share init create failed", { sessionId, error }))
     })
 
     Bus.subscribe(Session.Event.Updated, async (evt) => {
@@ -125,7 +129,7 @@ export namespace ShareNext {
 
     await Storage.write(["session_share", sessionId], result)
 
-    fullSync(sessionId)
+    void fullSync(sessionId).catch((error) => log.error("share full sync failed", { sessionId, error }))
 
     return result
   }
@@ -233,43 +237,128 @@ export namespace ShareNext {
         data: SDK.Model[]
       }
 
+  // Per-session debounce queue.
+  //
+  // Events fire frequently (message/part updates during streaming), so we coalesce many updates
+  // into at most one POST per ~1s per session.
+  //
+  // - Outer Map key: local session id
+  // - Inner Map key: stable entity key (message:<id>, part:<id>, etc.) so newer updates overwrite older
+  //   within the same debounce window.
   const queue = new Map<string, { timeout: NodeJS.Timeout; data: Map<string, Data> }>()
+
+  function id(value: unknown) {
+    if (!value) return undefined
+    if (typeof value !== "object") return undefined
+    if (!("id" in value)) return undefined
+    const result = (value as { id?: unknown }).id
+    if (typeof result === "string" && result.length > 0) return result
+    return undefined
+  }
+
+  function key(item: Data) {
+    // Stable keys are important so updates for the same entity collapse to a single queued item.
+    // If we can't derive a stable key, we fall back to a random key (ulid) so the item is still sent.
+    if (item.type === "session") return "session"
+    if (item.type === "session_diff") return "session_diff"
+
+    if (item.type === "message") {
+      const value = id(item.data)
+      return value ? `message:${value}` : ulid()
+    }
+
+    if (item.type === "part") {
+      const value = id(item.data)
+      return value ? `part:${value}` : ulid()
+    }
+
+    const models = item.data
+      .map((m) => `${m.providerID}:${m.id}`)
+      .sort()
+      .join(",")
+    return models.length > 0 ? `model:${models}` : ulid()
+  }
+
+  function flush(sessionId: string, timeout: NodeJS.Timeout) {
+    // Flush is scheduled by sync() and sends the currently queued payload.
+    //
+    // Note: we delete the queue entry before the network call so that new incoming events can start
+    // a fresh debounce window immediately.
+    void (async () => {
+      const queued = queue.get(sessionId)
+      if (!queued) return
+
+      clearTimeout(timeout)
+      queue.delete(sessionId)
+
+      try {
+        const share = await get(sessionId).catch(() => undefined)
+        if (!share) return
+
+        const client = await getClient()
+        if (!client) return
+
+        const response = await client.fetch(`${client.url}${share.ingestPath}`, {
+          method: "POST",
+          body: JSON.stringify({
+            data: Array.from(queued.data.values()),
+          }),
+        })
+
+        if (!response.ok) {
+          throw new Error(`sync failed: ${response.status} ${response.statusText}`)
+        }
+      } catch (error) {
+        log.error("share sync failed", { sessionId, error })
+        // Requeue without overwriting newer updates.
+        // If a new debounce window is already queued (due to fresh events while this flush was in-flight),
+        // only fill missing keys so we don't clobber newer data with stale data from the failed batch.
+        requeue(sessionId, Array.from(queued.data.values()))
+      }
+    })()
+  }
+
+  function requeue(sessionId: string, items: Data[]) {
+    const existing = queue.get(sessionId)
+    if (existing) {
+      for (const item of items) {
+        const k = key(item)
+        if (existing.data.has(k)) continue
+        existing.data.set(k, item)
+      }
+      return
+    }
+
+    const dataMap = new Map<string, Data>()
+    for (const item of items) {
+      dataMap.set(key(item), item)
+    }
+
+    const timeout = setTimeout(() => flush(sessionId, timeout), 1000)
+    queue.set(sessionId, { timeout, data: dataMap })
+  }
+
   async function sync(sessionId: string, data: Data[]) {
+    // sync() is called by event handlers and is intentionally cheap:
+    // - If sharing isn't configured (no token / disabled), we skip queueing.
+    // - Otherwise, merge into the pending queue entry (if present) or start a new 1s timer.
     const client = await getClient()
     if (!client) return
 
     const existing = queue.get(sessionId)
     if (existing) {
       for (const item of data) {
-        existing.data.set("id" in item ? (item.id as string) : ulid(), item)
+        existing.data.set(key(item), item)
       }
       return
     }
 
     const dataMap = new Map<string, Data>()
     for (const item of data) {
-      dataMap.set("id" in item ? (item.id as string) : ulid(), item)
+      dataMap.set(key(item), item)
     }
 
-    const timeout = setTimeout(async () => {
-      const queued = queue.get(sessionId)
-      if (!queued) return
-
-      queue.delete(sessionId)
-
-      const share = await get(sessionId).catch(() => undefined)
-      if (!share) return
-
-      const client = await getClient()
-      if (!client) return
-
-      await client.fetch(`${client.url}${share.ingestPath}`, {
-        method: "POST",
-        body: JSON.stringify({
-          data: Array.from(queued.data.values()),
-        }),
-      })
-    }, 1000)
+    const timeout = setTimeout(() => flush(sessionId, timeout), 1000)
     queue.set(sessionId, { timeout, data: dataMap })
   }
 
