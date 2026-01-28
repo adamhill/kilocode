@@ -37,7 +37,7 @@ import { Config } from "@/config/config"
 import { Todo } from "@/session/todo"
 import { z } from "zod"
 import { LoadAPIKeyError } from "ai"
-import { fetchDefaultFreeModel } from "@kilocode/kilo-gateway" // kilocode_change
+import { fetchDefaultModel } from "@kilocode/kilo-gateway" // kilocode_change
 import type { Event, OpencodeClient, SessionMessageResponse } from "@opencode-ai/sdk/v2"
 import { applyPatch } from "diff"
 
@@ -1385,7 +1385,7 @@ export namespace ACP {
     if (specified) return specified
 
     // kilocode_change start
-    const freeModel = await fetchDefaultFreeModel()
+    const freeModel = await fetchDefaultModel()
     const parsed = Provider.parseModel(freeModel)
     return { providerID: "kilo", modelID: parsed.modelID }
     // kilocode_change end

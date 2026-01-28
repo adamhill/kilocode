@@ -8,7 +8,7 @@ import { errors } from "../error"
 import { Log } from "../../util/log"
 import { lazy } from "../../util/lazy"
 // kilocode_change start
-import { fetchDefaultModel, fetchDefaultFreeModel } from "@kilocode/kilo-gateway"
+import { fetchDefaultModel } from "@kilocode/kilo-gateway"
 import { Auth } from "../../auth"
 // kilocode_change end
 
@@ -89,19 +89,10 @@ export const ConfigRoutes = lazy(() =>
         const providers = await Provider.list()
 
         // kilocode_change start - Fetch default model from Kilo API
-        let kiloApiDefault: string | undefined
-        try {
-          const kiloAuth = await Auth.get("kilo")
-          if (kiloAuth) {
-            const token = kiloAuth.type === "oauth" ? kiloAuth.access : kiloAuth.key
-            const organizationId = kiloAuth.type === "oauth" ? kiloAuth.accountId : undefined
-            kiloApiDefault = await fetchDefaultModel(token, organizationId)
-          } else {
-            kiloApiDefault = await fetchDefaultFreeModel()
-          }
-        } catch {
-          // Fall back to Provider.sort() on API failure
-        }
+        const kiloAuth = await Auth.get("kilo")
+        const token = kiloAuth?.type === "oauth" ? kiloAuth.access : kiloAuth?.key
+        const organizationId = kiloAuth?.type === "oauth" ? kiloAuth.accountId : undefined
+        const kiloApiDefault = await fetchDefaultModel(token, organizationId)
         // kilocode_change end
 
         // kilocode_change start - Use API default for Kilo provider if valid
