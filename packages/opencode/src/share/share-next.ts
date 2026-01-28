@@ -162,9 +162,6 @@ export namespace ShareNext {
     }
 
     const url = `https://app.kilo.ai/s/${result.public_id}`
-    if (!url) {
-      throw new Error(`Unable to share session ${sessionId}: generated share URL is empty`)
-    }
 
     await Storage.write(["session_share", sessionId], {
       ...current,
