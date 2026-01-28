@@ -31,15 +31,15 @@ export const ImportCommand = cmd({
       const isUrl = args.file.startsWith("http://") || args.file.startsWith("https://")
 
       if (isUrl) {
-        const urlMatch = args.file.match(/https?:\/\/opncd\.ai\/share\/([a-zA-Z0-9_-]+)/)
+        const urlMatch = args.file.match(/https?:\/\/app\.kilo\.ai\/s\/([a-zA-Z0-9_-]+)/)
         if (!urlMatch) {
-          process.stdout.write(`Invalid URL format. Expected: https://opncd.ai/share/<slug>`)
+          process.stdout.write(`Invalid URL format. Expected: https://app.kilo.ai/s/<id>`)
           process.stdout.write(EOL)
           return
         }
 
-        const slug = urlMatch[1]
-        const response = await fetch(`https://opncd.ai/api/share/${slug}`)
+        const id = urlMatch[1]
+        const response = await fetch(`https://app.kilo.ai/api/s/${id}`)
 
         if (!response.ok) {
           process.stdout.write(`Failed to fetch share data: ${response.statusText}`)
@@ -50,21 +50,12 @@ export const ImportCommand = cmd({
         const data = await response.json()
 
         if (!data.info || !data.messages || Object.keys(data.messages).length === 0) {
-          process.stdout.write(`Share not found: ${slug}`)
+          process.stdout.write(`Share not found: ${id}`)
           process.stdout.write(EOL)
           return
         }
 
-        exportData = {
-          info: data.info,
-          messages: Object.values(data.messages).map((msg: any) => {
-            const { parts, ...info } = msg
-            return {
-              info,
-              parts,
-            }
-          }),
-        }
+        exportData = data
       } else {
         const file = Bun.file(args.file)
         exportData = await file.json().catch(() => {})
