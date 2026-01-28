@@ -114,11 +114,12 @@ export const dict = {
   "provider.connect.apiKey.label": "{{provider}} APIキー",
   "provider.connect.apiKey.placeholder": "APIキー",
   "provider.connect.apiKey.required": "APIキーが必要です",
-  "provider.connect.opencodeZen.line1":
-    "Kilo CLI Zenは、コーディングエージェント向けに最適化された信頼性の高いモデルへのアクセスを提供します。",
-  "provider.connect.opencodeZen.line2": "1つのAPIキーで、Claude、GPT、Gemini、GLMなどのモデルにアクセスできます。",
-  "provider.connect.opencodeZen.visit.prefix": " ",
-  "provider.connect.opencodeZen.visit.suffix": " にアクセスしてAPIキーを取得してください。",
+  "provider.connect.kiloGateway.line1":
+    "Kilo Gatewayは、コーディングエージェント向けに最適化された信頼性の高いモデルへのアクセスを提供します。",
+  "provider.connect.kiloGateway.line2": "1つのAPIキーで、Claude、GPT、Gemini、GLMなどのモデルにアクセスできます。",
+  "provider.connect.kiloGateway.visit.prefix": " ",
+  "provider.connect.kiloGateway.visit.link": "kilo.ai",
+  "provider.connect.kiloGateway.visit.suffix": " にアクセスしてAPIキーを取得してください。",
   "provider.connect.oauth.code.visit.prefix": " ",
   "provider.connect.oauth.code.visit.link": "このリンク",
   "provider.connect.oauth.code.visit.suffix":
