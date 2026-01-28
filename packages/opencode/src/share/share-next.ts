@@ -52,7 +52,7 @@ export namespace ShareNext {
     }
   }
 
-  const disabled = process.env["OPENCODE_DISABLE_SHARE"] === "true" || process.env["OPENCODE_DISABLE_SHARE"] === "1"
+  const disabled = process.env["KILO_DISABLE_SHARE"] === "true" || process.env["KILO_DISABLE_SHARE"] === "1"
 
   export async function init() {
     Bus.subscribe(Session.Event.Created, async (evt) => {
@@ -132,7 +132,7 @@ export namespace ShareNext {
 
   export async function share(sessionId: string) {
     if (disabled) {
-      throw new Error("Sharing is disabled (OPENCODE_DISABLE_SHARE=1)")
+      throw new Error("Sharing is disabled (KILO_DISABLE_SHARE=1)")
     }
 
     const client = await getClient()
@@ -176,7 +176,7 @@ export namespace ShareNext {
 
   export async function unshare(sessionId: string) {
     if (disabled) {
-      throw new Error("Unshare is disabled (OPENCODE_DISABLE_SHARE=1)")
+      throw new Error("Unshare is disabled (KILO_DISABLE_SHARE=1)")
     }
 
     const client = await getClient()

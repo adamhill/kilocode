@@ -70,7 +70,7 @@ export namespace Share {
     process.env["OPENCODE_API"] ??
     (Installation.isPreview() || Installation.isLocal() ? "https://api.dev.opencode.ai" : "https://api.opencode.ai")
 
-  const disabled = process.env["OPENCODE_DISABLE_SHARE"] === "true" || process.env["OPENCODE_DISABLE_SHARE"] === "1"
+  const disabled = process.env["KILO_DISABLE_SHARE"] === "true" || process.env["KILO_DISABLE_SHARE"] === "1"
 
   export async function create(sessionID: string) {
     if (disabled) return { url: "", secret: "" }

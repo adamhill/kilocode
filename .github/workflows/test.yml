@@ -67,7 +67,7 @@ jobs:
         working-directory: packages/opencode
         run: bun script/seed-e2e.ts
         env:
-          OPENCODE_DISABLE_SHARE: "true"
+          KILO_DISABLE_SHARE: "true"
           OPENCODE_DISABLE_LSP_DOWNLOAD: "true"
           OPENCODE_DISABLE_DEFAULT_PLUGINS: "true"
           OPENCODE_EXPERIMENTAL_DISABLE_FILEWATCHER: "true"
@@ -86,7 +86,7 @@ jobs:
         working-directory: packages/opencode
         run: bun dev -- --print-logs --log-level WARN serve --port 4096 --hostname 127.0.0.1 &
         env:
-          OPENCODE_DISABLE_SHARE: "true"
+          KILO_DISABLE_SHARE: "true"
           OPENCODE_DISABLE_LSP_DOWNLOAD: "true"
           OPENCODE_DISABLE_DEFAULT_PLUGINS: "true"
           OPENCODE_EXPERIMENTAL_DISABLE_FILEWATCHER: "true"
@@ -111,7 +111,7 @@ jobs:
         run: ${{ matrix.settings.command }}
         env:
           CI: true
-          OPENCODE_DISABLE_SHARE: "true"
+          KILO_DISABLE_SHARE: "true"
           OPENCODE_DISABLE_LSP_DOWNLOAD: "true"
           OPENCODE_DISABLE_DEFAULT_PLUGINS: "true"
           OPENCODE_EXPERIMENTAL_DISABLE_FILEWATCHER: "true"
