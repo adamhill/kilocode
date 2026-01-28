@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 
 import { $ } from "bun"
-import { createOpencode } from "@opencode-ai/sdk"
+import { createOpencode } from "@kilocode/sdk" // kilocode_change
 import { parseArgs } from "util"
 
 export const team = [

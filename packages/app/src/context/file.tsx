@@ -1,7 +1,7 @@
 import { createEffect, createMemo, createRoot, onCleanup } from "solid-js"
 import { createStore, produce } from "solid-js/store"
 import { createSimpleContext } from "@opencode-ai/ui/context"
-import type { FileContent } from "@opencode-ai/sdk/v2"
+import type { FileContent } from "@kilocode/sdk/v2" // kilocode_change
 import { showToast } from "@opencode-ai/ui/toast"
 import { useParams } from "@solidjs/router"
 import { getFilename } from "@opencode-ai/util/path"

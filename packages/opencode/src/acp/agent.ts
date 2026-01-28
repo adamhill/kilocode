@@ -38,7 +38,7 @@ import { Todo } from "@/session/todo"
 import { z } from "zod"
 import { LoadAPIKeyError } from "ai"
 import { fetchDefaultModel } from "@kilocode/kilo-gateway" // kilocode_change
-import type { Event, OpencodeClient, SessionMessageResponse } from "@opencode-ai/sdk/v2"
+import type { Event, OpencodeClient, SessionMessageResponse } from "@kilocode/sdk/v2"
 import { applyPatch } from "diff"
 
 export namespace ACP {
