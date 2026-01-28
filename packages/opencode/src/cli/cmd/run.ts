@@ -91,7 +91,8 @@ export const RunCommand = cmd({
         type: "string",
         describe: "model variant (provider-specific reasoning effort, e.g., high, max, minimal)",
       })
-      .option("auto", { // kilocode_change
+      .option("auto", {
+        // kilocode_change
         type: "boolean",
         describe: "auto-approve all permissions (for autonomous/pipeline usage)",
       })
@@ -213,7 +214,7 @@ export const RunCommand = cmd({
           if (event.type === "permission.asked") {
             const permission = event.properties
             if (permission.sessionID !== sessionID) continue
-            
+
             // kilocode_change start - In auto mode, automatically approve all permissions without prompting
             if (args.auto) {
               await sdk.permission.respond({
@@ -224,7 +225,7 @@ export const RunCommand = cmd({
               continue
             }
             // kilocode_change end
-            
+
             const result = await select({
               message: `Permission required: ${permission.permission} (${permission.patterns.join(", ")})`,
               options: [
@@ -315,7 +316,7 @@ export const RunCommand = cmd({
             pattern: "*",
           },
         ]
-        
+
         // kilocode_change start - In auto mode, allow all permissions by default except questions
         // The question deny rule must come AFTER the wildcard to override it (findLast behavior)
         const permissions = args.auto
@@ -415,11 +416,7 @@ export const RunCommand = cmd({
           : undefined
 
         const result = await sdk.session.create(
-          title
-            ? { title, permission: permissions }
-            : permissions
-              ? { permission: permissions }
-              : {},
+          title ? { title, permission: permissions } : permissions ? { permission: permissions } : {},
         )
         // kilocode_change end
         return result.data?.id
