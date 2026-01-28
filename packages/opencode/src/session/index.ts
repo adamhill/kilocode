@@ -22,7 +22,6 @@ import { Snapshot } from "@/snapshot"
 import type { Provider } from "@/provider/provider"
 import { PermissionNext } from "@/permission/next"
 import { Global } from "@/global"
-import { ShareNext } from "@/share/share-next"
 
 export namespace Session {
   const log = Log.create({ service: "session" })
@@ -341,6 +340,7 @@ export namespace Session {
       for (const child of await children(sessionID)) {
         await remove(child.id)
       }
+      const { ShareNext } = await import("@/share/share-next")
       await ShareNext.remove(sessionID).catch(() => {})
       for (const msg of await Storage.list(["message", sessionID])) {
         for (const part of await Storage.list(["part", msg.at(-1)!])) {
