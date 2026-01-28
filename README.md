@@ -23,6 +23,17 @@
 - **Automated Refactoring:** Kilo can refactor and improve existing code.
 - **MCP Server Marketplace**: Kilo can easily find, and use MCP servers to extend the agent capabilities.
 - **Multi Mode**: Plan with Architect, Code with Coder, and Debug with Debugger, and make your own custom modes.
+- **Autonomous Mode**: Run Kilo in fully autonomous mode for CI/CD pipelines with `--auto` flag.
+
+## Autonomous Mode
+
+Use the `--auto` flag with `kilo run` to enable fully autonomous operation without user interaction. This is ideal for CI/CD pipelines and automated workflows:
+
+```bash
+kilo run --auto "run tests and fix any failures"
+```
+
+**Important:** The `--auto` flag disables all permission prompts and allows the agent to execute any action without confirmation. Only use this in trusted environments like CI/CD pipelines.
 
 ## Contributing
 
