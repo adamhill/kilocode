@@ -1,3 +1,4 @@
+// kilocode_change start
 import type {
   Message,
   Agent,
@@ -17,7 +18,8 @@ import type {
   ProviderListResponse,
   ProviderAuthMethod,
   VcsInfo,
-} from "@opencode-ai/sdk/v2"
+} from "@kilocode/sdk/v2"
+// kilocode_change end
 import { createStore, produce, reconcile } from "solid-js/store"
 import { useSDK } from "@tui/context/sdk"
 import { Binary } from "@opencode-ai/util/binary"
@@ -27,7 +29,7 @@ import { useExit } from "./exit"
 import { useArgs } from "./args"
 import { batch, onMount } from "solid-js"
 import { Log } from "@/util/log"
-import type { Path } from "@opencode-ai/sdk"
+import type { Path } from "@kilocode/sdk" // kilocode_change
 
 export const { use: useSync, provider: SyncProvider } = createSimpleContext({
   name: "Sync",

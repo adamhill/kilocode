@@ -85,7 +85,7 @@ Tests MUST test actual implementation, do not duplicate logic into a test.
 
 ## Fork Merge Process
 
-Kilo CLI is a fork of [opencode](https://github.com/anomalyco/opencode).
+Kilo CLI is a fork of [opencode](https://github.com/Kilo-Org/kilo).
 
 ### Minimizing Merge Conflicts
 

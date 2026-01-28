@@ -28,7 +28,7 @@
   },
   "dependencies": {
     "@opencode-ai/plugin": "workspace:*",
-    "@opencode-ai/sdk": "workspace:*",
+    "@kilocode/sdk": "workspace:*",
     "@openrouter/ai-sdk-provider": "1.5.2",
     "@clack/prompts": "1.0.0-alpha.1",
     "ai": "catalog:",

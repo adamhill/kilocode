@@ -1,4 +1,4 @@
-import { createOpencodeClient, type Event } from "@opencode-ai/sdk/v2/client"
+import { createOpencodeClient, type Event } from "@kilocode/sdk/v2/client" // kilocode_change
 import { createSimpleContext } from "@opencode-ai/ui/context"
 import { createGlobalEmitter } from "@solid-primitives/event-bus"
 import { createEffect, createMemo, onCleanup } from "solid-js"

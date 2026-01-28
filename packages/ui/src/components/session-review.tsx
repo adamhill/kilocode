@@ -11,7 +11,7 @@ import { useI18n } from "../context/i18n"
 import { getDirectory, getFilename } from "@opencode-ai/util/path"
 import { createEffect, createMemo, createSignal, For, Match, Show, Switch, type JSX } from "solid-js"
 import { createStore } from "solid-js/store"
-import { type FileContent, type FileDiff } from "@opencode-ai/sdk/v2"
+import { type FileContent, type FileDiff } from "@kilocode/sdk/v2" // kilocode_change
 import { PreloadMultiFileDiffResult } from "@pierre/diffs/ssr"
 import { type SelectedLineRange } from "@pierre/diffs"
 import { Dynamic } from "solid-js/web"

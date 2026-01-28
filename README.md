@@ -69,7 +69,7 @@ If you're interested in contributing, please read our [contributing docs](./CONT
 
 #### Where did Kilo CLI come from?
 
-Kilo CLI is a fork of [OpenCode](https://github.com/anomalyco/opencode), enhanced to work within the Kilo agentic engineering platform.
+Kilo CLI is a fork of [OpenCode](https://github.com/Kilo-Org/kilo), enhanced to work within the Kilo agentic engineering platform.
 
 ---
 

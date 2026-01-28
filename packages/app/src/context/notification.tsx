@@ -9,7 +9,7 @@ import { useLanguage } from "@/context/language"
 import { useSettings } from "@/context/settings"
 import { Binary } from "@opencode-ai/util/binary"
 import { base64Decode, base64Encode } from "@opencode-ai/util/encode"
-import { EventSessionError } from "@opencode-ai/sdk/v2"
+import { EventSessionError } from "@kilocode/sdk/v2" // kilocode_change
 import { Persist, persisted } from "@/utils/persist"
 import { playSound, soundSrc } from "@/utils/sound"
 

@@ -1,4 +1,4 @@
-import { FileDiff, Message, Model, Part, Session, SessionStatus, UserMessage } from "@opencode-ai/sdk/v2"
+import { FileDiff, Message, Model, Part, Session, SessionStatus, UserMessage } from "@kilocode/sdk/v2" // kilocode_change
 import { SessionTurn } from "@opencode-ai/ui/session-turn"
 import { SessionReview } from "@opencode-ai/ui/session-review"
 import { DataProvider } from "@opencode-ai/ui/context"
@@ -327,7 +327,7 @@ export default function () {
                               <div class="flex gap-3 items-center">
                                 <IconButton
                                   as={"a"}
-                                  href="https://github.com/anomalyco/opencode"
+                                  href="https://github.com/Kilo-Org/kilo"
                                   target="_blank"
                                   icon="github"
                                   variant="ghost"

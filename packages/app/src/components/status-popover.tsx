@@ -13,7 +13,7 @@ import { useSDK } from "@/context/sdk"
 import { normalizeServerUrl, serverDisplayName, useServer } from "@/context/server"
 import { usePlatform } from "@/context/platform"
 import { useLanguage } from "@/context/language"
-import { createOpencodeClient } from "@opencode-ai/sdk/v2/client"
+import { createOpencodeClient } from "@kilocode/sdk/v2/client" // kilocode_change
 import { DialogSelectServer } from "./dialog-select-server"
 
 type ServerStatus = { healthy: boolean; version?: string }
