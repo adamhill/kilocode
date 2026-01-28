@@ -181,7 +181,7 @@ export namespace ShareNext {
 
     const client = await getClient()
     if (!client) {
-      throw new Error("Unable to unshare session: no Kilo credentials found. Run `opencode auth login`.")
+      throw new Error("Unable to unshare session: no Kilo credentials found. Run `kilo auth login`.")
     }
 
     log.info("unsharing", { sessionId })
