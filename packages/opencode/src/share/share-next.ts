@@ -34,7 +34,7 @@ export namespace ShareNext {
     const base = await Config.get().then((x) => x.enterprise?.url ?? "https://ingest.kilosessions.ai")
     const baseHeaders: Record<string, string> = {
       "Content-Type": "application/json",
-      Authorization: `bearer ${token}`,
+      Authorization: `Bearer ${token}`,
     }
 
     const withHeaders = (init?: RequestInit) => {
