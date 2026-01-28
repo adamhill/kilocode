@@ -256,7 +256,7 @@ export namespace ShareNext {
     const share = await get(sessionId)
     if (!share) return
 
-    await client.fetch(`${client.url}/api/share/${share.id}`, {
+    await client.fetch(`${client.url}/api/session/${share.id}`, {
       method: "DELETE",
     })
 
