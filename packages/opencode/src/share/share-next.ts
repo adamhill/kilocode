@@ -131,23 +131,40 @@ export namespace ShareNext {
   }
 
   export async function share(sessionId: string) {
-    if (disabled) return { url: "" }
+    if (disabled) {
+      throw new Error("Sharing is disabled (OPENCODE_DISABLE_SHARE=1)")
+    }
 
     const client = await getClient()
-    if (!client) return { url: "" }
+    if (!client) {
+      throw new Error("Unable to share session: no Kilo credentials found. Run `kilo auth login`.")
+    }
+
+    const current = (await get(sessionId).catch(() => undefined)) ?? (await create(sessionId))
+    if (!current.id || !current.ingestPath) {
+      throw new Error(`Unable to share session ${sessionId}: failed to initialize session sync.`)
+    }
 
     log.info("sharing", { sessionId })
 
-    const result = await client
-      .fetch(`${client.url}/api/session/${sessionId}/share`, {
-        method: "POST",
-        body: JSON.stringify({ sessionId }),
-      })
-      .then((x) => x.json())
-      .then((x) => x as { public_id: string })
+    const response = await client.fetch(`${client.url}/api/session/${sessionId}/share`, {
+      method: "POST",
+      body: JSON.stringify({ sessionId }),
+    })
 
-    const current = (await Storage.read(["session_share", sessionId])) as Awaited<ReturnType<typeof get>>
+    if (!response.ok) {
+      throw new Error(`Unable to share session ${sessionId}: ${response.status} ${response.statusText}`)
+    }
+
+    const result = (await response.json()) as { public_id?: string }
+    if (!result.public_id) {
+      throw new Error(`Unable to share session ${sessionId}: server did not return a public id`)
+    }
+
     const url = `https://app.kilo.ai/s/${result.public_id}`
+    if (!url) {
+      throw new Error(`Unable to share session ${sessionId}: generated share URL is empty`)
+    }
 
     await Storage.write(["session_share", sessionId], {
       ...current,
@@ -158,23 +175,35 @@ export namespace ShareNext {
   }
 
   export async function unshare(sessionId: string) {
-    if (disabled) return
+    if (disabled) {
+      throw new Error("Unshare is disabled (OPENCODE_DISABLE_SHARE=1)")
+    }
 
     const client = await getClient()
-    if (!client) return
+    if (!client) {
+      throw new Error("Unable to unshare session: no Kilo credentials found. Run `opencode auth login`.")
+    }
 
     log.info("unsharing", { sessionId })
 
-    const result = await client.fetch(`${client.url}/api/session/${sessionId}/unshare`, {
+    const response = await client.fetch(`${client.url}/api/session/${sessionId}/unshare`, {
       method: "POST",
       body: JSON.stringify({ sessionId }),
     })
 
-    const current = (await Storage.read(["session_share", sessionId])) as Awaited<ReturnType<typeof get>>
+    if (!response.ok) {
+      throw new Error(`Unable to unshare session ${sessionId}: ${response.status} ${response.statusText}`)
+    }
 
-    delete current.url
+    const current = await get(sessionId).catch(() => undefined)
+    if (!current) return
 
-    await Storage.write(["session_share", sessionId], current)
+    const next = {
+      ...current,
+    }
+    delete next.url
+
+    await Storage.write(["session_share", sessionId], next)
   }
 
   function get(sessionId: string) {
