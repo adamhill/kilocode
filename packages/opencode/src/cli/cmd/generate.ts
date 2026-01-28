@@ -11,10 +11,11 @@ export const GenerateCommand = {
         if (!operation?.operationId) continue
         // @ts-expect-error
         operation["x-codeSamples"] = [
+          // kilocode_change start
           {
             lang: "js",
             source: [
-              `import { createOpencodeClient } from "@opencode-ai/sdk`,
+              `import { createOpencodeClient } from "@kilocode/sdk`,
               ``,
               `const client = createOpencodeClient()`,
               `await client.${operation.operationId}({`,
@@ -22,6 +23,7 @@ export const GenerateCommand = {
               `})`,
             ].join("\n"),
           },
+          // kilocode_change end,
         ]
       }
     }

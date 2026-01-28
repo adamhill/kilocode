@@ -8,7 +8,7 @@ import { MessageV2 } from "@/session/message-v2"
 import { Storage } from "@/storage/storage"
 import { Log } from "@/util/log"
 import { Auth } from "@/auth"
-import type * as SDK from "@opencode-ai/sdk/v2"
+import type * as SDK from "@kilocode/sdk/v2" // kilocode_change
 
 export namespace ShareNext {
   const log = Log.create({ service: "share-next" })

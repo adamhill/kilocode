@@ -1,3 +1,4 @@
+// kilocode_change start
 import type {
   Event,
   createOpencodeClient,
@@ -10,7 +11,8 @@ import type {
   Part,
   Auth,
   Config,
-} from "@opencode-ai/sdk"
+} from "@kilocode/sdk"
+// kilocode_change end
 
 import type { BunShell } from "./shell.js"
 import { type ToolDefinition } from "./tool.js"

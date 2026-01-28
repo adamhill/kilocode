@@ -1,3 +1,4 @@
+// kilocode_change start
 import type {
   Message,
   Session,
@@ -7,7 +8,8 @@ import type {
   PermissionRequest,
   QuestionRequest,
   QuestionAnswer,
-} from "@opencode-ai/sdk/v2"
+} from "@kilocode/sdk/v2"
+// kilocode_change end
 import { createSimpleContext } from "./helper"
 import { PreloadMultiFileDiffResult } from "@pierre/diffs/ssr"
 
