@@ -1,6 +1,6 @@
 import { select } from "@clack/prompts"
 import type { KilocodeProfile, Organization, KilocodeBalance } from "../types.js"
-import { KILO_API_BASE, DEFAULT_MODEL } from "./constants.js"
+import { KILO_API_BASE, DEFAULT_MODEL, DEFAULT_FREE_MODEL } from "./constants.js"
 
 /**
  * Fetch user profile from Kilo API
@@ -105,6 +105,33 @@ export async function fetchDefaultModel(token: string, organizationId?: string):
  * Alias for compatibility with existing code
  */
 export const getKiloDefaultModel = fetchDefaultModel
+
+/**
+ * Fetch default free model for anonymous usage (no authentication required)
+ */
+export async function fetchDefaultFreeModel(): Promise<string> {
+  try {
+    const response = await fetch(`${KILO_API_BASE}/api/defaults`, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+
+    if (!response.ok) {
+      return DEFAULT_FREE_MODEL
+    }
+
+    const data = (await response.json()) as { defaultFreeModel?: string }
+    return data.defaultFreeModel || DEFAULT_FREE_MODEL
+  } catch {
+    return DEFAULT_FREE_MODEL
+  }
+}
+
+/**
+ * Alias for compatibility
+ */
+export const getKiloDefaultFreeModel = fetchDefaultFreeModel
 
 /**
  * Fetch both profile and balance in parallel

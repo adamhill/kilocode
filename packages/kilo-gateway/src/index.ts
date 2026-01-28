@@ -27,9 +27,11 @@ export {
   fetchBalance,
   fetchProfileWithBalance,
   fetchDefaultModel,
+  fetchDefaultFreeModel,
   getKiloProfile,
   getKiloBalance,
   getKiloDefaultModel,
+  getKiloDefaultFreeModel,
   promptOrganizationSelection,
 } from "./api/profile.js"
 export { fetchKiloModels } from "./api/models.js"
@@ -74,6 +76,7 @@ export {
   KILO_OPENROUTER_BASE,
   POLL_INTERVAL_MS,
   DEFAULT_MODEL,
+  DEFAULT_FREE_MODEL,
   TOKEN_EXPIRATION_MS,
   USER_AGENT,
   CONTENT_TYPE,
