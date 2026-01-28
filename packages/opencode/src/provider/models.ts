@@ -7,6 +7,7 @@ import { Flag } from "../flag/flag"
 import { lazy } from "@/util/lazy"
 import { Config } from "../config/config" // kilocode_change
 import { ModelCache } from "./model-cache" // kilocode_change
+import { KILO_OPENROUTER_BASE } from "@kilocode/kilo-gateway" // kilocode_change
 
 // Try to import bundled snapshot (generated at build time)
 // Falls back to undefined in dev mode when snapshot doesn't exist
@@ -138,8 +139,8 @@ export namespace ModelsDev {
       providers["kilo"] = {
         id: "kilo",
         name: "Kilo Gateway",
-        env: [],
-        api: ensureTrailingSlash(providerBaseURL),
+        env: ["KILO_API_KEY"],
+        api: ensureTrailingSlash(KILO_OPENROUTER_BASE),
         npm: "@kilocode/kilo-gateway",
         models: kiloModels,
       }

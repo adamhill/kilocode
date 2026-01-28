@@ -67,6 +67,8 @@ jobs:
         working-directory: packages/opencode
         run: bun script/seed-e2e.ts
         env:
+          KILO_API_KEY: ${{ secrets.KILO_API_KEY }}
+          KILO_ORG_ID: ${{ secrets.KILO_ORG_ID }}
           OPENCODE_DISABLE_SHARE: "true"
           OPENCODE_DISABLE_LSP_DOWNLOAD: "true"
           OPENCODE_DISABLE_DEFAULT_PLUGINS: "true"
@@ -79,13 +81,15 @@ jobs:
           OPENCODE_E2E_PROJECT_DIR: ${{ github.workspace }}
           OPENCODE_E2E_SESSION_TITLE: "E2E Session"
           OPENCODE_E2E_MESSAGE: "Seeded for UI e2e"
-          OPENCODE_E2E_MODEL: "opencode/gpt-5-nano"
+          OPENCODE_E2E_MODEL: "kilo/openai/gpt-5-nano"
 
       - name: Run opencode server
         if: matrix.settings.name != 'windows'
         working-directory: packages/opencode
         run: bun dev -- --print-logs --log-level WARN serve --port 4096 --hostname 127.0.0.1 &
         env:
+          KILO_API_KEY: ${{ secrets.KILO_API_KEY }}
+          KILO_ORG_ID: ${{ secrets.KILO_ORG_ID }}
           OPENCODE_DISABLE_SHARE: "true"
           OPENCODE_DISABLE_LSP_DOWNLOAD: "true"
           OPENCODE_DISABLE_DEFAULT_PLUGINS: "true"
@@ -111,6 +115,8 @@ jobs:
         run: ${{ matrix.settings.command }}
         env:
           CI: true
+          KILO_API_KEY: ${{ secrets.KILO_API_KEY }}
+          KILO_ORG_ID: ${{ secrets.KILO_ORG_ID }}
           OPENCODE_DISABLE_SHARE: "true"
           OPENCODE_DISABLE_LSP_DOWNLOAD: "true"
           OPENCODE_DISABLE_DEFAULT_PLUGINS: "true"
