@@ -402,7 +402,7 @@ describe("session.getUsage", () => {
           usage: {
             cost: 0.01, // OpenRouter 5% fee
             costDetails: {
-              upstreamInferenceCost: 0.20, // Actual inference cost
+              upstreamInferenceCost: 0.2, // Actual inference cost
             },
           },
         },
@@ -410,7 +410,7 @@ describe("session.getUsage", () => {
     })
 
     // Should use upstreamInferenceCost for Kilo provider (BYOK)
-    expect(result.cost).toBe(0.20)
+    expect(result.cost).toBe(0.2)
   })
 
   test("uses regular cost for OpenRouter provider", () => {
@@ -435,7 +435,7 @@ describe("session.getUsage", () => {
       metadata: {
         openrouter: {
           usage: {
-            cost: 0.50, // Regular OpenRouter cost
+            cost: 0.5, // Regular OpenRouter cost
             costDetails: {
               upstreamInferenceCost: 0.45,
             },
@@ -445,7 +445,7 @@ describe("session.getUsage", () => {
     })
 
     // Should use regular cost for OpenRouter provider
-    expect(result.cost).toBe(0.50)
+    expect(result.cost).toBe(0.5)
   })
 
   test("falls back to regular cost when provider is not specified", () => {
@@ -468,7 +468,7 @@ describe("session.getUsage", () => {
       metadata: {
         openrouter: {
           usage: {
-            cost: 0.30,
+            cost: 0.3,
             costDetails: {
               upstreamInferenceCost: 0.25,
             },
@@ -478,7 +478,7 @@ describe("session.getUsage", () => {
     })
 
     // Should use regular cost when provider is not specified
-    expect(result.cost).toBe(0.30)
+    expect(result.cost).toBe(0.3)
   })
 
   test("uses regular cost when upstreamInferenceCost is missing for Kilo", () => {

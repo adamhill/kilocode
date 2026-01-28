@@ -456,11 +456,13 @@ export namespace Session {
       // The OpenRouter AI SDK provider exposes cost at providerMetadata.openrouter.usage
       // Reference: https://openrouter.ai/docs/use-cases/usage-accounting
       // Note: The AI SDK uses camelCase (upstreamInferenceCost), not snake_case
-      const openrouterUsage = input.metadata?.["openrouter"]?.["usage"] as {
-        cost?: number
-        costDetails?: { upstreamInferenceCost?: number }
-      } | undefined
-      
+      const openrouterUsage = input.metadata?.["openrouter"]?.["usage"] as
+        | {
+            cost?: number
+            costDetails?: { upstreamInferenceCost?: number }
+          }
+        | undefined
+
       if (openrouterUsage) {
         // For Kilo provider (BYOK), always prefer upstreamInferenceCost when available
         // The 'cost' field from OpenRouter is just their 5% fee for BYOK requests
@@ -468,7 +470,7 @@ export namespace Session {
         const isKiloProvider = (input.provider?.id ?? input.model.providerID) === "kilo"
         const upstreamCost = openrouterUsage.costDetails?.upstreamInferenceCost
         const openrouterCost = openrouterUsage.cost
-        
+
         // Kilo is always BYOK, so prefer upstream cost. For OpenRouter, use regular cost.
         const providerCost = isKiloProvider && upstreamCost !== undefined ? upstreamCost : openrouterCost
 
