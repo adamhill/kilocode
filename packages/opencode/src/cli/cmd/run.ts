@@ -332,7 +332,6 @@ export const RunCommand = cmd({
               },
             ]
           : basePermissions
-        // kilocode_change end
 
         const result = await sdk.session.create(
           title
@@ -344,6 +343,7 @@ export const RunCommand = cmd({
                 permission: permissions,
               },
         )
+        // kilocode_change end
         return result.data?.id
       })()
 
@@ -413,7 +413,6 @@ export const RunCommand = cmd({
               },
             ]
           : undefined
-        // kilocode_change end
 
         const result = await sdk.session.create(
           title
@@ -422,6 +421,7 @@ export const RunCommand = cmd({
               ? { permission: permissions }
               : {},
         )
+        // kilocode_change end
         return result.data?.id
       })()
 
