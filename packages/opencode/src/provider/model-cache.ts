@@ -186,6 +186,12 @@ export namespace ModelCache {
         options.kilocodeToken = providerConfig.options.apiKey
       }
 
+      // kilocode_change start
+      if (providerConfig?.options?.kilocodeOrganizationId) {
+        options.kilocodeOrganizationId = providerConfig.options.kilocodeOrganizationId
+      }
+      // kilocode_change end
+
       // Get from Auth
       const auth = await Auth.get(providerID)
       if (auth) {
@@ -198,11 +204,11 @@ export namespace ModelCache {
 
       // Get from Env
       const env = Env.all()
-      if (env.KILOCODE_TOKEN) {
-        options.kilocodeToken = env.KILOCODE_TOKEN
+      if (env.KILO_API_KEY) {
+        options.kilocodeToken = env.KILO_API_KEY
       }
-      if (env.KILOCODE_ORGANIZATION_ID) {
-        options.kilocodeOrganizationId = env.KILOCODE_ORGANIZATION_ID
+      if (env.KILO_ORG_ID) {
+        options.kilocodeOrganizationId = env.KILO_ORG_ID
       }
 
       log.debug("auth options resolved", {
