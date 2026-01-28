@@ -32,4 +32,4 @@ Contributions are welcome, and they are greatly appreciated! Get started by read
 
 #### Where did Kilo CLI come from?
 
-Kilo CLI is a fork of [OpenCode](https://github.com/anomalyco/opencode) designeed to work within the Kilo all-in-one agentic engineering platform.
+Kilo CLI is a fork of [OpenCode](https://github.com/Kilo-Org/kilo) designeed to work within the Kilo all-in-one agentic engineering platform.
