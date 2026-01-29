@@ -31,14 +31,28 @@ export const ImportCommand = cmd({
       const isUrl = args.file.startsWith("http://") || args.file.startsWith("https://")
 
       if (isUrl) {
-        const urlMatch = args.file.match(/https?:\/\/app\.kilo\.ai\/s\/([a-zA-Z0-9_-]+)/)
-        if (!urlMatch) {
+        const url = (() => {
+          try {
+            return new URL(args.file)
+          } catch {
+            return undefined
+          }
+        })()
+
+        if (!url || url.hostname !== "app.kilo.ai") {
           process.stdout.write(`Invalid URL format. Expected: https://app.kilo.ai/s/<id>`)
           process.stdout.write(EOL)
           return
         }
 
-        const id = urlMatch[1]
+        const parts = url.pathname.split("/").filter(Boolean)
+        const id = parts.length >= 2 && parts[0] === "s" ? parts[1] : undefined
+        if (!id) {
+          process.stdout.write(`Invalid URL format. Expected: https://app.kilo.ai/s/<id>`)
+          process.stdout.write(EOL)
+          return
+        }
+
         const response = await fetch(`https://ingest.kilosessions.ai/session/${id}`)
 
         if (!response.ok) {
