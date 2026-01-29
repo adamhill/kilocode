@@ -47,7 +47,6 @@ export namespace ShareNext {
   }
 
   async function getClient(): Promise<Client | undefined> {
-    if (disabled) return undefined
     const token = await kilocodeToken()
     if (!token) return undefined
 
