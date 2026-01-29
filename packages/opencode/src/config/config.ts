@@ -296,7 +296,9 @@ export namespace Config {
     if (!hasGitIgnore) await Bun.write(gitignore, ["node_modules", "package.json", "bun.lock", ".gitignore"].join("\n"))
 
     await BunProc.run(
-      ["add", "@opencode-ai/plugin@" + (Installation.isLocal() ? "latest" : Installation.VERSION), "--exact"],
+      // kilocode_change start - change package name
+      ["add", "@kilocode/plugin@" + (Installation.isLocal() ? "latest" : Installation.VERSION), "--exact"],
+      // kilocode_change end
       {
         cwd: dir,
       },

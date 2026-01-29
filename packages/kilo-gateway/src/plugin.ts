@@ -1,4 +1,4 @@
-import type { Plugin } from "@opencode-ai/plugin"
+import type { Plugin } from "@kilocode/plugin"
 import { authenticateWithDeviceAuthTUI } from "./auth/device-auth-tui.js"
 
 /**

@@ -6,8 +6,8 @@
       "name": "opencode",
       "dependencies": {
         "@aws-sdk/client-s3": "3.933.0",
+        "@kilocode/plugin": "workspace:*",
         "@kilocode/sdk": "workspace:*",
-        "@opencode-ai/plugin": "workspace:*",
         "@opencode-ai/script": "workspace:*",
         "typescript": "catalog:",
       },
@@ -260,8 +260,8 @@
       "version": "1.0.0",
       "dependencies": {
         "@clack/prompts": "1.0.0-alpha.1",
+        "@kilocode/plugin": "workspace:*",
         "@kilocode/sdk": "workspace:*",
-        "@opencode-ai/plugin": "workspace:*",
         "@openrouter/ai-sdk-provider": "1.5.2",
         "ai": "catalog:",
         "open": "10.1.2",
@@ -342,12 +342,12 @@
         "@hono/zod-validator": "catalog:",
         "@kilocode/kilo-gateway": "workspace:*",
         "@kilocode/kilo-telemetry": "workspace:*",
+        "@kilocode/plugin": "workspace:*",
         "@kilocode/sdk": "workspace:*",
         "@modelcontextprotocol/sdk": "1.25.2",
         "@octokit/graphql": "9.0.2",
         "@octokit/rest": "catalog:",
         "@openauthjs/openauth": "catalog:",
-        "@opencode-ai/plugin": "workspace:*",
         "@opencode-ai/script": "workspace:*",
         "@opencode-ai/util": "workspace:*",
         "@openrouter/ai-sdk-provider": "1.5.2",
@@ -414,7 +414,7 @@
       },
     },
     "packages/plugin": {
-      "name": "@opencode-ai/plugin",
+      "name": "@kilocode/plugin",
       "version": "1.1.36",
       "dependencies": {
         "@kilocode/sdk": "workspace:*",
@@ -1172,6 +1172,8 @@
 
     "@kilocode/kilo-telemetry": ["@kilocode/kilo-telemetry@workspace:packages/kilo-telemetry"],
 
+    "@kilocode/plugin": ["@kilocode/plugin@workspace:packages/plugin"],
+
     "@kilocode/sdk": ["@kilocode/sdk@workspace:packages/sdk/js"],
 
     "@kobalte/core": ["@kobalte/core@0.13.11", "", { "dependencies": { "@floating-ui/dom": "^1.5.1", "@internationalized/date": "^3.4.0", "@internationalized/number": "^3.2.1", "@kobalte/utils": "^0.9.1", "@solid-primitives/props": "^3.1.8", "@solid-primitives/resize-observer": "^2.0.26", "solid-presence": "^0.1.8", "solid-prevent-scroll": "^0.1.4" }, "peerDependencies": { "solid-js": "^1.8.15" } }, "sha512-hK7TYpdib/XDb/r/4XDBFaO9O+3ZHz4ZWryV4/3BfES+tSQVgg2IJupDnztKXB0BqbSRy/aWlHKw1SPtNPYCFQ=="],
@@ -1269,8 +1271,6 @@
     "@opencode-ai/enterprise": ["@opencode-ai/enterprise@workspace:packages/enterprise"],
 
     "@opencode-ai/function": ["@opencode-ai/function@workspace:packages/function"],
-
-    "@opencode-ai/plugin": ["@opencode-ai/plugin@workspace:packages/plugin"],
 
     "@opencode-ai/script": ["@opencode-ai/script@workspace:packages/script"],
 
