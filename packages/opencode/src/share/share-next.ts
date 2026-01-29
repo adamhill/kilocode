@@ -16,6 +16,23 @@ import type * as SDK from "@kilocode/sdk/v2" // kilocode_change
 export namespace ShareNext {
   const log = Log.create({ service: "share-next" })
 
+  const authCache = new Map<string, { valid: boolean }>()
+
+  async function authValid(token: string) {
+    const cached = authCache.get(token)
+    if (cached) return cached.valid
+
+    const response = await fetch("https://app.kilo.ai/api/user", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }).catch(() => undefined)
+
+    const valid = response ? response.ok : false
+    authCache.set(token, { valid: !!response?.ok })
+    return valid
+  }
+
   export async function kilocodeToken() {
     const auth = await Auth.get("kilo")
     if (auth?.type === "api" && auth.key.length > 0) return auth.key
@@ -33,6 +50,9 @@ export namespace ShareNext {
     if (disabled) return undefined
     const token = await kilocodeToken()
     if (!token) return undefined
+
+    const valid = await authValid(token)
+    if (!valid) return undefined
 
     const base = await Config.get().then((x) => x.enterprise?.url ?? "https://ingest.kilosessions.ai")
     const baseHeaders: Record<string, string> = {
