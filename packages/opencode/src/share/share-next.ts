@@ -125,6 +125,10 @@ export namespace ShareNext {
     Bus.subscribe(Session.Event.Updated, async (evt) => {
       await ingest.sync(evt.properties.info.id, [
         {
+          type: "kilo_meta",
+          data: meta(),
+        },
+        {
           type: "session",
           data: evt.properties.info,
         },
@@ -332,6 +336,10 @@ export namespace ShareNext {
 
     await ingest.sync(sessionId, [
       {
+        type: "kilo_meta",
+        data: meta(),
+      },
+      {
         type: "session",
         data: session,
       },
@@ -349,5 +357,15 @@ export namespace ShareNext {
         data: models,
       },
     ])
+  }
+
+  function meta() {
+    const platform = process.env["KILO_PLATFORM"] ?? "cli"
+    const orgId = process.env["KILO_ORG_ID"]
+
+    return {
+      platform,
+      ...(orgId ? { orgId } : {}),
+    }
   }
 }
