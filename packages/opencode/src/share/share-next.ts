@@ -1,6 +1,5 @@
 // kilocode_change pretty much completely refactored - @iscekic for conflicts
 import { Bus } from "@/bus"
-import { Config } from "@/config/config"
 import { ulid } from "ulid"
 import { Provider } from "@/provider/provider"
 import { Session } from "@/session"
@@ -8,7 +7,7 @@ import { MessageV2 } from "@/session/message-v2"
 import { Storage } from "@/storage/storage"
 import { Log } from "@/util/log"
 import { Auth } from "@/auth"
-import type * as SDK from "@kilocode/sdk/v2" // kilocode_change
+import type * as SDK from "@kilocode/sdk/v2"
 
 /**
  * Even though this is called "share-next", this is where we handle session stuff.
@@ -46,37 +45,61 @@ export namespace ShareNext {
     fetch: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>
   }
 
+  const cache = {
+    at: 0,
+    value: undefined as Client | undefined,
+    inflight: undefined as Promise<Client | undefined> | undefined,
+  }
+
   async function getClient(): Promise<Client | undefined> {
-    const token = await kilocodeToken()
-    if (!token) return undefined
+    const now = Date.now()
+    if (cache.value && now - cache.at < 5_000) return cache.value
+    if (cache.inflight && now - cache.at < 5_000) return cache.inflight
 
-    const valid = await authValid(token)
-    if (!valid) return undefined
+    cache.at = now
+    cache.inflight = (async () => {
+      const token = await kilocodeToken()
+      if (!token) return undefined
 
-    const base = await Config.get().then((x) => x.enterprise?.url ?? "https://ingest.kilosessions.ai")
-    const baseHeaders: Record<string, string> = {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    }
+      const valid = await authValid(token)
+      if (!valid) return undefined
 
-    const withHeaders = (init?: RequestInit) => {
-      const headers = new Headers(init?.headers)
-      for (const [k, v] of Object.entries(baseHeaders)) headers.set(k, v)
+      const base = "https://ingest.kilosessions.ai"
+      const baseHeaders: Record<string, string> = {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      }
+
+      const withHeaders = (init?: RequestInit) => {
+        const headers = new Headers(init?.headers)
+        for (const [k, v] of Object.entries(baseHeaders)) headers.set(k, v)
+        return {
+          ...init,
+          headers,
+        } satisfies RequestInit
+      }
+
       return {
-        ...init,
-        headers,
-      } satisfies RequestInit
-    }
+        url: base,
+        fetch: (input, init) => fetch(input, withHeaders(init)),
+      }
+    })()
 
-    return {
-      url: base,
-      fetch: (input, init) => fetch(input, withHeaders(init)),
+    try {
+      cache.value = await cache.inflight
+      return cache.value
+    } finally {
+      cache.inflight = undefined
     }
   }
 
-  const disabled = process.env["KILO_DISABLE_SHARE"] === "true" || process.env["KILO_DISABLE_SHARE"] === "1"
+  const shareDisabled = process.env["KILO_DISABLE_SHARE"] === "true" || process.env["KILO_DISABLE_SHARE"] === "1"
+  const ingestDisabled =
+    process.env["KILO_DISABLE_SESSION_INGEST"] === "true" || process.env["KILO_DISABLE_SESSION_INGEST"] === "1"
 
   export async function init() {
+    if (ingestDisabled) return
+
     Bus.subscribe(Session.Event.Created, (evt) => {
       const sessionId = evt.properties.info.id
       void create(sessionId).catch((error) => log.error("share init create failed", { sessionId, error }))
@@ -138,13 +161,16 @@ export namespace ShareNext {
 
     log.info("creating session", { sessionId })
 
-    const result = await client
-      .fetch(`${client.url}/api/session`, {
-        method: "POST",
-        body: JSON.stringify({ sessionId }),
-      })
-      .then((x) => x.json())
-      .then((x) => x as { id: string; ingestPath: string })
+    const response = await client.fetch(`${client.url}/api/session`, {
+      method: "POST",
+      body: JSON.stringify({ sessionId }),
+    })
+
+    if (!response.ok) {
+      throw new Error(`Unable to create session ${sessionId}: ${response.status} ${response.statusText}`)
+    }
+
+    const result = (await response.json()) as { id: string; ingestPath: string }
 
     await Storage.write(["session_share", sessionId], result)
 
@@ -154,7 +180,7 @@ export namespace ShareNext {
   }
 
   export async function share(sessionId: string) {
-    if (disabled) {
+    if (shareDisabled) {
       throw new Error("Sharing is disabled (KILO_DISABLE_SHARE=1)")
     }
 
@@ -195,7 +221,7 @@ export namespace ShareNext {
   }
 
   export async function unshare(sessionId: string) {
-    if (disabled) {
+    if (shareDisabled) {
       throw new Error("Unshare is disabled (KILO_DISABLE_SHARE=1)")
     }
 
@@ -361,9 +387,6 @@ export namespace ShareNext {
     // sync() is called by event handlers and is intentionally cheap:
     // - If sharing isn't configured (no token / disabled), we skip queueing.
     // - Otherwise, merge into the pending queue entry (if present) or start a new 1s timer.
-    const client = await getClient()
-    if (!client) return
-
     const existing = queue.get(sessionId)
     if (existing) {
       for (const item of data) {
@@ -371,6 +394,9 @@ export namespace ShareNext {
       }
       return
     }
+
+    const client = await getClient()
+    if (!client) return
 
     const dataMap = new Map<string, Data>()
     for (const item of data) {
