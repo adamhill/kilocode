@@ -23,7 +23,8 @@ await Bun.file(`./dist/${pkg.name}/package.json`).write(
     {
       name: pkg.name,
       bin: {
-        [pkg.name]: `./bin/${pkg.name}`,
+        kilo: `./bin/kilo`,
+        kilocode: `./bin/kilo`,
       },
       scripts: {
         postinstall: "bun ./postinstall.mjs || node ./postinstall.mjs",
