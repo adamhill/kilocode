@@ -27,8 +27,11 @@ export namespace ShareNext {
       },
     }).catch(() => undefined)
 
-    const valid = response ? response.ok : false
-    authCache.set(token, { valid: !!response?.ok })
+    // Don't cache transient network failures; allow future calls to retry.
+    if (!response) return false
+
+    const valid = response.ok
+    authCache.set(token, { valid })
     return valid
   }
 
