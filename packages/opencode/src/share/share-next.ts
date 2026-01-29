@@ -203,7 +203,7 @@ export namespace ShareNext {
 
     log.info("sharing", { sessionId })
 
-    const response = await client.fetch(`${client.url}/api/session/${sessionId}/share`, {
+    const response = await client.fetch(`${client.url}/api/session/${encodeURIComponent(sessionId)}/share`, {
       method: "POST",
       body: JSON.stringify({ sessionId }),
     })
@@ -243,7 +243,7 @@ export namespace ShareNext {
 
     log.info("unsharing", { sessionId })
 
-    const response = await client.fetch(`${client.url}/api/session/${sessionId}/unshare`, {
+    const response = await client.fetch(`${client.url}/api/session/${encodeURIComponent(sessionId)}/unshare`, {
       method: "POST",
       body: JSON.stringify({ sessionId }),
     })
