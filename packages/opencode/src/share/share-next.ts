@@ -67,7 +67,7 @@ export namespace ShareNext {
       const valid = await authValid(token)
       if (!valid) return undefined
 
-      const base = "https://ingest.kilosessions.ai"
+      const base = process.env["KILO_SESSION_INGEST_URL"] ?? "https://ingest.kilosessions.ai"
       const baseHeaders: Record<string, string> = {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
