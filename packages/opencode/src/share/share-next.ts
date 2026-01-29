@@ -293,15 +293,38 @@ export namespace ShareNext {
         data: SDK.Model[]
       }
 
-  // Per-session debounce queue.
+  // Per-session debounce/flush queue.
   //
-  // Events fire frequently (message/part updates during streaming), so we coalesce many updates
-  // into at most one POST per ~1s per session.
+  // The share ingest endpoint is updated very frequently (streaming message parts, diffs, etc.).
+  // To avoid spamming the server, we coalesce updates and flush at most once per ~1s per session.
   //
-  // - Outer Map key: local session id
-  // - Inner Map key: stable entity key (message:<id>, part:<id>, etc.) so newer updates overwrite older
-  //   within the same debounce window.
-  const queue = new Map<string, { timeout: NodeJS.Timeout; data: Map<string, Data> }>()
+  // `due` is the earliest time we should flush; it is also used to respect backoff when retries are
+  // active. A later `due` always wins over an earlier one.
+  const queue = new Map<string, { timeout: NodeJS.Timeout; due: number; data: Map<string, Data> }>()
+
+  // Per-session retry state.
+  //
+  // We keep retry logic intentionally simple and local:
+  // - Only retry a small set of transient errors (network, 429, 5xx, etc.)
+  // - Use exponential backoff with a small max budget to prevent infinite loops/log spam
+  // - Store `until` so sync() can avoid scheduling a flush before backoff expires
+  const retry = new Map<string, { count: number; until: number }>()
+
+  function retryable(status: number) {
+    // Retry only statuses that are likely transient.
+    if (status === 408) return true
+    if (status === 409) return true
+    if (status === 425) return true
+    if (status === 429) return true
+    if (status >= 500) return true
+    return false
+  }
+
+  function backoff(count: number) {
+    // Exponential backoff capped to keep the system responsive.
+    const clamped = Math.min(count, 6)
+    return Math.min(60_000, 1_000 * 2 ** (clamped - 1))
+  }
 
   function id(value: unknown) {
     if (!value) return undefined
@@ -335,7 +358,43 @@ export namespace ShareNext {
     return models.length > 0 ? `model:${models}` : ulid()
   }
 
-  function flush(sessionId: string, timeout: NodeJS.Timeout) {
+  function schedule(sessionId: string, due: number, data: Map<string, Data>) {
+    const existing = queue.get(sessionId)
+    if (existing) {
+      // Don't reschedule if an earlier flush is already planned.
+      // We only move the flush later (e.g., to respect backoff).
+      if (existing.due >= due) return
+      clearTimeout(existing.timeout)
+    }
+
+    const wait = Math.max(0, due - Date.now())
+    const timeout = setTimeout(() => flush(sessionId), wait)
+    queue.set(sessionId, { timeout, due, data })
+  }
+
+  function enqueue(sessionId: string, items: Data[], mode: "overwrite" | "fill", due: number) {
+    const existing = queue.get(sessionId)
+    if (existing) {
+      for (const item of items) {
+        const k = key(item)
+        // overwrite: normal event updates (newer data should win)
+        // fill: retry requeue (never clobber newer updates that arrived while a flush was in-flight)
+        if (mode === "fill" && existing.data.has(k)) continue
+        existing.data.set(k, item)
+      }
+      schedule(sessionId, due, existing.data)
+      return
+    }
+
+    const data = new Map<string, Data>()
+    for (const item of items) {
+      data.set(key(item), item)
+    }
+
+    schedule(sessionId, due, data)
+  }
+
+  function flush(sessionId: string) {
     // Flush is scheduled by sync() and sends the currently queued payload.
     //
     // Note: we delete the queue entry before the network call so that new incoming events can start
@@ -344,8 +403,10 @@ export namespace ShareNext {
       const queued = queue.get(sessionId)
       if (!queued) return
 
-      clearTimeout(timeout)
+      clearTimeout(queued.timeout)
       queue.delete(sessionId)
+
+      const items = Array.from(queued.data.values())
 
       try {
         const share = await get(sessionId).catch(() => undefined)
@@ -354,68 +415,99 @@ export namespace ShareNext {
         const client = await getClient()
         if (!client) return
 
-        const response = await client.fetch(`${client.url}${share.ingestPath}`, {
-          method: "POST",
-          body: JSON.stringify({
-            data: Array.from(queued.data.values()),
-          }),
-        })
+        const response = await client
+          .fetch(`${client.url}${share.ingestPath}`, {
+            method: "POST",
+            body: JSON.stringify({
+              data: items,
+            }),
+          })
+          .catch(() => undefined)
 
-        if (!response.ok) {
-          throw new Error(`sync failed: ${response.status} ${response.statusText}`)
+        if (!response) {
+          // Network failures are assumed transient; retry with backoff and a small budget.
+          const count = (retry.get(sessionId)?.count ?? 0) + 1
+          if (count > 6) {
+            log.error("share sync failed", { sessionId, error: "retry budget exceeded" })
+            retry.delete(sessionId)
+            return
+          }
+
+          const delay = backoff(count)
+          retry.set(sessionId, { count, until: Date.now() + delay })
+          log.error("share sync failed", { sessionId, error: "network", retryInMs: delay })
+          enqueue(sessionId, items, "fill", Date.now() + delay)
+          return
         }
+
+        if (response.ok) {
+          retry.delete(sessionId)
+          return
+        }
+
+        if (response.status === 401 || response.status === 403) {
+          // Non-retryable until credentials are fixed.
+          // Clearing caches prevents repeated use of a now-invalid token/client.
+          authCache.clear()
+          cache.value = undefined
+          cache.inflight = undefined
+          cache.at = 0
+          log.error("share sync failed", {
+            sessionId,
+            status: response.status,
+            statusText: response.statusText,
+          })
+          retry.delete(sessionId)
+          return
+        }
+
+        if (!retryable(response.status)) {
+          // Permanent-ish failures (eg. 404 due to bad ingestPath) should not loop forever.
+          log.error("share sync failed", {
+            sessionId,
+            status: response.status,
+            statusText: response.statusText,
+          })
+          retry.delete(sessionId)
+          return
+        }
+
+        const current = retry.get(sessionId)
+        const count = (current?.count ?? 0) + 1
+        if (count > 6) {
+          log.error("share sync failed", { sessionId, error: "retry budget exceeded" })
+          retry.delete(sessionId)
+          return
+        }
+
+        const delay = backoff(count)
+        retry.set(sessionId, { count, until: Date.now() + delay })
+        log.error("share sync failed", {
+          sessionId,
+          status: response.status,
+          statusText: response.statusText,
+          retryInMs: delay,
+        })
+        enqueue(sessionId, items, "fill", Date.now() + delay)
       } catch (error) {
         log.error("share sync failed", { sessionId, error })
-        // Requeue without overwriting newer updates.
-        // If a new debounce window is already queued (due to fresh events while this flush was in-flight),
-        // only fill missing keys so we don't clobber newer data with stale data from the failed batch.
-        requeue(sessionId, Array.from(queued.data.values()))
       }
     })()
-  }
-
-  function requeue(sessionId: string, items: Data[]) {
-    const existing = queue.get(sessionId)
-    if (existing) {
-      for (const item of items) {
-        const k = key(item)
-        if (existing.data.has(k)) continue
-        existing.data.set(k, item)
-      }
-      return
-    }
-
-    const dataMap = new Map<string, Data>()
-    for (const item of items) {
-      dataMap.set(key(item), item)
-    }
-
-    const timeout = setTimeout(() => flush(sessionId, timeout), 1000)
-    queue.set(sessionId, { timeout, data: dataMap })
   }
 
   async function sync(sessionId: string, data: Data[]) {
     // sync() is called by event handlers and is intentionally cheap:
     // - If sharing isn't configured (no token / disabled), we skip queueing.
-    // - Otherwise, merge into the pending queue entry (if present) or start a new 1s timer.
-    const existing = queue.get(sessionId)
-    if (existing) {
-      for (const item of data) {
-        existing.data.set(key(item), item)
-      }
-      return
-    }
-
+    // - Otherwise, merge into the pending queue entry.
+    //   The next flush is scheduled ~1s after the first queued event (throttled), but never earlier
+    //   than the current backoff window (if retries are active).
     const client = await getClient()
     if (!client) return
 
-    const dataMap = new Map<string, Data>()
-    for (const item of data) {
-      dataMap.set(key(item), item)
-    }
-
-    const timeout = setTimeout(() => flush(sessionId, timeout), 1000)
-    queue.set(sessionId, { timeout, data: dataMap })
+    const until = retry.get(sessionId)?.until ?? 0
+    const base = queue.get(sessionId)?.due ?? Date.now() + 1000
+    const due = Math.max(base, until)
+    enqueue(sessionId, data, "overwrite", due)
   }
 
   export async function remove(sessionId: string) {
