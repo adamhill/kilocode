@@ -11,7 +11,7 @@ export const ImportCommand = cmd({
   describe: "import session data from JSON file or URL",
   builder: (yargs: Argv) => {
     return yargs.positional("file", {
-      describe: "path to JSON file or app.kilo.ai share URL",
+      describe: "path to JSON file or app.kilo.ai share URL", // kilocode_change
       type: "string",
       demandOption: true,
     })
@@ -31,6 +31,7 @@ export const ImportCommand = cmd({
       const isUrl = args.file.startsWith("http://") || args.file.startsWith("https://")
 
       if (isUrl) {
+        // kilocode_change start
         const url = (() => {
           try {
             return new URL(args.file)
@@ -70,6 +71,7 @@ export const ImportCommand = cmd({
         }
 
         exportData = data
+        // kilocode_change end
       } else {
         const file = Bun.file(args.file)
         exportData = await file.json().catch(() => {})

@@ -1,3 +1,4 @@
+// kilocode_change - new file
 import { ulid } from "ulid"
 import type * as SDK from "@kilocode/sdk/v2"
 
