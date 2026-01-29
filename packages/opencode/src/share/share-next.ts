@@ -183,6 +183,10 @@ export namespace ShareNext {
   }
 
   export async function share(sessionId: string) {
+    if (ingestDisabled) {
+      throw new Error("Session ingest is disabled (KILO_DISABLE_SESSION_INGEST=1)")
+    }
+
     if (shareDisabled) {
       throw new Error("Sharing is disabled (KILO_DISABLE_SHARE=1)")
     }
@@ -224,6 +228,10 @@ export namespace ShareNext {
   }
 
   export async function unshare(sessionId: string) {
+    if (ingestDisabled) {
+      throw new Error("Session ingest is disabled (KILO_DISABLE_SESSION_INGEST=1)")
+    }
+
     if (shareDisabled) {
       throw new Error("Unshare is disabled (KILO_DISABLE_SHARE=1)")
     }
@@ -419,9 +427,25 @@ export namespace ShareNext {
     const share = await get(sessionId)
     if (!share) return
 
-    await client.fetch(`${client.url}/api/session/${share.id}`, {
-      method: "DELETE",
-    })
+    const response = await client
+      .fetch(`${client.url}/api/session/${encodeURIComponent(share.id)}`, {
+        method: "DELETE",
+      })
+      .catch(() => undefined)
+
+    if (!response) {
+      log.error("share remove failed", { sessionId, error: "network" })
+      return
+    }
+
+    if (!response.ok) {
+      log.error("share remove failed", {
+        sessionId,
+        status: response.status,
+        statusText: response.statusText,
+      })
+      return
+    }
 
     await Storage.remove(["session_share", sessionId])
   }
