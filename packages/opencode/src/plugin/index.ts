@@ -1,4 +1,4 @@
-import type { Hooks, PluginInput, Plugin as PluginInstance } from "@opencode-ai/plugin"
+import type { Hooks, PluginInput, Plugin as PluginInstance } from "@kilocode/plugin" // kilocode_change
 import { Config } from "../config/config"
 import { Bus } from "../bus"
 import { Log } from "../util/log"
