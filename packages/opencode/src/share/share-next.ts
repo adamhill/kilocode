@@ -6,7 +6,7 @@ import { MessageV2 } from "@/session/message-v2"
 import { Storage } from "@/storage/storage"
 import { Log } from "@/util/log"
 import { Auth } from "@/auth"
-import { IngestQueue } from "@/share/ingest-queue" // kilocode_change
+import { IngestQueue } from "@/share/ingest-queue"
 import type * as SDK from "@kilocode/sdk/v2"
 
 /**
@@ -16,6 +16,12 @@ export namespace ShareNext {
   const log = Log.create({ service: "share-next" })
 
   const authCache = new Map<string, { valid: boolean }>()
+
+  const orgCache = {
+    at: 0,
+    value: undefined as string | undefined,
+    inflight: undefined as Promise<string | undefined> | undefined,
+  }
 
   async function authValid(token: string) {
     const cached = authCache.get(token)
@@ -126,7 +132,7 @@ export namespace ShareNext {
       await ingest.sync(evt.properties.info.id, [
         {
           type: "kilo_meta",
-          data: meta(),
+          data: await meta(),
         },
         {
           type: "session",
@@ -337,7 +343,7 @@ export namespace ShareNext {
     await ingest.sync(sessionId, [
       {
         type: "kilo_meta",
-        data: meta(),
+        data: await meta(),
       },
       {
         type: "session",
@@ -359,13 +365,37 @@ export namespace ShareNext {
     ])
   }
 
-  function meta() {
-    const platform = process.env["KILO_PLATFORM"] ?? "cli"
-    const orgId = process.env["KILO_ORG_ID"]
+  async function meta() {
+    const platform = process.env["KILO_PLATFORM"] || "cli"
+    const orgId = await getOrgId()
 
     return {
       platform,
       ...(orgId ? { orgId } : {}),
+    }
+  }
+
+  async function getOrgId(): Promise<string | undefined> {
+    const env = process.env["KILO_ORG_ID"]
+    if (env) return env
+
+    const now = Date.now()
+    if (orgCache.value && now - orgCache.at < 5_000) return orgCache.value
+    if (orgCache.inflight && now - orgCache.at < 5_000) return orgCache.inflight
+
+    orgCache.at = now
+    orgCache.inflight = (async () => {
+      const auth = await Auth.get("kilo")
+      if (auth?.type === "oauth" && auth.accountId) return auth.accountId
+
+      return undefined
+    })()
+
+    try {
+      orgCache.value = await orgCache.inflight
+      return orgCache.value
+    } finally {
+      orgCache.inflight = undefined
     }
   }
 }
