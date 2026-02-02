@@ -1,25 +1,16 @@
 import { useGlobalSync } from "@/context/global-sync"
-import { base64Decode } from "@opencode-ai/util/encode"
+import { decode64 } from "@/utils/base64"
 import { useParams } from "@solidjs/router"
 import { createMemo } from "solid-js"
 
 // kilocode_change start - Preferred providers list (order determines display priority)
-export const preferredProviders = [
-  "kilo",
-  "opencode",
-  "anthropic",
-  "github-copilot",
-  "openai",
-  "google",
-  "openrouter",
-  "vercel",
-]
+export const preferredProviders = ["kilo", "anthropic", "github-copilot", "openai", "google", "openrouter", "vercel"]
 // kilocode_change end
 
 export function useProviders() {
   const globalSync = useGlobalSync()
   const params = useParams()
-  const currentDirectory = createMemo(() => base64Decode(params.dir ?? ""))
+  const currentDirectory = createMemo(() => decode64(params.dir) ?? "")
   const providers = createMemo(() => {
     if (currentDirectory()) {
       const [projectStore] = globalSync.child(currentDirectory())
