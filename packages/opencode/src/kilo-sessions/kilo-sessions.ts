@@ -33,9 +33,9 @@ export namespace KiloSessions {
 
     if (newTokenValidKey !== tokenValidKey) {
       clearInFlightCache(tokenValidKey)
-    }
 
-    tokenValidKey = tokenValidKeyTemplate + token
+      tokenValidKey = newTokenValidKey
+    }
 
     return withInFlightCache(tokenValidKey, Number.POSITIVE_INFINITY, async () => {
       const response = await fetch("https://app.kilo.ai/api/user", {
