@@ -12,14 +12,19 @@ export function withInFlightCache<T>(key: string, ttlMs: number, cb: () => Promi
   const existing = store.get(key) as Entry<T> | undefined
 
   if (existing) {
+    // If a refresh is in-flight, always await it.
+    // This avoids returning a stale cached value while a newer one is being computed.
+    if (existing.inflight) return existing.inflight
+
     // Allow caching `undefined` by tracking presence separately.
     if (existing.has && now - existing.at < ttlMs) return Promise.resolve(existing.value as T)
-    if (existing.inflight && now - existing.at < ttlMs) return existing.inflight
   }
 
   const next: Entry<T> = existing
     ? {
-        at: now,
+        // Keep the original timestamp until the refresh succeeds.
+        // Otherwise, a failed refresh could make an old value look "fresh" and suppress retries.
+        at: existing.at,
         value: existing.value,
         has: existing.has,
         inflight: undefined,
@@ -34,6 +39,7 @@ export function withInFlightCache<T>(key: string, ttlMs: number, cb: () => Promi
   const task = cb().then((value) => {
     next.value = value
     next.has = true
+    next.at = Date.now()
     return value
   })
 

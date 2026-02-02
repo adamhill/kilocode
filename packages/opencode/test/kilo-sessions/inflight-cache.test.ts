@@ -108,6 +108,32 @@ describe("withInFlightCache", () => {
     clearInFlightCache(key)
   })
 
+  test("does not return stale cached value while refresh is in-flight", async () => {
+    Date.now = () => clock.now
+    const key = "refresh-inflight"
+    clearInFlightCache(key)
+
+    // Seed a cached value.
+    expect(await withInFlightCache(key, 10, async () => 1)).toBe(1)
+
+    // Expire it.
+    clock.now += 11
+
+    // Start a refresh that we can hold.
+    const job = deferred<number>()
+    const refresh = withInFlightCache(key, 10, () => job.promise)
+
+    // Subsequent callers must await refresh, not get the old cached value.
+    const follower = withInFlightCache(key, 10, async () => 999)
+    expect(follower).toBe(refresh)
+
+    job.resolve(2)
+    expect(await refresh).toBe(2)
+    expect(await follower).toBe(2)
+
+    clearInFlightCache(key)
+  })
+
   test("clearInFlightCache forces recompute", async () => {
     Date.now = () => clock.now
     const key = "clear"
@@ -126,4 +152,3 @@ describe("withInFlightCache", () => {
     clearInFlightCache(key)
   })
 })
-
