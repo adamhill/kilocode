@@ -139,7 +139,6 @@ export namespace ModelsDev {
 
       // Virtual model that resolves to Kilo's default model at runtime.
       // Appears as `kilo/auto` in model selectors.
-      delete kiloModels["auto"]
       kiloModels["kilo/auto"] = {
         id: "kilo/auto",
         name: "Auto",
@@ -150,11 +149,11 @@ export namespace ModelsDev {
         temperature: true,
         tool_call: true,
         limit: {
-          context: 128000,
-          output: 8192,
+          context: 200000,
+          output: 64000,
         },
         options: {
-          description: "Automatically selects your Kilo default model",
+          description: "Automatically selects an optimal model",
         },
       }
       providers["kilo"] = {
