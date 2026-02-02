@@ -29,6 +29,12 @@ export namespace KiloSessions {
   }
 
   async function authValid(token: string) {
+    const newTokenValidKey = tokenValidKeyTemplate + token
+
+    if (newTokenValidKey !== tokenValidKey) {
+      clearInFlightCache(tokenValidKey)
+    }
+
     tokenValidKey = tokenValidKeyTemplate + token
 
     return withInFlightCache(tokenValidKey, Number.POSITIVE_INFINITY, async () => {
