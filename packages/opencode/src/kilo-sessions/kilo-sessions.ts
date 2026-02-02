@@ -16,7 +16,9 @@ export namespace KiloSessions {
   const Uuid = z.uuid()
   type Uuid = z.infer<typeof Uuid>
 
-  const tokenValidKey = "kilo-sessions:token-valid"
+  const tokenValidKeyTemplate = "kilo-sessions:token-valid:"
+  let tokenValidKey = tokenValidKeyTemplate + "unknown"
+
   const tokenKey = "kilo-sessions:token"
   const orgKey = "kilo-sessions:org"
 
@@ -27,6 +29,8 @@ export namespace KiloSessions {
   }
 
   async function authValid(token: string) {
+    tokenValidKey = tokenValidKeyTemplate + token
+
     return withInFlightCache(tokenValidKey, Number.POSITIVE_INFINITY, async () => {
       const response = await fetch("https://app.kilo.ai/api/user", {
         headers: {
