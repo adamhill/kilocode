@@ -1,4 +1,3 @@
-// kilocode_change pretty much completely refactored - @iscekic for conflicts
 import { Bus } from "@/bus"
 import { Provider } from "@/provider/provider"
 import { Session } from "@/session"
@@ -6,16 +5,19 @@ import { MessageV2 } from "@/session/message-v2"
 import { Storage } from "@/storage/storage"
 import { Log } from "@/util/log"
 import { Auth } from "@/auth"
-import { IngestQueue } from "@/share/ingest-queue" // kilocode_change
+import { IngestQueue } from "@/kilo-sessions/ingest-queue"
 import type * as SDK from "@kilocode/sdk/v2"
 
-/**
- * Even though this is called "share-next", this is where we handle session stuff.
- */
-export namespace ShareNext {
+export namespace KiloSessions {
   const log = Log.create({ service: "share-next" })
 
   const authCache = new Map<string, { valid: boolean }>()
+
+  const orgCache = {
+    at: 0,
+    value: undefined as string | undefined,
+    inflight: undefined as Promise<string | undefined> | undefined,
+  }
 
   async function authValid(token: string) {
     const cached = authCache.get(token)
@@ -124,6 +126,10 @@ export namespace ShareNext {
 
     Bus.subscribe(Session.Event.Updated, async (evt) => {
       await ingest.sync(evt.properties.info.id, [
+        {
+          type: "kilo_meta",
+          data: await meta(),
+        },
         {
           type: "session",
           data: evt.properties.info,
@@ -332,6 +338,10 @@ export namespace ShareNext {
 
     await ingest.sync(sessionId, [
       {
+        type: "kilo_meta",
+        data: await meta(),
+      },
+      {
         type: "session",
         data: session,
       },
@@ -349,5 +359,39 @@ export namespace ShareNext {
         data: models,
       },
     ])
+  }
+
+  async function meta() {
+    const platform = process.env["KILO_PLATFORM"] || "cli"
+    const orgId = await getOrgId()
+
+    return {
+      platform,
+      ...(orgId ? { orgId } : {}),
+    }
+  }
+
+  async function getOrgId(): Promise<string | undefined> {
+    const env = process.env["KILO_ORG_ID"]
+    if (env) return env
+
+    const now = Date.now()
+    if (orgCache.value && now - orgCache.at < 5_000) return orgCache.value
+    if (orgCache.inflight && now - orgCache.at < 5_000) return orgCache.inflight
+
+    orgCache.at = now
+    orgCache.inflight = (async () => {
+      const auth = await Auth.get("kilo")
+      if (auth?.type === "oauth" && auth.accountId) return auth.accountId
+
+      return undefined
+    })()
+
+    try {
+      orgCache.value = await orgCache.inflight
+      return orgCache.value
+    } finally {
+      orgCache.inflight = undefined
+    }
   }
 }

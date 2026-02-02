@@ -1,4 +1,3 @@
-// kilocode_change - new file
 import { ulid } from "ulid"
 import type * as SDK from "@kilocode/sdk/v2"
 
@@ -9,6 +8,13 @@ export namespace IngestQueue {
   }
 
   export type Data =
+    | {
+        type: "kilo_meta"
+        data: {
+          platform: string
+          orgId?: string
+        }
+      }
     | {
         type: "session"
         data: SDK.Session
@@ -98,6 +104,7 @@ export namespace IngestQueue {
     function key(item: Data) {
       // Stable keys are important so updates for the same entity collapse to a single queued item.
       // If we can't derive a stable key, we fall back to a random key (ulid) so the item is still sent.
+      if (item.type === "kilo_meta") return "kilo_meta"
       if (item.type === "session") return "session"
       if (item.type === "session_diff") return "session_diff"
 

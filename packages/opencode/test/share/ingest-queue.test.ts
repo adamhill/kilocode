@@ -1,6 +1,6 @@
 // kilocode_change - new file
 import { describe, expect, test, beforeEach } from "bun:test"
-import { IngestQueue } from "../../src/share/ingest-queue"
+import { IngestQueue } from "../../src/kilo-sessions/ingest-queue"
 
 function scheduler(now: () => number) {
   const tasks = new Map<number, { at: number; fn: () => void }>()
@@ -117,6 +117,39 @@ describe("share ingest queue", () => {
     expect(sent.length).toBe(1)
     expect((sent[0] as any).data.length).toBe(1)
     expect((sent[0] as any).data[0].data.v).toBe(2)
+  })
+
+  test("kilo_meta uses stable key and coalesces", async () => {
+    const sent: unknown[] = []
+    const sched = scheduler(() => clock.now)
+
+    const q = IngestQueue.create({
+      now: () => clock.now,
+      setTimeout: sched.setTimeout,
+      clearTimeout: sched.clearTimeout,
+      log: { error: () => {} },
+      getShare: async () => ({ ingestPath: "/ingest" }),
+      getClient: async () => ({
+        url: "https://ingest.test",
+        fetch: async (_input, init) => {
+          sent.push(JSON.parse((init?.body as string) ?? "{}"))
+          return new Response("{}", { status: 200 })
+        },
+      }),
+    })
+
+    await q.sync("s7", [{ type: "kilo_meta", data: { platform: "cli" } }])
+    clock.now = 100
+    await q.sync("s7", [{ type: "kilo_meta", data: { platform: "vscode", orgId: "org-1" } }])
+
+    clock.now = 1000
+    sched.run()
+    await Bun.sleep(0)
+    expect(sent.length).toBe(1)
+    expect((sent[0] as any).data.length).toBe(1)
+    expect((sent[0] as any).data[0].type).toBe("kilo_meta")
+    expect((sent[0] as any).data[0].data.platform).toBe("vscode")
+    expect((sent[0] as any).data[0].data.orgId).toBe("org-1")
   })
 
   test("network failure retries and fill preserves newer updates", async () => {
