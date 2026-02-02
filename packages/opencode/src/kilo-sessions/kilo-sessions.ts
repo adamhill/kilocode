@@ -7,16 +7,20 @@ import { Log } from "@/util/log"
 import { Auth } from "@/auth"
 import { IngestQueue } from "@/kilo-sessions/ingest-queue"
 import type * as SDK from "@kilocode/sdk/v2"
+import z from "zod"
 
 export namespace KiloSessions {
-  const log = Log.create({ service: "share-next" })
+  const log = Log.create({ service: "kilo-sessions" })
+
+  const Uuid = z.uuid()
+  type Uuid = z.infer<typeof Uuid>
 
   const authCache = new Map<string, { valid: boolean }>()
 
   const orgCache = {
     at: 0,
-    value: undefined as string | undefined,
-    inflight: undefined as Promise<string | undefined> | undefined,
+    value: undefined as Uuid | undefined,
+    inflight: undefined as Promise<Uuid | undefined> | undefined,
   }
 
   async function authValid(token: string) {
@@ -371,9 +375,9 @@ export namespace KiloSessions {
     }
   }
 
-  async function getOrgId(): Promise<string | undefined> {
+  async function getOrgId(): Promise<Uuid | undefined> {
     const env = process.env["KILO_ORG_ID"]
-    if (env) return env
+    if (isUuid(env)) return env
 
     const now = Date.now()
     if (orgCache.value && now - orgCache.at < 5_000) return orgCache.value
@@ -382,16 +386,22 @@ export namespace KiloSessions {
     orgCache.at = now
     orgCache.inflight = (async () => {
       const auth = await Auth.get("kilo")
-      if (auth?.type === "oauth" && auth.accountId) return auth.accountId
+      if (auth?.type === "oauth" && isUuid(auth.accountId)) return auth.accountId
 
       return undefined
     })()
 
     try {
-      orgCache.value = await orgCache.inflight
+      const id = await orgCache.inflight
+      orgCache.value = isUuid(id) ? id : undefined
       return orgCache.value
     } finally {
       orgCache.inflight = undefined
     }
+  }
+
+  function isUuid(value: string | undefined): value is Uuid {
+    if (!value) return false
+    return Uuid.safeParse(value).success
   }
 }
