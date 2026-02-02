@@ -92,6 +92,7 @@ export namespace KiloSessions {
       // Clearing caches prevents repeated use of a now-invalid token/client.
       authCache.clear()
       clearInFlightCache(clientKey)
+      clearInFlightCache(orgKey)
     },
   })
 
