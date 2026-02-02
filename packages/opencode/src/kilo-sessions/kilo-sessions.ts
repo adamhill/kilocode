@@ -6,6 +6,7 @@ import { Storage } from "@/storage/storage"
 import { Log } from "@/util/log"
 import { Auth } from "@/auth"
 import { IngestQueue } from "@/kilo-sessions/ingest-queue"
+import { clearInFlightCache, withInFlightCache } from "@/kilo-sessions/inflight-cache"
 import type * as SDK from "@kilocode/sdk/v2"
 import z from "zod"
 
@@ -16,12 +17,6 @@ export namespace KiloSessions {
   type Uuid = z.infer<typeof Uuid>
 
   const authCache = new Map<string, { valid: boolean }>()
-
-  const orgCache = {
-    at: 0,
-    value: undefined as Uuid | undefined,
-    inflight: undefined as Promise<Uuid | undefined> | undefined,
-  }
 
   async function authValid(token: string) {
     const cached = authCache.get(token)
@@ -54,19 +49,12 @@ export namespace KiloSessions {
     fetch: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>
   }
 
-  const cache = {
-    at: 0,
-    value: undefined as Client | undefined,
-    inflight: undefined as Promise<Client | undefined> | undefined,
-  }
+  const clientKey = "kilo-sessions:client"
+  const orgKey = "kilo-sessions:org"
+  const ttlMs = 5_000
 
   async function getClient(): Promise<Client | undefined> {
-    const now = Date.now()
-    if (cache.value && now - cache.at < 5_000) return cache.value
-    if (cache.inflight && now - cache.at < 5_000) return cache.inflight
-
-    cache.at = now
-    cache.inflight = (async () => {
+    return withInFlightCache(clientKey, ttlMs, async () => {
       const token = await kilocodeToken()
       if (!token) return undefined
 
@@ -92,14 +80,7 @@ export namespace KiloSessions {
         url: base,
         fetch: (input, init) => fetch(input, withHeaders(init)),
       }
-    })()
-
-    try {
-      cache.value = await cache.inflight
-      return cache.value
-    } finally {
-      cache.inflight = undefined
-    }
+    })
   }
 
   const ingest = IngestQueue.create({
@@ -110,9 +91,7 @@ export namespace KiloSessions {
       // Non-retryable until credentials are fixed.
       // Clearing caches prevents repeated use of a now-invalid token/client.
       authCache.clear()
-      cache.value = undefined
-      cache.inflight = undefined
-      cache.at = 0
+      clearInFlightCache(clientKey)
     },
   })
 
@@ -379,25 +358,11 @@ export namespace KiloSessions {
     const env = process.env["KILO_ORG_ID"]
     if (isUuid(env)) return env
 
-    const now = Date.now()
-    if (orgCache.value && now - orgCache.at < 5_000) return orgCache.value
-    if (orgCache.inflight && now - orgCache.at < 5_000) return orgCache.inflight
-
-    orgCache.at = now
-    orgCache.inflight = (async () => {
+    return withInFlightCache(orgKey, ttlMs, async () => {
       const auth = await Auth.get("kilo")
       if (auth?.type === "oauth" && isUuid(auth.accountId)) return auth.accountId
-
       return undefined
-    })()
-
-    try {
-      const id = await orgCache.inflight
-      orgCache.value = isUuid(id) ? id : undefined
-      return orgCache.value
-    } finally {
-      orgCache.inflight = undefined
-    }
+    })
   }
 
   function isUuid(value: string | undefined): value is Uuid {
