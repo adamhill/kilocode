@@ -1,13 +1,12 @@
 type Entry<T> = {
   at: number
   value: T | undefined
-  has: boolean
-  inflight: Promise<T> | undefined
+  inflight: Promise<T | undefined> | undefined
 }
 
 const store = new Map<string, Entry<unknown>>()
 
-export function withInFlightCache<T>(key: string, ttlMs: number, cb: () => Promise<T>): Promise<T> {
+export function withInFlightCache<T>(key: string, ttlMs: number, cb: () => Promise<T | undefined>): Promise<T | undefined> {
   const now = Date.now()
   const existing = store.get(key) as Entry<T> | undefined
 
@@ -16,8 +15,8 @@ export function withInFlightCache<T>(key: string, ttlMs: number, cb: () => Promi
     // This avoids returning a stale cached value while a newer one is being computed.
     if (existing.inflight) return existing.inflight
 
-    // Allow caching `undefined` by tracking presence separately.
-    if (existing.has && now - existing.at < ttlMs) return Promise.resolve(existing.value as T)
+    // `undefined` means "no value" (and is never cached).
+    if (existing.value !== undefined && now - existing.at < ttlMs) return Promise.resolve(existing.value)
   }
 
   const next: Entry<T> = existing
@@ -26,29 +25,34 @@ export function withInFlightCache<T>(key: string, ttlMs: number, cb: () => Promi
         // Otherwise, a failed refresh could make an old value look "fresh" and suppress retries.
         at: existing.at,
         value: existing.value,
-        has: existing.has,
         inflight: undefined,
       }
     : {
         at: now,
         value: undefined,
-        has: false,
         inflight: undefined,
       }
 
   const task = cb().then((value) => {
+    if (value === undefined) {
+      // `undefined` is treated as a non-cacheable sentinel.
+      // Drop the entry entirely so future calls retry instead of serving stale data.
+      store.delete(key)
+      return undefined
+    }
+
     next.value = value
-    next.has = true
     next.at = Date.now()
     return value
   })
 
-  next.inflight = task.finally(() => {
+  const inflight = task.finally(() => {
     next.inflight = undefined
   })
 
+  next.inflight = inflight
   store.set(key, next as Entry<unknown>)
-  return next.inflight
+  return inflight
 }
 
 export function clearInFlightCache(key: string) {
