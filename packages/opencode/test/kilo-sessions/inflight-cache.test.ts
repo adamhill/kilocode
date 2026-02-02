@@ -39,6 +39,9 @@ describe("withInFlightCache", () => {
     const b = withInFlightCache(key, 10_000, cb)
 
     expect(a).toBe(b)
+    // cb() is invoked via a microtask in withInFlightCache().
+    // Allow it to run before asserting call count.
+    await Promise.resolve()
     expect(calls.count).toBe(1)
 
     job.resolve(123)
