@@ -6,7 +6,11 @@ type Entry<T> = {
 
 const store = new Map<string, Entry<unknown>>()
 
-export function withInFlightCache<T>(key: string, ttlMs: number, cb: () => Promise<T | undefined>): Promise<T | undefined> {
+export function withInFlightCache<T>(
+  key: string,
+  ttlMs: number,
+  cb: () => Promise<T | undefined>,
+): Promise<T | undefined> {
   const now = Date.now()
   const existing = store.get(key) as Entry<T> | undefined
 
@@ -33,18 +37,23 @@ export function withInFlightCache<T>(key: string, ttlMs: number, cb: () => Promi
         inflight: undefined,
       }
 
-  const task = cb().then((value) => {
-    if (value === undefined) {
-      // `undefined` is treated as a non-cacheable sentinel.
-      // Drop the entry entirely so future calls retry instead of serving stale data.
-      store.delete(key)
-      return undefined
-    }
+  const task = cb()
+    .then((value) => {
+      if (value === undefined) {
+        // `undefined` is treated as a non-cacheable sentinel.
+        // Drop the entry entirely so future calls retry instead of serving stale data.
+        store.delete(key)
+        return undefined
+      }
 
-    next.value = value
-    next.at = Date.now()
-    return value
-  })
+      next.value = value
+      next.at = Date.now()
+      return value
+    })
+    .catch((error) => {
+      store.delete(key)
+      throw error
+    })
 
   const inflight = task.finally(() => {
     next.inflight = undefined
