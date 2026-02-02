@@ -39,7 +39,8 @@ export function withInFlightCache<T>(
 
   // Guard against synchronous throws in `cb()` by forcing it into the promise chain.
   // This ensures errors flow through the `.catch()` below and the cache entry is cleaned up.
-  const task = Promise.resolve().then(() => cb())
+  const task = Promise.resolve()
+    .then(() => cb())
     .then((value) => {
       if (value === undefined) {
         // `undefined` is treated as a non-cacheable sentinel.
