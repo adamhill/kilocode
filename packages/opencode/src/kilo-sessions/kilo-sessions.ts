@@ -37,7 +37,7 @@ export namespace KiloSessions {
       tokenValidKey = newTokenValidKey
     }
 
-    return withInFlightCache(tokenValidKey, Number.POSITIVE_INFINITY, async () => {
+    return withInFlightCache(tokenValidKey, 15 * 60_000, async () => {
       const response = await fetch("https://app.kilo.ai/api/user", {
         headers: {
           Authorization: `Bearer ${token}`,
