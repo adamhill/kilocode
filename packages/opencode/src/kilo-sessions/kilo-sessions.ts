@@ -22,7 +22,7 @@ export namespace KiloSessions {
   const tokenKey = "kilo-sessions:token"
   const orgKey = "kilo-sessions:org"
 
-  async function clearCache() {
+  function clearCache() {
     clearInFlightCache(tokenKey)
     clearInFlightCache(tokenValidKey)
     clearInFlightCache(orgKey)
