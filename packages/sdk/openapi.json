@@ -86,7 +86,7 @@
         "x-codeSamples": [
           {
             "lang": "js",
-            "source": "import { createOpencodeClient } from \"@opencode-ai/sdk\n\nconst client = createOpencodeClient()\nawait client.global.config.get({\n  ...\n})"
+            "source": "import { createOpencodeClient } from \"@kilocode/sdk\n\nconst client = createOpencodeClient()\nawait client.global.config.get({\n  ...\n})"
           }
         ]
       },
@@ -128,7 +128,7 @@
         "x-codeSamples": [
           {
             "lang": "js",
-            "source": "import { createOpencodeClient } from \"@opencode-ai/sdk\n\nconst client = createOpencodeClient()\nawait client.global.config.update({\n  ...\n})"
+            "source": "import { createOpencodeClient } from \"@kilocode/sdk\n\nconst client = createOpencodeClient()\nawait client.global.config.update({\n  ...\n})"
           }
         ]
       }
@@ -207,7 +207,7 @@
         "x-codeSamples": [
           {
             "lang": "js",
-            "source": "import { createOpencodeClient } from \"@opencode-ai/sdk\n\nconst client = createOpencodeClient()\nawait client.auth.set({\n  ...\n})"
+            "source": "import { createOpencodeClient } from \"@kilocode/sdk\n\nconst client = createOpencodeClient()\nawait client.auth.set({\n  ...\n})"
           }
         ]
       },
@@ -250,7 +250,7 @@
         "x-codeSamples": [
           {
             "lang": "js",
-            "source": "import { createOpencodeClient } from \"@opencode-ai/sdk\n\nconst client = createOpencodeClient()\nawait client.auth.remove({\n  ...\n})"
+            "source": "import { createOpencodeClient } from \"@kilocode/sdk\n\nconst client = createOpencodeClient()\nawait client.auth.remove({\n  ...\n})"
           }
         ]
       }
