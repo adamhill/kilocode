@@ -69,7 +69,7 @@ describe("withInFlightCache", () => {
     clearInFlightCache(key)
   })
 
-  test("caches undefined values (tracks presence separately)", async () => {
+  test("does not cache undefined (treats as no value)", async () => {
     Date.now = () => clock.now
     const key = "cache-undefined"
     clearInFlightCache(key)
@@ -85,7 +85,7 @@ describe("withInFlightCache", () => {
 
     clock.now += 5
     expect(await withInFlightCache(key, 10_000, cb)).toBeUndefined()
-    expect(calls.count).toBe(1)
+    expect(calls.count).toBe(2)
 
     clearInFlightCache(key)
   })
