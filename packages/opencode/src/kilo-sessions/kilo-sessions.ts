@@ -1,4 +1,3 @@
-// kilocode_change pretty much completely refactored - @iscekic for conflicts
 import { Bus } from "@/bus"
 import { Provider } from "@/provider/provider"
 import { Session } from "@/session"
@@ -6,13 +5,10 @@ import { MessageV2 } from "@/session/message-v2"
 import { Storage } from "@/storage/storage"
 import { Log } from "@/util/log"
 import { Auth } from "@/auth"
-import { IngestQueue } from "@/share/ingest-queue"
+import { IngestQueue } from "@/kilo-sessions/ingest-queue"
 import type * as SDK from "@kilocode/sdk/v2"
 
-/**
- * Even though this is called "share-next", this is where we handle session stuff.
- */
-export namespace ShareNext {
+export namespace KiloSessions {
   const log = Log.create({ service: "share-next" })
 
   const authCache = new Map<string, { valid: boolean }>()
