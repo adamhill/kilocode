@@ -21,10 +21,14 @@ export namespace KiloSessions {
 
   const tokenKey = "kilo-sessions:token"
   const orgKey = "kilo-sessions:org"
+  const clientKey = "kilo-sessions:client"
+
+  const ttlMs = 10_000
 
   function clearCache() {
     clearInFlightCache(tokenKey)
     clearInFlightCache(tokenValidKey)
+    clearInFlightCache(clientKey)
     clearInFlightCache(orgKey)
   }
 
@@ -53,7 +57,7 @@ export namespace KiloSessions {
   }
 
   async function kilocodeToken() {
-    return withInFlightCache(tokenKey, 10_000, async () => {
+    return withInFlightCache(tokenKey, ttlMs, async () => {
       const auth = await Auth.get("kilo")
       if (auth?.type === "api" && auth.key.length > 0) return auth.key
       if (auth?.type === "oauth" && auth.access.length > 0) return auth.access
@@ -68,31 +72,33 @@ export namespace KiloSessions {
   }
 
   async function getClient(): Promise<Client | undefined> {
-    const token = await kilocodeToken()
-    if (!token) return undefined
+    return withInFlightCache(clientKey, ttlMs, async () => {
+      const token = await kilocodeToken()
+      if (!token) return undefined
 
-    const valid = await authValid(token)
-    if (!valid) return undefined
+      const valid = await authValid(token)
+      if (!valid) return undefined
 
-    const base = process.env["KILO_SESSION_INGEST_URL"] ?? "https://ingest.kilosessions.ai"
-    const baseHeaders: Record<string, string> = {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    }
+      const base = process.env["KILO_SESSION_INGEST_URL"] ?? "https://ingest.kilosessions.ai"
+      const baseHeaders: Record<string, string> = {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      }
 
-    const withHeaders = (init?: RequestInit) => {
-      const headers = new Headers(init?.headers)
-      for (const [k, v] of Object.entries(baseHeaders)) headers.set(k, v)
+      const withHeaders = (init?: RequestInit) => {
+        const headers = new Headers(init?.headers)
+        for (const [k, v] of Object.entries(baseHeaders)) headers.set(k, v)
+        return {
+          ...init,
+          headers,
+        } satisfies RequestInit
+      }
+
       return {
-        ...init,
-        headers,
-      } satisfies RequestInit
-    }
-
-    return {
-      url: base,
-      fetch: (input, init) => fetch(input, withHeaders(init)),
-    }
+        url: base,
+        fetch: (input, init) => fetch(input, withHeaders(init)),
+      }
+    })
   }
 
   const ingest = IngestQueue.create({
@@ -369,7 +375,7 @@ export namespace KiloSessions {
     const env = process.env["KILO_ORG_ID"]
     if (isUuid(env)) return env
 
-    return withInFlightCache(orgKey, 5_000, async () => {
+    return withInFlightCache(orgKey, ttlMs, async () => {
       const auth = await Auth.get("kilo")
       if (auth?.type === "oauth" && isUuid(auth.accountId)) return auth.accountId
       return undefined
