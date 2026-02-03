@@ -1,0 +1,80 @@
+#!/usr/bin/env bun
+/**
+ * Configuration for upstream merge automation
+ */
+
+export interface PackageMapping {
+  from: string
+  to: string
+}
+
+export interface MergeConfig {
+  /** Package name mappings from opencode to kilo */
+  packageMappings: PackageMapping[]
+
+  /** Files to always keep Kilo's version (never take upstream changes) */
+  keepOurs: string[]
+
+  /** Directories that are Kilo-specific and should be preserved */
+  kiloDirectories: string[]
+
+  /** File patterns to exclude from codemods */
+  excludePatterns: string[]
+
+  /** Default branch to merge into */
+  baseBranch: string
+
+  /** Branch prefix for merge branches */
+  branchPrefix: string
+
+  /** Remote name for upstream */
+  upstreamRemote: string
+
+  /** Remote name for origin */
+  originRemote: string
+}
+
+export const defaultConfig: MergeConfig = {
+  packageMappings: [
+    { from: "opencode-ai", to: "@kilocode/cli" },
+    { from: "@opencode-ai/cli", to: "@kilocode/cli" },
+    { from: "@opencode-ai/sdk", to: "@kilocode/sdk" },
+    { from: "@opencode-ai/plugin", to: "@kilocode/plugin" },
+  ],
+
+  keepOurs: [
+    "README.md",
+    "CONTRIBUTING.md",
+    "CODE_OF_CONDUCT.md",
+    "PRIVACY.md",
+    "SECURITY.md",
+    "AGENTS.md",
+    ".github/workflows/publish-stable.yml",
+  ],
+
+  kiloDirectories: [
+    "packages/opencode/src/kilocode",
+    "packages/opencode/test/kilocode",
+    "packages/kilo-gateway",
+    "packages/kilo-telemetry",
+    "script/upstream",
+  ],
+
+  excludePatterns: [
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/.git/**",
+    "**/bun.lock",
+    "**/package-lock.json",
+    "**/yarn.lock",
+  ],
+
+  baseBranch: "dev",
+  branchPrefix: "upstream-merge",
+  upstreamRemote: "upstream",
+  originRemote: "origin",
+}
+
+export function loadConfig(overrides?: Partial<MergeConfig>): MergeConfig {
+  return { ...defaultConfig, ...overrides }
+}
