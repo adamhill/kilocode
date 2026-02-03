@@ -16,3 +16,11 @@ export * from "./utils/report"
 export { transformAll as transformPackageNames, transformFile } from "./transforms/package-names"
 export { preserveAllVersions, preserveVersion, getCurrentVersion } from "./transforms/preserve-versions"
 export { keepOursFiles, resetToOurs, shouldKeepOurs } from "./transforms/keep-ours"
+export { skipFiles, skipSpecificFiles, shouldSkip } from "./transforms/skip-files"
+export {
+  transformAllI18n,
+  transformConflictedI18n,
+  transformI18nFile,
+  transformI18nContent,
+  isI18nFile,
+} from "./transforms/transform-i18n"

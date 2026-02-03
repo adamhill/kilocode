@@ -18,15 +18,24 @@ export interface ConflictReport {
 
 export interface ConflictFile {
   path: string
-  type: "markdown" | "package" | "code" | "config" | "other"
-  recommendation: "keep-ours" | "keep-theirs" | "manual" | "codemod"
+  type: "markdown" | "package" | "code" | "config" | "i18n" | "other"
+  recommendation: "keep-ours" | "keep-theirs" | "manual" | "codemod" | "skip" | "i18n-transform"
   reason: string
+}
+
+/**
+ * Check if a file is an i18n translation file
+ */
+function isI18nFile(path: string): boolean {
+  // Match patterns like packages/*/src/i18n/*.ts
+  return /packages\/[^/]+\/src\/i18n\/[^/]+\.ts$/.test(path) && !path.endsWith("/index.ts")
 }
 
 /**
  * Classify a file based on its path
  */
 export function classifyFile(path: string): ConflictFile["type"] {
+  if (isI18nFile(path)) return "i18n"
   if (path.endsWith(".md")) return "markdown"
   if (path.includes("package.json")) return "package"
   if (path.endsWith(".ts") || path.endsWith(".tsx") || path.endsWith(".js") || path.endsWith(".jsx")) return "code"
@@ -42,12 +51,28 @@ export function classifyFile(path: string): ConflictFile["type"] {
 }
 
 /**
+ * Check if a file should be skipped (not added from upstream)
+ */
+function shouldSkipFile(path: string, skipPatterns: string[]): boolean {
+  return skipPatterns.some((pattern) => path === pattern || path.includes(pattern))
+}
+
+/**
  * Get recommendation for a conflicted file
  */
 export function getRecommendation(
   path: string,
   keepOurs: string[],
+  skipFiles: string[] = [],
 ): { recommendation: ConflictFile["recommendation"]; reason: string } {
+  // Check if file should be skipped entirely (doesn't exist in Kilo, shouldn't be added)
+  if (shouldSkipFile(path, skipFiles)) {
+    return {
+      recommendation: "skip",
+      reason: "File should be skipped (does not exist in Kilo fork)",
+    }
+  }
+
   // Check if file should always keep ours
   if (keepOurs.some((pattern) => path.includes(pattern) || path === pattern)) {
     return {
@@ -67,6 +92,11 @@ export function getRecommendation(
   const type = classifyFile(path)
 
   switch (type) {
+    case "i18n":
+      return {
+        recommendation: "i18n-transform",
+        reason: "i18n file: take upstream translations and apply Kilo branding",
+      }
     case "markdown":
       return {
         recommendation: "keep-ours",
@@ -102,6 +132,7 @@ export async function analyzeConflicts(
   upstreamRef: string,
   baseBranch: string,
   keepOurs: string[],
+  skipFiles: string[] = [],
 ): Promise<ConflictFile[]> {
   // Get list of files that differ between branches
   // Use quiet to suppress output and nothrow to handle errors
@@ -121,7 +152,7 @@ export async function analyzeConflicts(
 
   for (const path of files) {
     const type = classifyFile(path)
-    const { recommendation, reason } = getRecommendation(path, keepOurs)
+    const { recommendation, reason } = getRecommendation(path, keepOurs, skipFiles)
 
     conflicts.push({
       path,
@@ -162,20 +193,29 @@ export function generateMarkdownReport(report: ConflictReport): string {
     byRecommendation.set(conflict.recommendation, list)
   }
 
-  const order: ConflictFile["recommendation"][] = ["keep-ours", "codemod", "keep-theirs", "manual"]
+  const order: ConflictFile["recommendation"][] = [
+    "skip",
+    "i18n-transform",
+    "keep-ours",
+    "codemod",
+    "keep-theirs",
+    "manual",
+  ]
 
   for (const rec of order) {
     const files = byRecommendation.get(rec)
     if (!files || files.length === 0) continue
 
-    const title =
-      rec === "keep-ours"
-        ? "Keep Kilo Version (Ours)"
-        : rec === "keep-theirs"
-          ? "Take Upstream Version (Theirs)"
-          : rec === "codemod"
-            ? "Apply Codemod"
-            : "Manual Review Required"
+    const titleMap: Record<ConflictFile["recommendation"], string> = {
+      skip: "Skip (Auto-Remove)",
+      "i18n-transform": "i18n Transform (Auto-Apply Kilo Branding)",
+      "keep-ours": "Keep Kilo Version (Ours)",
+      "keep-theirs": "Take Upstream Version (Theirs)",
+      codemod: "Apply Codemod",
+      manual: "Manual Review Required",
+    }
+
+    const title = titleMap[rec]
 
     lines.push(`### ${title}`)
     lines.push("")

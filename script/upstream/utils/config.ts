@@ -15,6 +15,9 @@ export interface MergeConfig {
   /** Files to always keep Kilo's version (never take upstream changes) */
   keepOurs: string[]
 
+  /** Files to skip entirely (don't add from upstream, remove if added) */
+  skipFiles: string[]
+
   /** Directories that are Kilo-specific and should be preserved */
   kiloDirectories: string[]
 
@@ -32,6 +35,9 @@ export interface MergeConfig {
 
   /** Remote name for origin */
   originRemote: string
+
+  /** i18n file patterns that need string transformation */
+  i18nPatterns: string[]
 }
 
 export const defaultConfig: MergeConfig = {
@@ -50,6 +56,30 @@ export const defaultConfig: MergeConfig = {
     "SECURITY.md",
     "AGENTS.md",
     ".github/workflows/publish-stable.yml",
+  ],
+
+  // Files that only exist in upstream and should NOT be added to Kilo
+  // These are removed during merge if they appear
+  skipFiles: [
+    // Translated README files (Kilo doesn't have these)
+    "README.ar.md",
+    "README.br.md",
+    "README.da.md",
+    "README.de.md",
+    "README.es.md",
+    "README.fr.md",
+    "README.it.md",
+    "README.ja.md",
+    "README.ko.md",
+    "README.no.md",
+    "README.pl.md",
+    "README.ru.md",
+    "README.th.md",
+    "README.tr.md",
+    "README.zh.md",
+    "README.zht.md",
+    // Stats file
+    "STATS.md",
   ],
 
   kiloDirectories: [
@@ -73,6 +103,9 @@ export const defaultConfig: MergeConfig = {
   branchPrefix: "upstream-merge",
   upstreamRemote: "upstream",
   originRemote: "origin",
+
+  // i18n translation files that need Kilo branding transforms
+  i18nPatterns: ["packages/*/src/i18n/*.ts", "packages/desktop/src/i18n/*.ts"],
 }
 
 export function loadConfig(overrides?: Partial<MergeConfig>): MergeConfig {

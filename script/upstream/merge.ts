@@ -26,6 +26,8 @@ import { defaultConfig, loadConfig, type MergeConfig } from "./utils/config"
 import { transformAll as transformPackageNames } from "./transforms/package-names"
 import { preserveAllVersions } from "./transforms/preserve-versions"
 import { keepOursFiles, resetToOurs } from "./transforms/keep-ours"
+import { skipFiles, skipSpecificFiles } from "./transforms/skip-files"
+import { transformConflictedI18n, transformAllI18n } from "./transforms/transform-i18n"
 
 interface MergeOptions {
   version?: string
@@ -154,7 +156,12 @@ async function main() {
   // Step 4: Generate conflict report
   logger.step(4, 8, "Analyzing potential conflicts...")
 
-  const conflicts = await report.analyzeConflicts(`upstream/${targetVersion.tag}`, config.baseBranch, config.keepOurs)
+  const conflicts = await report.analyzeConflicts(
+    `upstream/${targetVersion.tag}`,
+    config.baseBranch,
+    config.keepOurs,
+    config.skipFiles,
+  )
 
   const conflictReport: report.ConflictReport = {
     timestamp: new Date().toISOString(),
@@ -168,18 +175,32 @@ async function main() {
   }
 
   // Add recommendations
+  const skipCount = conflicts.filter((c) => c.recommendation === "skip").length
+  const i18nCount = conflicts.filter((c) => c.recommendation === "i18n-transform").length
+  const keepOursCount = conflicts.filter((c) => c.recommendation === "keep-ours").length
+  const codemodCount = conflicts.filter((c) => c.recommendation === "codemod").length
   const manualCount = conflicts.filter((c) => c.recommendation === "manual").length
+
+  if (skipCount > 0) {
+    conflictReport.recommendations.push(`${skipCount} files will be skipped (auto-removed)`)
+  }
+  if (i18nCount > 0) {
+    conflictReport.recommendations.push(`${i18nCount} i18n files will be auto-transformed`)
+  }
+  if (keepOursCount > 0) {
+    conflictReport.recommendations.push(`${keepOursCount} files will keep Kilo's version`)
+  }
+  if (codemodCount > 0) {
+    conflictReport.recommendations.push(`${codemodCount} files will be processed by codemods`)
+  }
   if (manualCount > 0) {
     conflictReport.recommendations.push(`${manualCount} files require manual review`)
   }
 
-  const codemodCount = conflicts.filter((c) => c.recommendation === "codemod").length
-  if (codemodCount > 0) {
-    conflictReport.recommendations.push(`${codemodCount} files will be processed by codemods`)
-  }
-
   logger.info(`Total files changed: ${conflicts.length}`)
-  logger.info(`  - Keep ours: ${conflicts.filter((c) => c.recommendation === "keep-ours").length}`)
+  logger.info(`  - Skip (auto-remove): ${skipCount}`)
+  logger.info(`  - i18n transform: ${i18nCount}`)
+  logger.info(`  - Keep ours: ${keepOursCount}`)
   logger.info(`  - Codemod: ${codemodCount}`)
   logger.info(`  - Manual review: ${manualCount}`)
 
@@ -263,7 +284,25 @@ async function main() {
     logger.info("Conflicted files:")
     logger.list(mergeResult.conflicts)
 
-    // Auto-resolve keep-ours conflicts
+    // Step 7a: Skip files that shouldn't exist in Kilo
+    logger.info("Removing files that shouldn't exist in Kilo...")
+    const skipResults = await skipFiles({ dryRun: false, verbose: options.verbose })
+    const skippedCount = skipResults.filter((r) => r.action === "removed").length
+    if (skippedCount > 0) {
+      logger.success(`Skipped ${skippedCount} files (removed from merge)`)
+    }
+
+    // Step 7b: Transform i18n files (take upstream + apply Kilo branding)
+    logger.info("Transforming i18n files...")
+    const conflictedFiles = await git.getConflictedFiles()
+    const i18nResults = await transformConflictedI18n(conflictedFiles, { dryRun: false, verbose: options.verbose })
+    const i18nTransformed = i18nResults.filter((r) => r.replacements > 0).length
+    if (i18nTransformed > 0) {
+      logger.success(`Transformed ${i18nTransformed} i18n files with Kilo branding`)
+    }
+
+    // Step 7c: Auto-resolve keep-ours conflicts
+    logger.info("Keeping Kilo-specific files...")
     const resolved = await keepOursFiles({ dryRun: false, verbose: options.verbose })
     const autoResolved = resolved.filter((r) => r.action === "kept")
 
@@ -286,6 +325,16 @@ async function main() {
     }
   } else {
     logger.success("Merge completed without conflicts")
+
+    // Even without conflicts, transform i18n files to ensure Kilo branding
+    logger.info("Transforming i18n files for Kilo branding...")
+    const i18nResults = await transformAllI18n({ dryRun: false, verbose: options.verbose })
+    const i18nTransformed = i18nResults.filter((r) => r.replacements > 0).length
+    if (i18nTransformed > 0) {
+      await git.stageAll()
+      await git.commit(`chore: apply Kilo branding to i18n files`)
+      logger.success(`Transformed ${i18nTransformed} i18n files with Kilo branding`)
+    }
   }
 
   // Step 8: Push and cleanup
