@@ -52,13 +52,18 @@ for (const tag of tags) {
 
 if (!Script.preview) {
   // Create archives for GitHub release
+  // kilocode_change start - use absolute paths to avoid issues with scoped package names containing '/'
+  const archiveDir = `${dir}/dist/archives`
+  await $`mkdir -p ${archiveDir}`
   for (const key of Object.keys(binaries)) {
+    const archiveName = key.replace("/", "-") // @kilocode/cli-linux-arm64 → @kilocode-cli-linux-arm64
     if (key.includes("linux")) {
-      await $`tar -czf ../../${key}.tar.gz *`.cwd(`dist/${key}/bin`)
+      await $`tar -czf ${archiveDir}/${archiveName}.tar.gz *`.cwd(`dist/${key}/bin`)
     } else {
-      await $`zip -r ../../${key}.zip *`.cwd(`dist/${key}/bin`)
+      await $`zip -r ${archiveDir}/${archiveName}.zip *`.cwd(`dist/${key}/bin`)
     }
   }
+  // kilocode_change end
 
   const image = "ghcr.io/Kilo-Org/kilo"
   const platforms = "linux/amd64,linux/arm64"
