@@ -156,12 +156,9 @@ async function main() {
   // Step 4: Generate conflict report
   logger.step(4, 8, "Analyzing potential conflicts...")
 
-  const conflicts = await report.analyzeConflicts(
-    `upstream/${targetVersion.tag}`,
-    config.baseBranch,
-    config.keepOurs,
-    config.skipFiles,
-  )
+  // Use the commit hash or tag directly (tags are fetched, not remote refs)
+  const upstreamRef = targetVersion.commit || targetVersion.tag
+  const conflicts = await report.analyzeConflicts(upstreamRef, config.baseBranch, config.keepOurs, config.skipFiles)
 
   const conflictReport: report.ConflictReport = {
     timestamp: new Date().toISOString(),
