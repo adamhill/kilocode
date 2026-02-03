@@ -1,4 +1,4 @@
-import { FileDiff, Message, Model, Part, Session } from "@kilocode/sdk/v2" // kilocode_change
+import { FileDiff, Message, Model, Part, Session } from "@kilocode/sdk/v2"
 import { fn } from "@opencode-ai/util/fn"
 import { iife } from "@opencode-ai/util/iife"
 import { Identifier } from "@opencode-ai/util/identifier"

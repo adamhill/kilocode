@@ -1,4 +1,4 @@
-import type { ProviderAuthAuthorization } from "@kilocode/sdk/v2/client" // kilocode_change
+import type { ProviderAuthAuthorization } from "@kilocode/sdk/v2/client"
 import { Button } from "@opencode-ai/ui/button"
 import { useDialog } from "@opencode-ai/ui/context/dialog"
 import { Dialog } from "@opencode-ai/ui/dialog"

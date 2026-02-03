@@ -1,4 +1,3 @@
-// kilocode_change start
 import {
   type Message,
   type Agent,
@@ -20,7 +19,6 @@ import {
   type QuestionRequest,
   createOpencodeClient,
 } from "@kilocode/sdk/v2/client"
-// kilocode_change end
 import { createStore, produce, reconcile, type SetStoreFunction, type Store } from "solid-js/store"
 import { Binary } from "@opencode-ai/util/binary"
 import { retry } from "@opencode-ai/util/retry"

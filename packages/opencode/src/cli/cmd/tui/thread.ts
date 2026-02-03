@@ -7,7 +7,7 @@ import { UI } from "@/cli/ui"
 import { iife } from "@/util/iife"
 import { Log } from "@/util/log"
 import { withNetworkOptions, resolveNetworkOptions } from "@/cli/network"
-import type { Event } from "@kilocode/sdk/v2" // kilocode_change
+import type { Event } from "@kilocode/sdk/v2"
 import type { EventSource } from "./context/sdk"
 
 declare global {

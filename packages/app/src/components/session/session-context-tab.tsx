@@ -11,7 +11,7 @@ import { Accordion } from "@opencode-ai/ui/accordion"
 import { StickyAccordionHeader } from "@opencode-ai/ui/sticky-accordion-header"
 import { Code } from "@opencode-ai/ui/code"
 import { Markdown } from "@opencode-ai/ui/markdown"
-import type { AssistantMessage, Message, Part, UserMessage } from "@kilocode/sdk/v2/client" // kilocode_change
+import type { AssistantMessage, Message, Part, UserMessage } from "@kilocode/sdk/v2/client"
 import { useLanguage } from "@/context/language"
 
 interface SessionContextTabProps {

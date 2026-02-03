@@ -50,8 +50,8 @@ import { DialogFork } from "@/components/dialog-fork"
 import { useCommand } from "@/context/command"
 import { useLanguage } from "@/context/language"
 import { useNavigate, useParams } from "@solidjs/router"
-import { UserMessage } from "@kilocode/sdk/v2" // kilocode_change
-import type { FileDiff } from "@kilocode/sdk/v2/client" // kilocode_change
+import { UserMessage } from "@kilocode/sdk/v2"
+import type { FileDiff } from "@kilocode/sdk/v2/client"
 import { useSDK } from "@/context/sdk"
 import { usePrompt } from "@/context/prompt"
 import { useComments, type LineComment } from "@/context/comments"
@@ -730,8 +730,8 @@ export default function Page() {
       onSelect: () => view().terminal.toggle(),
     },
     {
-      id: "fileTree.toggle",
-      title: language.t("command.fileTree.toggle"),
+      id: "review.toggle",
+      title: language.t("command.review.toggle"),
       description: "",
       category: language.t("command.category.view"),
       keybind: "mod+shift+r",

@@ -1,5 +1,5 @@
 import { App } from "@slack/bolt"
-import { createOpencode, type ToolPart } from "@kilocode/sdk" // kilocode_change
+import { createOpencode, type ToolPart } from "@kilocode/sdk"
 
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,

@@ -1,4 +1,4 @@
-import { FileDiff, Message, Model, Part, Session, SessionStatus, UserMessage } from "@kilocode/sdk/v2" // kilocode_change
+import { FileDiff, Message, Model, Part, Session, SessionStatus, UserMessage } from "@kilocode/sdk/v2"
 import { SessionTurn } from "@opencode-ai/ui/session-turn"
 import { SessionReview } from "@opencode-ai/ui/session-review"
 import { DataProvider } from "@opencode-ai/ui/context"

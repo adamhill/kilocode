@@ -3,7 +3,7 @@ import { Tooltip } from "@opencode-ai/ui/tooltip"
 import { ProgressCircle } from "@opencode-ai/ui/progress-circle"
 import { Button } from "@opencode-ai/ui/button"
 import { useParams } from "@solidjs/router"
-import { AssistantMessage } from "@kilocode/sdk/v2/client" // kilocode_change
+import { AssistantMessage } from "@kilocode/sdk/v2/client"
 import { findLast } from "@opencode-ai/util/array"
 
 import { useLayout } from "@/context/layout"

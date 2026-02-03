@@ -16,6 +16,8 @@ use std::{
     time::{Duration, Instant},
 };
 use tauri::{AppHandle, LogicalSize, Manager, RunEvent, State, WebviewWindowBuilder};
+#[cfg(any(target_os = "linux", all(debug_assertions, windows)))]
+use tauri_plugin_deep_link::DeepLinkExt;
 #[cfg(windows)]
 use tauri_plugin_decorum::WebviewWindowExt;
 use tauri_plugin_dialog::{DialogExt, MessageDialogButtons, MessageDialogResult};
@@ -25,7 +27,7 @@ use tokio::sync::oneshot;
 
 use crate::window_customizer::PinchZoomDisablePlugin;
 
-const SETTINGS_STORE: &str = "kilo.settings.dat"; // kilocode_change
+const SETTINGS_STORE: &str = "kilo.settings.dat";
 const DEFAULT_SERVER_URL_KEY: &str = "defaultServerUrl";
 
 #[derive(Clone, serde::Serialize)]
@@ -252,7 +254,7 @@ pub fn run() {
 
     #[cfg(all(target_os = "macos", not(debug_assertions)))]
     let _ = std::process::Command::new("killall")
-        .arg("kilo-cli") // kilocode_change
+        .arg("kilo-cli")
         .output();
 
     let mut builder = tauri::Builder::default()
@@ -263,6 +265,7 @@ pub fn run() {
                 let _ = window.unminimize();
             }
         }))
+        .plugin(tauri_plugin_deep_link::init())
         .plugin(tauri_plugin_os::init())
         .plugin(
             tauri_plugin_window_state::Builder::new()
@@ -291,6 +294,9 @@ pub fn run() {
             markdown::parse_markdown_command
         ])
         .setup(move |app| {
+            #[cfg(any(target_os = "linux", all(debug_assertions, windows)))]
+            app.deep_link().register_all().ok();
+
             let app = app.handle().clone();
 
             // Initialize log state

@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 
 import path from "path"
-import { createOpencode } from "@kilocode/sdk" // kilocode_change
+import { createOpencode } from "@kilocode/sdk"
 import { parseArgs } from "util"
 
 async function main() {

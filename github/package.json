@@ -16,5 +16,6 @@
     "@octokit/graphql": "9.0.1",
     "@octokit/rest": "catalog:",
     "@kilocode/sdk": "workspace:*"
-  }
+  },
+  "version": "1.0.13"
 }

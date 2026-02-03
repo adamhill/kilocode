@@ -1,8 +1,8 @@
-import type { Hooks, PluginInput, Plugin as PluginInstance } from "@kilocode/plugin" // kilocode_change
+import type { Hooks, PluginInput, Plugin as PluginInstance } from "@kilocode/plugin"
 import { Config } from "../config/config"
 import { Bus } from "../bus"
 import { Log } from "../util/log"
-import { createOpencodeClient } from "@kilocode/sdk" // kilocode_change
+import { createOpencodeClient } from "@kilocode/sdk"
 import { Server } from "../server/server"
 import { BunProc } from "../bun"
 import { Instance } from "../project/instance"
