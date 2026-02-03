@@ -37,7 +37,10 @@ let notes: string[] = []
 
 console.log("=== publishing ===\n")
 
-if (!Script.preview) {
+const skipNotes = process.env["OPENCODE_SKIP_NOTES"] === "1" // kilocode_change
+if (skipNotes) console.log("changelog skipped: OPENCODE_SKIP_NOTES=1") // kilocode_change
+
+if (!Script.preview && !skipNotes) {
   const previous = await getLatestRelease()
   notes = await buildNotes(previous, "HEAD")
   // notes.unshift(highlightsTemplate)
@@ -86,7 +89,7 @@ if (!Script.preview) {
   await $`git cherry-pick HEAD..origin/dev`.nothrow()
   await $`git push origin HEAD --tags --no-verify --force-with-lease`
   await new Promise((resolve) => setTimeout(resolve, 5_000))
-  await $`gh release create v${Script.version} -d --title "v${Script.version}" --notes ${notes.join("\n") || "No notable changes"} ./packages/opencode/dist/*.zip ./packages/opencode/dist/*.tar.gz`
+  await $`gh release create v${Script.version} -d --title "v${Script.version}" --notes ${notes.join("\n") || "No notable changes"} ./packages/opencode/dist/archives/*.zip ./packages/opencode/dist/archives/*.tar.gz` // kilocode_change - archives now in subdirectory
   const release = await $`gh release view v${Script.version} --json id,tagName`.json()
   output += `release=${release.id}\n`
   output += `tag=${release.tagName}\n`

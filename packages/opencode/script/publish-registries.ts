@@ -4,14 +4,20 @@ import { Script } from "@opencode-ai/script"
 
 if (!Script.preview) {
   // Calculate SHA values
-  const arm64Sha = await $`sha256sum ./dist/@kilocode/cli-linux-arm64.tar.gz | cut -d' ' -f1`
+  // kilocode_change start - archives now use '-' instead of '/' and are in archives/ subdirectory
+  const arm64Sha = await $`sha256sum ./dist/archives/@kilocode-cli-linux-arm64.tar.gz | cut -d' ' -f1`
     .text()
     .then((x) => x.trim())
-  const x64Sha = await $`sha256sum ./dist/@kilocode/cli-linux-x64.tar.gz | cut -d' ' -f1`.text().then((x) => x.trim())
-  const macX64Sha = await $`sha256sum ./dist/@kilocode/cli-darwin-x64.zip | cut -d' ' -f1`.text().then((x) => x.trim())
-  const macArm64Sha = await $`sha256sum ./dist/@kilocode/cli-darwin-arm64.zip | cut -d' ' -f1`
+  const x64Sha = await $`sha256sum ./dist/archives/@kilocode-cli-linux-x64.tar.gz | cut -d' ' -f1`
     .text()
     .then((x) => x.trim())
+  const macX64Sha = await $`sha256sum ./dist/archives/@kilocode-cli-darwin-x64.zip | cut -d' ' -f1`
+    .text()
+    .then((x) => x.trim())
+  const macArm64Sha = await $`sha256sum ./dist/archives/@kilocode-cli-darwin-arm64.zip | cut -d' ' -f1`
+    .text()
+    .then((x) => x.trim())
+  // kilocode_change end
 
   const [pkgver, _subver = ""] = Script.version.split(/(-.*)/, 2)
 
