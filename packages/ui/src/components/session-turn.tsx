@@ -6,8 +6,8 @@ import {
   type PermissionRequest,
   TextPart,
   ToolPart,
-} from "@opencode-ai/sdk/v2/client"
-import { type FileDiff } from "@opencode-ai/sdk/v2"
+} from "@kilocode/sdk/v2/client"
+import { type FileDiff } from "@kilocode/sdk/v2"
 import { useData } from "../context"
 import { useDiffComponent } from "../context/diff"
 import { type UiI18nKey, type UiI18nParams, useI18n } from "../context/i18n"
