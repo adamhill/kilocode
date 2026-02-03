@@ -241,6 +241,45 @@ export function shouldTakeTheirs(file: string, patterns?: string[]): boolean {
   return matchesPattern(file, p)
 }
 
+/**
+ * Transform all files matching take-theirs patterns (pre-merge, on opencode branch)
+ * This applies branding transforms to files that exist on the current branch
+ */
+export async function transformAllTakeTheirs(options: TakeTheirsOptions = {}): Promise<TakeTheirsResult[]> {
+  const { Glob } = await import("bun")
+  const results: TakeTheirsResult[] = []
+  const patterns = options.patterns || defaultConfig.takeTheirsAndTransform
+
+  for (const pattern of patterns) {
+    const glob = new Glob(pattern)
+
+    for await (const path of glob.scan({ absolute: false })) {
+      // Skip if file doesn't exist
+      const file = Bun.file(path)
+      if (!(await file.exists())) continue
+
+      try {
+        const content = await file.text()
+        const { result, replacements } = applyBrandingTransforms(content, options.verbose)
+
+        if (replacements > 0 && !options.dryRun) {
+          await Bun.write(path, result)
+          success(`Transformed ${path}: ${replacements} branding replacements`)
+        } else if (options.dryRun && replacements > 0) {
+          info(`[DRY-RUN] Would transform ${path}: ${replacements} branding replacements`)
+        }
+
+        results.push({ file: path, action: "transformed", replacements, dryRun: options.dryRun ?? false })
+      } catch (err) {
+        warn(`Failed to transform ${path}: ${err}`)
+        results.push({ file: path, action: "failed", replacements: 0, dryRun: options.dryRun ?? false })
+      }
+    }
+  }
+
+  return results
+}
+
 // CLI entry point
 if (import.meta.main) {
   const args = process.argv.slice(2)

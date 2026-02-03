@@ -29,6 +29,7 @@ export {
 export {
   transformConflictedTakeTheirs,
   transformTakeTheirs,
+  transformAllTakeTheirs,
   shouldTakeTheirs,
   applyBrandingTransforms,
   matchesPattern,
@@ -37,6 +38,7 @@ export {
 export {
   transformConflictedTauri,
   transformTauriFile,
+  transformAllTauri,
   isTauriFile,
   applyTauriTransforms,
 } from "./transforms/transform-tauri"
@@ -44,12 +46,14 @@ export {
 export {
   transformConflictedPackageJson,
   transformPackageJson,
+  transformAllPackageJson,
   isPackageJson,
 } from "./transforms/transform-package-json"
 
 export {
   transformConflictedScripts,
   transformScriptFile,
+  transformAllScripts,
   isScriptFile,
   applyScriptTransforms,
 } from "./transforms/transform-scripts"
@@ -57,8 +61,15 @@ export {
 export {
   transformConflictedExtensions,
   transformExtensionFile,
+  transformAllExtensions,
   isExtensionFile,
   applyExtensionTransforms,
 } from "./transforms/transform-extensions"
 
-export { transformConflictedWeb, transformWebFile, isWebFile, applyWebTransforms } from "./transforms/transform-web"
+export {
+  transformConflictedWeb,
+  transformWebFile,
+  transformAllWeb,
+  isWebFile,
+  applyWebTransforms,
+} from "./transforms/transform-web"

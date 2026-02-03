@@ -171,6 +171,43 @@ export async function transformConflictedScripts(
   return results
 }
 
+/**
+ * Transform all script files (pre-merge, on opencode branch)
+ */
+export async function transformAllScripts(options: ScriptTransformOptions = {}): Promise<ScriptTransformResult[]> {
+  const { Glob } = await import("bun")
+  const results: ScriptTransformResult[] = []
+  const patterns = defaultConfig.scriptFiles
+
+  for (const pattern of patterns) {
+    const glob = new Glob(pattern)
+
+    for await (const path of glob.scan({ absolute: false })) {
+      const file = Bun.file(path)
+      if (!(await file.exists())) continue
+
+      try {
+        const content = await file.text()
+        const { result, replacements } = applyScriptTransforms(content, options.verbose)
+
+        if (replacements > 0 && !options.dryRun) {
+          await Bun.write(path, result)
+          success(`Transformed script ${path}: ${replacements} replacements`)
+        } else if (options.dryRun && replacements > 0) {
+          info(`[DRY-RUN] Would transform script ${path}: ${replacements} replacements`)
+        }
+
+        results.push({ file: path, action: "transformed", replacements, dryRun: options.dryRun ?? false })
+      } catch (err) {
+        warn(`Failed to transform script ${path}: ${err}`)
+        results.push({ file: path, action: "failed", replacements: 0, dryRun: options.dryRun ?? false })
+      }
+    }
+  }
+
+  return results
+}
+
 // CLI entry point
 if (import.meta.main) {
   const args = process.argv.slice(2)

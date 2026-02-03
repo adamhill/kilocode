@@ -57,7 +57,7 @@ bun run merge.ts --version v1.1.49 --dry-run
 
 ## Merge Process
 
-The merge automation follows this process:
+The merge automation follows this process, applying **all transformations BEFORE the merge** to minimize conflicts:
 
 1. **Validate environment**
    - Check for upstream remote
@@ -72,14 +72,26 @@ The merge automation follows this process:
    - `<author>/kilo-opencode-<version>` - Merge target branch
    - `<author>/opencode-<version>` - Transformed upstream branch
 
-5. **Apply transformations** to upstream branch:
+5. **Apply ALL transformations to upstream branch (PRE-MERGE)**:
    - Transform package names (opencode-ai -> @kilocode/cli)
    - Preserve Kilo's versions
+   - Transform i18n files with Kilo branding
+   - Transform branding-only files (UI components, configs)
+   - Transform Tauri/Desktop config files
+   - Transform package.json files (names, deps, Kilo injections)
+   - Transform script files (GitHub API references)
+   - Transform extension files (Zed, etc.)
+   - Transform web/docs files
    - Reset Kilo-specific files
 
 6. **Merge** transformed upstream into Kilo branch
+   - Since all branding transforms are applied pre-merge, conflicts should be minimal
+   - Remaining conflicts are files with actual code differences (kilocode_change markers)
 
-7. **Auto-resolve** known conflicts (markdown, Kilo-specific files)
+7. **Auto-resolve** any remaining conflicts
+   - Skip files that shouldn't exist in Kilo
+   - Keep Kilo's version of specific files
+   - Fallback transforms for edge cases
 
 8. **Push** and generate final report
 
@@ -138,9 +150,27 @@ Configuration is defined in `utils/config.ts`:
 }
 ```
 
-## Auto-Resolution Strategies
+## Pre-Merge Transformation Strategy
 
-The merge tool uses different strategies based on file type:
+**Key insight**: By applying all branding transforms to the upstream branch BEFORE merging, we eliminate most conflicts that would otherwise occur due to branding differences (OpenCode -> Kilo).
+
+### Transform Order (Pre-Merge)
+
+The following transforms are applied to the opencode branch before merging:
+
+1. **Package names** - `opencode-ai` -> `@kilocode/cli`, etc.
+2. **Versions** - Preserve Kilo's version numbers
+3. **i18n files** - OpenCode -> Kilo in user-visible strings
+4. **Branding files** - UI components, configs with branding only
+5. **Tauri configs** - Desktop app identifiers, names
+6. **package.json** - Names, dependencies, Kilo injections
+7. **Scripts** - GitHub API references
+8. **Extensions** - Zed, etc.
+9. **Web/docs** - Documentation files
+
+### Post-Merge Strategies
+
+After merging, any remaining conflicts are handled based on file type:
 
 | File Type         | Strategy                | Description                                      |
 | ----------------- | ----------------------- | ------------------------------------------------ |
@@ -154,6 +184,22 @@ The merge tool uses different strategies based on file type:
 | README/docs       | `keep-ours`             | Keep Kilo's version                              |
 | GitHub workflows  | `keep-ours`             | Keep Kilo's version (manual review)              |
 | Code with markers | `manual`                | Has `kilocode_change` markers, needs review      |
+
+### Why This Reduces Conflicts
+
+Previously, conflicts occurred because:
+
+- Upstream had `OpenCode` branding
+- Kilo had `Kilo` branding
+- Git saw these as conflicting changes
+
+Now:
+
+- We transform upstream to `Kilo` branding BEFORE merge
+- Both branches have the same branding
+- Git sees no conflict for branding-only files
+
+The only remaining conflicts are files with **actual code differences** - files with `kilocode_change` markers that contain Kilo-specific logic.
 
 ## CLI Options
 

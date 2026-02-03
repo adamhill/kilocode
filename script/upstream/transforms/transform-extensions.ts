@@ -205,6 +205,50 @@ export async function transformConflictedExtensions(
   return results
 }
 
+/**
+ * Transform all extension files (pre-merge, on opencode branch)
+ */
+export async function transformAllExtensions(
+  options: ExtensionTransformOptions = {},
+): Promise<ExtensionTransformResult[]> {
+  const { Glob } = await import("bun")
+  const results: ExtensionTransformResult[] = []
+  const patterns = defaultConfig.extensionFiles
+
+  for (const pattern of patterns) {
+    const glob = new Glob(pattern)
+
+    for await (const path of glob.scan({ absolute: false })) {
+      const file = Bun.file(path)
+      if (!(await file.exists())) continue
+
+      // Skip non-text files
+      if (!path.endsWith(".toml") && !path.endsWith(".json") && !path.endsWith(".ts") && !path.endsWith(".js")) {
+        continue
+      }
+
+      try {
+        const content = await file.text()
+        const { result, replacements } = applyExtensionTransforms(content, path, options.verbose)
+
+        if (replacements > 0 && !options.dryRun) {
+          await Bun.write(path, result)
+          success(`Transformed extension ${path}: ${replacements} replacements`)
+        } else if (options.dryRun && replacements > 0) {
+          info(`[DRY-RUN] Would transform extension ${path}: ${replacements} replacements`)
+        }
+
+        results.push({ file: path, action: "transformed", replacements, dryRun: options.dryRun ?? false })
+      } catch (err) {
+        warn(`Failed to transform extension ${path}: ${err}`)
+        results.push({ file: path, action: "failed", replacements: 0, dryRun: options.dryRun ?? false })
+      }
+    }
+  }
+
+  return results
+}
+
 // CLI entry point
 if (import.meta.main) {
   const args = process.argv.slice(2)

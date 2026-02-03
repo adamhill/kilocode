@@ -195,6 +195,103 @@ export async function transformConflictedPackageJson(
   return results
 }
 
+/**
+ * Transform all package.json files (pre-merge, on opencode branch)
+ */
+export async function transformAllPackageJson(options: PackageJsonOptions = {}): Promise<PackageJsonResult[]> {
+  const { Glob } = await import("bun")
+  const results: PackageJsonResult[] = []
+
+  // Find all package.json files
+  const glob = new Glob("**/package.json")
+
+  for await (const path of glob.scan({ absolute: false })) {
+    // Skip node_modules
+    if (path.includes("node_modules")) continue
+
+    const file = Bun.file(path)
+    if (!(await file.exists())) continue
+
+    try {
+      const content = await file.text()
+      const pkg = JSON.parse(content)
+      const changes: string[] = []
+
+      // 1. Transform package name if needed
+      const newName = TRANSFORM_PACKAGE_NAMES[path]
+      if (newName && pkg.name !== newName) {
+        changes.push(`name: ${pkg.name} -> ${newName}`)
+        pkg.name = newName
+      }
+
+      // 2. Preserve Kilo version if requested
+      if (options.preserveVersion !== false) {
+        const kiloVersion = await getCurrentVersion()
+        if (pkg.version !== kiloVersion) {
+          changes.push(`version: ${pkg.version} -> ${kiloVersion}`)
+          pkg.version = kiloVersion
+        }
+      }
+
+      // 3. Transform dependencies
+      if (pkg.dependencies) {
+        const { result, changes: depChanges } = transformDependencies(pkg.dependencies)
+        if (depChanges.length > 0) {
+          pkg.dependencies = result
+          changes.push(...depChanges.map((c) => `dependencies: ${c}`))
+        }
+      }
+
+      // 4. Transform devDependencies
+      if (pkg.devDependencies) {
+        const { result, changes: devChanges } = transformDependencies(pkg.devDependencies)
+        if (devChanges.length > 0) {
+          pkg.devDependencies = result
+          changes.push(...devChanges.map((c) => `devDependencies: ${c}`))
+        }
+      }
+
+      // 5. Transform peerDependencies
+      if (pkg.peerDependencies) {
+        const { result, changes: peerChanges } = transformDependencies(pkg.peerDependencies)
+        if (peerChanges.length > 0) {
+          pkg.peerDependencies = result
+          changes.push(...peerChanges.map((c) => `peerDependencies: ${c}`))
+        }
+      }
+
+      // 6. Inject Kilo-specific dependencies
+      const kiloDeps = KILO_DEPENDENCIES[path]
+      if (kiloDeps) {
+        pkg.dependencies = pkg.dependencies || {}
+        for (const [name, version] of Object.entries(kiloDeps)) {
+          if (!pkg.dependencies[name]) {
+            pkg.dependencies[name] = version
+            changes.push(`injected: ${name}`)
+          }
+        }
+      }
+
+      if (changes.length > 0) {
+        if (!options.dryRun) {
+          const newContent = JSON.stringify(pkg, null, 2) + "\n"
+          await Bun.write(path, newContent)
+          success(`Transformed ${path}: ${changes.length} changes`)
+        } else {
+          info(`[DRY-RUN] Would transform ${path}: ${changes.length} changes`)
+        }
+      }
+
+      results.push({ file: path, action: "transformed", changes, dryRun: options.dryRun ?? false })
+    } catch (err) {
+      warn(`Failed to transform ${path}: ${err}`)
+      results.push({ file: path, action: "failed", changes: [], dryRun: options.dryRun ?? false })
+    }
+  }
+
+  return results
+}
+
 // CLI entry point
 if (import.meta.main) {
   const args = process.argv.slice(2)
