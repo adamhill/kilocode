@@ -55,7 +55,10 @@ export async function hasUpstreamRemote(): Promise<boolean> {
 }
 
 export async function fetchUpstream(): Promise<void> {
-  await $`git fetch upstream`
+  const result = await $`git fetch upstream`.quiet().nothrow()
+  if (result.exitCode !== 0) {
+    throw new Error(`Failed to fetch upstream: ${result.stderr.toString()}`)
+  }
 }
 
 export async function checkout(ref: string): Promise<void> {
@@ -161,11 +164,15 @@ export async function getAllTags(): Promise<string[]> {
 }
 
 export async function getUpstreamTags(): Promise<string[]> {
-  await fetchUpstream()
-  const result = await $`git ls-remote --tags upstream`.text()
+  const result = await $`git ls-remote --tags upstream`.quiet().nothrow()
+  if (result.exitCode !== 0) {
+    throw new Error(`Failed to list upstream tags: ${result.stderr.toString()}`)
+  }
+
+  const output = result.stdout.toString()
   const tags: string[] = []
 
-  for (const line of result.trim().split("\n")) {
+  for (const line of output.trim().split("\n")) {
     const match = line.match(/refs\/tags\/([^\^]+)$/)
     if (match && match[1]) tags.push(match[1])
   }

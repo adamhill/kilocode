@@ -99,13 +99,20 @@ export function getRecommendation(
  * Analyze potential conflicts before merge
  */
 export async function analyzeConflicts(
-  upstreamBranch: string,
+  upstreamRef: string,
   baseBranch: string,
   keepOurs: string[],
 ): Promise<ConflictFile[]> {
   // Get list of files that differ between branches
-  const result = await $`git diff --name-only ${baseBranch}...${upstreamBranch}`.text()
-  const files = result
+  // Use quiet to suppress output and nothrow to handle errors
+  const result = await $`git diff --name-only ${baseBranch}...${upstreamRef}`.quiet().nothrow()
+
+  if (result.exitCode !== 0) {
+    throw new Error(`Failed to analyze conflicts: ${result.stderr.toString()}`)
+  }
+
+  const files = result.stdout
+    .toString()
     .trim()
     .split("\n")
     .filter((f) => f.length > 0)

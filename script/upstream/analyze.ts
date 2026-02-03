@@ -92,11 +92,8 @@ async function main() {
   // Analyze conflicts
   info("Analyzing changes...")
 
-  const conflicts = await report.analyzeConflicts(
-    `upstream/${target.tag}`,
-    defaultConfig.baseBranch,
-    defaultConfig.keepOurs,
-  )
+  // Use commit hash directly since we may not have the tag fetched locally
+  const conflicts = await report.analyzeConflicts(target.commit, defaultConfig.baseBranch, defaultConfig.keepOurs)
 
   // Group by type
   const byType = new Map<string, report.ConflictFile[]>()

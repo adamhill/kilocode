@@ -14,10 +14,20 @@ export interface VersionInfo {
 
 /**
  * Parse version from a tag string (e.g., "v1.1.49" -> "1.1.49")
+ * Only matches stable versions (not dev/preview tags like v0.0.0-202507310417)
  */
-export function parseVersion(tag: string): string | null {
-  const match = tag.match(/^v?(\d+\.\d+\.\d+.*)$/)
-  return match?.[1] ?? null
+export function parseVersion(tag: string, includePrerelease = false): string | null {
+  // Match stable versions like v1.1.49 or 1.1.49
+  const stableMatch = tag.match(/^v?(\d+\.\d+\.\d+)$/)
+  if (stableMatch) return stableMatch[1] ?? null
+
+  // Optionally match prerelease versions
+  if (includePrerelease) {
+    const prereleaseMatch = tag.match(/^v?(\d+\.\d+\.\d+-.+)$/)
+    if (prereleaseMatch) return prereleaseMatch[1] ?? null
+  }
+
+  return null
 }
 
 /**
@@ -42,30 +52,11 @@ export function compareVersions(a: string, b: string): number {
  * Get the latest upstream version from tags
  */
 export async function getLatestUpstreamVersion(): Promise<VersionInfo | null> {
-  const tags = await getUpstreamTags()
-
-  const versions: Array<{ tag: string; version: string }> = []
-  for (const tag of tags) {
-    const version = parseVersion(tag)
-    if (version) versions.push({ tag, version })
-  }
+  const versions = await getAvailableUpstreamVersions()
 
   if (versions.length === 0) return null
 
-  // Sort by version descending
-  versions.sort((a, b) => compareVersions(b.version, a.version))
-
-  const latest = versions[0]
-  if (!latest) return null
-
-  // Get commit for this tag
-  const commit = await $`git rev-list -n 1 upstream/${latest.tag}`.text().then((t) => t.trim())
-
-  return {
-    version: latest.version,
-    tag: latest.tag,
-    commit,
-  }
+  return versions[0] ?? null
 }
 
 /**
@@ -99,13 +90,27 @@ export async function getVersionForCommit(commit: string): Promise<VersionInfo |
  * Get available upstream versions (sorted newest first)
  */
 export async function getAvailableUpstreamVersions(): Promise<VersionInfo[]> {
-  const tags = await getUpstreamTags()
+  // Get tags with their commits directly from ls-remote
+  const result = await $`git ls-remote --tags upstream`.quiet().nothrow()
+  if (result.exitCode !== 0) {
+    throw new Error(`Failed to list upstream tags: ${result.stderr.toString()}`)
+  }
+
+  const output = result.stdout.toString()
   const versions: VersionInfo[] = []
 
-  for (const tag of tags) {
+  for (const line of output.trim().split("\n")) {
+    // Match lines like: abc123... refs/tags/v1.1.49
+    // Skip annotated tag references (those ending with ^{})
+    const match = line.match(/^([a-f0-9]+)\s+refs\/tags\/([^\^]+)$/)
+    if (!match) continue
+
+    const commit = match[1]
+    const tag = match[2]
+    if (!commit || !tag) continue
+
     const version = parseVersion(tag)
     if (version) {
-      const commit = await $`git rev-list -n 1 upstream/${tag}`.text().then((t) => t.trim())
       versions.push({ version, tag, commit })
     }
   }
@@ -120,6 +125,8 @@ export async function getAvailableUpstreamVersions(): Promise<VersionInfo[]> {
  * Get current Kilo version from package.json
  */
 export async function getCurrentKiloVersion(): Promise<string> {
-  const pkg = await Bun.file("packages/opencode/package.json").json()
+  // Resolve path relative to repo root (script is in script/upstream/)
+  const path = new URL("../../../packages/opencode/package.json", import.meta.url).pathname
+  const pkg = await Bun.file(path).json()
   return pkg.version
 }
