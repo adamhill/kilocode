@@ -491,6 +491,26 @@ async function main() {
       logger.info("These conflicts likely contain kilocode_change markers or have actual code differences.")
       logger.info("After resolving conflicts, run:")
       logger.info("  git add -A && git commit -m 'resolve merge conflicts'")
+
+      // Save report before exiting so user has documentation
+      conflictReport.mergeBranch = kiloBranch
+      const reportPath = `upstream-merge-report-${targetVersion.version}.md`
+      await report.saveReport(conflictReport, reportPath)
+      logger.success(`Report saved to ${reportPath}`)
+
+      logger.divider()
+      logger.info("Next steps:")
+      logger.info("  1. Resolve remaining conflicts manually")
+      logger.info("  2. git add -A && git commit -m 'resolve merge conflicts'")
+      logger.info(`  3. git push ${config.originRemote} ${kiloBranch}`)
+      logger.info("  4. Create PR from " + kiloBranch + " to " + config.baseBranch)
+      logger.info("")
+      logger.info("To rollback:")
+      logger.info(`  git checkout ${config.baseBranch}`)
+      logger.info(`  git reset --hard ${backupBranch}`)
+
+      // Exit early - don't continue to finalization steps
+      process.exit(1)
     } else {
       await git.stageAll()
       await git.commit(`merge: upstream ${targetVersion.tag}`)
@@ -505,7 +525,7 @@ async function main() {
     }
   }
 
-  // Step 8: Push and cleanup
+  // Step 8: Push and cleanup (only reached if no manual conflicts)
   logger.step(8, 8, "Finalizing...")
 
   if (options.push) {
