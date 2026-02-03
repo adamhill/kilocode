@@ -345,9 +345,23 @@ export namespace ProviderTransform {
 
     switch (model.api.npm) {
       case "@openrouter/ai-sdk-provider":
-      case "@kilocode/kilo-gateway": // kilocode_change
         if (!model.id.includes("gpt") && !model.id.includes("gemini-3")) return {}
         return Object.fromEntries(OPENAI_EFFORTS.map((effort) => [effort, { reasoning: { effort } }]))
+
+      // kilocode_change start - GPT models via Kilo need encrypted reasoning content to avoid org_id mismatch
+      case "@kilocode/kilo-gateway":
+        if (!model.id.includes("gpt") && !model.id.includes("gemini-3")) return {}
+        return Object.fromEntries(
+          OPENAI_EFFORTS.map((effort) => [
+            effort,
+            {
+              reasoning: { effort },
+              reasoningSummary: "auto",
+              include: ["reasoning.encrypted_content"],
+            },
+          ]),
+        )
+      // kilocode_change end
 
       // TODO: YOU CANNOT SET max_tokens if this is set!!!
       case "@ai-sdk/gateway":
@@ -604,7 +618,8 @@ export namespace ProviderTransform {
         result["textVerbosity"] = "low"
       }
 
-      if (input.model.providerID.startsWith("opencode")) {
+      // kilocode_change - include kilo provider for encrypted reasoning content
+      if (input.model.providerID.startsWith("opencode") || input.model.api.npm === "@kilocode/kilo-gateway") {
         result["promptCacheKey"] = input.sessionID
         result["include"] = ["reasoning.encrypted_content"]
         result["reasoningSummary"] = "auto"
