@@ -35,17 +35,17 @@ const PACKAGE_PATTERNS = [
   { pattern: /"@opencode-ai\/sdk":\s*"/g, replacement: '"@kilocode/sdk": "' },
   { pattern: /"@opencode-ai\/plugin":\s*"/g, replacement: '"@kilocode/plugin": "' },
 
-  // In import statements
+  // In import statements (supports subpaths like @opencode-ai/sdk/v2)
   { pattern: /from\s+["']opencode-ai["']/g, replacement: 'from "@kilocode/cli"' },
-  { pattern: /from\s+["']@opencode-ai\/cli["']/g, replacement: 'from "@kilocode/cli"' },
-  { pattern: /from\s+["']@opencode-ai\/sdk["']/g, replacement: 'from "@kilocode/sdk"' },
-  { pattern: /from\s+["']@opencode-ai\/plugin["']/g, replacement: 'from "@kilocode/plugin"' },
+  { pattern: /from\s+["']@opencode-ai\/cli(\/[^"']*)?["']/g, replacement: 'from "@kilocode/cli$1"' },
+  { pattern: /from\s+["']@opencode-ai\/sdk(\/[^"']*)?["']/g, replacement: 'from "@kilocode/sdk$1"' },
+  { pattern: /from\s+["']@opencode-ai\/plugin(\/[^"']*)?["']/g, replacement: 'from "@kilocode/plugin$1"' },
 
-  // In require statements
+  // In require statements (supports subpaths like @opencode-ai/sdk/v2)
   { pattern: /require\(["']opencode-ai["']\)/g, replacement: 'require("@kilocode/cli")' },
-  { pattern: /require\(["']@opencode-ai\/cli["']\)/g, replacement: 'require("@kilocode/cli")' },
-  { pattern: /require\(["']@opencode-ai\/sdk["']\)/g, replacement: 'require("@kilocode/sdk")' },
-  { pattern: /require\(["']@opencode-ai\/plugin["']\)/g, replacement: 'require("@kilocode/plugin")' },
+  { pattern: /require\(["']@opencode-ai\/cli(\/[^"']*)?["']\)/g, replacement: 'require("@kilocode/cli$1")' },
+  { pattern: /require\(["']@opencode-ai\/sdk(\/[^"']*)?["']\)/g, replacement: 'require("@kilocode/sdk$1")' },
+  { pattern: /require\(["']@opencode-ai\/plugin(\/[^"']*)?["']\)/g, replacement: 'require("@kilocode/plugin$1")' },
 
   // In npx/npm commands
   { pattern: /npx opencode-ai/g, replacement: "npx @kilocode/cli" },

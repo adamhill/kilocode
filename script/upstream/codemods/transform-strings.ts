@@ -22,11 +22,11 @@ interface StringReplacement {
 }
 
 const STRING_REPLACEMENTS: StringReplacement[] = [
-  // Package names in strings
+  // Package names in strings (no trailing \b to allow subpath matching like @opencode-ai/sdk/v2)
   { pattern: /\bopencode-ai\b/g, replacement: "@kilocode/cli" },
-  { pattern: /@opencode-ai\/cli\b/g, replacement: "@kilocode/cli" },
-  { pattern: /@opencode-ai\/sdk\b/g, replacement: "@kilocode/sdk" },
-  { pattern: /@opencode-ai\/plugin\b/g, replacement: "@kilocode/plugin" },
+  { pattern: /@opencode-ai\/cli(?=\/|"|'|`|$)/g, replacement: "@kilocode/cli" },
+  { pattern: /@opencode-ai\/sdk(?=\/|"|'|`|$)/g, replacement: "@kilocode/sdk" },
+  { pattern: /@opencode-ai\/plugin(?=\/|"|'|`|$)/g, replacement: "@kilocode/plugin" },
 
   // CLI commands
   { pattern: /\bnpx opencode\b/g, replacement: "npx @kilocode/cli" },

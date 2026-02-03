@@ -27,6 +27,29 @@ const IMPORT_MAPPINGS: Record<string, string> = {
   "@opencode-ai/plugin": "@kilocode/plugin",
 }
 
+/**
+ * Get the transformed module specifier, handling subpaths.
+ * Examples:
+ *   "@opencode-ai/sdk" -> "@kilocode/sdk"
+ *   "@opencode-ai/sdk/v2" -> "@kilocode/sdk/v2"
+ *   "@opencode-ai/sdk/v2/client" -> "@kilocode/sdk/v2/client"
+ */
+function getTransformedModule(specifier: string): string | undefined {
+  // Check exact match first
+  if (IMPORT_MAPPINGS[specifier]) {
+    return IMPORT_MAPPINGS[specifier]
+  }
+
+  // Check for subpath imports (e.g., @opencode-ai/sdk/v2)
+  for (const [from, to] of Object.entries(IMPORT_MAPPINGS)) {
+    if (specifier.startsWith(from + "/")) {
+      return to + specifier.slice(from.length)
+    }
+  }
+
+  return undefined
+}
+
 export interface TransformResult {
   file: string
   changes: number
@@ -42,7 +65,7 @@ export function transformImports(sourceFile: SourceFile): number {
   const imports = sourceFile.getImportDeclarations()
   for (const imp of imports) {
     const moduleSpecifier = imp.getModuleSpecifierValue()
-    const newModule = IMPORT_MAPPINGS[moduleSpecifier]
+    const newModule = getTransformedModule(moduleSpecifier)
 
     if (newModule) {
       imp.setModuleSpecifier(newModule)
@@ -55,7 +78,7 @@ export function transformImports(sourceFile: SourceFile): number {
   for (const exp of exports) {
     const moduleSpecifier = exp.getModuleSpecifierValue()
     if (moduleSpecifier) {
-      const newModule = IMPORT_MAPPINGS[moduleSpecifier]
+      const newModule = getTransformedModule(moduleSpecifier)
       if (newModule) {
         exp.setModuleSpecifier(newModule)
         changes++
@@ -73,7 +96,7 @@ export function transformImports(sourceFile: SourceFile): number {
         const arg = args[0]
         if (arg && arg.getKind() === SyntaxKind.StringLiteral) {
           const value = arg.getText().slice(1, -1) // Remove quotes
-          const newModule = IMPORT_MAPPINGS[value]
+          const newModule = getTransformedModule(value)
           if (newModule) {
             arg.replaceWithText(`"${newModule}"`)
             changes++
@@ -92,7 +115,7 @@ export function transformImports(sourceFile: SourceFile): number {
         const arg = args[0]
         if (arg && arg.getKind() === SyntaxKind.StringLiteral) {
           const value = arg.getText().slice(1, -1)
-          const newModule = IMPORT_MAPPINGS[value]
+          const newModule = getTransformedModule(value)
           if (newModule) {
             arg.replaceWithText(`"${newModule}"`)
             changes++
