@@ -34,11 +34,19 @@ bun run merge.ts --version v1.1.49 --dry-run
 
 ### Transform Scripts
 
-| Script                            | Description                              |
-| --------------------------------- | ---------------------------------------- |
-| `transforms/package-names.ts`     | Transform opencode package names to kilo |
-| `transforms/preserve-versions.ts` | Preserve Kilo's package versions         |
-| `transforms/keep-ours.ts`         | Keep Kilo's version of specific files    |
+| Script                                 | Description                                                 |
+| -------------------------------------- | ----------------------------------------------------------- |
+| `transforms/package-names.ts`          | Transform opencode package names to kilo                    |
+| `transforms/preserve-versions.ts`      | Preserve Kilo's package versions                            |
+| `transforms/keep-ours.ts`              | Keep Kilo's version of specific files                       |
+| `transforms/skip-files.ts`             | Skip/remove files that shouldn't exist in Kilo              |
+| `transforms/transform-i18n.ts`         | Transform i18n files with Kilo branding                     |
+| `transforms/transform-take-theirs.ts`  | Take upstream + apply Kilo branding for branding-only files |
+| `transforms/transform-tauri.ts`        | Transform Tauri/Desktop config files                        |
+| `transforms/transform-package-json.ts` | Enhanced package.json with Kilo dependency injection        |
+| `transforms/transform-scripts.ts`      | Transform script files with GitHub API references           |
+| `transforms/transform-extensions.ts`   | Transform extension files (Zed, etc.)                       |
+| `transforms/transform-web.ts`          | Transform web/docs files (.mdx)                             |
 
 ### Codemods (AST-based)
 
@@ -88,22 +96,64 @@ Configuration is defined in `utils/config.ts`:
     // ...
   ],
 
-  // Files to always keep Kilo's version
+  // Files to always keep Kilo's version (never take upstream)
   keepOurs: [
     "README.md",
     "CONTRIBUTING.md",
     "AGENTS.md",
+    ".github/workflows/publish.yml",  // GitHub workflows - manual review
     // ...
   ],
 
-  // Kilo-specific directories
+  // Files to skip entirely (remove from merge)
+  skipFiles: [
+    "README.*.md",  // Translated READMEs
+    "STATS.md",
+    ".github/workflows/update-nix-hashes.yml",
+    // ...
+  ],
+
+  // Files to take upstream + apply Kilo branding transforms
+  takeTheirsAndTransform: [
+    "packages/app/src/components/**/*.tsx",
+    "packages/app/src/context/**/*.tsx",
+    "packages/ui/src/**/*.tsx",
+    // ...
+  ],
+
+  // Tauri/Desktop config files
+  tauriFiles: [
+    "packages/desktop/src-tauri/*.json",
+    "packages/desktop/src-tauri/src/*.rs",
+    // ...
+  ],
+
+  // Kilo-specific directories (preserved)
   kiloDirectories: [
     "packages/opencode/src/kilocode",
     "packages/kilo-gateway",
+    "packages/kilo-telemetry",
     // ...
   ],
 }
 ```
+
+## Auto-Resolution Strategies
+
+The merge tool uses different strategies based on file type:
+
+| File Type         | Strategy                | Description                                      |
+| ----------------- | ----------------------- | ------------------------------------------------ |
+| i18n files        | `i18n-transform`        | Take upstream, apply Kilo branding               |
+| App components    | `take-theirs-transform` | Take upstream, apply branding (no logic changes) |
+| Tauri configs     | `tauri-transform`       | Take upstream, transform identifiers/names       |
+| package.json      | `package-transform`     | Take upstream, transform names, inject Kilo deps |
+| Script files      | `script-transform`      | Take upstream, transform GitHub references       |
+| Extensions        | `extension-transform`   | Take upstream, apply branding                    |
+| Web/docs          | `web-transform`         | Take upstream, apply branding                    |
+| README/docs       | `keep-ours`             | Keep Kilo's version                              |
+| GitHub workflows  | `keep-ours`             | Keep Kilo's version (manual review)              |
+| Code with markers | `manual`                | Has `kilocode_change` markers, needs review      |
 
 ## CLI Options
 

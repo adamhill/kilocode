@@ -28,6 +28,13 @@ import { preserveAllVersions } from "./transforms/preserve-versions"
 import { keepOursFiles, resetToOurs } from "./transforms/keep-ours"
 import { skipFiles, skipSpecificFiles } from "./transforms/skip-files"
 import { transformConflictedI18n, transformAllI18n } from "./transforms/transform-i18n"
+// New transforms for auto-resolving more conflict types
+import { transformConflictedTakeTheirs, shouldTakeTheirs } from "./transforms/transform-take-theirs"
+import { transformConflictedTauri, isTauriFile } from "./transforms/transform-tauri"
+import { transformConflictedPackageJson, isPackageJson } from "./transforms/transform-package-json"
+import { transformConflictedScripts, isScriptFile } from "./transforms/transform-scripts"
+import { transformConflictedExtensions, isExtensionFile } from "./transforms/transform-extensions"
+import { transformConflictedWeb, isWebFile } from "./transforms/transform-web"
 
 interface MergeOptions {
   version?: string
@@ -291,7 +298,7 @@ async function main() {
 
     // Step 7b: Transform i18n files (take upstream + apply Kilo branding)
     logger.info("Transforming i18n files...")
-    const conflictedFiles = await git.getConflictedFiles()
+    let conflictedFiles = await git.getConflictedFiles()
     const i18nResults = await transformConflictedI18n(conflictedFiles, { dryRun: false, verbose: options.verbose })
     const i18nTransformed = i18nResults.filter((r) => r.replacements > 0).length
     if (i18nTransformed > 0) {
@@ -305,6 +312,90 @@ async function main() {
 
     if (autoResolved.length > 0) {
       logger.success(`Auto-resolved ${autoResolved.length} conflicts (kept Kilo's version)`)
+    }
+
+    // Step 7d: Transform branding-only files (take theirs + apply Kilo branding)
+    conflictedFiles = await git.getConflictedFiles()
+    if (conflictedFiles.length > 0) {
+      logger.info("Transforming branding-only files...")
+      const takeTheirsResults = await transformConflictedTakeTheirs(conflictedFiles, {
+        dryRun: false,
+        verbose: options.verbose,
+      })
+      const takeTheirsCount = takeTheirsResults.filter((r) => r.action === "transformed").length
+      if (takeTheirsCount > 0) {
+        logger.success(`Transformed ${takeTheirsCount} files (take upstream + Kilo branding)`)
+      }
+    }
+
+    // Step 7e: Transform Tauri/Desktop config files
+    conflictedFiles = await git.getConflictedFiles()
+    if (conflictedFiles.length > 0) {
+      logger.info("Transforming Tauri/Desktop config files...")
+      const tauriResults = await transformConflictedTauri(conflictedFiles, {
+        dryRun: false,
+        verbose: options.verbose,
+      })
+      const tauriCount = tauriResults.filter((r) => r.action === "transformed").length
+      if (tauriCount > 0) {
+        logger.success(`Transformed ${tauriCount} Tauri config files`)
+      }
+    }
+
+    // Step 7f: Transform package.json files
+    conflictedFiles = await git.getConflictedFiles()
+    if (conflictedFiles.length > 0) {
+      logger.info("Transforming package.json files...")
+      const pkgResults = await transformConflictedPackageJson(conflictedFiles, {
+        dryRun: false,
+        verbose: options.verbose,
+      })
+      const pkgCount = pkgResults.filter((r) => r.action === "transformed").length
+      if (pkgCount > 0) {
+        logger.success(`Transformed ${pkgCount} package.json files`)
+      }
+    }
+
+    // Step 7g: Transform script files
+    conflictedFiles = await git.getConflictedFiles()
+    if (conflictedFiles.length > 0) {
+      logger.info("Transforming script files...")
+      const scriptResults = await transformConflictedScripts(conflictedFiles, {
+        dryRun: false,
+        verbose: options.verbose,
+      })
+      const scriptCount = scriptResults.filter((r) => r.action === "transformed").length
+      if (scriptCount > 0) {
+        logger.success(`Transformed ${scriptCount} script files`)
+      }
+    }
+
+    // Step 7h: Transform extension files
+    conflictedFiles = await git.getConflictedFiles()
+    if (conflictedFiles.length > 0) {
+      logger.info("Transforming extension files...")
+      const extResults = await transformConflictedExtensions(conflictedFiles, {
+        dryRun: false,
+        verbose: options.verbose,
+      })
+      const extCount = extResults.filter((r) => r.action === "transformed").length
+      if (extCount > 0) {
+        logger.success(`Transformed ${extCount} extension files`)
+      }
+    }
+
+    // Step 7i: Transform web/docs files
+    conflictedFiles = await git.getConflictedFiles()
+    if (conflictedFiles.length > 0) {
+      logger.info("Transforming web/docs files...")
+      const webResults = await transformConflictedWeb(conflictedFiles, {
+        dryRun: false,
+        verbose: options.verbose,
+      })
+      const webCount = webResults.filter((r) => r.action === "transformed").length
+      if (webCount > 0) {
+        logger.success(`Transformed ${webCount} web/docs files`)
+      }
     }
 
     // Check remaining conflicts

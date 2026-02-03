@@ -24,3 +24,41 @@ export {
   transformI18nContent,
   isI18nFile,
 } from "./transforms/transform-i18n"
+
+// New transforms for auto-resolving more conflict types
+export {
+  transformConflictedTakeTheirs,
+  transformTakeTheirs,
+  shouldTakeTheirs,
+  applyBrandingTransforms,
+  matchesPattern,
+} from "./transforms/transform-take-theirs"
+
+export {
+  transformConflictedTauri,
+  transformTauriFile,
+  isTauriFile,
+  applyTauriTransforms,
+} from "./transforms/transform-tauri"
+
+export {
+  transformConflictedPackageJson,
+  transformPackageJson,
+  isPackageJson,
+} from "./transforms/transform-package-json"
+
+export {
+  transformConflictedScripts,
+  transformScriptFile,
+  isScriptFile,
+  applyScriptTransforms,
+} from "./transforms/transform-scripts"
+
+export {
+  transformConflictedExtensions,
+  transformExtensionFile,
+  isExtensionFile,
+  applyExtensionTransforms,
+} from "./transforms/transform-extensions"
+
+export { transformConflictedWeb, transformWebFile, isWebFile, applyWebTransforms } from "./transforms/transform-web"

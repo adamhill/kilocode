@@ -18,8 +18,20 @@ export interface ConflictReport {
 
 export interface ConflictFile {
   path: string
-  type: "markdown" | "package" | "code" | "config" | "i18n" | "other"
-  recommendation: "keep-ours" | "keep-theirs" | "manual" | "codemod" | "skip" | "i18n-transform"
+  type: "markdown" | "package" | "code" | "config" | "i18n" | "tauri" | "script" | "extension" | "web" | "other"
+  recommendation:
+    | "keep-ours"
+    | "keep-theirs"
+    | "manual"
+    | "codemod"
+    | "skip"
+    | "i18n-transform"
+    | "take-theirs-transform"
+    | "tauri-transform"
+    | "package-transform"
+    | "script-transform"
+    | "extension-transform"
+    | "web-transform"
   reason: string
 }
 
@@ -32,10 +44,63 @@ function isI18nFile(path: string): boolean {
 }
 
 /**
+ * Check if a file is a Tauri/Desktop config file
+ */
+function isTauriFile(path: string): boolean {
+  return (
+    path.includes("packages/desktop/src-tauri/") &&
+    (path.endsWith(".json") || path.endsWith(".toml") || path.endsWith(".rs") || path.endsWith(".lock"))
+  )
+}
+
+/**
+ * Check if a file is a script file
+ */
+function isScriptFile(path: string): boolean {
+  return path.startsWith("script/") || path.includes("/script/")
+}
+
+/**
+ * Check if a file is an extension file
+ */
+function isExtensionFile(path: string): boolean {
+  return path.includes("packages/extensions/")
+}
+
+/**
+ * Check if a file is a web/docs file
+ */
+function isWebFile(path: string): boolean {
+  return path.includes("packages/web/src/content/docs/") && path.endsWith(".mdx")
+}
+
+/**
+ * Check if a file should use take-theirs + transform strategy
+ */
+function shouldTakeTheirsTransform(path: string): boolean {
+  const patterns = [
+    /^packages\/app\/src\/components\/.*\.tsx$/,
+    /^packages\/app\/src\/context\/.*\.tsx$/,
+    /^packages\/app\/src\/pages\/.*\.tsx$/,
+    /^packages\/ui\/src\/.*\.tsx$/,
+    /^packages\/desktop\/src\/.*\.ts$/,
+    /^packages\/app\/e2e\/.*\.ts$/,
+    /^packages\/app\/script\/.*\.ts$/,
+    /^github\/index\.ts$/,
+    /^packages\/slack\/src\/.*\.ts$/,
+  ]
+  return patterns.some((p) => p.test(path))
+}
+
+/**
  * Classify a file based on its path
  */
 export function classifyFile(path: string): ConflictFile["type"] {
   if (isI18nFile(path)) return "i18n"
+  if (isTauriFile(path)) return "tauri"
+  if (isScriptFile(path)) return "script"
+  if (isExtensionFile(path)) return "extension"
+  if (isWebFile(path)) return "web"
   if (path.endsWith(".md")) return "markdown"
   if (path.includes("package.json")) return "package"
   if (path.endsWith(".ts") || path.endsWith(".tsx") || path.endsWith(".js") || path.endsWith(".jsx")) return "code"
@@ -91,11 +156,39 @@ export function getRecommendation(
 
   const type = classifyFile(path)
 
+  // Check for specific auto-transform strategies
+  if (shouldTakeTheirsTransform(path)) {
+    return {
+      recommendation: "take-theirs-transform",
+      reason: "Branding-only file: take upstream and apply Kilo branding transforms",
+    }
+  }
+
   switch (type) {
     case "i18n":
       return {
         recommendation: "i18n-transform",
         reason: "i18n file: take upstream translations and apply Kilo branding",
+      }
+    case "tauri":
+      return {
+        recommendation: "tauri-transform",
+        reason: "Tauri config: take upstream and apply Kilo branding transforms",
+      }
+    case "script":
+      return {
+        recommendation: "script-transform",
+        reason: "Script file: take upstream and transform GitHub references",
+      }
+    case "extension":
+      return {
+        recommendation: "extension-transform",
+        reason: "Extension file: take upstream and apply Kilo branding",
+      }
+    case "web":
+      return {
+        recommendation: "web-transform",
+        reason: "Web/docs file: take upstream and apply Kilo branding",
       }
     case "markdown":
       return {
@@ -104,8 +197,8 @@ export function getRecommendation(
       }
     case "package":
       return {
-        recommendation: "codemod",
-        reason: "Package.json needs codemod to transform names and preserve version",
+        recommendation: "package-transform",
+        reason: "Package.json: take upstream, transform names, inject Kilo deps, preserve version",
       }
     case "code":
       return {
@@ -196,6 +289,12 @@ export function generateMarkdownReport(report: ConflictReport): string {
   const order: ConflictFile["recommendation"][] = [
     "skip",
     "i18n-transform",
+    "take-theirs-transform",
+    "tauri-transform",
+    "package-transform",
+    "script-transform",
+    "extension-transform",
+    "web-transform",
     "keep-ours",
     "codemod",
     "keep-theirs",
@@ -209,6 +308,12 @@ export function generateMarkdownReport(report: ConflictReport): string {
     const titleMap: Record<ConflictFile["recommendation"], string> = {
       skip: "Skip (Auto-Remove)",
       "i18n-transform": "i18n Transform (Auto-Apply Kilo Branding)",
+      "take-theirs-transform": "Take Upstream + Kilo Branding (Auto)",
+      "tauri-transform": "Tauri Config Transform (Auto)",
+      "package-transform": "Package.json Transform (Auto)",
+      "script-transform": "Script Transform (Auto)",
+      "extension-transform": "Extension Transform (Auto)",
+      "web-transform": "Web/Docs Transform (Auto)",
       "keep-ours": "Keep Kilo Version (Ours)",
       "keep-theirs": "Take Upstream Version (Theirs)",
       codemod: "Apply Codemod",

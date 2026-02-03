@@ -18,6 +18,21 @@ export interface MergeConfig {
   /** Files to skip entirely (don't add from upstream, remove if added) */
   skipFiles: string[]
 
+  /** Files that should take upstream version and apply Kilo branding transforms */
+  takeTheirsAndTransform: string[]
+
+  /** Tauri/Desktop config files with predictable branding patterns */
+  tauriFiles: string[]
+
+  /** Script files with GitHub API references */
+  scriptFiles: string[]
+
+  /** Extension files (Zed, etc.) */
+  extensionFiles: string[]
+
+  /** Web/docs files */
+  webFiles: string[]
+
   /** Directories that are Kilo-specific and should be preserved */
   kiloDirectories: string[]
 
@@ -55,7 +70,15 @@ export const defaultConfig: MergeConfig = {
     "PRIVACY.md",
     "SECURITY.md",
     "AGENTS.md",
+    // GitHub workflows - MANUAL REVIEW (can break CI/CD)
     ".github/workflows/publish-stable.yml",
+    ".github/workflows/publish.yml",
+    ".github/workflows/close-stale-prs.yml",
+    ".github/pull_request_template.md",
+    // Kilo-specific command files
+    ".opencode/command/commit.md",
+    // Kilo-specific publish scripts
+    "packages/opencode/script/publish-registries.ts",
   ],
 
   // Files that only exist in upstream and should NOT be added to Kilo
@@ -80,7 +103,48 @@ export const defaultConfig: MergeConfig = {
     "README.zht.md",
     // Stats file
     "STATS.md",
+    // Workflows that don't exist in Kilo
+    ".github/workflows/update-nix-hashes.yml",
   ],
+
+  // Files that should take upstream version and apply Kilo branding transforms
+  // These are files with only branding differences, no logic changes
+  takeTheirsAndTransform: [
+    // App components with branding only
+    "packages/app/src/components/**/*.tsx",
+    "packages/app/src/context/**/*.tsx",
+    "packages/app/src/pages/**/*.tsx",
+    // UI components
+    "packages/ui/src/components/**/*.tsx",
+    "packages/ui/src/context/**/*.tsx",
+    // Desktop TypeScript files (not Rust)
+    "packages/desktop/src/**/*.ts",
+    // E2E and test fixtures
+    "packages/app/e2e/**/*.ts",
+    "packages/app/script/**/*.ts",
+    // GitHub script
+    "github/index.ts",
+    // Slack integration
+    "packages/slack/src/**/*.ts",
+  ],
+
+  // Tauri/Desktop config files with predictable branding patterns
+  tauriFiles: [
+    "packages/desktop/src-tauri/tauri.conf.json",
+    "packages/desktop/src-tauri/tauri.prod.conf.json",
+    "packages/desktop/src-tauri/Cargo.toml",
+    "packages/desktop/src-tauri/Cargo.lock",
+    "packages/desktop/src-tauri/src/*.rs",
+  ],
+
+  // Script files with GitHub API references
+  scriptFiles: ["script/*.ts", "packages/opencode/script/*.ts"],
+
+  // Extension files
+  extensionFiles: ["packages/extensions/**/*"],
+
+  // Web/docs files
+  webFiles: ["packages/web/src/content/docs/**/*.mdx"],
 
   kiloDirectories: [
     "packages/opencode/src/kilocode",
