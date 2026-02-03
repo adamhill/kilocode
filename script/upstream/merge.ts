@@ -47,6 +47,7 @@ import {
   transformAllExtensions,
 } from "./transforms/transform-extensions"
 import { transformConflictedWeb, isWebFile, transformAllWeb } from "./transforms/transform-web"
+import { resolveLockFileConflicts, regenerateLockFiles } from "./transforms/lock-files"
 
 interface MergeOptions {
   version?: string
@@ -480,6 +481,19 @@ async function main() {
           logger.success(`Auto-resolved ${webCount} web/docs conflicts`)
         }
       }
+
+      // Resolve lock file conflicts (accept ours, will regenerate later)
+      conflictedFiles = await git.getConflictedFiles()
+      if (conflictedFiles.length > 0) {
+        const lockResults = await resolveLockFileConflicts({
+          dryRun: false,
+          verbose: options.verbose,
+        })
+        const lockCount = lockResults.filter((r) => r.action === "resolved").length
+        if (lockCount > 0) {
+          logger.success(`Resolved ${lockCount} lock file conflicts (will regenerate)`)
+        }
+      }
     }
 
     // Check remaining conflicts
@@ -525,8 +539,22 @@ async function main() {
     }
   }
 
-  // Step 8: Push and cleanup (only reached if no manual conflicts)
-  logger.step(8, 8, "Finalizing...")
+  // Step 8: Regenerate lock files and finalize
+  logger.step(8, 8, "Regenerating lock files and finalizing...")
+
+  // Regenerate lock files (bun.lock, Cargo.lock, etc.)
+  const lockRegenResults = await regenerateLockFiles({ dryRun: false, verbose: options.verbose })
+  const regeneratedCount = lockRegenResults.filter((r) => r.action === "regenerated").length
+  if (regeneratedCount > 0) {
+    logger.success(`Regenerated ${regeneratedCount} lock file(s)`)
+    // Stage and commit the regenerated lock files
+    await git.stageAll()
+    const hasLockChanges = await git.hasUncommittedChanges()
+    if (hasLockChanges) {
+      await git.commit("chore: regenerate lock files after upstream merge")
+      logger.success("Committed regenerated lock files")
+    }
+  }
 
   if (options.push) {
     await git.push(config.originRemote, kiloBranch)

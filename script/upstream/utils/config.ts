@@ -33,6 +33,9 @@ export interface MergeConfig {
   /** Web/docs files */
   webFiles: string[]
 
+  /** Lock files to accept ours and regenerate after merge */
+  lockFiles: string[]
+
   /** Directories that are Kilo-specific and should be preserved */
   kiloDirectories: string[]
 
@@ -145,6 +148,20 @@ export const defaultConfig: MergeConfig = {
 
   // Web/docs files
   webFiles: ["packages/web/src/content/docs/**/*.mdx"],
+
+  // Lock files to accept ours and regenerate after merge
+  lockFiles: [
+    "bun.lock",
+    "**/bun.lock",
+    "package-lock.json",
+    "**/package-lock.json",
+    "yarn.lock",
+    "**/yarn.lock",
+    "pnpm-lock.yaml",
+    "**/pnpm-lock.yaml",
+    "Cargo.lock",
+    "**/Cargo.lock",
+  ],
 
   kiloDirectories: [
     "packages/opencode/src/kilocode",
