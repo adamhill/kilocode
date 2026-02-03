@@ -88,7 +88,12 @@ function parseArgs(): MergeOptions {
 
 async function getAuthor(): Promise<string> {
   const result = await $`git config user.name`.text()
-  return result.trim().toLowerCase().replace(/\s+/g, "")
+  return result
+    .trim()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/\s+/g, "")
 }
 
 async function createBackupBranch(baseBranch: string): Promise<string> {
@@ -249,6 +254,10 @@ async function main() {
 
   // Create Kilo merge branch
   const kiloBranch = `${author}/kilo-opencode-${targetVersion.tag}`
+  const kiloBackup = await git.backupAndDeleteBranch(kiloBranch)
+  if (kiloBackup) {
+    logger.info(`Backed up existing branch to: ${kiloBackup}`)
+  }
   await git.createBranch(kiloBranch)
 
   if (options.push) {
@@ -257,8 +266,12 @@ async function main() {
   logger.info(`Created Kilo branch: ${kiloBranch}`)
 
   // Create opencode compatibility branch from upstream commit
-  await git.checkout(targetVersion.commit)
   const opencodeBranch = `${author}/opencode-${targetVersion.tag}`
+  const opencodeBackup = await git.backupAndDeleteBranch(opencodeBranch)
+  if (opencodeBackup) {
+    logger.info(`Backed up existing branch to: ${opencodeBackup}`)
+  }
+  await git.checkout(targetVersion.commit)
   await git.createBranch(opencodeBranch)
   logger.info(`Created opencode branch: ${opencodeBranch}`)
 

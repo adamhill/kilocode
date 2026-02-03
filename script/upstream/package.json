@@ -17,5 +17,8 @@
   },
   "dependencies": {
     "ts-morph": "^24.0.0"
+  },
+  "devDependencies": {
+    "@types/bun": "catalog:"
   }
 }

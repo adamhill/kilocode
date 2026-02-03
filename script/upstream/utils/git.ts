@@ -81,6 +81,25 @@ export async function deleteBranch(name: string, force = false): Promise<void> {
   }
 }
 
+export async function backupAndDeleteBranch(name: string): Promise<string | null> {
+  if (!(await branchExists(name))) return null
+
+  const timestamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19)
+  const backupName = `backup/${name}-${timestamp}`
+  const current = await getCurrentBranch()
+
+  // Create backup from the existing branch
+  await $`git branch ${backupName} ${name}`
+
+  // Delete the old branch (must not be on it)
+  if (current === name) {
+    throw new Error(`Cannot backup and delete branch '${name}' while it is checked out`)
+  }
+  await deleteBranch(name, true)
+
+  return backupName
+}
+
 export async function push(remote = "origin", branch?: string, setUpstream = false): Promise<void> {
   const currentBranch = branch || (await getCurrentBranch())
   if (setUpstream) {
