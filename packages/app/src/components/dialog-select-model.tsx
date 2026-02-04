@@ -3,7 +3,7 @@ import { Component, ComponentProps, createEffect, createMemo, JSX, onCleanup, Sh
 import { createStore } from "solid-js/store"
 import { useLocal } from "@/context/local"
 import { useDialog } from "@opencode-ai/ui/context/dialog"
-import { preferredProviders } from "@/hooks/use-providers"
+import { popularProviders } from "@/hooks/use-providers"
 import { Button } from "@opencode-ai/ui/button"
 import { IconButton } from "@opencode-ai/ui/icon-button"
 import { Tag } from "@opencode-ai/ui/tag"
@@ -45,16 +45,15 @@ const ModelList: Component<{
       sortGroupsBy={(a, b) => {
         const aProvider = a.items[0].provider.id
         const bProvider = b.items[0].provider.id
-        if (preferredProviders.includes(aProvider) && !preferredProviders.includes(bProvider)) return -1
-        if (!preferredProviders.includes(aProvider) && preferredProviders.includes(bProvider)) return 1
-        return preferredProviders.indexOf(aProvider) - preferredProviders.indexOf(bProvider)
+        if (popularProviders.includes(aProvider) && !popularProviders.includes(bProvider)) return -1
+        if (!popularProviders.includes(aProvider) && popularProviders.includes(bProvider)) return 1
+        return popularProviders.indexOf(aProvider) - popularProviders.indexOf(bProvider)
       }}
       itemWrapper={(item, node) => (
         <Tooltip
           class="w-full"
           placement="right-start"
           gutter={12}
-          forceMount={false}
           value={
             <ModelTooltip
               model={item}
@@ -214,7 +213,7 @@ export function ModelSelectorPopover<T extends ValidComponent = "div">(props: {
             class="p-1"
             action={
               <div class="flex items-center gap-1">
-                <Tooltip placement="top" forceMount={false} value={language.t("command.provider.connect")}>
+                <Tooltip placement="top" value={language.t("command.provider.connect")}>
                   <IconButton
                     icon="plus-small"
                     variant="ghost"
@@ -224,7 +223,7 @@ export function ModelSelectorPopover<T extends ValidComponent = "div">(props: {
                     onClick={handleConnectProvider}
                   />
                 </Tooltip>
-                <Tooltip placement="top" forceMount={false} value={language.t("dialog.model.manage")}>
+                <Tooltip placement="top" value={language.t("dialog.model.manage")}>
                   <IconButton
                     icon="sliders"
                     variant="ghost"

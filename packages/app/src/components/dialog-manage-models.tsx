@@ -4,7 +4,7 @@ import { Switch } from "@opencode-ai/ui/switch"
 import { Button } from "@opencode-ai/ui/button"
 import type { Component } from "solid-js"
 import { useLocal } from "@/context/local"
-import { preferredProviders } from "@/hooks/use-providers"
+import { popularProviders } from "@/hooks/use-providers"
 import { useLanguage } from "@/context/language"
 import { useDialog } from "@opencode-ai/ui/context/dialog"
 import { DialogSelectProvider } from "./dialog-select-provider"
@@ -39,9 +39,9 @@ export const DialogManageModels: Component = () => {
         sortGroupsBy={(a, b) => {
           const aProvider = a.items[0].provider.id
           const bProvider = b.items[0].provider.id
-          if (preferredProviders.includes(aProvider) && !preferredProviders.includes(bProvider)) return -1
-          if (!preferredProviders.includes(aProvider) && preferredProviders.includes(bProvider)) return 1
-          return preferredProviders.indexOf(aProvider) - preferredProviders.indexOf(bProvider)
+          if (popularProviders.includes(aProvider) && !popularProviders.includes(bProvider)) return -1
+          if (!popularProviders.includes(aProvider) && popularProviders.includes(bProvider)) return 1
+          return popularProviders.indexOf(aProvider) - popularProviders.indexOf(bProvider)
         }}
         onSelect={(x) => {
           if (!x) return

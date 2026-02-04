@@ -4,7 +4,16 @@ import { useParams } from "@solidjs/router"
 import { createMemo } from "solid-js"
 
 // kilocode_change start - Preferred providers list (order determines display priority)
-export const preferredProviders = ["kilo", "anthropic", "github-copilot", "openai", "google", "openrouter", "vercel"]
+export const popularProviders = [
+  "kilo",
+  "opencode",
+  "anthropic",
+  "github-copilot",
+  "openai",
+  "google",
+  "openrouter",
+  "vercel",
+]
 // kilocode_change end
 
 export function useProviders() {
@@ -22,11 +31,11 @@ export function useProviders() {
   const paid = createMemo(() =>
     connected().filter((p) => p.id !== "opencode" || Object.values(p.models).find((m) => m.cost?.input)),
   )
-  const preferred = createMemo(() => providers().all.filter((p) => preferredProviders.includes(p.id)))
+  const popular = createMemo(() => providers().all.filter((p) => popularProviders.includes(p.id)))
   return {
     all: createMemo(() => providers().all),
     default: createMemo(() => providers().default),
-    preferred, // kilocode_change - renamed from popular
+    popular,
     connected,
     paid,
   }
