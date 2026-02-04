@@ -26,9 +26,10 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - depot-ubuntu-24.04-8
-          - depot-ubuntu-24.04-arm-8
-          - depot-macos-15
+          - blacksmith-4vcpu-ubuntu-2404
+          - blacksmith-4vcpu-ubuntu-2404-arm
+          - macos-15-intel
+          - macos-latest
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
     steps:
