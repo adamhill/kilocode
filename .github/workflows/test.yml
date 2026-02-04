@@ -11,7 +11,7 @@ jobs:
       matrix:
         settings:
           - name: linux
-            host: depot-ubuntu-24.04-4
+            host: blacksmith-4vcpu-ubuntu-2404
             playwright: bunx playwright install --with-deps
             workdir: .
             command: |
@@ -19,7 +19,7 @@ jobs:
               git config --global user.name "opencode"
               bun turbo test
           - name: windows
-            host: depot-windows-2025-4
+            host: windows-latest
             playwright: bunx playwright install
             workdir: packages/app
             command: bun test:e2e:local
