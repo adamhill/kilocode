@@ -18,7 +18,7 @@ import {
   type PermissionRequest,
   type QuestionRequest,
   createOpencodeClient,
-} from "@opencode-ai/sdk/v2/client"
+} from "@kilocode/sdk/v2/client"
 import { createStore, produce, reconcile, type SetStoreFunction, type Store } from "solid-js/store"
 import { Binary } from "@opencode-ai/util/binary"
 import { retry } from "@opencode-ai/util/retry"
