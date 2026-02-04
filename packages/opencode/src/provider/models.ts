@@ -142,8 +142,8 @@ export namespace ModelsDev {
       kiloModels["kilo/auto"] = {
         id: "kilo/auto",
         name: "Auto",
-        family: "kilo",
-        release_date: "2020-01-01",
+        family: "kilo/auto",
+        release_date: new Date().toISOString().split("T")[0],
         attachment: false,
         reasoning: true,
         temperature: true,
