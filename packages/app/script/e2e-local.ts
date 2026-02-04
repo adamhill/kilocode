@@ -58,6 +58,7 @@ const sandbox = await fs.mkdtemp(path.join(os.tmpdir(), "opencode-e2e-"))
 
 const serverEnv = {
   ...process.env,
+  OPENCODE_DISABLE_SHARE: process.env.OPENCODE_DISABLE_SHARE ?? "true",
   KILO_DISABLE_SHARE: "true", // kilocode_change
   KILO_DISABLE_SESSION_INGEST: "true", // kilocode_change
   OPENCODE_DISABLE_LSP_DOWNLOAD: "true",
