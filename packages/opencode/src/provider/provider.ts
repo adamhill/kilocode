@@ -410,7 +410,7 @@ export namespace Provider {
       const providerConfig = config.provider?.["gitlab"]
 
       const aiGatewayHeaders = {
-        "User-Agent": `opencode/${Installation.VERSION} gitlab-ai-provider/${GITLAB_PROVIDER_VERSION} (${os.platform()} ${os.release()}; ${os.arch()})`,
+        "User-Agent": `kilo/${Installation.VERSION} gitlab-ai-provider/${GITLAB_PROVIDER_VERSION} (${os.platform()} ${os.release()}; ${os.arch()})`, // kilocode_change
         ...(providerConfig?.options?.aiGatewayHeaders || {}),
       }
 
