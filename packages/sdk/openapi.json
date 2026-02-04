@@ -6497,6 +6497,10 @@
           },
           "deletions": {
             "type": "number"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["added", "deleted", "modified"]
           }
         },
         "required": ["file", "before", "after", "additions", "deletions"]
@@ -9321,6 +9325,10 @@
             "description": "Enable mDNS service discovery",
             "type": "boolean"
           },
+          "mdnsDomain": {
+            "description": "Custom domain name for mDNS service (default: opencode.local)",
+            "type": "string"
+          },
           "cors": {
             "description": "Additional domains to allow for CORS",
             "type": "array",
@@ -9430,6 +9438,10 @@
         "type": "object",
         "properties": {
           "model": {
+            "type": "string"
+          },
+          "variant": {
+            "description": "Default model variant for this agent (applies only when using the agent's configured model).",
             "type": "string"
           },
           "temperature": {
@@ -10980,7 +10992,7 @@
         "properties": {
           "type": {
             "type": "string",
-            "const": "text"
+            "enum": ["text", "binary"]
           },
           "content": {
             "type": "string"
@@ -11257,6 +11269,9 @@
               }
             },
             "required": ["modelID", "providerID"]
+          },
+          "variant": {
+            "type": "string"
           },
           "prompt": {
             "type": "string"

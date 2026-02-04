@@ -1,4 +1,5 @@
 // kilocode_change - new file
+/** @jsxImportSource @opentui/solid */
 /**
  * Kilo Notifications Dialog
  *
