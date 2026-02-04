@@ -5,10 +5,14 @@
  */
 
 import { createMemo } from "solid-js"
-import { getTUIDependencies } from "../context.js"
-import type { Organization } from "../../types.js"
-import { DialogKiloTeamSelect } from "../components/dialog-kilo-team-select.js"
-import { DialogKiloProfile } from "../components/dialog-kilo-profile.js"
+import { useCommandDialog } from "@tui/component/dialog-command"
+import { useSync } from "@tui/context/sync"
+import { useDialog } from "@tui/ui/dialog"
+import { useToast } from "@tui/ui/toast"
+import { DialogAlert } from "@tui/ui/dialog-alert"
+import type { Organization } from "@kilocode/kilo-gateway"
+import { DialogKiloTeamSelect } from "./components/dialog-kilo-team-select.js"
+import { DialogKiloProfile } from "./components/dialog-kilo-profile.js"
 
 // These types are OpenCode-internal and imported at runtime
 type UseSDK = any
@@ -21,13 +25,11 @@ type SDK = any
  * @param useSDK - OpenCode's useSDK hook (passed from TUI context)
  */
 export function registerKiloCommands(useSDK: () => UseSDK) {
-  const deps = getTUIDependencies()
-  const command = deps.useCommandDialog()
-  const sync = deps.useSync()
-  const dialog = deps.useDialog()
+  const command = useCommandDialog()
+  const sync = useSync()
+  const dialog = useDialog()
   const sdk = useSDK()
-  const toast = deps.useToast()
-  const DialogAlert = deps.DialogAlert
+  const toast = useToast()
 
   // Only show Kilo commands when connected to Kilo Gateway
   const isKiloConnected = createMemo(() => {

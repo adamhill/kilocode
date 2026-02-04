@@ -19,14 +19,17 @@ export type { TUIDependencies } from "./tui/types.js"
 export { formatProfileInfo, getOrganizationOptions, getDefaultOrganizationSelection } from "./tui/helpers.js"
 
 // ============================================================================
-// TUI Components (requires solid-js and @opentui/*)
+// NOTE: TUI Components Moved to OpenCode
 // ============================================================================
-export { registerKiloCommands } from "./tui/commands/kilo-commands.js"
-export { DialogKiloTeamSelect } from "./tui/components/dialog-kilo-team-select.js"
-export { DialogKiloOrganization } from "./tui/components/dialog-kilo-organization.js"
-export { KiloAutoMethod } from "./tui/components/dialog-kilo-auto-method.js"
-
-// ============================================================================
-// Re-exported Types
-// ============================================================================
-export type { KilocodeNotification } from "./api/notifications.js"
+// All TUI components with JSX have been moved to packages/opencode/src/kilocode/
+// to ensure correct JSX transpilation with @opentui/solid.
+//
+// Components moved:
+// - registerKiloCommands -> @/kilocode/kilo-commands
+// - DialogKiloTeamSelect -> @/kilocode/components/dialog-kilo-team-select
+// - DialogKiloOrganization -> @/kilocode/components/dialog-kilo-organization
+// - DialogKiloProfile -> @/kilocode/components/dialog-kilo-profile
+// - KiloAutoMethod -> @/kilocode/components/dialog-kilo-auto-method
+// - KiloNews -> @/kilocode/components/kilo-news
+// - NotificationBanner -> @/kilocode/components/notification-banner
+// - DialogKiloNotifications -> @/kilocode/components/dialog-kilo-notifications

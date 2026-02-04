@@ -38,7 +38,8 @@ import { ArgsProvider, useArgs, type Args } from "./context/args"
 import open from "open"
 import { writeHeapSnapshot } from "v8"
 import { PromptRefProvider, usePromptRef } from "./context/prompt"
-import { registerKiloCommands, initializeTUIDependencies } from "@kilocode/kilo-gateway/tui" // kilocode_change
+import { registerKiloCommands } from "@/kilocode/kilo-commands" // kilocode_change
+import { initializeTUIDependencies } from "@kilocode/kilo-gateway/tui" // kilocode_change
 
 async function getTerminalBackgroundColor(): Promise<"dark" | "light"> {
   // can't set raw mode if not a TTY

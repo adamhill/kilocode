@@ -5,8 +5,12 @@
  * Displays user profile information with a clickable usage details link.
  */
 
-import { getTUIDependencies } from "../context.js"
-import type { KilocodeProfile, KilocodeBalance } from "../../types.js"
+import { useKeyboard } from "@opentui/solid"
+import { useTheme } from "@tui/context/theme"
+import { useDialog } from "@tui/ui/dialog"
+import { Link } from "@tui/ui/link"
+import { TextAttributes } from "@opentui/core"
+import type { KilocodeProfile, KilocodeBalance } from "@kilocode/kilo-gateway"
 
 interface DialogKiloProfileProps {
   profile: KilocodeProfile
@@ -15,13 +19,10 @@ interface DialogKiloProfileProps {
 }
 
 export function DialogKiloProfile(props: DialogKiloProfileProps) {
-  const deps = getTUIDependencies()
-  const Link = deps.Link
-  const TextAttributes = deps.TextAttributes
-  const dialog = deps.useDialog()
-  const { theme } = deps.useTheme()
+  const { theme } = useTheme()
+  const dialog = useDialog()
 
-  deps.useKeyboard((evt: any) => {
+  useKeyboard((evt: any) => {
     if (evt.name === "return") {
       dialog.clear()
     }
