@@ -42,7 +42,6 @@ await Bun.file(`./dist/${pkg.name}/package.json`).write(
   ),
 )
 
-/*
 const tasks = Object.entries(binaries).map(async ([name]) => {
   if (process.platform !== "win32") {
     await $`chmod -R 755 .`.cwd(`./dist/${name}`)
@@ -58,7 +57,6 @@ const platforms = "linux/amd64,linux/arm64"
 const tags = [`${image}:${version}`, `${image}:${Script.channel}`]
 const tagFlags = tags.flatMap((t) => ["-t", t])
 await $`docker buildx build --platform ${platforms} ${tagFlags} --push .`
-*/
 
 // registries
 if (!Script.preview) {
@@ -70,7 +68,6 @@ if (!Script.preview) {
 
   const [pkgver, _subver = ""] = Script.version.split(/(-.*)/, 2)
 
-  /*
   // arch
   const binaryPkgbuild = [
     "# Maintainer: dax",
@@ -184,7 +181,6 @@ if (!Script.preview) {
       }
     }
   }
-  */
 
   // Homebrew formula
   const homebrewFormula = [
