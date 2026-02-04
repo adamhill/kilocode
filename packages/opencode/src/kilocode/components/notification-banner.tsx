@@ -1,5 +1,4 @@
 // kilocode_change - new file
-/** @jsxImportSource @opentui/solid */
 /**
  * Kilo Notification Banner
  *
@@ -12,8 +11,8 @@
  */
 
 import { createSignal, Show } from "solid-js"
-import { getTUIDependencies } from "../context.js"
-import type { KilocodeNotification } from "../../api/notifications.js"
+import { useTheme } from "@tui/context/theme"
+import type { KilocodeNotification } from "@kilocode/kilo-gateway"
 
 interface NotificationBannerProps {
   notification: KilocodeNotification
@@ -22,8 +21,7 @@ interface NotificationBannerProps {
 }
 
 export function NotificationBanner(props: NotificationBannerProps) {
-  const deps = getTUIDependencies()
-  const { theme } = deps.useTheme()
+  const { theme } = useTheme()
   const [hover, setHover] = createSignal(false)
 
   return (

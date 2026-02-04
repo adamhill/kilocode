@@ -1,5 +1,4 @@
 // kilocode_change - new file
-/** @jsxImportSource @opentui/solid */
 /**
  * Kilo Notifications Dialog
  *
@@ -8,22 +7,23 @@
  */
 
 import { createSignal, For } from "solid-js"
-import { getTUIDependencies } from "../context.js"
-import type { KilocodeNotification } from "../../api/notifications.js"
+import { useKeyboard } from "@opentui/solid"
+import { useTheme } from "@tui/context/theme"
+import { useDialog } from "@tui/ui/dialog"
+import { Link } from "@tui/ui/link"
+import { TextAttributes } from "@opentui/core"
+import type { KilocodeNotification } from "@kilocode/kilo-gateway"
 
 interface DialogKiloNotificationsProps {
   notifications: KilocodeNotification[]
 }
 
 export function DialogKiloNotifications(props: DialogKiloNotificationsProps) {
-  const deps = getTUIDependencies()
-  const Link = deps.Link
-  const TextAttributes = deps.TextAttributes
-  const dialog = deps.useDialog()
-  const { theme } = deps.useTheme()
+  const { theme } = useTheme()
+  const dialog = useDialog()
   const [closeHover, setCloseHover] = createSignal(false)
 
-  deps.useKeyboard((evt: any) => {
+  useKeyboard((evt: any) => {
     if (evt.name === "escape" || evt.name === "return") {
       dialog.clear()
     }
@@ -75,11 +75,7 @@ export function DialogKiloNotifications(props: DialogKiloNotificationsProps) {
                     </text>
                     {notification.action && (
                       <box flexDirection="row" marginTop={1}>
-                        <Link
-                          href={notification.action.actionURL}
-                          fg={theme.primary}
-                          attributes={hover() ? TextAttributes.BOLD : undefined}
-                        >
+                        <Link href={notification.action.actionURL} fg={theme.primary}>
                           [{notification.action.actionText}]
                         </Link>
                       </box>

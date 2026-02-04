@@ -14,7 +14,7 @@ import { usePromptRef } from "../context/prompt"
 import { Installation } from "@/installation"
 import { useKV } from "../context/kv"
 import { useCommandDialog } from "../component/dialog-command"
-import { KiloNews } from "@kilocode/kilo-gateway/tui" // kilocode_change
+import { KiloNews } from "@/kilocode/components/kilo-news" // kilocode_change
 
 // TODO: what is the best way to do this?
 let once = false

@@ -1,5 +1,4 @@
 // kilocode_change - new file
-/** @jsxImportSource @opentui/solid */
 /**
  * Kilo News Component
  *
@@ -8,16 +7,17 @@
  */
 
 import { createMemo, createSignal, onMount, Show } from "solid-js"
-import { getTUIDependencies } from "../context.js"
-import type { KilocodeNotification } from "../../api/notifications.js"
+import { useSync } from "@tui/context/sync"
+import { useSDK } from "@tui/context/sdk"
+import { useDialog } from "@tui/ui/dialog"
+import type { KilocodeNotification } from "@kilocode/kilo-gateway"
 import { NotificationBanner } from "./notification-banner.js"
 import { DialogKiloNotifications } from "./dialog-kilo-notifications.js"
 
 export function KiloNews() {
-  const deps = getTUIDependencies()
-  const sync = deps.useSync()
-  const sdk = deps.useSDK()
-  const dialog = deps.useDialog()
+  const sync = useSync()
+  const sdk = useSDK()
+  const dialog = useDialog()
 
   const [notifications, setNotifications] = createSignal<KilocodeNotification[]>([])
   const isKiloConnected = createMemo(() => sync.data.provider_next.connected.includes("kilo"))
