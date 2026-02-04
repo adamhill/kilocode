@@ -1,2 +1,3 @@
 sst-env.d.ts
 packages/web/src/content/docs/**
+desktop/src/bindings.ts
