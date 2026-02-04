@@ -35,11 +35,17 @@ const PACKAGE_NAME_MAP: Record<string, string> = {
 }
 
 // Kilo-specific dependencies to inject into specific packages
+// NOTE: When adding new Kilo-specific workspace dependencies (packages starting with @kilocode/kilo-*),
+// add them here to prevent them from being removed during upstream merges
 const KILO_DEPENDENCIES: Record<string, Record<string, string>> = {
   // packages/opencode/package.json needs these
   "packages/opencode/package.json": {
     "@kilocode/kilo-gateway": "workspace:*",
     "@kilocode/kilo-telemetry": "workspace:*",
+  },
+  // packages/app/package.json needs these
+  "packages/app/package.json": {
+    "@kilocode/kilo-i18n": "workspace:*",
   },
 }
 
