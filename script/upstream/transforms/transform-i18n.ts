@@ -67,9 +67,9 @@ const I18N_REPLACEMENTS: StringReplacement[] = [
     description: "App domain",
   },
   {
-    pattern: /opencode\.ai/g,
+    pattern: /opencode\.ai(?!\/zen)/g,
     replacement: "kilo.ai",
-    description: "Main domain",
+    description: "Main domain (excluding zen)",
   },
 
   // Product name (specific phrases first)
@@ -77,11 +77,6 @@ const I18N_REPLACEMENTS: StringReplacement[] = [
     pattern: /OpenCode Desktop/g,
     replacement: "Kilo Desktop",
     description: "Desktop app name",
-  },
-  {
-    pattern: /OpenCode Zen/g,
-    replacement: "Kilo Zen",
-    description: "Zen product name",
   },
 
   // CLI commands (be careful with order)
@@ -124,7 +119,7 @@ const I18N_REPLACEMENTS: StringReplacement[] = [
   // Generic product name replacement (must come after specific patterns)
   // Only replace "OpenCode" when it's a standalone word (not part of opencode.json, etc.)
   {
-    pattern: /\bOpenCode\b(?!\.json|\/)/g,
+    pattern: /\bOpenCode\b(?!\.json|\/| Zen)/g,
     replacement: "Kilo",
     description: "Product name",
   },

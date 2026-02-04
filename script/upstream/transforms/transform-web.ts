@@ -49,9 +49,9 @@ const WEB_REPLACEMENTS: WebReplacement[] = [
     description: "App domain",
   },
   {
-    pattern: /opencode\.ai/g,
+    pattern: /opencode\.ai(?!\/zen)/g,
     replacement: "kilo.ai",
-    description: "Main domain",
+    description: "Main domain (excluding zen)",
   },
 
   // Product names
@@ -61,12 +61,7 @@ const WEB_REPLACEMENTS: WebReplacement[] = [
     description: "Desktop name",
   },
   {
-    pattern: /OpenCode Zen/g,
-    replacement: "Kilo Zen",
-    description: "Zen name",
-  },
-  {
-    pattern: /\bOpenCode\b(?!\.json|\/)/g,
+    pattern: /\bOpenCode\b(?!\.json|\/| Zen)/g,
     replacement: "Kilo",
     description: "Product name",
   },

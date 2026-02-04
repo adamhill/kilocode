@@ -55,9 +55,9 @@ const BRANDING_REPLACEMENTS: BrandingReplacement[] = [
     description: "App domain",
   },
   {
-    pattern: /opencode\.ai/g,
+    pattern: /opencode\.ai(?!\/zen)/g,
     replacement: "kilo.ai",
-    description: "Main domain",
+    description: "Main domain (excluding zen)",
   },
 
   // Product name (specific phrases first)
@@ -65,11 +65,6 @@ const BRANDING_REPLACEMENTS: BrandingReplacement[] = [
     pattern: /OpenCode Desktop/g,
     replacement: "Kilo Desktop",
     description: "Desktop app name",
-  },
-  {
-    pattern: /OpenCode Zen/g,
-    replacement: "Kilo Zen",
-    description: "Zen product name",
   },
 
   // CLI commands
@@ -97,7 +92,7 @@ const BRANDING_REPLACEMENTS: BrandingReplacement[] = [
   // Generic product name replacement (must come after specific patterns)
   // Only replace "OpenCode" when it's a standalone word
   {
-    pattern: /\bOpenCode\b(?!\.json|\/)/g,
+    pattern: /\bOpenCode\b(?!\.json|\/| Zen)/g,
     replacement: "Kilo",
     description: "Product name",
   },
