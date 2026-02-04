@@ -1002,10 +1002,19 @@ export namespace Provider {
         const opts = init ?? {}
 
         // Merge configured headers into request headers
+        // kilocode_change start - Handle Headers instances correctly (spreading Headers gives {})
+        const existingHeaders =
+          opts.headers instanceof Headers
+            ? Object.fromEntries(opts.headers.entries())
+            : typeof opts.headers === "object"
+              ? opts.headers
+              : {}
+
         opts.headers = {
-          ...(typeof opts.headers === "object" ? opts.headers : {}),
+          ...existingHeaders,
           ...options["headers"],
         }
+        // kilocode_change end
 
         if (options["timeout"] !== undefined && options["timeout"] !== null) {
           const signals: AbortSignal[] = []
