@@ -228,14 +228,16 @@ export function Session() {
 
   createEffect(() => {
     const title = Locale.truncate(session()?.title ?? "", 50)
+    // kilocode_change start
     return exit.message.set(
       [
         ``,
-        `  █▀▀█  ${UI.Style.TEXT_DIM}${title}${UI.Style.TEXT_NORMAL}`,
-        `  █  █  ${UI.Style.TEXT_DIM}opencode -s ${session()?.id}${UI.Style.TEXT_NORMAL}`,
-        `  ▀▀▀▀  `,
+        `  ██ ▄█▀ ██ ██     ▄████▄  ${UI.Style.TEXT_DIM}${title}${UI.Style.TEXT_NORMAL}`,
+        `  ████   ██ ██     ██  ██  ${UI.Style.TEXT_DIM}kilo -s ${session()?.id}${UI.Style.TEXT_NORMAL}`,
+        `  ██ ▀█▄ ██ ██████ ▀████▀  `,
       ].join("\n"),
     )
+    // kilocode_change end
   })
 
   useKeyboard((evt) => {
