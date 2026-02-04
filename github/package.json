@@ -17,5 +17,5 @@
     "@octokit/rest": "catalog:",
     "@kilocode/sdk": "workspace:*"
   },
-  "version": "1.0.13"
+  "version": "1.0.14"
 }

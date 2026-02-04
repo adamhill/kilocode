@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
-  "name": "@kilocode/cli",
+  "name": "opencode",
   "description": "AI-powered development tool",
   "private": true,
   "type": "module",
@@ -65,7 +65,6 @@
   "devDependencies": {
     "@actions/artifact": "5.0.1",
     "@tsconfig/bun": "catalog:",
-    "baseline-browser-mapping": "2.9.18",
     "husky": "9.1.7",
     "prettier": "3.6.2",
     "semver": "^7.6.0",
@@ -81,7 +80,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Kilo-Org/kilo"
+    "url": "https://github.com/anomalyco/opencode"
   },
   "license": "MIT",
   "prettier": {
@@ -102,5 +101,5 @@
   "patchedDependencies": {
     "ghostty-web@0.3.0": "patches/ghostty-web@0.3.0.patch"
   },
-  "version": "1.0.13"
+  "version": "1.0.14"
 }

@@ -34,11 +34,8 @@ export const DialogSelectModelUnpaid: Component = () => {
   })
 
   return (
-    <Dialog
-      title={language.t("dialog.model.select.title")}
-      class="overflow-y-auto [&_[data-slot=dialog-body]]:overflow-visible [&_[data-slot=dialog-body]]:flex-none"
-    >
-      <div class="flex flex-col gap-3 px-2.5">
+    <Dialog title={language.t("dialog.model.select.title")}>
+      <div class="flex flex-col gap-3 px-2.5 flex-1 min-h-0 overflow-hidden">
         <div class="text-14-medium text-text-base px-2.5">{language.t("dialog.model.unpaid.freeModels.title")}</div>
         <List
           class="[&_[data-slot=list-scroll]]:overflow-visible"
@@ -80,7 +77,7 @@ export const DialogSelectModelUnpaid: Component = () => {
           )}
         </List>
       </div>
-      <div class="px-1.5 pb-1.5">
+      <div class="shrink-0 px-1.5 pb-1.5">
         <div class="w-full rounded-sm border border-border-weak-base bg-surface-raised-base">
           <div class="w-full flex flex-col items-start gap-4 px-1.5 pt-4 pb-4">
             <div class="px-2 text-14-medium text-text-base">{language.t("dialog.model.unpaid.addMore.title")}</div>
