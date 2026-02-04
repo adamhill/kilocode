@@ -68,6 +68,7 @@ jobs:
         env:
           KILO_API_KEY: ${{ secrets.KILO_API_KEY }}
           KILO_ORG_ID: ${{ secrets.KILO_ORG_ID }}
+          OPENCODE_DISABLE_SHARE: "false" # kilocode_change
           KILO_DISABLE_SHARE: "true" # kilocode_change
           KILO_DISABLE_SESSION_INGEST: "true" # kilocode_change
           OPENCODE_DISABLE_LSP_DOWNLOAD: "true"
@@ -90,6 +91,7 @@ jobs:
         env:
           KILO_API_KEY: ${{ secrets.KILO_API_KEY }}
           KILO_ORG_ID: ${{ secrets.KILO_ORG_ID }}
+          OPENCODE_DISABLE_SHARE: "false" # kilocode_change
           KILO_DISABLE_SHARE: "true" # kilocode_change
           KILO_DISABLE_SESSION_INGEST: "true" # kilocode_change
           OPENCODE_DISABLE_LSP_DOWNLOAD: "true"
@@ -118,6 +120,7 @@ jobs:
           CI: true
           KILO_API_KEY: ${{ secrets.KILO_API_KEY }}
           KILO_ORG_ID: ${{ secrets.KILO_ORG_ID }}
+          OPENCODE_DISABLE_SHARE: "false" # kilocode_change
           KILO_DISABLE_SHARE: "true" # kilocode_change
           KILO_DISABLE_SESSION_INGEST: "true" # kilocode_change
           OPENCODE_DISABLE_LSP_DOWNLOAD: "true"
