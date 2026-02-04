@@ -20,6 +20,9 @@ bun run merge.ts --version v1.1.49
 
 # Dry-run to preview what would happen
 bun run merge.ts --version v1.1.49 --dry-run
+
+# Use a different base branch (e.g., for incremental merges)
+bun run merge.ts --version v1.1.50 --base-branch catrielmuller/kilo-opencode-v1.1.44
 ```
 
 ## Scripts
@@ -207,22 +210,66 @@ The only remaining conflicts are files with **actual code differences** - files 
 
 ```
 Options:
-  --version <version>  Target upstream version (e.g., v1.1.49)
-  --commit <hash>      Target upstream commit hash
-  --dry-run            Preview changes without applying them
-  --no-push            Don't push branches to remote
-  --report-only        Only generate conflict report
-  --verbose            Enable verbose logging
-  --author <name>      Author name for branch prefix
+  --version <version>    Target upstream version (e.g., v1.1.49)
+  --commit <hash>        Target upstream commit hash
+  --base-branch <name>   Base branch to merge into (default: dev)
+  --dry-run              Preview changes without applying them
+  --no-push              Don't push branches to remote
+  --report-only          Only generate conflict report
+  --verbose              Enable verbose logging
+  --author <name>        Author name for branch prefix
 ```
 
 ### analyze.ts
 
 ```
 Options:
-  --version <version>  Target upstream version
-  --commit <hash>      Target commit hash
-  --output <file>      Output file for report
+  --version <version>    Target upstream version
+  --commit <hash>        Target commit hash
+  --base-branch <name>   Base branch to analyze from (default: dev)
+  --output <file>        Output file for report
+```
+
+## Using Custom Base Branches
+
+By default, upstream merges start from the `dev` branch. However, you can use `--base-branch` to start from a different branch. This is useful for:
+
+### Incremental Merges
+
+When working on multiple upstream versions, you can create a chain of merge PRs:
+
+```bash
+# First merge: v1.1.44 into dev
+bun run merge.ts --version v1.1.44
+
+# Create PR: catrielmuller/kilo-opencode-v1.1.44 -> dev
+
+# Second merge: v1.1.50 based on the previous PR (without waiting for approval)
+bun run merge.ts --version v1.1.50 --base-branch catrielmuller/kilo-opencode-v1.1.44
+
+# Create PR: catrielmuller/kilo-opencode-v1.1.50 -> catrielmuller/kilo-opencode-v1.1.44
+# OR: catrielmuller/kilo-opencode-v1.1.50 -> dev (once first PR is merged)
+```
+
+### Benefits
+
+- **Work in parallel**: Don't wait for PR approval to start the next merge
+- **Isolation**: Each merge is independent and easier to review
+- **Flexibility**: Can adjust the PR chain as needed
+- **Cleaner history**: Related merges can be grouped together
+
+### Example Workflow
+
+```bash
+# 1. Analyze next version from your WIP branch
+bun run analyze.ts --version v1.1.50 --base-branch catrielmuller/kilo-opencode-v1.1.44
+
+# 2. Run the merge
+bun run merge.ts --version v1.1.50 --base-branch catrielmuller/kilo-opencode-v1.1.44
+
+# 3. Create PR from catrielmuller/kilo-opencode-v1.1.50
+#    - Target: catrielmuller/kilo-opencode-v1.1.44 (if first PR not merged yet)
+#    - Target: dev (if first PR is already merged)
 ```
 
 ## Manual Conflict Resolution

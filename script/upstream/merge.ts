@@ -10,6 +10,7 @@
  * Options:
  *   --version <version>  Target upstream version (e.g., v1.1.49)
  *   --commit <hash>      Target upstream commit hash
+ *   --base-branch <name> Base branch to merge into (default: dev)
  *   --dry-run            Preview changes without applying them
  *   --no-push            Don't push branches to remote
  *   --report-only        Only generate conflict report, don't merge
@@ -52,6 +53,7 @@ import { resolveLockFileConflicts, regenerateLockFiles } from "./transforms/lock
 interface MergeOptions {
   version?: string
   commit?: string
+  baseBranch?: string
   dryRun: boolean
   push: boolean
   reportOnly: boolean
@@ -84,6 +86,11 @@ function parseArgs(): MergeOptions {
     options.author = args[authorIdx + 1]
   }
 
+  const baseBranchIdx = args.indexOf("--base-branch")
+  if (baseBranchIdx !== -1 && args[baseBranchIdx + 1]) {
+    options.baseBranch = args[baseBranchIdx + 1]
+  }
+
   return options
 }
 
@@ -109,7 +116,7 @@ async function createBackupBranch(baseBranch: string): Promise<string> {
 
 async function main() {
   const options = parseArgs()
-  const config = loadConfig()
+  const config = loadConfig(options.baseBranch ? { baseBranch: options.baseBranch } : undefined)
 
   if (options.verbose) {
     logger.setVerbose(true)

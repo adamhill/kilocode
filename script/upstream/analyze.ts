@@ -7,19 +7,21 @@
  * Usage:
  *   bun run script/upstream/analyze.ts --version v1.1.49
  *   bun run script/upstream/analyze.ts --commit abc123
+ *   bun run script/upstream/analyze.ts --version v1.1.49 --base-branch catrielmuller/kilo-opencode-v1.1.44
  */
 
 import { $ } from "bun"
 import * as git from "./utils/git"
 import * as version from "./utils/version"
 import * as report from "./utils/report"
-import { defaultConfig } from "./utils/config"
+import { defaultConfig, loadConfig } from "./utils/config"
 import { header, info, success, warn, error, divider, list } from "./utils/logger"
 
 interface AnalyzeOptions {
   version?: string
   commit?: string
   output?: string
+  baseBranch?: string
 }
 
 function parseArgs(): AnalyzeOptions {
@@ -41,11 +43,17 @@ function parseArgs(): AnalyzeOptions {
     options.output = args[outputIdx + 1]
   }
 
+  const baseBranchIdx = args.indexOf("--base-branch")
+  if (baseBranchIdx !== -1 && args[baseBranchIdx + 1]) {
+    options.baseBranch = args[baseBranchIdx + 1]
+  }
+
   return options
 }
 
 async function main() {
   const options = parseArgs()
+  const config = loadConfig(options.baseBranch ? { baseBranch: options.baseBranch } : undefined)
 
   header("Upstream Change Analysis")
 
@@ -93,7 +101,7 @@ async function main() {
   info("Analyzing changes...")
 
   // Use commit hash directly since we may not have the tag fetched locally
-  const conflicts = await report.analyzeConflicts(target.commit, defaultConfig.baseBranch, defaultConfig.keepOurs)
+  const conflicts = await report.analyzeConflicts(target.commit, config.baseBranch, config.keepOurs)
 
   // Group by type
   const byType = new Map<string, report.ConflictFile[]>()
@@ -149,7 +157,7 @@ async function main() {
     timestamp: new Date().toISOString(),
     upstreamVersion: target.version,
     upstreamCommit: target.commit,
-    baseBranch: defaultConfig.baseBranch,
+    baseBranch: config.baseBranch,
     mergeBranch: "",
     totalConflicts: conflicts.length,
     conflicts,
