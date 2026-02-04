@@ -1,10 +1,9 @@
 name: beta
 
 on:
-  push:
-    branches: [dev]
-  pull_request:
-    types: [opened, synchronize, labeled, unlabeled]
+  workflow_dispatch:
+  schedule:
+    - cron: "0 * * * *"
 
 jobs:
   sync:
@@ -18,7 +17,6 @@ jobs:
     runs-on: blacksmith-4vcpu-ubuntu-2404
     permissions:
       contents: write
-      pull-requests: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4

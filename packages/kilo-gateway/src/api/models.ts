@@ -142,7 +142,7 @@ function transformToModelDevFormat(model: OpenRouterModel): any {
   return {
     id: model.id,
     name: model.name,
-    family: extractFamily(model.id),
+    family: model.id === "kilo/auto" ? "kilo/auto" : extractFamily(model.id), // kilocode_change
     release_date: new Date().toISOString().split("T")[0], // Default to today
     attachment: supportsImages,
     reasoning: supportsReasoning,

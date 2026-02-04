@@ -2120,7 +2120,7 @@ export type Command = {
   description?: string
   agent?: string
   model?: string
-  mcp?: boolean
+  source?: "command" | "mcp" | "skill"
   template: string
   subtask?: boolean
   hints: Array<string>
@@ -5023,6 +5023,7 @@ export type AppSkillsResponses = {
     name: string
     description: string
     location: string
+    content: string
   }>
 }
 
