@@ -13,7 +13,7 @@ import { useSDK } from "@/context/sdk"
 import { normalizeServerUrl, serverDisplayName, useServer } from "@/context/server"
 import { usePlatform } from "@/context/platform"
 import { useLanguage } from "@/context/language"
-import { createOpencodeClient } from "@opencode-ai/sdk/v2/client"
+import { createOpencodeClient } from "@kilocode/sdk/v2/client"
 import { DialogSelectServer } from "./dialog-select-server"
 import { showToast } from "@opencode-ai/ui/toast"
 
