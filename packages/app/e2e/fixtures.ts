@@ -36,7 +36,7 @@ export const test = base.extend<TestFixtures, WorkerFixtures>({
       localStorage.setItem(
         "opencode.global.dat:model",
         JSON.stringify({
-          recent: [{ providerID: "opencode", modelID: "big-pickle" }],
+          recent: [{ providerID: "kilo", modelID: "kilo/auto" }], // kilocode_change
           user: [],
           variant: {},
         }),
