@@ -22,15 +22,20 @@ await $`cp ./script/postinstall.mjs ./dist/${pkg.name}/postinstall.mjs`
 await Bun.file(`./dist/${pkg.name}/package.json`).write(
   JSON.stringify(
     {
-      name: pkg.name + "-ai",
+      name: pkg.name,
       bin: {
-        [pkg.name]: `./bin/${pkg.name}`,
+        kilo: `./bin/kilo`,
+        kilocode: `./bin/kilo`,
       },
       scripts: {
         postinstall: "bun ./postinstall.mjs || node ./postinstall.mjs",
       },
       version: version,
       optionalDependencies: binaries,
+      repository: {
+        type: "git",
+        url: "https://github.com/Kilo-Org/kilo",
+      },
     },
     null,
     2,

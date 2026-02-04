@@ -18,7 +18,8 @@
     "deploy": "echo 'Deploying application...' && bun run build && echo 'Deployment completed successfully'"
   },
   "bin": {
-    "opencode": "./bin/opencode"
+    "kilo": "./bin/kilo",
+    "kilocode": "./bin/kilocode"
   },
   "exports": {
     "./*": "./src/*.ts"
