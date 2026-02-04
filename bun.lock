@@ -14,7 +14,6 @@
       "devDependencies": {
         "@actions/artifact": "5.0.1",
         "@tsconfig/bun": "catalog:",
-        "baseline-browser-mapping": "2.9.18",
         "husky": "9.1.7",
         "prettier": "3.6.2",
         "semver": "^7.6.0",
@@ -26,7 +25,6 @@
       "name": "@opencode-ai/app",
       "version": "1.0.14",
       "dependencies": {
-        "@kilocode/kilo-i18n": "workspace:*",
         "@kilocode/sdk": "workspace:*",
         "@kobalte/core": "catalog:",
         "@opencode-ai/ui": "workspace:*",
@@ -172,7 +170,7 @@
     },
     "packages/console/resource": {
       "name": "@opencode-ai/console-resource",
-      "version": "1.0.13",
+      "version": "1.0.14",
       "dependencies": {
         "@cloudflare/workers-types": "catalog:",
       },
@@ -444,7 +442,7 @@
     },
     "packages/script": {
       "name": "@opencode-ai/script",
-      "version": "1.0.13",
+      "version": "1.0.14",
       "devDependencies": {
         "@types/bun": "catalog:",
       },
