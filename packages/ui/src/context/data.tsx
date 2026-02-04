@@ -1,4 +1,3 @@
-// kilocode_change start
 import type {
   Message,
   Session,
@@ -9,7 +8,6 @@ import type {
   QuestionRequest,
   QuestionAnswer,
 } from "@kilocode/sdk/v2"
-// kilocode_change end
 import { createSimpleContext } from "./helper"
 import { PreloadMultiFileDiffResult } from "@pierre/diffs/ssr"
 

@@ -1,6 +1,6 @@
 import { Component, Show } from "solid-js"
 import { useDialog } from "@opencode-ai/ui/context/dialog"
-import { preferredProviders, useProviders } from "@/hooks/use-providers"
+import { popularProviders, useProviders } from "@/hooks/use-providers"
 import { Dialog } from "@opencode-ai/ui/dialog"
 import { List } from "@opencode-ai/ui/list"
 import { Tag } from "@opencode-ai/ui/tag"
@@ -23,9 +23,9 @@ export const DialogSelectProvider: Component = () => {
   const language = useLanguage()
 
   // kilocode_change start - Use "Recommended" terminology to match kilocode
-  const recommendedGroup = () => language.t("dialog.provider.group.recommended")
-  const otherGroup = () => language.t("dialog.provider.group.other")
+  const popularGroup = () => language.t("dialog.provider.group.recommended")
   // kilocode_change end
+  const otherGroup = () => language.t("dialog.provider.group.other")
 
   return (
     <Dialog title={language.t("command.provider.connect")} transition>
@@ -39,18 +39,18 @@ export const DialogSelectProvider: Component = () => {
           return [{ id: CUSTOM_ID, name: "Custom provider" }, ...providers.all()]
         }}
         filterKeys={["id", "name"]}
-        groupBy={(x) => (preferredProviders.includes(x.id) ? recommendedGroup() : otherGroup())}
+        groupBy={(x) => (popularProviders.includes(x.id) ? popularGroup() : otherGroup())}
         sortBy={(a, b) => {
           if (a.id === CUSTOM_ID) return -1
           if (b.id === CUSTOM_ID) return 1
-          if (preferredProviders.includes(a.id) && preferredProviders.includes(b.id))
-            return preferredProviders.indexOf(a.id) - preferredProviders.indexOf(b.id)
+          if (popularProviders.includes(a.id) && popularProviders.includes(b.id))
+            return popularProviders.indexOf(a.id) - popularProviders.indexOf(b.id)
           return a.name.localeCompare(b.name)
         }}
         sortGroupsBy={(a, b) => {
-          const recommended = recommendedGroup()
-          if (a.category === recommended && b.category !== recommended) return -1
-          if (b.category === recommended && a.category !== recommended) return 1
+          const popular = popularGroup()
+          if (a.category === popular && b.category !== popular) return -1
+          if (b.category === popular && a.category !== popular) return 1
           return 0
         }}
         onSelect={(x) => {

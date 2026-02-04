@@ -71,7 +71,7 @@ const serverEnv = {
   OPENCODE_E2E_PROJECT_DIR: repoDir,
   OPENCODE_E2E_SESSION_TITLE: "E2E Session",
   OPENCODE_E2E_MESSAGE: "Seeded for UI e2e",
-  OPENCODE_E2E_MODEL: "kilo/openai/gpt-5-nano",
+  OPENCODE_E2E_MODEL: "kilo/kilo/auto", // kilocode_change
   OPENCODE_CLIENT: "app",
 } satisfies Record<string, string>
 

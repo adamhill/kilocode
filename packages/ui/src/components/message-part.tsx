@@ -12,7 +12,6 @@ import {
 } from "solid-js"
 import stripAnsi from "strip-ansi"
 import { Dynamic } from "solid-js/web"
-// kilocode_change start
 import {
   AgentPart,
   AssistantMessage,
@@ -28,7 +27,6 @@ import {
   QuestionAnswer,
   QuestionInfo,
 } from "@kilocode/sdk/v2"
-// kilocode_change end
 import { createStore } from "solid-js/store"
 import { useData } from "../context"
 import { useDiffComponent } from "../context/diff"

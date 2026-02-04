@@ -8,7 +8,7 @@ import { IconButton } from "@opencode-ai/ui/icon-button"
 import { TextField } from "@opencode-ai/ui/text-field"
 import { normalizeServerUrl, serverDisplayName, useServer } from "@/context/server"
 import { usePlatform } from "@/context/platform"
-import { createOpencodeClient } from "@kilocode/sdk/v2/client" // kilocode_change
+import { createOpencodeClient } from "@kilocode/sdk/v2/client"
 import { useNavigate } from "@solidjs/router"
 import { useLanguage } from "@/context/language"
 import { DropdownMenu } from "@opencode-ai/ui/dropdown-menu"

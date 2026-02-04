@@ -1,4 +1,4 @@
-import type { Hooks, PluginInput } from "@kilocode/plugin" // kilocode_change
+import type { Hooks, PluginInput } from "@kilocode/plugin"
 import { Installation } from "@/installation"
 import { iife } from "@/util/iife"
 

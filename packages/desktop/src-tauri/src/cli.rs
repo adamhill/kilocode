@@ -1,8 +1,8 @@
 use tauri::{AppHandle, Manager, path::BaseDirectory};
 use tauri_plugin_shell::{ShellExt, process::Command};
 
-const CLI_INSTALL_DIR: &str = ".kilo/bin"; // kilocode_change
-const CLI_BINARY_NAME: &str = "kilo"; // kilocode_change
+const CLI_INSTALL_DIR: &str = ".kilo/bin";
+const CLI_BINARY_NAME: &str = "opencode";
 
 #[derive(serde::Deserialize)]
 pub struct ServerConfig {
@@ -39,7 +39,7 @@ pub fn get_sidecar_path(app: &tauri::AppHandle) -> std::path::PathBuf {
         .expect("Failed to get current binary")
         .parent()
         .expect("Failed to get parent dir")
-        .join("kilo-cli") // kilocode_change
+        .join("kilo-cli")
 }
 
 fn is_cli_installed() -> bool {
@@ -61,7 +61,7 @@ pub fn install_cli(app: tauri::AppHandle) -> Result<String, String> {
         return Err("Sidecar binary not found".to_string());
     }
 
-    let temp_script = std::env::temp_dir().join("kilo-install.sh"); // kilocode_change
+    let temp_script = std::env::temp_dir().join("opencode-install.sh");
     std::fs::write(&temp_script, INSTALL_SCRIPT)
         .map_err(|e| format!("Failed to write install script: {}", e))?;
 

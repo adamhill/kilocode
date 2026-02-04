@@ -33,6 +33,23 @@ import { dict as uiAr } from "@opencode-ai/ui/i18n/ar"
 import { dict as uiNo } from "@opencode-ai/ui/i18n/no"
 import { dict as uiBr } from "@opencode-ai/ui/i18n/br"
 import { dict as uiTh } from "@opencode-ai/ui/i18n/th"
+// kilocode_change start
+import { dict as kiloEn } from "@kilocode/kilo-i18n/en"
+import { dict as kiloZh } from "@kilocode/kilo-i18n/zh"
+import { dict as kiloZht } from "@kilocode/kilo-i18n/zht"
+import { dict as kiloKo } from "@kilocode/kilo-i18n/ko"
+import { dict as kiloDe } from "@kilocode/kilo-i18n/de"
+import { dict as kiloEs } from "@kilocode/kilo-i18n/es"
+import { dict as kiloFr } from "@kilocode/kilo-i18n/fr"
+import { dict as kiloDa } from "@kilocode/kilo-i18n/da"
+import { dict as kiloJa } from "@kilocode/kilo-i18n/ja"
+import { dict as kiloPl } from "@kilocode/kilo-i18n/pl"
+import { dict as kiloRu } from "@kilocode/kilo-i18n/ru"
+import { dict as kiloAr } from "@kilocode/kilo-i18n/ar"
+import { dict as kiloNo } from "@kilocode/kilo-i18n/no"
+import { dict as kiloBr } from "@kilocode/kilo-i18n/br"
+import { dict as kiloTh } from "@kilocode/kilo-i18n/th"
+// kilocode_change end
 
 export type Locale =
   | "en"
@@ -51,7 +68,7 @@ export type Locale =
   | "br"
   | "th"
 
-type RawDictionary = typeof en & typeof uiEn
+type RawDictionary = typeof en & typeof uiEn & typeof kiloEn // kilocode_change
 type Dictionary = i18n.Flatten<RawDictionary>
 
 const LOCALES: readonly Locale[] = [
@@ -138,24 +155,26 @@ export const { use: useLanguage, provider: LanguageProvider } = createSimpleCont
       setStore("locale", current)
     })
 
-    const base = i18n.flatten({ ...en, ...uiEn })
+    // kilocode_change start - kilo translations merged last for override capability
+    const base = i18n.flatten({ ...en, ...uiEn, ...kiloEn })
     const dict = createMemo<Dictionary>(() => {
       if (locale() === "en") return base
-      if (locale() === "zh") return { ...base, ...i18n.flatten({ ...zh, ...uiZh }) }
-      if (locale() === "zht") return { ...base, ...i18n.flatten({ ...zht, ...uiZht }) }
-      if (locale() === "de") return { ...base, ...i18n.flatten({ ...de, ...uiDe }) }
-      if (locale() === "es") return { ...base, ...i18n.flatten({ ...es, ...uiEs }) }
-      if (locale() === "fr") return { ...base, ...i18n.flatten({ ...fr, ...uiFr }) }
-      if (locale() === "da") return { ...base, ...i18n.flatten({ ...da, ...uiDa }) }
-      if (locale() === "ja") return { ...base, ...i18n.flatten({ ...ja, ...uiJa }) }
-      if (locale() === "pl") return { ...base, ...i18n.flatten({ ...pl, ...uiPl }) }
-      if (locale() === "ru") return { ...base, ...i18n.flatten({ ...ru, ...uiRu }) }
-      if (locale() === "ar") return { ...base, ...i18n.flatten({ ...ar, ...uiAr }) }
-      if (locale() === "no") return { ...base, ...i18n.flatten({ ...no, ...uiNo }) }
-      if (locale() === "br") return { ...base, ...i18n.flatten({ ...br, ...uiBr }) }
-      if (locale() === "th") return { ...base, ...i18n.flatten({ ...th, ...uiTh }) }
-      return { ...base, ...i18n.flatten({ ...ko, ...uiKo }) }
+      if (locale() === "zh") return { ...base, ...i18n.flatten({ ...zh, ...uiZh, ...kiloZh }) }
+      if (locale() === "zht") return { ...base, ...i18n.flatten({ ...zht, ...uiZht, ...kiloZht }) }
+      if (locale() === "de") return { ...base, ...i18n.flatten({ ...de, ...uiDe, ...kiloDe }) }
+      if (locale() === "es") return { ...base, ...i18n.flatten({ ...es, ...uiEs, ...kiloEs }) }
+      if (locale() === "fr") return { ...base, ...i18n.flatten({ ...fr, ...uiFr, ...kiloFr }) }
+      if (locale() === "da") return { ...base, ...i18n.flatten({ ...da, ...uiDa, ...kiloDa }) }
+      if (locale() === "ja") return { ...base, ...i18n.flatten({ ...ja, ...uiJa, ...kiloJa }) }
+      if (locale() === "pl") return { ...base, ...i18n.flatten({ ...pl, ...uiPl, ...kiloPl }) }
+      if (locale() === "ru") return { ...base, ...i18n.flatten({ ...ru, ...uiRu, ...kiloRu }) }
+      if (locale() === "ar") return { ...base, ...i18n.flatten({ ...ar, ...uiAr, ...kiloAr }) }
+      if (locale() === "no") return { ...base, ...i18n.flatten({ ...no, ...uiNo, ...kiloNo }) }
+      if (locale() === "br") return { ...base, ...i18n.flatten({ ...br, ...uiBr, ...kiloBr }) }
+      if (locale() === "th") return { ...base, ...i18n.flatten({ ...th, ...uiTh, ...kiloTh }) }
+      return { ...base, ...i18n.flatten({ ...ko, ...uiKo, ...kiloKo }) }
     })
+    // kilocode_change end
 
     const t = i18n.translator(dict, i18n.resolveTemplate)
 

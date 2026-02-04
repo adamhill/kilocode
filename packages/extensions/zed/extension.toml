@@ -1,5 +1,5 @@
-id = "opencode"
-name = "OpenCode"
+id = "kilo"
+name = "Kilo"
 description = "The open source coding agent."
 version = "1.0.14"
 schema_version = 1
@@ -7,7 +7,7 @@ authors = ["Anomaly"]
 repository = "https://github.com/Kilo-Org/kilo"
 
 [agent_servers.opencode]
-name = "OpenCode"
+name = "Kilo"
 icon = "./icons/opencode.svg"
 
 [agent_servers.opencode.targets.darwin-aarch64]

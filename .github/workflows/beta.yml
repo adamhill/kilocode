@@ -1,0 +1,37 @@
+name: beta
+
+on:
+  push:
+    branches: [dev]
+  pull_request:
+    types: [opened, synchronize, labeled, unlabeled]
+
+jobs:
+  sync:
+    # kilocode_change start - disabled for kilo-cli fork (OpenCode Discord integration)
+    if: false
+    # if: |
+    #   github.event_name == 'push' || 
+    #   (github.event_name == 'pull_request' && 
+    #    contains(github.event.pull_request.labels.*.name, 'contributor'))
+    # kilocode_change end
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    permissions:
+      contents: write
+      pull-requests: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: ./.github/actions/setup-bun
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Sync beta branch
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: bun script/beta.ts

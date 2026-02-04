@@ -4,10 +4,14 @@ on:
   push:
     branches:
       - dev
+  pull_request:
   workflow_dispatch:
 
 jobs:
   generate:
+    # kilocode_change start - disabled for kilo-cli fork (OpenCode Discord integration)
+    if: false
+    # kilocode_change end
     runs-on: depot-ubuntu-24.04-4
     permissions:
       contents: write

@@ -8,7 +8,7 @@ import { Tag } from "@opencode-ai/ui/tag"
 import { Tooltip } from "@opencode-ai/ui/tooltip"
 import { type Component, onCleanup, onMount, Show } from "solid-js"
 import { useLocal } from "@/context/local"
-import { preferredProviders, useProviders } from "@/hooks/use-providers"
+import { popularProviders, useProviders } from "@/hooks/use-providers"
 import { DialogConnectProvider } from "./dialog-connect-provider"
 import { DialogSelectProvider } from "./dialog-select-provider"
 import { ModelTooltip } from "./model-tooltip"
@@ -34,11 +34,14 @@ export const DialogSelectModelUnpaid: Component = () => {
   })
 
   return (
-    <Dialog title={language.t("dialog.model.select.title")}>
-      <div class="flex flex-col gap-3 px-2.5 flex-1 min-h-0">
+    <Dialog
+      title={language.t("dialog.model.select.title")}
+      class="overflow-y-auto [&_[data-slot=dialog-body]]:overflow-visible [&_[data-slot=dialog-body]]:flex-none"
+    >
+      <div class="flex flex-col gap-3 px-2.5">
         <div class="text-14-medium text-text-base px-2.5">{language.t("dialog.model.unpaid.freeModels.title")}</div>
         <List
-          class="flex-1 min-h-0 [&_[data-slot=list-scroll]]:flex-1 [&_[data-slot=list-scroll]]:min-h-0"
+          class="[&_[data-slot=list-scroll]]:overflow-visible"
           ref={(ref) => (listRef = ref)}
           items={local.model.list}
           current={local.model.current()}
@@ -76,8 +79,6 @@ export const DialogSelectModelUnpaid: Component = () => {
             </div>
           )}
         </List>
-        <div />
-        <div />
       </div>
       <div class="px-1.5 pb-1.5">
         <div class="w-full rounded-sm border border-border-weak-base bg-surface-raised-base">
@@ -87,11 +88,11 @@ export const DialogSelectModelUnpaid: Component = () => {
               <List
                 class="w-full px-0"
                 key={(x) => x?.id}
-                items={providers.preferred}
+                items={providers.popular}
                 activeIcon="plus-small"
                 sortBy={(a, b) => {
-                  if (preferredProviders.includes(a.id) && preferredProviders.includes(b.id))
-                    return preferredProviders.indexOf(a.id) - preferredProviders.indexOf(b.id)
+                  if (popularProviders.includes(a.id) && popularProviders.includes(b.id))
+                    return popularProviders.indexOf(a.id) - popularProviders.indexOf(b.id)
                   return a.name.localeCompare(b.name)
                 }}
                 onSelect={(x) => {

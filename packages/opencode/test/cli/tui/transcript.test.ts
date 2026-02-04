@@ -5,7 +5,7 @@ import {
   formatPart,
   formatTranscript,
 } from "../../../src/cli/cmd/tui/util/transcript"
-import type { AssistantMessage, Part, UserMessage } from "@kilocode/sdk/v2" // kilocode_change
+import type { AssistantMessage, Part, UserMessage } from "@kilocode/sdk/v2"
 
 describe("transcript", () => {
   describe("formatAssistantHeader", () => {

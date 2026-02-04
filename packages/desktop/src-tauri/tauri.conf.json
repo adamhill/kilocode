@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "Kilo Dev",
+  "productName": "Kilo",
   "identifier": "ai.kilo.desktop.dev",
   "mainBinaryName": "Kilo",
   "version": "../package.json",
@@ -50,6 +50,13 @@
         "installerIcon": "icons/dev/icon.ico",
         "headerImage": "assets/nsis-header.bmp",
         "sidebarImage": "assets/nsis-sidebar.bmp"
+      }
+    }
+  },
+  "plugins": {
+    "deep-link": {
+      "desktop": {
+        "schemes": ["opencode"]
       }
     }
   }
