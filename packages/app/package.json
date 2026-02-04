@@ -36,7 +36,6 @@
   },
   "dependencies": {
     "@kobalte/core": "catalog:",
-    "@kilocode/kilo-i18n": "workspace:*",
     "@kilocode/sdk": "workspace:*",
     "@opencode-ai/ui": "workspace:*",
     "@opencode-ai/util": "workspace:*",
@@ -65,6 +64,7 @@
     "solid-list": "catalog:",
     "tailwindcss": "catalog:",
     "virtua": "catalog:",
-    "zod": "catalog:"
+    "zod": "catalog:",
+    "@kilocode/kilo-i18n": "workspace:*"
   }
 }

@@ -42,6 +42,7 @@ await Bun.file(`./dist/${pkg.name}/package.json`).write(
   ),
 )
 
+/*
 const tasks = Object.entries(binaries).map(async ([name]) => {
   if (process.platform !== "win32") {
     await $`chmod -R 755 .`.cwd(`./dist/${name}`)
@@ -57,6 +58,7 @@ const platforms = "linux/amd64,linux/arm64"
 const tags = [`${image}:${version}`, `${image}:${Script.channel}`]
 const tagFlags = tags.flatMap((t) => ["-t", t])
 await $`docker buildx build --platform ${platforms} ${tagFlags} --push .`
+*/
 
 // registries
 if (!Script.preview) {
@@ -68,6 +70,7 @@ if (!Script.preview) {
 
   const [pkgver, _subver = ""] = Script.version.split(/(-.*)/, 2)
 
+  /*
   // arch
   const binaryPkgbuild = [
     "# Maintainer: dax",
@@ -181,6 +184,7 @@ if (!Script.preview) {
       }
     }
   }
+  */
 
   // Homebrew formula
   const homebrewFormula = [
@@ -235,8 +239,14 @@ if (!Script.preview) {
     "",
   ].join("\n")
 
+  const token = process.env.GITHUB_TOKEN
+  if (!token) {
+    console.error("GITHUB_TOKEN is required to update homebrew tap")
+    process.exit(1)
+  }
+  const tap = `https://x-access-token:${token}@github.com/anomalyco/homebrew-tap.git`
   await $`rm -rf ./dist/homebrew-tap`
-  await $`git clone https://${process.env["GITHUB_TOKEN"]}@github.com/sst/homebrew-tap.git ./dist/homebrew-tap`
+  await $`git clone ${tap} ./dist/homebrew-tap`
   await Bun.file("./dist/homebrew-tap/opencode.rb").write(homebrewFormula)
   await $`cd ./dist/homebrew-tap && git add opencode.rb`
   await $`cd ./dist/homebrew-tap && git commit -m "Update to v${Script.version}"`

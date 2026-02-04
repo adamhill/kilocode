@@ -38,9 +38,10 @@ import { Config } from "@/config/config"
 import { Todo } from "@/session/todo"
 import { z } from "zod"
 import { LoadAPIKeyError } from "ai"
-import { fetchDefaultModel } from "@kilocode/kilo-gateway" // kilocode_change
 import type { Event, OpencodeClient, SessionMessageResponse } from "@kilocode/sdk/v2"
 import { applyPatch } from "diff"
+
+import { fetchDefaultModel } from "@kilocode/kilo-gateway" // kilocode_change
 
 type ModeOption = { id: string; name: string; description?: string }
 type ModelOption = { modelId: string; name: string }
