@@ -45,7 +45,7 @@ const tasks = Object.entries(binaries).map(async ([name]) => {
   await $`npm publish *.tgz --access public --tag ${Script.channel}`.cwd(`./dist/${name}`)
 })
 await Promise.all(tasks)
-await $`cd ./dist/${pkg.name} && bun pm pack && npm publish *.tgz --access public --tag ${Script.channel}`
+await $`cd ./dist/${pkg.name} && bun pm pack && npm publish *.tgz --access public --tag ${Script.channel} --provenance`
 
 const image = "ghcr.io/Kilo-Org/kilo"
 const platforms = "linux/amd64,linux/arm64"
