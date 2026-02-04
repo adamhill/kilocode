@@ -25,6 +25,7 @@
       "name": "@opencode-ai/app",
       "version": "1.0.14",
       "dependencies": {
+        "@kilocode/kilo-i18n": "workspace:*",
         "@kilocode/sdk": "workspace:*",
         "@kobalte/core": "catalog:",
         "@opencode-ai/ui": "workspace:*",
