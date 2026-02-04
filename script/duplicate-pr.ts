@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 
 import path from "path"
-import { createOpencode } from "@opencode-ai/sdk"
+import { createOpencode } from "@kilocode/sdk"
 import { parseArgs } from "util"
 
 async function main() {
