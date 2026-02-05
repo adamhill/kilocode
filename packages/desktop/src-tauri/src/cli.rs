@@ -1,7 +1,7 @@
 use tauri::{AppHandle, Manager, path::BaseDirectory};
 use tauri_plugin_shell::{ShellExt, process::Command};
 
-const CLI_INSTALL_DIR: &str = ".opencode/bin";
+const CLI_INSTALL_DIR: &str = ".kilo/bin";
 const CLI_BINARY_NAME: &str = "opencode";
 
 #[derive(serde::Deserialize)]
@@ -39,7 +39,7 @@ pub fn get_sidecar_path(app: &tauri::AppHandle) -> std::path::PathBuf {
         .expect("Failed to get current binary")
         .parent()
         .expect("Failed to get parent dir")
-        .join("opencode-cli")
+        .join("kilo-cli")
 }
 
 fn is_cli_installed() -> bool {
@@ -154,7 +154,7 @@ pub fn create_command(app: &tauri::AppHandle, args: &str) -> Command {
     #[cfg(target_os = "windows")]
     return app
         .shell()
-        .sidecar("opencode-cli")
+        .sidecar("kilo-cli")
         .unwrap()
         .args(args.split_whitespace())
         .env("OPENCODE_EXPERIMENTAL_ICON_DISCOVERY", "true")
