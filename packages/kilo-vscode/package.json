@@ -29,6 +29,72 @@
           "name": "Kilo Code"
         }
       ]
+    },
+    "commands": [
+      {
+        "command": "kilo-code.plusButtonClicked",
+        "title": "New Task",
+        "icon": "$(add)"
+      },
+      {
+        "command": "kilo-code.agentManagerOpen",
+        "title": "Agent Manager",
+        "icon": "$(circuit-board)"
+      },
+      {
+        "command": "kilo-code.marketplaceButtonClicked",
+        "title": "Marketplace",
+        "icon": "$(extensions)"
+      },
+      {
+        "command": "kilo-code.historyButtonClicked",
+        "title": "History",
+        "icon": "$(history)"
+      },
+      {
+        "command": "kilo-code.profileButtonClicked",
+        "title": "Profile",
+        "icon": "$(account)"
+      },
+      {
+        "command": "kilo-code.settingsButtonClicked",
+        "title": "Settings",
+        "icon": "$(settings-gear)"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "kilo-code.plusButtonClicked",
+          "group": "navigation@0",
+          "when": "view == kilo-code.sidebarView"
+        },
+        {
+          "command": "kilo-code.agentManagerOpen",
+          "group": "navigation@1",
+          "when": "view == kilo-code.sidebarView"
+        },
+        {
+          "command": "kilo-code.marketplaceButtonClicked",
+          "group": "navigation@2",
+          "when": "view == kilo-code.sidebarView"
+        },
+        {
+          "command": "kilo-code.historyButtonClicked",
+          "group": "navigation@3",
+          "when": "view == kilo-code.sidebarView"
+        },
+        {
+          "command": "kilo-code.profileButtonClicked",
+          "group": "navigation@4",
+          "when": "view == kilo-code.sidebarView"
+        },
+        {
+          "command": "kilo-code.settingsButtonClicked",
+          "group": "navigation@5",
+          "when": "view == kilo-code.sidebarView"
+        }
+      ]
     }
   },
   "scripts": {

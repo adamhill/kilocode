@@ -3,6 +3,8 @@ import * as vscode from 'vscode';
 export class KiloProvider implements vscode.WebviewViewProvider {
 	public static readonly viewType = 'kilo-code.sidebarView';
 
+	private _view?: vscode.WebviewView;
+
 	constructor(private readonly _extensionUri: vscode.Uri) {}
 
 	public resolveWebviewView(
@@ -10,12 +12,20 @@ export class KiloProvider implements vscode.WebviewViewProvider {
 		_context: vscode.WebviewViewResolveContext,
 		_token: vscode.CancellationToken
 	) {
+		this._view = webviewView;
+
 		webviewView.webview.options = {
 			enableScripts: true,
 			localResourceRoots: [this._extensionUri]
 		};
 
 		webviewView.webview.html = this._getHtmlForWebview(webviewView.webview);
+	}
+
+	public postMessage(message: unknown) {
+		if (this._view) {
+			this._view.webview.postMessage(message);
+		}
 	}
 
 	private _getHtmlForWebview(webview: vscode.Webview): string {
