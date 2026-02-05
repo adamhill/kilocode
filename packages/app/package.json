@@ -66,5 +66,6 @@
     "virtua": "catalog:",
     "zod": "catalog:",
     "@kilocode/kilo-i18n": "workspace:*"
-  }
+  },
+  "peerDependencies": {}
 }
