@@ -7,11 +7,152 @@
  * 2. Transforming package names (opencode -> kilo)
  * 3. Injecting Kilo-specific dependencies
  * 4. Preserving Kilo's version number
+ * 5. Preserving overrides and patchedDependencies
+ * 6. Using "newest wins" strategy for dependency versions
  */
 
 import { $ } from "bun"
 import { info, success, warn, debug } from "../utils/logger"
 import { getCurrentVersion } from "./preserve-versions"
+
+/**
+ * Extract clean version string from a version specifier
+ * Removes ^, ~, >=, etc. prefixes
+ */
+function extractVersion(version: string): string | null {
+  // Handle special formats that can't be compared
+  if (
+    version.startsWith("workspace:") ||
+    version.startsWith("catalog:") ||
+    version.startsWith("http://") ||
+    version.startsWith("https://") ||
+    version.startsWith("git://") ||
+    version.startsWith("git+") ||
+    version.startsWith("file:") ||
+    version.startsWith("link:") ||
+    version.startsWith("npm:")
+  ) {
+    return null
+  }
+
+  // Remove common prefixes: ^, ~, >=, >, <=, <, =
+  const cleaned = version.replace(/^[\^~>=<]+/, "").trim()
+
+  // Basic semver validation (x.y.z with optional pre-release/build)
+  if (/^\d+\.\d+\.\d+/.test(cleaned)) {
+    return cleaned
+  }
+
+  // Handle x.y format
+  if (/^\d+\.\d+$/.test(cleaned)) {
+    return cleaned + ".0"
+  }
+
+  // Handle single number
+  if (/^\d+$/.test(cleaned)) {
+    return cleaned + ".0.0"
+  }
+
+  return null
+}
+
+/**
+ * Parse a semver string into components
+ */
+function parseSemver(version: string): { major: number; minor: number; patch: number; prerelease: string } | null {
+  const match = version.match(/^(\d+)\.(\d+)\.(\d+)(?:-(.+))?/)
+  if (!match) return null
+
+  return {
+    major: parseInt(match[1], 10),
+    minor: parseInt(match[2], 10),
+    patch: parseInt(match[3], 10),
+    prerelease: match[4] || "",
+  }
+}
+
+/**
+ * Compare two version strings
+ * Returns: 1 if a > b, -1 if a < b, 0 if equal
+ * For special formats (URLs, catalog:, workspace:*), returns null (can't compare)
+ */
+function compareVersions(a: string, b: string): number | null {
+  const cleanA = extractVersion(a)
+  const cleanB = extractVersion(b)
+
+  // If either can't be parsed, return null (can't compare)
+  if (!cleanA || !cleanB) return null
+
+  const semverA = parseSemver(cleanA)
+  const semverB = parseSemver(cleanB)
+
+  if (!semverA || !semverB) return null
+
+  // Compare major.minor.patch
+  if (semverA.major !== semverB.major) return semverA.major > semverB.major ? 1 : -1
+  if (semverA.minor !== semverB.minor) return semverA.minor > semverB.minor ? 1 : -1
+  if (semverA.patch !== semverB.patch) return semverA.patch > semverB.patch ? 1 : -1
+
+  // Handle prerelease (no prerelease > prerelease)
+  if (!semverA.prerelease && semverB.prerelease) return 1
+  if (semverA.prerelease && !semverB.prerelease) return -1
+  if (semverA.prerelease && semverB.prerelease) {
+    return semverA.prerelease.localeCompare(semverB.prerelease)
+  }
+
+  return 0
+}
+
+/**
+ * Merge two dependency objects using "newest wins" strategy
+ * For non-comparable versions (URLs, catalog:, workspace:*), upstream (theirs) wins
+ */
+function mergeWithNewestVersions(
+  ours: Record<string, string> | undefined,
+  theirs: Record<string, string> | undefined,
+  changes: string[],
+  section: string,
+): Record<string, string> {
+  const result: Record<string, string> = {}
+
+  // Start with all of theirs
+  if (theirs) {
+    for (const [name, version] of Object.entries(theirs)) {
+      result[name] = version
+    }
+  }
+
+  // Merge in ours, keeping newer versions
+  if (ours) {
+    for (const [name, ourVersion] of Object.entries(ours)) {
+      const theirVersion = result[name]
+
+      if (!theirVersion) {
+        // Dependency only exists in ours - keep it
+        result[name] = ourVersion
+        changes.push(`${section}: preserved ${name}@${ourVersion} (kilo-only)`)
+      } else if (ourVersion !== theirVersion) {
+        // Both have it with different versions - compare
+        const comparison = compareVersions(ourVersion, theirVersion)
+
+        if (comparison === null) {
+          // Can't compare (special format) - upstream wins per user preference
+          changes.push(`${section}: ${name} kept upstream ${theirVersion} (special format)`)
+        } else if (comparison > 0) {
+          // Ours is newer
+          result[name] = ourVersion
+          changes.push(`${section}: ${name} ${theirVersion} -> ${ourVersion} (kilo newer)`)
+        } else if (comparison < 0) {
+          // Theirs is newer - already in result
+          changes.push(`${section}: ${name} kept upstream ${theirVersion} (upstream newer)`)
+        }
+        // If equal, keep theirs (already in result)
+      }
+    }
+  }
+
+  return result
+}
 
 export interface PackageJsonResult {
   file: string
@@ -100,11 +241,30 @@ export async function transformPackageJson(file: string, options: PackageJsonOpt
   }
 
   try {
-    // Take upstream's version first
+    // Save Kilo's version BEFORE taking theirs
+    let ourPkg: Record<string, unknown> | null = null
+    try {
+      const ourContent = await $`git show :2:${file}`.text() // :2: is "ours" in merge
+      ourPkg = JSON.parse(ourContent)
+    } catch {
+      // File might not exist in ours (new file from upstream)
+      // or we're not in a merge conflict - try reading current file
+      try {
+        const currentContent = await Bun.file(file).text()
+        if (!currentContent.includes("<<<<<<<")) {
+          // Not a conflict, read as-is
+          ourPkg = JSON.parse(currentContent)
+        }
+      } catch {
+        // File doesn't exist yet
+      }
+    }
+
+    // Take upstream's version
     await $`git checkout --theirs ${file}`.quiet().nothrow()
     await $`git add ${file}`.quiet().nothrow()
 
-    // Read and parse
+    // Read and parse upstream's version
     const content = await Bun.file(file).text()
     const pkg = JSON.parse(content)
 
@@ -125,28 +285,85 @@ export async function transformPackageJson(file: string, options: PackageJsonOpt
       }
     }
 
-    // 3. Transform dependencies
+    // 3. Merge dependencies with "newest wins" strategy
+    if (ourPkg) {
+      pkg.dependencies = mergeWithNewestVersions(
+        ourPkg.dependencies as Record<string, string> | undefined,
+        pkg.dependencies,
+        changes,
+        "dependencies",
+      )
+
+      pkg.devDependencies = mergeWithNewestVersions(
+        ourPkg.devDependencies as Record<string, string> | undefined,
+        pkg.devDependencies,
+        changes,
+        "devDependencies",
+      )
+
+      pkg.peerDependencies = mergeWithNewestVersions(
+        ourPkg.peerDependencies as Record<string, string> | undefined,
+        pkg.peerDependencies,
+        changes,
+        "peerDependencies",
+      )
+
+      // 4. Preserve/merge overrides
+      const ourOverrides = ourPkg.overrides as Record<string, string> | undefined
+      if (ourOverrides || pkg.overrides) {
+        pkg.overrides = mergeWithNewestVersions(ourOverrides, pkg.overrides, changes, "overrides")
+      }
+
+      // 5. Preserve patchedDependencies (Kilo-specific, upstream won't have these)
+      const ourPatchedDeps = ourPkg.patchedDependencies as Record<string, string> | undefined
+      if (ourPatchedDeps) {
+        pkg.patchedDependencies = pkg.patchedDependencies || {}
+        for (const [name, patch] of Object.entries(ourPatchedDeps)) {
+          if (!pkg.patchedDependencies[name]) {
+            pkg.patchedDependencies[name] = patch
+            changes.push(`patchedDependencies: preserved ${name}`)
+          }
+        }
+      }
+
+      // 6. Handle workspaces.catalog for root package.json
+      const ourWorkspaces = ourPkg.workspaces as { catalog?: Record<string, string> } | undefined
+      const theirWorkspaces = pkg.workspaces as { catalog?: Record<string, string> } | undefined
+      if (ourWorkspaces?.catalog || theirWorkspaces?.catalog) {
+        pkg.workspaces = pkg.workspaces || {}
+        pkg.workspaces.catalog = mergeWithNewestVersions(
+          ourWorkspaces?.catalog,
+          theirWorkspaces?.catalog,
+          changes,
+          "workspaces.catalog",
+        )
+      }
+    }
+
+    // 7. Transform dependency names (opencode -> kilo)
     if (pkg.dependencies) {
       const { result, changes: depChanges } = transformDependencies(pkg.dependencies)
       pkg.dependencies = result
       changes.push(...depChanges.map((c) => `dependencies: ${c}`))
     }
 
-    // 4. Transform devDependencies
     if (pkg.devDependencies) {
       const { result, changes: devChanges } = transformDependencies(pkg.devDependencies)
-      pkg.devDependencies = devChanges.length > 0 ? result : pkg.devDependencies
-      changes.push(...devChanges.map((c) => `devDependencies: ${c}`))
+      if (devChanges.length > 0) {
+        pkg.devDependencies = result
+        changes.push(...devChanges.map((c) => `devDependencies: ${c}`))
+      }
     }
 
-    // 5. Transform peerDependencies
     if (pkg.peerDependencies) {
       const { result, changes: peerChanges } = transformDependencies(pkg.peerDependencies)
-      pkg.peerDependencies = peerChanges.length > 0 ? result : pkg.peerDependencies
-      changes.push(...peerChanges.map((c) => `peerDependencies: ${c}`))
+      if (peerChanges.length > 0) {
+        pkg.peerDependencies = result
+        changes.push(...peerChanges.map((c) => `peerDependencies: ${c}`))
+      }
     }
 
-    // 6. Inject Kilo-specific dependencies
+    // 8. Inject Kilo-specific dependencies
     const kiloDeps = KILO_DEPENDENCIES[relativePath]
     if (kiloDeps) {
       pkg.dependencies = pkg.dependencies || {}
@@ -202,7 +419,23 @@ export async function transformConflictedPackageJson(
 }
 
 /**
+ * Get Kilo's package.json from the base branch (dev) for comparison
+ * Used during pre-merge to compare upstream versions against Kilo's versions
+ */
+async function getKiloPackageJson(path: string, baseBranch = "dev"): Promise<Record<string, unknown> | null> {
+  try {
+    // Try to get the file from origin/dev (or whatever base branch)
+    const content = await $`git show origin/${baseBranch}:${path}`.text()
+    return JSON.parse(content)
+  } catch {
+    // File might not exist in Kilo
+    return null
+  }
+}
+
+/**
  * Transform all package.json files (pre-merge, on opencode branch)
+ * This function merges Kilo's versions with upstream, using "newest wins" strategy
  */
 export async function transformAllPackageJson(options: PackageJsonOptions = {}): Promise<PackageJsonResult[]> {
   const { Glob } = await import("bun")
@@ -220,8 +453,11 @@ export async function transformAllPackageJson(options: PackageJsonOptions = {}):
 
     try {
       const content = await file.text()
-      const pkg = JSON.parse(content)
+      const pkg = JSON.parse(content) // This is upstream's version
       const changes: string[] = []
+
+      // Get Kilo's version from base branch for comparison
+      const kiloPkg = await getKiloPackageJson(path)
 
       // 1. Transform package name if needed
       const newName = TRANSFORM_PACKAGE_NAMES[path]
@@ -239,7 +475,62 @@ export async function transformAllPackageJson(options: PackageJsonOptions = {}):
         }
       }
 
-      // 3. Transform dependencies
+      // 3. Merge dependencies with "newest wins" strategy (if Kilo has this file)
+      if (kiloPkg) {
+        pkg.dependencies = mergeWithNewestVersions(
+          kiloPkg.dependencies as Record<string, string> | undefined,
+          pkg.dependencies,
+          changes,
+          "dependencies",
+        )
+
+        pkg.devDependencies = mergeWithNewestVersions(
+          kiloPkg.devDependencies as Record<string, string> | undefined,
+          pkg.devDependencies,
+          changes,
+          "devDependencies",
+        )
+
+        pkg.peerDependencies = mergeWithNewestVersions(
+          kiloPkg.peerDependencies as Record<string, string> | undefined,
+          pkg.peerDependencies,
+          changes,
+          "peerDependencies",
+        )
+
+        // 4. Preserve/merge overrides
+        const kiloOverrides = kiloPkg.overrides as Record<string, string> | undefined
+        if (kiloOverrides || pkg.overrides) {
+          pkg.overrides = mergeWithNewestVersions(kiloOverrides, pkg.overrides, changes, "overrides")
+        }
+
+        // 5. Preserve patchedDependencies (Kilo-specific, upstream won't have these)
+        const kiloPatchedDeps = kiloPkg.patchedDependencies as Record<string, string> | undefined
+        if (kiloPatchedDeps) {
+          pkg.patchedDependencies = pkg.patchedDependencies || {}
+          for (const [name, patch] of Object.entries(kiloPatchedDeps)) {
+            if (!pkg.patchedDependencies[name]) {
+              pkg.patchedDependencies[name] = patch
+              changes.push(`patchedDependencies: preserved ${name}`)
+            }
+          }
+        }
+
+        // 6. Handle workspaces.catalog for root package.json
+        const kiloWorkspaces = kiloPkg.workspaces as { catalog?: Record<string, string> } | undefined
+        const upstreamWorkspaces = pkg.workspaces as { catalog?: Record<string, string> } | undefined
+        if (kiloWorkspaces?.catalog || upstreamWorkspaces?.catalog) {
+          pkg.workspaces = pkg.workspaces || {}
+          pkg.workspaces.catalog = mergeWithNewestVersions(
+            kiloWorkspaces?.catalog,
+            upstreamWorkspaces?.catalog,
+            changes,
+            "workspaces.catalog",
+          )
+        }
+      }
+
+      // 7. Transform dependency names (opencode -> kilo)
       if (pkg.dependencies) {
         const { result, changes: depChanges } = transformDependencies(pkg.dependencies)
         if (depChanges.length > 0) {
@@ -248,7 +539,6 @@ export async function transformAllPackageJson(options: PackageJsonOptions = {}):
         }
       }
 
-      // 4. Transform devDependencies
       if (pkg.devDependencies) {
         const { result, changes: devChanges } = transformDependencies(pkg.devDependencies)
         if (devChanges.length > 0) {
@@ -257,7 +547,6 @@ export async function transformAllPackageJson(options: PackageJsonOptions = {}):
         }
       }
 
-      // 5. Transform peerDependencies
       if (pkg.peerDependencies) {
         const { result, changes: peerChanges } = transformDependencies(pkg.peerDependencies)
         if (peerChanges.length > 0) {
@@ -266,7 +555,7 @@ export async function transformAllPackageJson(options: PackageJsonOptions = {}):
         }
       }
 
-      // 6. Inject Kilo-specific dependencies
+      // 8. Inject Kilo-specific dependencies
       const kiloDeps = KILO_DEPENDENCIES[path]
       if (kiloDeps) {
         pkg.dependencies = pkg.dependencies || {}
