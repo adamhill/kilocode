@@ -8,7 +8,7 @@ export class AgentManagerProvider implements vscode.Disposable {
 	public static readonly viewType = 'kilo-code.AgentManagerPanel';
 
 	private panel: vscode.WebviewPanel | undefined;
-	private disposables: vscode.Disposable[] = [];
+	private panelDisposables: vscode.Disposable[] = [];
 
 	constructor(private readonly _extensionUri: vscode.Uri) {}
 
@@ -36,10 +36,13 @@ export class AgentManagerProvider implements vscode.Disposable {
 
 		this.panel.onDidDispose(
 			() => {
+				// Clean up panel-specific disposables when panel is closed
+				this.panelDisposables.forEach(d => d.dispose());
+				this.panelDisposables = [];
 				this.panel = undefined;
 			},
 			null,
-			this.disposables
+			this.panelDisposables
 		);
 
 		console.log('Agent Manager panel opened');
@@ -79,7 +82,8 @@ export class AgentManagerProvider implements vscode.Disposable {
 
 	public dispose(): void {
 		this.panel?.dispose();
-		this.disposables.forEach(d => d.dispose());
+		this.panelDisposables.forEach(d => d.dispose());
+		this.panelDisposables = [];
 	}
 }
 
