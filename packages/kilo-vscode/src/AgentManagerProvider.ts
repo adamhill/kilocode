@@ -5,7 +5,7 @@ import * as vscode from 'vscode';
  * Opens in the main editor area (not sidebar).
  */
 export class AgentManagerProvider implements vscode.Disposable {
-	public static readonly viewType = 'kilo-code.AgentManagerPanel';
+	public static readonly viewType = 'kilo-code.new.AgentManagerPanel';
 
 	private panel: vscode.WebviewPanel | undefined;
 	private panelDisposables: vscode.Disposable[] = [];

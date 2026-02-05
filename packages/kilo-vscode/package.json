@@ -25,39 +25,39 @@
       "kilo-code-sidebar": [
         {
           "type": "webview",
-          "id": "kilo-code.sidebarView",
+          "id": "kilo-code.new.sidebarView",
           "name": "Kilo Code"
         }
       ]
     },
     "commands": [
       {
-        "command": "kilo-code.plusButtonClicked",
+        "command": "kilo-code.new.plusButtonClicked",
         "title": "New Task",
         "icon": "$(add)"
       },
       {
-        "command": "kilo-code.agentManagerOpen",
+        "command": "kilo-code.new.agentManagerOpen",
         "title": "Agent Manager",
         "icon": "$(circuit-board)"
       },
       {
-        "command": "kilo-code.marketplaceButtonClicked",
+        "command": "kilo-code.new.marketplaceButtonClicked",
         "title": "Marketplace",
         "icon": "$(extensions)"
       },
       {
-        "command": "kilo-code.historyButtonClicked",
+        "command": "kilo-code.new.historyButtonClicked",
         "title": "History",
         "icon": "$(history)"
       },
       {
-        "command": "kilo-code.profileButtonClicked",
+        "command": "kilo-code.new.profileButtonClicked",
         "title": "Profile",
         "icon": "$(account)"
       },
       {
-        "command": "kilo-code.settingsButtonClicked",
+        "command": "kilo-code.new.settingsButtonClicked",
         "title": "Settings",
         "icon": "$(settings-gear)"
       }
@@ -65,34 +65,34 @@
     "menus": {
       "view/title": [
         {
-          "command": "kilo-code.plusButtonClicked",
+          "command": "kilo-code.new.plusButtonClicked",
           "group": "navigation@0",
-          "when": "view == kilo-code.sidebarView"
+          "when": "view == kilo-code.new.sidebarView"
         },
         {
-          "command": "kilo-code.agentManagerOpen",
+          "command": "kilo-code.new.agentManagerOpen",
           "group": "navigation@1",
-          "when": "view == kilo-code.sidebarView"
+          "when": "view == kilo-code.new.sidebarView"
         },
         {
-          "command": "kilo-code.marketplaceButtonClicked",
+          "command": "kilo-code.new.marketplaceButtonClicked",
           "group": "navigation@2",
-          "when": "view == kilo-code.sidebarView"
+          "when": "view == kilo-code.new.sidebarView"
         },
         {
-          "command": "kilo-code.historyButtonClicked",
+          "command": "kilo-code.new.historyButtonClicked",
           "group": "navigation@3",
-          "when": "view == kilo-code.sidebarView"
+          "when": "view == kilo-code.new.sidebarView"
         },
         {
-          "command": "kilo-code.profileButtonClicked",
+          "command": "kilo-code.new.profileButtonClicked",
           "group": "navigation@4",
-          "when": "view == kilo-code.sidebarView"
+          "when": "view == kilo-code.new.sidebarView"
         },
         {
-          "command": "kilo-code.settingsButtonClicked",
+          "command": "kilo-code.new.settingsButtonClicked",
           "group": "navigation@5",
-          "when": "view == kilo-code.sidebarView"
+          "when": "view == kilo-code.new.sidebarView"
         }
       ]
     }

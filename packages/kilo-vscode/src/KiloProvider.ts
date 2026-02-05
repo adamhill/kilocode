@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 
 export class KiloProvider implements vscode.WebviewViewProvider {
-	public static readonly viewType = 'kilo-code.sidebarView';
+	public static readonly viewType = 'kilo-code.new.sidebarView';
 
 	private _view?: vscode.WebviewView;
 
