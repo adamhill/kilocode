@@ -48,25 +48,17 @@ export class ServerManager {
     console.log('[Kilo New] ServerManager: 📍 CLI path:', cliPath);
     console.log('[Kilo New] ServerManager: 🔐 Generated password (length):', password.length);
 
-    // Debug: verify the CLI binary exists at the expected path.
-    const cliExists = fs.existsSync(cliPath)
-    console.log('[Kilo New] ServerManager: 📄 CLI exists:', cliExists);
-    if (cliExists) {
-      try {
-        const stat = fs.statSync(cliPath)
-        console.log('[Kilo New] ServerManager: 📄 CLI isFile:', stat.isFile());
-        // NOTE: on Windows this is less meaningful; on macOS/Linux it helps confirm exec bit.
-        console.log('[Kilo New] ServerManager: 📄 CLI mode (octal):', (stat.mode & 0o777).toString(8));
-      } catch (e) {
-        console.error('[Kilo New] ServerManager: ❌ Failed to stat CLI binary:', e);
-      }
-    } else {
-      // Fail fast with a clearer error than a generic spawn ENOENT.
-      throw new Error(`CLI binary not found at expected path: ${cliPath}`)
+    // Verify the CLI binary exists
+    if (!fs.existsSync(cliPath)) {
+      throw new Error(`CLI binary not found at expected path: ${cliPath}. Please ensure the CLI is built and bundled with the extension.`)
     }
 
+    const stat = fs.statSync(cliPath)
+    console.log('[Kilo New] ServerManager: 📄 CLI isFile:', stat.isFile());
+    console.log('[Kilo New] ServerManager: 📄 CLI mode (octal):', (stat.mode & 0o777).toString(8));
+
     return new Promise((resolve, reject) => {
-      console.log('[Kilo New] ServerManager: 🎬 Spawning CLI process with command:', cliPath, ['serve', '--port', '0']);
+      console.log('[Kilo New] ServerManager: 🎬 Spawning CLI process:', cliPath, ['serve', '--port', '0']);
       const serverProcess = spawn(cliPath, ["serve", "--port", "0"], {
         env: {
           ...process.env,
@@ -110,6 +102,9 @@ export class ServerManager {
         if (this.instance?.process === serverProcess) {
           this.instance = null
         }
+        if (!resolved) {
+          reject(new Error(`CLI process exited with code ${code} before server started`))
+        }
       })
 
       // Timeout after 30 seconds
@@ -124,22 +119,10 @@ export class ServerManager {
   }
 
   private getCliPath(): string {
-    // In development: use the local package
-    // In production: use the bundled binary
-    const isDev = this.context.extensionMode === vscode.ExtensionMode.Development
-    console.log('[Kilo New] ServerManager: 🏗️ Extension mode:', isDev ? 'Development' : 'Production');
-
-    if (isDev) {
-      // Navigate from packages/kilo-vscode/dist to packages/opencode/bin/kilo
-      const devPath = path.resolve(__dirname, "../../opencode/bin/kilo")
-      console.log('[Kilo New] ServerManager: 🛠️ Using development CLI path:', devPath);
-      return devPath
-    }
-
-    // Bundled with extension
-    const prodPath = path.join(this.context.extensionPath, "bin", "kilo")
-    console.log('[Kilo New] ServerManager: 📦 Using production CLI path:', prodPath);
-    return prodPath
+    // Always use the bundled binary from the extension directory
+    const cliPath = path.join(this.context.extensionPath, "bin", "kilo")
+    console.log('[Kilo New] ServerManager: 📦 Using CLI path:', cliPath);
+    return cliPath
   }
 
   dispose(): void {
