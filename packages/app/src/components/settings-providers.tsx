@@ -226,7 +226,7 @@ export const SettingsProviders: Component = () => {
             </For>
 
             <div
-              class="flex items-center justify-between gap-4 h-16 border-b border-border-weak-base last:border-none"
+              class="flex items-center justify-between gap-4 min-h-16 border-b border-border-weak-base last:border-none flex-wrap py-3"
               data-component="custom-provider-section"
             >
               <div class="flex flex-col min-w-0">

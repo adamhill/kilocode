@@ -28,6 +28,8 @@ import { existsSync } from "fs"
 import { Bus } from "@/bus"
 import { GlobalBus } from "@/bus/global"
 import { Event } from "../server/event"
+import { PackageRegistry } from "@/bun/registry"
+
 import { ModesMigrator } from "../kilocode/modes-migrator" // kilocode_change
 import { RulesMigrator } from "../kilocode/rules-migrator" // kilocode_change
 import { WorkflowsMigrator } from "../kilocode/workflows-migrator" // kilocode_change
@@ -239,9 +241,10 @@ export namespace Config {
         }
       }
 
-      const exists = existsSync(path.join(dir, "node_modules"))
-      const installing = installDependencies(dir)
-      if (!exists) await installing
+      const shouldInstall = await needsInstall(dir)
+      if (shouldInstall) {
+        await installDependencies(dir)
+      }
 
       result.command = mergeDeep(result.command ?? {}, await loadCommand(dir))
       result.agent = mergeDeep(result.agent, await loadAgent(dir))
@@ -320,6 +323,7 @@ export namespace Config {
 
   export async function installDependencies(dir: string) {
     const pkg = path.join(dir, "package.json")
+    const targetVersion = Installation.isLocal() ? "latest" : Installation.VERSION
 
     if (!(await Bun.file(pkg).exists())) {
       await Bun.write(pkg, "{}")
@@ -329,18 +333,42 @@ export namespace Config {
     const hasGitIgnore = await Bun.file(gitignore).exists()
     if (!hasGitIgnore) await Bun.write(gitignore, ["node_modules", "package.json", "bun.lock", ".gitignore"].join("\n"))
 
-    await BunProc.run(
-      // kilocode_change start - change package name
-      ["add", "@kilocode/plugin@" + (Installation.isLocal() ? "latest" : Installation.VERSION), "--exact"],
-      // kilocode_change end
-      {
-        cwd: dir,
-      },
-    ).catch(() => {})
+    await BunProc.run(["add", `@kilocode/plugin@${targetVersion}`, "--exact"], {
+      // kilocode_change
+      cwd: dir,
+    }).catch(() => {})
 
     // Install any additional dependencies defined in the package.json
     // This allows local plugins and custom tools to use external packages
     await BunProc.run(["install"], { cwd: dir }).catch(() => {})
+  }
+
+  async function needsInstall(dir: string) {
+    const nodeModules = path.join(dir, "node_modules")
+    if (!existsSync(nodeModules)) return true
+
+    const pkg = path.join(dir, "package.json")
+    const pkgFile = Bun.file(pkg)
+    const pkgExists = await pkgFile.exists()
+    if (!pkgExists) return true
+
+    const parsed = await pkgFile.json().catch(() => null)
+    const dependencies = parsed?.dependencies ?? {}
+    const depVersion = dependencies["@opencode-ai/plugin"]
+    if (!depVersion) return true
+
+    const targetVersion = Installation.isLocal() ? "latest" : Installation.VERSION
+    if (targetVersion === "latest") {
+      const isOutdated = await PackageRegistry.isOutdated("@opencode-ai/plugin", depVersion, dir)
+      if (!isOutdated) return false
+      log.info("Cached version is outdated, proceeding with install", {
+        pkg: "@opencode-ai/plugin",
+        cachedVersion: depVersion,
+      })
+      return true
+    }
+    if (depVersion === targetVersion) return false
+    return true
   }
 
   function rel(item: string, patterns: string[]) {
@@ -704,10 +732,12 @@ export namespace Config {
         .describe("Hide this subagent from the @ autocomplete menu (default: false, only applies to mode: subagent)"),
       options: z.record(z.string(), z.any()).optional(),
       color: z
-        .string()
-        .regex(/^#[0-9a-fA-F]{6}$/, "Invalid hex color format")
+        .union([
+          z.string().regex(/^#[0-9a-fA-F]{6}$/, "Invalid hex color format"),
+          z.enum(["primary", "secondary", "accent", "success", "warning", "error", "info"]),
+        ])
         .optional()
-        .describe("Hex color code for the agent (e.g., #FF5733)"),
+        .describe("Hex color code (e.g., #FF5733) or theme color (e.g., primary)"),
       steps: z
         .number()
         .int()

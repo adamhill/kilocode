@@ -9,8 +9,11 @@
 import { createSignal, onMount, Show } from "solid-js"
 import { TextAttributes } from "@opentui/core"
 import { useKeyboard } from "@opentui/solid"
-import { getTUIDependencies } from "../context.js"
-import { fetchProfile } from "../../api/profile.js"
+import { useDialog } from "@tui/ui/dialog"
+import { useSync } from "@tui/context/sync"
+import { useToast } from "@tui/ui/toast"
+import { Link } from "@tui/ui/link"
+import { Clipboard } from "@tui/util/clipboard"
 import { DialogKiloOrganization } from "./dialog-kilo-organization.js"
 
 // These types are OpenCode-internal and imported at runtime
@@ -30,19 +33,18 @@ interface KiloAutoMethodProps {
 }
 
 export function KiloAutoMethod(props: KiloAutoMethodProps) {
-  const deps = getTUIDependencies()
   const { theme } = props.useTheme()
   const sdk = props.useSDK()
-  const dialog = deps.useDialog()
-  const sync = deps.useSync()
-  const toast = deps.useToast()
+  const dialog = useDialog()
+  const sync = useSync()
+  const toast = useToast()
   const [status, setStatus] = createSignal<"waiting" | "fetching" | "error">("waiting")
   const [tokenForOrgSelection, setTokenForOrgSelection] = createSignal<string | null>(null)
 
   useKeyboard((evt: any) => {
     if (evt.name === "c" && !evt.ctrl && !evt.meta) {
       const code = props.authorization.instructions.match(/[A-Z0-9]{4}-[A-Z0-9]{4}/)?.[0] ?? props.authorization.url
-      deps.Clipboard.copy(code)
+      Clipboard.copy(code)
         .then(() => toast.show({ message: "Copied to clipboard", variant: "info" }))
         .catch(toast.error)
     }
@@ -126,7 +128,7 @@ export function KiloAutoMethod(props: KiloAutoMethodProps) {
       </box>
 
       <box gap={1}>
-        <deps.Link href={props.authorization.url} fg={theme.primary} />
+        <Link href={props.authorization.url} fg={theme.primary} />
         <text fg={theme.textMuted}>{props.authorization.instructions}</text>
       </box>
 

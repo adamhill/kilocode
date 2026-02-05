@@ -15,6 +15,7 @@ test("agent color parsed from project config", async () => {
           $schema: "https://opencode.ai/config.json",
           agent: {
             code: { color: "#FFA500" }, // kilocode_change
+            plan: { color: "primary" },
           },
         }),
       )
@@ -25,6 +26,7 @@ test("agent color parsed from project config", async () => {
     fn: async () => {
       const cfg = await Config.get()
       expect(cfg.agent?.["code"]?.color).toBe("#FFA500") // kilocode_change
+      expect(cfg.agent?.["plan"]?.color).toBe("primary")
     },
   })
 })
@@ -38,6 +40,7 @@ test("Agent.get includes color from config", async () => {
           $schema: "https://opencode.ai/config.json",
           agent: {
             plan: { color: "#A855F7" },
+            build: { color: "accent" },
           },
         }),
       )
@@ -48,6 +51,8 @@ test("Agent.get includes color from config", async () => {
     fn: async () => {
       const plan = await AgentSvc.get("plan")
       expect(plan?.color).toBe("#A855F7")
+      const build = await AgentSvc.get("build")
+      expect(build?.color).toBe("accent")
     },
   })
 })

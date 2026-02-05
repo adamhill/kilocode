@@ -6,9 +6,11 @@
  * Pre-selects the first organization by default.
  */
 
-import { getTUIDependencies } from "../context.js"
-import type { Organization } from "../../types.js"
-import { getOrganizationOptions, getDefaultOrganizationSelection } from "../helpers.js"
+import { useDialog } from "@tui/ui/dialog"
+import { useSync } from "@tui/context/sync"
+import { DialogSelect } from "@tui/ui/dialog-select"
+import type { Organization } from "@kilocode/kilo-gateway"
+import { getOrganizationOptions, getDefaultOrganizationSelection } from "@kilocode/kilo-gateway/tui"
 
 // These types are OpenCode-internal and imported at runtime
 type UseSDK = any
@@ -25,9 +27,8 @@ interface DialogKiloOrganizationProps {
 }
 
 export function DialogKiloOrganization(props: DialogKiloOrganizationProps) {
-  const deps = getTUIDependencies()
-  const dialog = deps.useDialog()
-  const sync = deps.useSync()
+  const dialog = useDialog()
+  const sync = useSync()
   const sdk = props.useSDK()
 
   // Get formatted options with current markers
@@ -37,7 +38,7 @@ export function DialogKiloOrganization(props: DialogKiloOrganizationProps) {
   const defaultSelection = getDefaultOrganizationSelection(props.organizations)
 
   return (
-    <deps.DialogSelect
+    <DialogSelect
       title={`Select Account (${props.userEmail})`}
       options={options}
       current={defaultSelection}
