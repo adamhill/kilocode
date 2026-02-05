@@ -52,6 +52,7 @@ import { dict as kiloAr } from "@kilocode/kilo-i18n/ar"
 import { dict as kiloNo } from "@kilocode/kilo-i18n/no"
 import { dict as kiloBr } from "@kilocode/kilo-i18n/br"
 import { dict as kiloTh } from "@kilocode/kilo-i18n/th"
+import { dict as kiloBs } from "@kilocode/kilo-i18n/bs"
 // kilocode_change end
 
 export type Locale =
@@ -179,7 +180,7 @@ export const { use: useLanguage, provider: LanguageProvider } = createSimpleCont
       if (locale() === "no") return { ...base, ...i18n.flatten({ ...no, ...uiNo, ...kiloNo }) }
       if (locale() === "br") return { ...base, ...i18n.flatten({ ...br, ...uiBr, ...kiloBr }) }
       if (locale() === "th") return { ...base, ...i18n.flatten({ ...th, ...uiTh, ...kiloTh }) }
-      if (locale() === "bs") return { ...base, ...i18n.flatten({ ...bs, ...uiBs }) }
+      if (locale() === "bs") return { ...base, ...i18n.flatten({ ...bs, ...uiBs, ...kiloBs }) }
       return { ...base, ...i18n.flatten({ ...ko, ...uiKo, ...kiloKo }) }
     })
     // kilocode_change end
