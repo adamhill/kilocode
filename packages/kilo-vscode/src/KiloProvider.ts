@@ -97,8 +97,13 @@ export class KiloProvider implements vscode.WebviewViewProvider {
 			const workspaceDir = this.getWorkspaceDirectory();
 			this.sseClient.connect(workspaceDir);
 
-			// Post "ready" message to webview
-			this.postMessage({ type: 'ready' });
+			// Post "ready" message to webview with server info
+			this.postMessage({
+				type: 'ready',
+				serverInfo: {
+					port: server.port,
+				},
+			});
 		} catch (error) {
 			console.error('[KiloProvider] Failed to initialize connection:', error);
 			this.postMessage({
