@@ -14,7 +14,6 @@ vsc-extension-quickstart.md
 **/*.map
 **/*.ts
 **/.vscode-test.*
-cli-backend-integration-plan*.md
 pnpm-lock.yaml
 
 # Include bin/ directory for CLI binary (production)
