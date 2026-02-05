@@ -125,6 +125,7 @@
     "typescript-eslint": "^8.54.0"
   },
   "dependencies": {
+    "eventsource": "^2.0.2",
     "solid-js": "^1.9.11"
   }
 }
