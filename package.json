@@ -76,8 +76,6 @@
     "@kilocode/plugin": "workspace:*",
     "@kilocode/sdk": "workspace:*",
     "@opencode-ai/script": "workspace:*",
-    "baseline-browser-mapping": "2.9.19",
-    "browserslist": "4.28.1",
     "typescript": "catalog:"
   },
   "repository": {
@@ -98,8 +96,7 @@
   ],
   "overrides": {
     "@types/bun": "catalog:",
-    "@types/node": "catalog:",
-    "baseline-browser-mapping": "2.9.19"
+    "@types/node": "catalog:"
   },
   "patchedDependencies": {
     "ghostty-web@0.3.0": "patches/ghostty-web@0.3.0.patch"
