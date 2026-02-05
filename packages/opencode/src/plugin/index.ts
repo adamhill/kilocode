@@ -21,7 +21,13 @@ export namespace Plugin {
   const BUILTIN = ["opencode-anthropic-auth@0.0.13"]
 
   // Built-in plugins that are directly imported (not installed from npm)
-  const INTERNAL_PLUGINS: PluginInstance[] = [KiloAuthPlugin, CodexAuthPlugin, CopilotAuthPlugin, GitlabAuthPlugin] // kilocode_change
+  // kilocode_change start
+  const INTERNAL_PLUGINS: PluginInstance[] = [
+    KiloAuthPlugin,
+    CodexAuthPlugin,
+    CopilotAuthPlugin,
+    GitlabAuthPlugin as unknown as PluginInstance,
+  ] // kilocode_change end
 
   const state = Instance.state(async () => {
     const client = createOpencodeClient({
