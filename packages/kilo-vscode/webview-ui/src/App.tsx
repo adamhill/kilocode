@@ -49,10 +49,18 @@ const App: Component = () => {
   const [connectionState, setConnectionState] = createSignal<ConnectionState>("disconnected");
 
   const handleMessage = (event: MessageEvent) => {
+    // Debug: log *all* messages received from the extension host.
+    console.log("[Webview/App] 📨 window.message received:", {
+      data: event.data,
+      origin: (event as any).origin,
+    });
+
     const message = event.data as WebviewMessage;
+    console.log("[Webview/App] 🔎 Parsed message.type:", (message as any)?.type);
     
     switch (message.type) {
       case "action":
+        console.log("[Webview/App] 🎬 action:", message.action);
         switch (message.action) {
           case "plusButtonClicked":
             setCurrentView("newTask");
@@ -72,21 +80,29 @@ const App: Component = () => {
         }
         break;
       case "ready":
+        console.log("[Webview/App] ✅ ready:", message.serverInfo);
         if (message.serverInfo?.port) {
           setServerPort(message.serverInfo.port);
         }
         break;
       case "connectionState":
+        console.log("[Webview/App] 🔄 connectionState:", message.state);
         setConnectionState(message.state);
+        break;
+      default:
+        // If the extension sends a new message type, we want to see it immediately.
+        console.warn("[Webview/App] ⚠️ Unknown message type:", event.data);
         break;
     }
   };
 
   onMount(() => {
+    console.log("[Webview/App] 🧩 Mount: adding window.message listener");
     window.addEventListener("message", handleMessage);
   });
 
   onCleanup(() => {
+    console.log("[Webview/App] 🧹 Cleanup: removing window.message listener");
     window.removeEventListener("message", handleMessage);
   });
 

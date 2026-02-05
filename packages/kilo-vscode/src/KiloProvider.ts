@@ -67,26 +67,34 @@ export class KiloProvider implements vscode.WebviewViewProvider {
 	 * Initialize connection to the CLI backend server.
 	 */
 	private async initializeConnection(): Promise<void> {
+		console.log('[KiloProvider] 🔧 Starting initializeConnection...');
 		try {
 			// Get server from server manager
+			console.log('[KiloProvider] 📡 Requesting server from serverManager...');
 			const server = await this.serverManager.getServer();
+			console.log('[KiloProvider] ✅ Server obtained:', { port: server.port, hasPassword: !!server.password });
 
 			// Create config with baseUrl and password
 			const config: ServerConfig = {
 				baseUrl: `http://127.0.0.1:${server.port}`,
 				password: server.password,
 			};
+			console.log('[KiloProvider] 🔑 Created config:', { baseUrl: config.baseUrl });
 
 			// Create HttpClient and SSEClient instances
 			this.httpClient = new HttpClient(config);
 			this.sseClient = new SSEClient(config);
+			console.log('[KiloProvider] 🔌 Created HttpClient and SSEClient');
 
 			// Set up SSE event handling
 			this.sseClient.onEvent((event) => {
+				console.log('[KiloProvider] 📨 Received SSE event:', event.type);
 				this.handleSSEEvent(event);
 			});
 
 			this.sseClient.onStateChange((state) => {
+				console.log('[KiloProvider] 🔄 SSE state changed to:', state);
+				console.log('[KiloProvider] 📤 Posting connectionState message to webview:', state);
 				this.postMessage({
 					type: 'connectionState',
 					state,
@@ -95,17 +103,20 @@ export class KiloProvider implements vscode.WebviewViewProvider {
 
 			// Connect SSE with workspace directory
 			const workspaceDir = this.getWorkspaceDirectory();
+			console.log('[KiloProvider] 📂 Connecting SSE with workspace:', workspaceDir);
 			this.sseClient.connect(workspaceDir);
 
 			// Post "ready" message to webview with server info
+			console.log('[KiloProvider] 📤 Posting ready message to webview');
 			this.postMessage({
 				type: 'ready',
 				serverInfo: {
 					port: server.port,
 				},
 			});
+			console.log('[KiloProvider] ✅ initializeConnection completed successfully');
 		} catch (error) {
-			console.error('[KiloProvider] Failed to initialize connection:', error);
+			console.error('[KiloProvider] ❌ Failed to initialize connection:', error);
 			this.postMessage({
 				type: 'error',
 				message: error instanceof Error ? error.message : 'Failed to connect to CLI backend',

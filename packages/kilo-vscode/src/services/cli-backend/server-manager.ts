@@ -1,5 +1,6 @@
 import { spawn, ChildProcess } from "child_process"
 import * as crypto from "crypto"
+import * as fs from "fs"
 import * as path from "path"
 import * as vscode from "vscode"
 
@@ -19,17 +20,22 @@ export class ServerManager {
    * Get or start the server instance
    */
   async getServer(): Promise<ServerInstance> {
+    console.log('[ServerManager] 🔍 getServer called');
     if (this.instance) {
+      console.log('[ServerManager] ♻️ Returning existing instance:', { port: this.instance.port });
       return this.instance
     }
 
     if (this.startupPromise) {
+      console.log('[ServerManager] ⏳ Startup already in progress, waiting...');
       return this.startupPromise
     }
 
+    console.log('[ServerManager] 🚀 Starting new server instance...');
     this.startupPromise = this.startServer()
     try {
       this.instance = await this.startupPromise
+      console.log('[ServerManager] ✅ Server started successfully:', { port: this.instance.port });
       return this.instance
     } finally {
       this.startupPromise = null
@@ -39,8 +45,28 @@ export class ServerManager {
   private async startServer(): Promise<ServerInstance> {
     const password = crypto.randomBytes(32).toString("hex")
     const cliPath = this.getCliPath()
+    console.log('[ServerManager] 📍 CLI path:', cliPath);
+    console.log('[ServerManager] 🔐 Generated password (length):', password.length);
+
+    // Debug: verify the CLI binary exists at the expected path.
+    const cliExists = fs.existsSync(cliPath)
+    console.log('[ServerManager] 📄 CLI exists:', cliExists);
+    if (cliExists) {
+      try {
+        const stat = fs.statSync(cliPath)
+        console.log('[ServerManager] 📄 CLI isFile:', stat.isFile());
+        // NOTE: on Windows this is less meaningful; on macOS/Linux it helps confirm exec bit.
+        console.log('[ServerManager] 📄 CLI mode (octal):', (stat.mode & 0o777).toString(8));
+      } catch (e) {
+        console.error('[ServerManager] ❌ Failed to stat CLI binary:', e);
+      }
+    } else {
+      // Fail fast with a clearer error than a generic spawn ENOENT.
+      throw new Error(`CLI binary not found at expected path: ${cliPath}`)
+    }
 
     return new Promise((resolve, reject) => {
+      console.log('[ServerManager] 🎬 Spawning CLI process with command:', cliPath, ['serve', '--port', '0']);
       const serverProcess = spawn(cliPath, ["serve", "--port", "0"], {
         env: {
           ...process.env,
@@ -49,34 +75,38 @@ export class ServerManager {
         },
         stdio: ["ignore", "pipe", "pipe"],
       })
+      console.log('[ServerManager] 📦 Process spawned with PID:', serverProcess.pid);
 
       let resolved = false
 
       serverProcess.stdout?.on("data", (data: Buffer) => {
         const output = data.toString()
-        console.log("[CLI Server]", output)
+        console.log("[ServerManager] 📥 [CLI Server stdout]", output)
 
         // Parse: "kilo server listening on http://127.0.0.1:12345"
         const match = output.match(/listening on http:\/\/[\w.]+:(\d+)/)
         if (match && !resolved) {
           resolved = true
           const port = parseInt(match[1], 10)
+          console.log('[ServerManager] 🎯 Port detected:', port);
           resolve({ port, password, process: serverProcess })
         }
       })
 
       serverProcess.stderr?.on("data", (data: Buffer) => {
-        console.error("[CLI Server Error]", data.toString())
+        const errorOutput = data.toString()
+        console.error("[ServerManager] ⚠️ [CLI Server stderr]", errorOutput)
       })
 
       serverProcess.on("error", (error) => {
+        console.error('[ServerManager] ❌ Process error:', error);
         if (!resolved) {
           reject(error)
         }
       })
 
       serverProcess.on("exit", (code) => {
-        console.log("[CLI Server] Exited with code:", code)
+        console.log("[ServerManager] 🛑 Process exited with code:", code)
         if (this.instance?.process === serverProcess) {
           this.instance = null
         }
@@ -85,6 +115,7 @@ export class ServerManager {
       // Timeout after 30 seconds
       setTimeout(() => {
         if (!resolved) {
+          console.error('[ServerManager] ⏰ Server startup timeout (30s)');
           serverProcess.kill()
           reject(new Error("Server startup timeout"))
         }
@@ -96,14 +127,19 @@ export class ServerManager {
     // In development: use the local package
     // In production: use the bundled binary
     const isDev = this.context.extensionMode === vscode.ExtensionMode.Development
+    console.log('[ServerManager] 🏗️ Extension mode:', isDev ? 'Development' : 'Production');
 
     if (isDev) {
       // Navigate from packages/kilo-vscode to packages/opencode
-      return path.resolve(__dirname, "../../../opencode/bin/kilo")
+      const devPath = path.resolve(__dirname, "../../../opencode/bin/kilo")
+      console.log('[ServerManager] 🛠️ Using development CLI path:', devPath);
+      return devPath
     }
 
     // Bundled with extension
-    return path.join(this.context.extensionPath, "bin", "kilo")
+    const prodPath = path.join(this.context.extensionPath, "bin", "kilo")
+    console.log('[ServerManager] 📦 Using production CLI path:', prodPath);
+    return prodPath
   }
 
   dispose(): void {
