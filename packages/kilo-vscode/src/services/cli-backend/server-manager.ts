@@ -130,8 +130,8 @@ export class ServerManager {
     console.log('[Kilo New] ServerManager: 🏗️ Extension mode:', isDev ? 'Development' : 'Production');
 
     if (isDev) {
-      // Navigate from packages/kilo-vscode to packages/opencode
-      const devPath = path.resolve(__dirname, "../../../opencode/bin/kilo")
+      // Navigate from packages/kilo-vscode/dist to packages/opencode/bin/kilo
+      const devPath = path.resolve(__dirname, "../../opencode/bin/kilo")
       console.log('[Kilo New] ServerManager: 🛠️ Using development CLI path:', devPath);
       return devPath
     }
