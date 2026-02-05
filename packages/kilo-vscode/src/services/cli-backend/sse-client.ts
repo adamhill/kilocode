@@ -15,6 +15,7 @@ export class SSEClient {
   private handlers: Set<SSEEventHandler> = new Set()
   private errorHandlers: Set<SSEErrorHandler> = new Set()
   private stateHandlers: Set<SSEStateHandler> = new Set()
+  private readonly authUsername = "opencode"
 
   constructor(private readonly config: ServerConfig) {}
 
@@ -40,8 +41,11 @@ export class SSEClient {
     console.log('[Kilo New] SSE: 🌐 Connecting to URL:', url);
 
     // Create auth header
-    const authHeader = `Basic ${Buffer.from(`:${this.config.password}`).toString("base64")}`
-    console.log('[Kilo New] SSE: 🔑 Auth header created (password length):', this.config.password.length);
+    const authHeader = `Basic ${Buffer.from(`${this.authUsername}:${this.config.password}`).toString("base64")}`
+    console.log('[Kilo New] SSE: 🔑 Auth header created', {
+      username: this.authUsername,
+      passwordLength: this.config.password.length,
+    });
 
     // Create EventSource with headers
     console.log('[Kilo New] SSE: 🎬 Creating EventSource...');

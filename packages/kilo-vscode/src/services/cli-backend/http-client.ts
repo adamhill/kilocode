@@ -7,11 +7,20 @@ import type { ServerConfig, SessionInfo, MessageInfo, MessagePart } from "./type
 export class HttpClient {
   private readonly baseUrl: string
   private readonly authHeader: string
+  private readonly authUsername = "opencode"
 
   constructor(config: ServerConfig) {
     this.baseUrl = config.baseUrl
-    // Auth header format: Basic base64(":password")
-    this.authHeader = `Basic ${Buffer.from(`:${config.password}`).toString("base64")}`
+    // Auth header format: Basic base64("opencode:password")
+    // NOTE: The CLI server expects a non-empty username ("opencode"). Using an empty username
+    // (":password") results in 401 for both REST and SSE endpoints.
+    this.authHeader = `Basic ${Buffer.from(`${this.authUsername}:${config.password}`).toString("base64")}`
+
+    // Safe debug logging: no secrets.
+    console.log("[Kilo New] HTTP: 🔐 Auth configured", {
+      username: this.authUsername,
+      passwordLength: config.password.length,
+    })
   }
 
   /**
