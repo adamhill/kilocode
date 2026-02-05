@@ -67,34 +67,34 @@ export class KiloProvider implements vscode.WebviewViewProvider {
 	 * Initialize connection to the CLI backend server.
 	 */
 	private async initializeConnection(): Promise<void> {
-		console.log('[KiloProvider] 🔧 Starting initializeConnection...');
+		console.log('[Kilo New] KiloProvider: 🔧 Starting initializeConnection...');
 		try {
 			// Get server from server manager
-			console.log('[KiloProvider] 📡 Requesting server from serverManager...');
+			console.log('[Kilo New] KiloProvider: 📡 Requesting server from serverManager...');
 			const server = await this.serverManager.getServer();
-			console.log('[KiloProvider] ✅ Server obtained:', { port: server.port, hasPassword: !!server.password });
+			console.log('[Kilo New] KiloProvider: ✅ Server obtained:', { port: server.port, hasPassword: !!server.password });
 
 			// Create config with baseUrl and password
 			const config: ServerConfig = {
 				baseUrl: `http://127.0.0.1:${server.port}`,
 				password: server.password,
 			};
-			console.log('[KiloProvider] 🔑 Created config:', { baseUrl: config.baseUrl });
+			console.log('[Kilo New] KiloProvider: 🔑 Created config:', { baseUrl: config.baseUrl });
 
 			// Create HttpClient and SSEClient instances
 			this.httpClient = new HttpClient(config);
 			this.sseClient = new SSEClient(config);
-			console.log('[KiloProvider] 🔌 Created HttpClient and SSEClient');
+			console.log('[Kilo New] KiloProvider: 🔌 Created HttpClient and SSEClient');
 
 			// Set up SSE event handling
 			this.sseClient.onEvent((event) => {
-				console.log('[KiloProvider] 📨 Received SSE event:', event.type);
+				console.log('[Kilo New] KiloProvider: 📨 Received SSE event:', event.type);
 				this.handleSSEEvent(event);
 			});
 
 			this.sseClient.onStateChange((state) => {
-				console.log('[KiloProvider] 🔄 SSE state changed to:', state);
-				console.log('[KiloProvider] 📤 Posting connectionState message to webview:', state);
+				console.log('[Kilo New] KiloProvider: 🔄 SSE state changed to:', state);
+				console.log('[Kilo New] KiloProvider: 📤 Posting connectionState message to webview:', state);
 				this.postMessage({
 					type: 'connectionState',
 					state,
@@ -103,20 +103,20 @@ export class KiloProvider implements vscode.WebviewViewProvider {
 
 			// Connect SSE with workspace directory
 			const workspaceDir = this.getWorkspaceDirectory();
-			console.log('[KiloProvider] 📂 Connecting SSE with workspace:', workspaceDir);
+			console.log('[Kilo New] KiloProvider: 📂 Connecting SSE with workspace:', workspaceDir);
 			this.sseClient.connect(workspaceDir);
 
 			// Post "ready" message to webview with server info
-			console.log('[KiloProvider] 📤 Posting ready message to webview');
+			console.log('[Kilo New] KiloProvider: 📤 Posting ready message to webview');
 			this.postMessage({
 				type: 'ready',
 				serverInfo: {
 					port: server.port,
 				},
 			});
-			console.log('[KiloProvider] ✅ initializeConnection completed successfully');
+			console.log('[Kilo New] KiloProvider: ✅ initializeConnection completed successfully');
 		} catch (error) {
-			console.error('[KiloProvider] ❌ Failed to initialize connection:', error);
+			console.error('[Kilo New] KiloProvider: ❌ Failed to initialize connection:', error);
 			this.postMessage({
 				type: 'error',
 				message: error instanceof Error ? error.message : 'Failed to connect to CLI backend',
@@ -151,7 +151,7 @@ export class KiloProvider implements vscode.WebviewViewProvider {
 				workspaceDir
 			);
 		} catch (error) {
-			console.error('[KiloProvider] Failed to send message:', error);
+			console.error('[Kilo New] KiloProvider: Failed to send message:', error);
 			this.postMessage({
 				type: 'error',
 				message: error instanceof Error ? error.message : 'Failed to send message',
@@ -171,7 +171,7 @@ export class KiloProvider implements vscode.WebviewViewProvider {
 			const workspaceDir = this.getWorkspaceDirectory();
 			await this.httpClient.abortSession(this.currentSession.id, workspaceDir);
 		} catch (error) {
-			console.error('[KiloProvider] Failed to abort session:', error);
+			console.error('[Kilo New] KiloProvider: Failed to abort session:', error);
 		}
 	}
 
@@ -195,7 +195,7 @@ export class KiloProvider implements vscode.WebviewViewProvider {
 				workspaceDir
 			);
 		} catch (error) {
-			console.error('[KiloProvider] Failed to respond to permission:', error);
+			console.error('[Kilo New] KiloProvider: Failed to respond to permission:', error);
 		}
 	}
 
