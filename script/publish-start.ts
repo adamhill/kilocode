@@ -69,7 +69,7 @@ await Bun.file(extensionToml).write(toml)
 await $`bun install`
 
 console.log("\n=== opencode ===\n")
-await import(`../packages/opencode/script/publish.ts`)
+await import(`../packages/opencode/script/legacy-publish.ts`)
 
 console.log("\n=== sdk ===\n")
 await import(`../packages/sdk/js/script/publish.ts`)
