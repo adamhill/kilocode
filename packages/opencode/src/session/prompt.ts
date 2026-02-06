@@ -268,22 +268,28 @@ export namespace SessionPrompt {
       })
     }
 
+    // kilocode_change start
     Bus.publish(Session.Event.TurnOpen, { sessionID })
     let closeReason: "completed" | "error" | "interrupted" = "completed"
+    // kilocode_change end
     using _ = defer(() => cancel(sessionID))
+    // kilocode_change start
     using _close = defer(() => {
       Bus.publish(Session.Event.TurnClose, { sessionID, reason: closeReason })
     })
+    // kilocode_change end
 
     let step = 0
     const session = await Session.get(sessionID)
     while (true) {
       SessionStatus.set(sessionID, { type: "busy" })
       log.info("loop", { step, sessionID })
+      // kilocode_change start
       if (abort.aborted) {
         closeReason = "interrupted"
         break
       }
+      // kilocode_change end
       let msgs = await MessageV2.filterCompacted(MessageV2.stream(sessionID))
 
       let lastUser: MessageV2.User | undefined
@@ -628,10 +634,12 @@ export namespace SessionPrompt {
         tools,
         model,
       })
+      // kilocode_change start
       if (result === "stop") {
         if (processor.message.error) closeReason = "error"
         break
       }
+      // kilocode_change end
       if (result === "compact") {
         await SessionCompaction.create({
           sessionID,

@@ -135,6 +135,7 @@ export namespace Session {
         error: MessageV2.Assistant.shape.error,
       }),
     ),
+    // kilocode_change start
     TurnOpen: BusEvent.define(
       "session.turn.open",
       z.object({
@@ -148,6 +149,7 @@ export namespace Session {
         reason: z.enum(["completed", "error", "interrupted"]),
       }),
     ),
+    // kilocode_change end
   }
 
   export const create = fn(
