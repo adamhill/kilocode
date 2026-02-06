@@ -7,6 +7,8 @@ export namespace IngestQueue {
     fetch: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>
   }
 
+  export type CloseReason = "completed" | "error" | "interrupted"
+
   export type Data =
     | {
         type: "kilo_meta"
@@ -34,6 +36,14 @@ export namespace IngestQueue {
     | {
         type: "model"
         data: SDK.Model[]
+      }
+    | {
+        type: "session_open"
+        data: Record<string, never>
+      }
+    | {
+        type: "session_close"
+        data: { reason: CloseReason }
       }
 
   type Share = {
@@ -107,6 +117,8 @@ export namespace IngestQueue {
       if (item.type === "kilo_meta") return "kilo_meta"
       if (item.type === "session") return "session"
       if (item.type === "session_diff") return "session_diff"
+      if (item.type === "session_open") return "session_open"
+      if (item.type === "session_close") return "session_close"
 
       if (item.type === "message") {
         const value = id(item.data)
@@ -184,7 +196,7 @@ export namespace IngestQueue {
         if (!client) return
 
         const response = await client
-          .fetch(`${client.url}${share.ingestPath}`, {
+          .fetch(`${client.url}${share.ingestPath}?v=1`, {
             method: "POST",
             body: JSON.stringify({
               data: items,

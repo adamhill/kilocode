@@ -135,6 +135,19 @@ export namespace Session {
         error: MessageV2.Assistant.shape.error,
       }),
     ),
+    TurnOpen: BusEvent.define(
+      "session.turn.open",
+      z.object({
+        sessionID: z.string(),
+      }),
+    ),
+    TurnClose: BusEvent.define(
+      "session.turn.close",
+      z.object({
+        sessionID: z.string(),
+        reason: z.enum(["completed", "error", "interrupted"]),
+      }),
+    ),
   }
 
   export const create = fn(

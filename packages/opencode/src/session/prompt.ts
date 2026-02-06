@@ -268,14 +268,22 @@ export namespace SessionPrompt {
       })
     }
 
+    Bus.publish(Session.Event.TurnOpen, { sessionID })
+    let closeReason: "completed" | "error" | "interrupted" = "completed"
     using _ = defer(() => cancel(sessionID))
+    using _close = defer(() => {
+      Bus.publish(Session.Event.TurnClose, { sessionID, reason: closeReason })
+    })
 
     let step = 0
     const session = await Session.get(sessionID)
     while (true) {
       SessionStatus.set(sessionID, { type: "busy" })
       log.info("loop", { step, sessionID })
-      if (abort.aborted) break
+      if (abort.aborted) {
+        closeReason = "interrupted"
+        break
+      }
       let msgs = await MessageV2.filterCompacted(MessageV2.stream(sessionID))
 
       let lastUser: MessageV2.User | undefined
@@ -620,7 +628,10 @@ export namespace SessionPrompt {
         tools,
         model,
       })
-      if (result === "stop") break
+      if (result === "stop") {
+        if (processor.message.error) closeReason = "error"
+        break
+      }
       if (result === "compact") {
         await SessionCompaction.create({
           sessionID,
