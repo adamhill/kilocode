@@ -636,7 +636,8 @@ export namespace SessionPrompt {
       })
       // kilocode_change start
       if (result === "stop") {
-        if (processor.message.error) closeReason = "error"
+        if (abort.aborted) closeReason = "interrupted"
+        else if (processor.message.error) closeReason = "error"
         break
       }
       // kilocode_change end
