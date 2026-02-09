@@ -2,6 +2,7 @@ import { test, expect } from "../fixtures"
 import { createTestProject, cleanupTestProject, openSidebar, clickMenuItem } from "../actions"
 import { projectCloseHoverSelector, projectCloseMenuSelector, projectSwitchSelector } from "../selectors"
 import { dirSlug } from "../utils"
+import path from "path" // kilocode_change - import path for project name extraction
 
 test("can close a project via hover card close button", async ({ page, withProject }) => {
   await page.setViewportSize({ width: 1400, height: 800 })
@@ -35,7 +36,7 @@ test("can close a project via project header more options menu", async ({ page, 
   await page.setViewportSize({ width: 1400, height: 800 })
 
   const other = await createTestProject()
-  const otherName = other.split("/").pop() ?? other
+  const otherName = path.basename(other) // kilocode_change - use project name instead of slug for header matching
   const otherSlug = dirSlug(other)
 
   try {
