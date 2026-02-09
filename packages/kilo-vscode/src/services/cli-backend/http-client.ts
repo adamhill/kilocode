@@ -1,4 +1,11 @@
-import type { ServerConfig, SessionInfo, MessageInfo, MessagePart } from "./types"
+import type {
+  ServerConfig,
+  SessionInfo,
+  MessageInfo,
+  MessagePart,
+  ProfileData,
+  ProviderAuthAuthorization,
+} from "./types"
 
 /**
  * HTTP Client for communicating with the CLI backend server.
@@ -26,12 +33,7 @@ export class HttpClient {
   /**
    * Make an HTTP request to the CLI backend server.
    */
-  private async request<T>(
-    method: string,
-    path: string,
-    body?: unknown,
-    options?: { directory?: string }
-  ): Promise<T> {
+  private async request<T>(method: string, path: string, body?: unknown, options?: { directory?: string }): Promise<T> {
     const url = `${this.baseUrl}${path}`
 
     const headers: Record<string, string> = {
@@ -98,28 +100,25 @@ export class HttpClient {
   async sendMessage(
     sessionId: string,
     parts: Array<{ type: "text"; text: string } | { type: "file"; mime: string; url: string }>,
-    directory: string
+    directory: string,
   ): Promise<{ info: MessageInfo; parts: MessagePart[] }> {
     return this.request<{ info: MessageInfo; parts: MessagePart[] }>(
       "POST",
       `/session/${sessionId}/message`,
       { parts },
-      { directory }
+      { directory },
     )
   }
 
   /**
    * Get all messages for a session.
    */
-  async getMessages(
-    sessionId: string,
-    directory: string
-  ): Promise<Array<{ info: MessageInfo; parts: MessagePart[] }>> {
+  async getMessages(sessionId: string, directory: string): Promise<Array<{ info: MessageInfo; parts: MessagePart[] }>> {
     return this.request<Array<{ info: MessageInfo; parts: MessagePart[] }>>(
       "GET",
       `/session/${sessionId}/message`,
       undefined,
-      { directory }
+      { directory },
     )
   }
 
@@ -146,14 +145,58 @@ export class HttpClient {
     sessionId: string,
     permissionId: string,
     response: "once" | "always" | "reject",
-    directory: string
+    directory: string,
   ): Promise<boolean> {
-    await this.request<void>(
-      "POST",
-      `/session/${sessionId}/permissions/${permissionId}`,
-      { response },
-      { directory }
-    )
+    await this.request<void>("POST", `/session/${sessionId}/permissions/${permissionId}`, { response }, { directory })
     return true
+  }
+
+  // ============================================
+  // Profile Methods
+  // ============================================
+
+  /**
+   * Get the current user's profile from the kilo-gateway.
+   * Returns null if not logged in or if the request fails.
+   */
+  async getProfile(): Promise<ProfileData | null> {
+    try {
+      return await this.request<ProfileData>("GET", "/kilo/profile")
+    } catch {
+      return null
+    }
+  }
+
+  // ============================================
+  // Auth Methods
+  // ============================================
+
+  /**
+   * Remove authentication credentials for a provider.
+   * Used for logout when called with "kilo".
+   */
+  async removeAuth(providerId: string): Promise<boolean> {
+    return this.request<boolean>("DELETE", `/auth/${providerId}`)
+  }
+
+  /**
+   * Initiate OAuth authorization for a provider.
+   * Returns the authorization URL and instructions.
+   */
+  async oauthAuthorize(providerId: string, method: number, directory: string): Promise<ProviderAuthAuthorization> {
+    return this.request<ProviderAuthAuthorization>(
+      "POST",
+      `/provider/${providerId}/oauth/authorize`,
+      { method },
+      { directory },
+    )
+  }
+
+  /**
+   * Complete OAuth callback for a provider.
+   * For "auto" method providers (like kilo), this blocks until polling completes.
+   */
+  async oauthCallback(providerId: string, method: number, directory: string): Promise<boolean> {
+    return this.request<boolean>("POST", `/provider/${providerId}/oauth/callback`, { method }, { directory })
   }
 }
