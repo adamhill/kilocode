@@ -5,6 +5,7 @@ import type {
   MessagePart,
   ProfileData,
   ProviderAuthAuthorization,
+  ProviderListResponse,
 } from "./types"
 
 /**
@@ -88,6 +89,17 @@ export class HttpClient {
    */
   async listSessions(directory: string): Promise<SessionInfo[]> {
     return this.request<SessionInfo[]>("GET", "/session", undefined, { directory })
+  }
+
+  // ============================================
+  // Provider Methods
+  // ============================================
+
+  /**
+   * List all providers with their models, connection status, and defaults.
+   */
+  async listProviders(directory: string): Promise<ProviderListResponse> {
+    return this.request<ProviderListResponse>("GET", "/provider", undefined, { directory })
   }
 
   // ============================================
