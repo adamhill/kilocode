@@ -11,6 +11,9 @@ importers:
       eventsource:
         specifier: ^2.0.2
         version: 2.0.2
+      lucide-solid:
+        specifier: ^0.563.0
+        version: 0.563.0(solid-js@1.9.11)
       solid-js:
         specifier: ^1.9.11
         version: 1.9.11
@@ -1299,6 +1302,11 @@ packages:
 
   lru-cache@5.1.1:
     resolution: {integrity: sha512-KpNARQA3Iwv+jTA0utUVVbrh+Jlrr1Fv0e56GGzAFOXN7dk/FviaDW8LHmK52DlcH4WP2n6gI8vN1aesBFgo9w==}
+
+  lucide-solid@0.563.0:
+    resolution: {integrity: sha512-Ort9I6BaKdarM/e0VwWddcd9tuven/y0wHqfXIPNzPPe3zwXtIZJDjR2UcAj2XBCfx1aHw/SWiLHPvn9O1Fniw==}
+    peerDependencies:
+      solid-js: ^1.4.7
 
   make-dir@4.0.0:
     resolution: {integrity: sha512-hXdUTZYIVOt1Ex//jAQi+wTZZpUpwBj/0QsOzqegb3rGMMeJiSEu5xLHnYfBrRV4RH2+OCSOO95Is/7x1WJ4bw==}
@@ -3210,6 +3218,10 @@ snapshots:
   lru-cache@5.1.1:
     dependencies:
       yallist: 3.1.1
+
+  lucide-solid@0.563.0(solid-js@1.9.11):
+    dependencies:
+      solid-js: 1.9.11
 
   make-dir@4.0.0:
     dependencies:

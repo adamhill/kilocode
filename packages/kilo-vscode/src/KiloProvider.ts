@@ -298,9 +298,7 @@ export class KiloProvider implements vscode.WebviewViewProvider {
 		.container {
 			display: flex;
 			flex-direction: column;
-			align-items: center;
-			justify-content: center;
-			min-height: 100px;
+			height: 100vh;
 		}
 	</style>
 </head>
