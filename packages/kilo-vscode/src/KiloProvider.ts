@@ -142,7 +142,7 @@ export class KiloProvider implements vscode.WebviewViewProvider {
           await this.syncWebviewState("webviewReady")
           break
         case "sendMessage":
-          await this.handleSendMessage(message.text, message.sessionID)
+          await this.handleSendMessage(message.text, message.sessionID, message.providerID, message.modelID)
           break
         case "abort":
           await this.handleAbort(message.sessionID)
@@ -176,6 +176,9 @@ export class KiloProvider implements vscode.WebviewViewProvider {
           if (message.url) {
             vscode.env.openExternal(vscode.Uri.parse(message.url))
           }
+          break
+        case "saveModel":
+          await this.handleSaveModel(message.providerID, message.modelID)
           break
       }
     })
@@ -248,6 +251,10 @@ export class KiloProvider implements vscode.WebviewViewProvider {
 
       this.postMessage({ type: "connectionState", state: this.connectionState })
       await this.syncWebviewState("initializeConnection")
+
+      // Fetch providers and send to webview
+      await this.fetchAndSendProviders()
+
       console.log("[Kilo New] KiloProvider: ✅ initializeConnection completed successfully")
     } catch (error) {
       console.error("[Kilo New] KiloProvider: ❌ Failed to initialize connection:", error)
@@ -380,9 +387,57 @@ export class KiloProvider implements vscode.WebviewViewProvider {
   }
 
   /**
+   * Fetch providers from the backend and send to webview.
+   */
+  private async fetchAndSendProviders(): Promise<void> {
+    if (!this.httpClient) {
+      return
+    }
+
+    try {
+      const workspaceDir = this.getWorkspaceDirectory()
+      const response = await this.httpClient.listProviders(workspaceDir)
+      const config = vscode.workspace.getConfiguration("kilo-code.new.model")
+      const providerID = config.get<string>("providerID", "")
+      const modelID = config.get<string>("modelID", "")
+
+      console.log("[Kilo New] KiloProvider: 📦 Providers loaded, sending to webview", {
+        providerCount: Object.keys(response.all).length,
+        connectedCount: response.connected.length,
+        savedProvider: providerID,
+        savedModel: modelID,
+      })
+
+      this.postMessage({
+        type: "providersLoaded",
+        providers: response.all,
+        connected: response.connected,
+        defaults: response.default,
+        savedSelection: providerID || modelID ? { providerID, modelID } : undefined,
+      })
+    } catch (error) {
+      console.error("[Kilo New] KiloProvider: Failed to fetch providers:", error)
+    }
+  }
+
+  /**
+   * Handle saving model selection to VS Code settings.
+   */
+  private async handleSaveModel(providerID: string, modelID: string): Promise<void> {
+    const config = vscode.workspace.getConfiguration("kilo-code.new.model")
+    try {
+      await config.update("providerID", providerID, vscode.ConfigurationTarget.Global)
+      await config.update("modelID", modelID, vscode.ConfigurationTarget.Global)
+      console.log("[Kilo New] KiloProvider: 💾 Model selection saved:", { providerID, modelID })
+    } catch (error) {
+      console.error("[Kilo New] KiloProvider: Failed to save model selection:", error)
+    }
+  }
+
+  /**
    * Handle sending a message from the webview.
    */
-  private async handleSendMessage(text: string, sessionID?: string): Promise<void> {
+  private async handleSendMessage(text: string, sessionID?: string, providerID?: string, modelID?: string): Promise<void> {
     if (!this.httpClient) {
       this.postMessage({
         type: "error",
@@ -410,8 +465,11 @@ export class KiloProvider implements vscode.WebviewViewProvider {
         throw new Error("No session available")
       }
 
-      // Send message with text part
-      await this.httpClient.sendMessage(targetSessionID, [{ type: "text", text }], workspaceDir)
+      // Send message with text part and optional model selection
+      await this.httpClient.sendMessage(targetSessionID, [{ type: "text", text }], workspaceDir, {
+        providerID,
+        modelID,
+      })
     } catch (error) {
       console.error("[Kilo New] KiloProvider: Failed to send message:", error)
       this.postMessage({
