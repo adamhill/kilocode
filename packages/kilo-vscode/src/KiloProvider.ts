@@ -18,6 +18,7 @@ export class KiloProvider implements vscode.WebviewViewProvider {
   private currentSession: SessionInfo | null = null
   private serverInfo: { port: number } | null = null
   private connectionState: "connecting" | "connected" | "disconnected" | "error" = "connecting"
+  private loginAttempt = 0
 
   constructor(
     private readonly extensionUri: vscode.Uri,
@@ -126,6 +127,7 @@ export class KiloProvider implements vscode.WebviewViewProvider {
           await this.handleLogin()
           break
         case "cancelLogin":
+          this.loginAttempt++ // Invalidate in-flight login
           this.postMessage({ type: "deviceAuthCancelled" })
           break
         case "logout":
@@ -439,37 +441,55 @@ export class KiloProvider implements vscode.WebviewViewProvider {
       return
     }
 
+    const attempt = ++this.loginAttempt
+
     console.log("[Kilo New] KiloProvider: 🔐 Starting login flow...")
 
-    const workspaceDir = this.getWorkspaceDirectory()
+    try {
+      const workspaceDir = this.getWorkspaceDirectory()
 
-    // Step 1: Initiate OAuth authorization
-    const auth = await this.httpClient.oauthAuthorize("kilo", 0, workspaceDir)
-    console.log("[Kilo New] KiloProvider: 🔐 Got auth URL:", auth.url)
+      // Step 1: Initiate OAuth authorization
+      const auth = await this.httpClient.oauthAuthorize("kilo", 0, workspaceDir)
+      console.log("[Kilo New] KiloProvider: 🔐 Got auth URL:", auth.url)
 
-    // Parse code from instructions (format: "Open URL and enter code: ABCD-1234")
-    const codeMatch = auth.instructions?.match(/code:\s*(\S+)/i)
-    const code = codeMatch ? codeMatch[1] : undefined
+      // Parse code from instructions (format: "Open URL and enter code: ABCD-1234")
+      const codeMatch = auth.instructions?.match(/code:\s*(\S+)/i)
+      const code = codeMatch ? codeMatch[1] : undefined
 
-    // Step 2: Open browser for user to authorize
-    vscode.env.openExternal(vscode.Uri.parse(auth.url))
+      // Step 2: Open browser for user to authorize
+      vscode.env.openExternal(vscode.Uri.parse(auth.url))
 
-    // Send device auth details to webview
-    this.postMessage({
-      type: "deviceAuthStarted",
-      code,
-      verificationUrl: auth.url,
-      expiresIn: 900, // 15 minutes default
-    })
+      // Send device auth details to webview
+      this.postMessage({
+        type: "deviceAuthStarted",
+        code,
+        verificationUrl: auth.url,
+        expiresIn: 900, // 15 minutes default
+      })
 
-    // Step 3: Wait for callback (blocks until polling completes)
-    await this.httpClient.oauthCallback("kilo", 0, workspaceDir)
-    console.log("[Kilo New] KiloProvider: 🔐 Login successful")
+      // Step 3: Wait for callback (blocks until polling completes)
+      await this.httpClient.oauthCallback("kilo", 0, workspaceDir)
 
-    // Step 4: Fetch profile and push to webview
-    const profileData = await this.httpClient.getProfile()
-    this.postMessage({ type: "profileData", data: profileData })
-    this.postMessage({ type: "deviceAuthComplete" })
+      // Check if this attempt was cancelled
+      if (attempt !== this.loginAttempt) {
+        return
+      }
+
+      console.log("[Kilo New] KiloProvider: 🔐 Login successful")
+
+      // Step 4: Fetch profile and push to webview
+      const profileData = await this.httpClient.getProfile()
+      this.postMessage({ type: "profileData", data: profileData })
+      this.postMessage({ type: "deviceAuthComplete" })
+    } catch (error) {
+      if (attempt !== this.loginAttempt) {
+        return
+      }
+      this.postMessage({
+        type: "deviceAuthFailed",
+        error: error instanceof Error ? error.message : "Login failed",
+      })
+    }
   }
 
   /**

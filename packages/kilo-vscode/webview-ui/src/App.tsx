@@ -94,8 +94,8 @@ const AppContent: Component = () => {
         <Match when={currentView() === "profile"}>
           <ProfileView
             profileData={server.profileData()}
-            loginStatus={server.loginStatus()}
-            loginError={server.loginError()}
+            deviceAuth={server.deviceAuth()}
+            onLogin={server.startLogin}
           />
         </Match>
         <Match when={currentView() === "settings"}>
