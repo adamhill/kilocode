@@ -341,6 +341,10 @@ export interface WebviewReadyRequest {
   type: "webviewReady"
 }
 
+export interface RequestProvidersMessage {
+  type: "requestProviders"
+}
+
 export type WebviewMessage =
   | SendMessageRequest
   | AbortRequest
@@ -354,6 +358,7 @@ export type WebviewMessage =
   | OpenExternalRequest
   | CancelLoginRequest
   | WebviewReadyRequest
+  | RequestProvidersMessage
 
 // ============================================
 // VS Code API type

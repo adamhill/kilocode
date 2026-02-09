@@ -40,6 +40,7 @@ export const ProviderProvider: ParentComponent = (props) => {
       for (const modelID of Object.keys(provider.models)) {
         result.push({
           ...provider.models[modelID],
+          id: modelID,
           providerID,
           providerName: provider.name,
         })
@@ -62,13 +63,14 @@ export const ProviderProvider: ParentComponent = (props) => {
         return
       }
 
-      console.log("[Kilo New] Providers loaded:", Object.keys(message.providers).length, "providers,", message.connected.length, "connected")
-
       setProviders(message.providers)
       setConnected(message.connected)
       setDefaults(message.defaults)
       setDefaultSelection(message.defaultSelection)
     })
+
+    // Request providers from extension in case the initial push was missed
+    vscode.postMessage({ type: "requestProviders" })
 
     onCleanup(unsubscribe)
   })

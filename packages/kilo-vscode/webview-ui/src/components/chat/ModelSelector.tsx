@@ -166,6 +166,11 @@ export const ModelSelector: Component = () => {
     if (sel) {
       return sel.name
     }
+    // Fallback: raw selection exists but findModel didn't resolve — show raw IDs
+    const raw = session.selected()
+    if (raw?.providerID && raw?.modelID) {
+      return raw.providerID === KILO_GATEWAY_ID ? raw.modelID : `${raw.providerID} / ${raw.modelID}`
+    }
     return hasProviders() ? "Select model" : "No providers"
   }
 
@@ -179,7 +184,7 @@ export const ModelSelector: Component = () => {
         aria-expanded={open()}
         title={selectedModel()?.id}
       >
-        <span class="model-selector-trigger-label">{triggerLabel()}</span>
+        <span class="model-selector-trigger-label">{() => triggerLabel()}</span>
         <svg class="model-selector-trigger-chevron" width="10" height="10" viewBox="0 0 16 16" fill="currentColor">
           <path d="M8 4l4 5H4l4-5z" />
         </svg>

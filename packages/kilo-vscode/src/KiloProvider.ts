@@ -9,6 +9,7 @@ export class KiloProvider implements vscode.WebviewViewProvider {
   private connectionState: "connecting" | "connected" | "disconnected" | "error" = "connecting"
   private loginAttempt = 0
   private isWebviewReady = false
+  private messageCounter = 0
 
   private trackedSessionIds: Set<string> = new Set()
   private unsubscribeEvent: (() => void) | null = null
@@ -89,6 +90,7 @@ export class KiloProvider implements vscode.WebviewViewProvider {
   ) {
     // Store the webview references
     this.isWebviewReady = false
+    console.log("[Kilo New] KiloProvider: 🧩 resolveWebviewView called")
     this.webview = webviewView.webview
 
     // Set up webview options
@@ -99,6 +101,7 @@ export class KiloProvider implements vscode.WebviewViewProvider {
 
     // Set HTML content
     webviewView.webview.html = this._getHtmlForWebview(webviewView.webview)
+    console.log("[Kilo New] KiloProvider: 🧩 Webview HTML set")
 
     // Handle messages from webview (shared handler)
     this.setupWebviewMessageHandler(webviewView.webview)
@@ -176,6 +179,9 @@ export class KiloProvider implements vscode.WebviewViewProvider {
           if (message.url) {
             vscode.env.openExternal(vscode.Uri.parse(message.url))
           }
+          break
+        case "requestProviders":
+          await this.fetchAndSendProviders()
           break
       }
     })
@@ -724,7 +730,29 @@ export class KiloProvider implements vscode.WebviewViewProvider {
    * Public so toolbar button commands can send messages.
    */
   public postMessage(message: unknown): void {
-    this.webview?.postMessage(message)
+    const id = ++this.messageCounter
+
+    const type =
+      typeof message === "object" &&
+      message !== null &&
+      "type" in message &&
+      typeof (message as { type?: unknown }).type === "string"
+        ? ((message as { type: string }).type as string)
+        : "<unknown>"
+
+    if (!this.webview) {
+      console.warn("[Kilo New] KiloProvider: ⚠️ postMessage dropped (no webview)", { id, type })
+      return
+    }
+
+    void this.webview.postMessage(message).then(
+      (delivered) => {
+        console.log("[Kilo New] KiloProvider: 📬 postMessage result", { id, type, delivered })
+      },
+      (error) => {
+        console.error("[Kilo New] KiloProvider: ❌ postMessage failed", { id, type, error })
+      },
+    )
   }
 
   /**

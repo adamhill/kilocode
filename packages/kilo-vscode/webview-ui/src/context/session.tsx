@@ -116,9 +116,9 @@ export const SessionProvider: ParentComponent = (props) => {
 
   // Per-session model selection
   const selected = createMemo<ModelSelection | null>(() => {
-    const id = currentSessionID()
-    if (id) {
-      return store.modelSelections[id] ?? provider.defaultSelection()
+    const sessionID = currentSessionID()
+    if (sessionID) {
+      return store.modelSelections[sessionID] ?? provider.defaultSelection()
     }
     return pendingModelSelection()
   })
@@ -176,7 +176,6 @@ export const SessionProvider: ParentComponent = (props) => {
 
   // Event handlers
   function handleSessionCreated(session: SessionInfo) {
-    console.log("[Kilo New] Session created:", session.id)
     batch(() => {
       setStore("sessions", session.id, session)
       setStore("messages", session.id, [])
@@ -193,7 +192,6 @@ export const SessionProvider: ParentComponent = (props) => {
   }
 
   function handleMessagesLoaded(sessionID: string, messages: Message[]) {
-    console.log("[Kilo New] Messages loaded for session:", sessionID, messages.length)
     setStore("messages", sessionID, messages)
 
     // Also extract parts from messages
@@ -205,8 +203,6 @@ export const SessionProvider: ParentComponent = (props) => {
   }
 
   function handleMessageCreated(message: Message) {
-    console.log("[Kilo New] Message created/updated:", message.id, message.role)
-
     setStore("messages", message.sessionID, (msgs = []) => {
       // Check if message already exists (update case)
       const existingIndex = msgs.findIndex((m) => m.id === message.id)
@@ -239,8 +235,6 @@ export const SessionProvider: ParentComponent = (props) => {
       return
     }
 
-    console.log("[Kilo New] Part updated:", effectiveMessageID, part.id, part.type)
-
     setStore(
       "parts",
       produce((parts) => {
@@ -272,24 +266,20 @@ export const SessionProvider: ParentComponent = (props) => {
   }
 
   function handleSessionStatus(sessionID: string, newStatus: SessionStatus) {
-    console.log("[Kilo New] Session status:", sessionID, newStatus)
     if (sessionID === currentSessionID()) {
       setStatus(newStatus)
     }
   }
 
   function handlePermissionRequest(permission: PermissionRequest) {
-    console.log("[Kilo New] Permission request:", permission.toolName)
     setPermissions((prev) => [...prev, permission])
   }
 
   function handleTodoUpdated(sessionID: string, items: TodoItem[]) {
-    console.log("[Kilo New] Todos updated:", sessionID, items.length)
     setStore("todos", sessionID, items)
   }
 
   function handleSessionsLoaded(loaded: SessionInfo[]) {
-    console.log("[Kilo New] Sessions loaded:", loaded.length)
     batch(() => {
       for (const s of loaded) {
         setStore("sessions", s.id, s)
@@ -304,7 +294,6 @@ export const SessionProvider: ParentComponent = (props) => {
       return
     }
 
-    console.log("[Kilo New] Sending message:", text.substring(0, 50))
     vscode.postMessage({
       type: "sendMessage",
       text,
@@ -321,7 +310,6 @@ export const SessionProvider: ParentComponent = (props) => {
       return
     }
 
-    console.log("[Kilo New] Aborting session:", sessionID)
     vscode.postMessage({
       type: "abort",
       sessionID,
@@ -333,7 +321,6 @@ export const SessionProvider: ParentComponent = (props) => {
     const permission = permissions().find((p) => p.id === permissionId)
     const sessionID = permission?.sessionID ?? currentSessionID() ?? ""
 
-    console.log("[Kilo New] Permission response:", permissionId, response, "sessionID:", sessionID)
     vscode.postMessage({
       type: "permissionResponse",
       permissionId,
@@ -351,7 +338,6 @@ export const SessionProvider: ParentComponent = (props) => {
       return
     }
 
-    console.log("[Kilo New] Creating new session")
     // Reset pending selection to default for the new session
     setPendingModelSelection(provider.defaultSelection())
     vscode.postMessage({ type: "createSession" })
@@ -362,7 +348,6 @@ export const SessionProvider: ParentComponent = (props) => {
       console.warn("[Kilo New] Cannot load sessions: not connected")
       return
     }
-    console.log("[Kilo New] Loading sessions")
     vscode.postMessage({ type: "loadSessions" })
   }
 
@@ -371,7 +356,6 @@ export const SessionProvider: ParentComponent = (props) => {
       console.warn("[Kilo New] Cannot select session: not connected")
       return
     }
-    console.log("[Kilo New] Selecting session:", id)
     setCurrentSessionID(id)
     setStatus("idle")
     vscode.postMessage({ type: "loadMessages", sessionID: id })
