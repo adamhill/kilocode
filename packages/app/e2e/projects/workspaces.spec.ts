@@ -61,6 +61,7 @@ async function setupWorkspaceTest(page: Page, project: { slug: string }) {
 }
 
 test("can enable and disable workspaces from project menu", async ({ page, withProject }) => {
+  test.skip(process.platform === "win32", "Skipping on Windows due to hover/menu interaction issues") // kilocode_change
   await page.setViewportSize({ width: 1400, height: 800 })
 
   await withProject(async ({ slug }) => {

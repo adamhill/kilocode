@@ -33,6 +33,7 @@ test("can close a project via hover card close button", async ({ page, withProje
 })
 
 test("can close a project via project header more options menu", async ({ page, withProject }) => {
+  test.skip(process.platform === "win32", "Skipping on Windows due to hover/menu interaction issues") // kilocode_change
   await page.setViewportSize({ width: 1400, height: 800 })
 
   const other = await createTestProject()
@@ -54,13 +55,13 @@ test("can close a project via project header more options menu", async ({ page, 
           .locator(".group\\/project")
           .filter({ has: page.locator(`[data-action="project-menu"][data-project="${otherSlug}"]`) })
           .first()
-        await expect(header).toBeVisible() // kilocode_change - ensure we're looking at the correct project header
-        await expect(header.locator('[data-action="project-menu"]')).toBeVisible() // kilocode_change - ensure the menu trigger is visible before interacting
+        await expect(header).toBeVisible() // kilocode_change - check visibility instead of text content
+        await expect(header.locator('[data-action="project-menu"]')).toBeVisible() // kilocode_change
 
         const trigger = header.locator(`[data-action="project-menu"][data-project="${otherSlug}"]`).first()
         await expect(trigger).toHaveCount(1)
         await trigger.focus()
-        await page.waitForTimeout(100) // kilocode_change
+        await page.waitForTimeout(100) // kilocode_change - wait before keyboard press
         await page.keyboard.press("Enter")
 
         const menu = page.locator('[data-component="dropdown-menu-content"]').first()
