@@ -96,7 +96,7 @@ const AppContent: Component = () => {
           <DummyView title="Profile" />
         </Match>
         <Match when={currentView() === "settings"}>
-          <Settings />
+          <Settings onBack={() => setCurrentView("newTask")} />
         </Match>
       </Switch>
     </div>

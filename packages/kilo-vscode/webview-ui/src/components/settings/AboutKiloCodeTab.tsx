@@ -1,6 +1,5 @@
 import { Component } from "solid-js"
-
-export type ConnectionState = "connecting" | "connected" | "disconnected"
+import type { ConnectionState } from "../../types/messages"
 
 export interface AboutKiloCodeTabProps {
   port: number | null
@@ -16,6 +15,8 @@ const AboutKiloCodeTab: Component<AboutKiloCodeTabProps> = (props) => {
         return "var(--vscode-testing-iconQueued, #cca700)"
       case "disconnected":
         return "var(--vscode-testing-iconFailed, #f14c4c)"
+      case "error":
+        return "var(--vscode-testing-iconFailed, #f14c4c)"
     }
   }
 
@@ -27,6 +28,8 @@ const AboutKiloCodeTab: Component<AboutKiloCodeTabProps> = (props) => {
         return "Connecting..."
       case "disconnected":
         return "Disconnected"
+      case "error":
+        return "Error"
     }
   }
 

@@ -29,11 +29,10 @@ import TerminalTab from "./settings/TerminalTab"
 import PromptsTab from "./settings/PromptsTab"
 import ExperimentalTab from "./settings/ExperimentalTab"
 import LanguageTab from "./settings/LanguageTab"
-import AboutKiloCodeTab, { type ConnectionState } from "./settings/AboutKiloCodeTab"
+import AboutKiloCodeTab from "./settings/AboutKiloCodeTab"
+import { useServer } from "../context/server"
 
 export interface SettingsProps {
-  port: number | null
-  connectionState: ConnectionState
   onBack?: () => void
 }
 
@@ -77,6 +76,7 @@ const tabs: TabConfig[] = [
 ]
 
 const Settings: Component<SettingsProps> = (props) => {
+  const server = useServer()
   const [activeTab, setActiveTab] = createSignal<TabId>("providers")
 
   const getTabIcon = (tabId: TabId) => {
@@ -118,7 +118,7 @@ const Settings: Component<SettingsProps> = (props) => {
       case "language":
         return <LanguageTab />
       case "aboutKiloCode":
-        return <AboutKiloCodeTab port={props.port} connectionState={props.connectionState} />
+        return <AboutKiloCodeTab port={server.serverInfo()?.port ?? null} connectionState={server.connectionState()} />
     }
   }
 
