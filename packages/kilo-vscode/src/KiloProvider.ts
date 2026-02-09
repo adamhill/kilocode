@@ -45,16 +45,22 @@ export class KiloProvider implements vscode.WebviewViewProvider {
 		webviewView.webview.onDidReceiveMessage(async (message) => {
 			switch (message.type) {
 				case 'sendMessage':
-					await this.handleSendMessage(message.text);
+					await this.handleSendMessage(message.text, message.sessionID);
 					break;
 				case 'abort':
-					await this.handleAbort();
+					await this.handleAbort(message.sessionID);
 					break;
-				case 'permissionResponse':
-					await this.handlePermissionResponse(
-						message.permissionId,
-						message.response
-					);
+			case 'permissionResponse':
+				await this.handlePermissionResponse(message.permissionId, message.sessionID, message.response);
+				break;
+				case 'createSession':
+					await this.handleCreateSession();
+					break;
+				case 'loadMessages':
+					await this.handleLoadMessages(message.sessionID);
+					break;
+				case 'loadSessions':
+					await this.handleLoadSessions();
 					break;
 			}
 		});
@@ -115,11 +121,123 @@ export class KiloProvider implements vscode.WebviewViewProvider {
 				},
 			});
 			console.log('[Kilo New] KiloProvider: ✅ initializeConnection completed successfully');
-		} catch (error) {
-			console.error('[Kilo New] KiloProvider: ❌ Failed to initialize connection:', error);
+	} catch (error) {
+		console.error('[Kilo New] KiloProvider: ❌ Failed to initialize connection:', error);
+		this.postMessage({
+			type: 'connectionState',
+			state: 'error',
+			error: error instanceof Error ? error.message : 'Failed to connect to CLI backend',
+		});
+	}
+	}
+
+	/**
+	 * Convert SessionInfo to webview format.
+	 */
+	private sessionToWebview(session: SessionInfo) {
+		return {
+			id: session.id,
+			title: session.title,
+			createdAt: new Date(session.time.created).toISOString(),
+			updatedAt: new Date(session.time.updated).toISOString(),
+		};
+	}
+
+	/**
+	 * Handle creating a new session.
+	 */
+	private async handleCreateSession(): Promise<void> {
+		if (!this.httpClient) {
 			this.postMessage({
 				type: 'error',
-				message: error instanceof Error ? error.message : 'Failed to connect to CLI backend',
+				message: 'Not connected to CLI backend',
+			});
+			return;
+		}
+
+		try {
+			const workspaceDir = this.getWorkspaceDirectory();
+			const session = await this.httpClient.createSession(workspaceDir);
+			this.currentSession = session;
+
+			// Notify webview of the new session
+			this.postMessage({
+				type: 'sessionCreated',
+				session: this.sessionToWebview(session),
+			});
+		} catch (error) {
+			console.error('[Kilo New] KiloProvider: Failed to create session:', error);
+			this.postMessage({
+				type: 'error',
+				message: error instanceof Error ? error.message : 'Failed to create session',
+			});
+		}
+	}
+
+	/**
+	 * Handle loading messages for a session.
+	 */
+	private async handleLoadMessages(sessionID: string): Promise<void> {
+		if (!this.httpClient) {
+			this.postMessage({
+				type: 'error',
+				message: 'Not connected to CLI backend',
+			});
+			return;
+		}
+
+		try {
+			const workspaceDir = this.getWorkspaceDirectory();
+			const messagesData = await this.httpClient.getMessages(sessionID, workspaceDir);
+
+			// Convert to webview format
+			const messages = messagesData.map((m) => ({
+				id: m.info.id,
+				sessionID: m.info.sessionID,
+				role: m.info.role,
+				parts: m.parts,
+				createdAt: new Date(m.info.time.created).toISOString(),
+			}));
+
+			this.postMessage({
+				type: 'messagesLoaded',
+				sessionID,
+				messages,
+			});
+		} catch (error) {
+			console.error('[Kilo New] KiloProvider: Failed to load messages:', error);
+			this.postMessage({
+				type: 'error',
+				message: error instanceof Error ? error.message : 'Failed to load messages',
+			});
+		}
+	}
+
+	/**
+	 * Handle loading all sessions.
+	 */
+	private async handleLoadSessions(): Promise<void> {
+		if (!this.httpClient) {
+			this.postMessage({
+				type: 'error',
+				message: 'Not connected to CLI backend',
+			});
+			return;
+		}
+
+		try {
+			const workspaceDir = this.getWorkspaceDirectory();
+			const sessions = await this.httpClient.listSessions(workspaceDir);
+
+			this.postMessage({
+				type: 'sessionsLoaded',
+				sessions: sessions.map((s) => this.sessionToWebview(s)),
+			});
+		} catch (error) {
+			console.error('[Kilo New] KiloProvider: Failed to load sessions:', error);
+			this.postMessage({
+				type: 'error',
+				message: error instanceof Error ? error.message : 'Failed to load sessions',
 			});
 		}
 	}
@@ -127,7 +245,7 @@ export class KiloProvider implements vscode.WebviewViewProvider {
 	/**
 	 * Handle sending a message from the webview.
 	 */
-	private async handleSendMessage(text: string): Promise<void> {
+	private async handleSendMessage(text: string, sessionID?: string): Promise<void> {
 		if (!this.httpClient) {
 			this.postMessage({
 				type: 'error',
@@ -140,16 +258,22 @@ export class KiloProvider implements vscode.WebviewViewProvider {
 			const workspaceDir = this.getWorkspaceDirectory();
 
 			// Create session if needed
-			if (!this.currentSession) {
+			if (!sessionID && !this.currentSession) {
 				this.currentSession = await this.httpClient.createSession(workspaceDir);
+				// Notify webview of the new session
+				this.postMessage({
+					type: 'sessionCreated',
+					session: this.sessionToWebview(this.currentSession),
+				});
+			}
+
+			const targetSessionID = sessionID || this.currentSession?.id;
+			if (!targetSessionID) {
+				throw new Error('No session available');
 			}
 
 			// Send message with text part
-			await this.httpClient.sendMessage(
-				this.currentSession.id,
-				[{ type: 'text', text }],
-				workspaceDir
-			);
+			await this.httpClient.sendMessage(targetSessionID, [{ type: 'text', text }], workspaceDir);
 		} catch (error) {
 			console.error('[Kilo New] KiloProvider: Failed to send message:', error);
 			this.postMessage({
@@ -162,14 +286,19 @@ export class KiloProvider implements vscode.WebviewViewProvider {
 	/**
 	 * Handle abort request from the webview.
 	 */
-	private async handleAbort(): Promise<void> {
-		if (!this.httpClient || !this.currentSession) {
+	private async handleAbort(sessionID?: string): Promise<void> {
+		if (!this.httpClient) {
+			return;
+		}
+
+		const targetSessionID = sessionID || this.currentSession?.id;
+		if (!targetSessionID) {
 			return;
 		}
 
 		try {
 			const workspaceDir = this.getWorkspaceDirectory();
-			await this.httpClient.abortSession(this.currentSession.id, workspaceDir);
+			await this.httpClient.abortSession(targetSessionID, workspaceDir);
 		} catch (error) {
 			console.error('[Kilo New] KiloProvider: Failed to abort session:', error);
 		}
@@ -180,16 +309,23 @@ export class KiloProvider implements vscode.WebviewViewProvider {
 	 */
 	private async handlePermissionResponse(
 		permissionId: string,
+		sessionID: string,
 		response: 'once' | 'always' | 'reject'
 	): Promise<void> {
-		if (!this.httpClient || !this.currentSession) {
+		if (!this.httpClient) {
+			return;
+		}
+
+		const targetSessionID = sessionID || this.currentSession?.id;
+		if (!targetSessionID) {
+			console.error('[Kilo New] KiloProvider: No sessionID for permission response');
 			return;
 		}
 
 		try {
 			const workspaceDir = this.getWorkspaceDirectory();
 			await this.httpClient.respondToPermission(
-				this.currentSession.id,
+				targetSessionID,
 				permissionId,
 				response,
 				workspaceDir
@@ -205,18 +341,38 @@ export class KiloProvider implements vscode.WebviewViewProvider {
 	private handleSSEEvent(event: SSEEvent): void {
 		// Filter events by sessionID (only process events for current session)
 		if ('sessionID' in event.properties) {
-			if (this.currentSession && event.properties.sessionID !== this.currentSession.id) {
+			const props = event.properties as { sessionID?: string };
+			if (this.currentSession && props.sessionID !== this.currentSession.id) {
 				return;
 			}
 		}
 
 		// Forward relevant events to webview
 		switch (event.type) {
-			case 'message.part.updated':
+			case 'message.part.updated': {
+				// The part contains the full part data including messageID, delta is optional text delta
+				const part = event.properties.part as { messageID?: string; sessionID?: string };
+				const messageID = part.messageID || '';
 				this.postMessage({
 					type: 'partUpdated',
+					sessionID: part.sessionID || this.currentSession?.id,
+					messageID,
 					part: event.properties.part,
-					delta: event.properties.delta,
+					delta: event.properties.delta ? { type: 'text-delta', textDelta: event.properties.delta } : undefined,
+				});
+				break;
+			}
+
+			case 'message.updated':
+				// Message info updated
+				this.postMessage({
+					type: 'messageCreated',
+					message: {
+						id: event.properties.info.id,
+						sessionID: event.properties.info.sessionID,
+						role: event.properties.info.role,
+						createdAt: new Date(event.properties.info.time.created).toISOString(),
+					},
 				});
 				break;
 
@@ -224,14 +380,20 @@ export class KiloProvider implements vscode.WebviewViewProvider {
 				this.postMessage({
 					type: 'sessionStatus',
 					sessionID: event.properties.sessionID,
-					status: event.properties.status,
+					status: event.properties.status.type,
 				});
 				break;
 
 			case 'permission.asked':
 				this.postMessage({
 					type: 'permissionRequest',
-					...event.properties,
+					permission: {
+						id: event.properties.id,
+						sessionID: event.properties.sessionID,
+						toolName: event.properties.permission,
+						args: event.properties.metadata,
+						message: `Permission required: ${event.properties.permission}`,
+					},
 				});
 				break;
 
@@ -248,6 +410,11 @@ export class KiloProvider implements vscode.WebviewViewProvider {
 				if (!this.currentSession) {
 					this.currentSession = event.properties.info;
 				}
+				// Notify webview
+				this.postMessage({
+					type: 'sessionCreated',
+					session: this.sessionToWebview(event.properties.info),
+				});
 				break;
 		}
 	}
@@ -275,27 +442,50 @@ export class KiloProvider implements vscode.WebviewViewProvider {
 		const scriptUri = webview.asWebviewUri(
 			vscode.Uri.joinPath(this.extensionUri, 'dist', 'webview.js')
 		);
+		const styleUri = webview.asWebviewUri(
+			vscode.Uri.joinPath(this.extensionUri, 'dist', 'webview.css')
+		);
 
 		const nonce = getNonce();
+
+		// CSP allows:
+		// - default-src 'none': Block everything by default
+		// - style-src: Allow inline styles and our CSS file
+		// - script-src 'nonce-...': Only allow scripts with our nonce
+		// - connect-src: Allow connections to localhost for API calls
+		// - img-src: Allow images from webview and data URIs
+		const csp = [
+			"default-src 'none'",
+			`style-src 'unsafe-inline' ${webview.cspSource}`,
+			`script-src 'nonce-${nonce}'`,
+			'connect-src http://127.0.0.1:* http://localhost:* ws://127.0.0.1:* ws://localhost:*',
+			`img-src ${webview.cspSource} data: https:`,
+		].join('; ');
 
 		return `<!DOCTYPE html>
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'nonce-${nonce}';">
+	<meta http-equiv="Content-Security-Policy" content="${csp}">
 	<title>Kilo Code</title>
+	<link rel="stylesheet" href="${styleUri}">
 	<style>
+		html, body {
+			margin: 0;
+			padding: 0;
+			height: 100%;
+			overflow: hidden;
+		}
 		body {
-			padding: 10px;
 			color: var(--vscode-foreground);
 			font-family: var(--vscode-font-family);
 		}
-		h1 {
-			font-size: 1.5em;
-			margin: 0;
+		#root {
+			height: 100%;
 		}
 		.container {
+			height: 100%;
 			display: flex;
 			flex-direction: column;
 			height: 100vh;

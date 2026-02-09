@@ -1,34 +1,37 @@
-import { Component } from "solid-js";
-
-export type ConnectionState = "connecting" | "connected" | "disconnected";
+import { Component } from "solid-js"
+import type { ConnectionState } from "../../types/messages"
 
 export interface AboutKiloCodeTabProps {
-  port: number | null;
-  connectionState: ConnectionState;
+  port: number | null
+  connectionState: ConnectionState
 }
 
 const AboutKiloCodeTab: Component<AboutKiloCodeTabProps> = (props) => {
   const getStatusColor = () => {
     switch (props.connectionState) {
       case "connected":
-        return "var(--vscode-testing-iconPassed, #89d185)";
+        return "var(--vscode-testing-iconPassed, #89d185)"
       case "connecting":
-        return "var(--vscode-testing-iconQueued, #cca700)";
+        return "var(--vscode-testing-iconQueued, #cca700)"
       case "disconnected":
-        return "var(--vscode-testing-iconFailed, #f14c4c)";
+        return "var(--vscode-testing-iconFailed, #f14c4c)"
+      case "error":
+        return "var(--vscode-testing-iconFailed, #f14c4c)"
     }
-  };
+  }
 
   const getStatusText = () => {
     switch (props.connectionState) {
       case "connected":
-        return "Connected";
+        return "Connected"
       case "connecting":
-        return "Connecting...";
+        return "Connecting..."
       case "disconnected":
-        return "Disconnected";
+        return "Disconnected"
+      case "error":
+        return "Error"
     }
-  };
+  }
 
   return (
     <div>
@@ -129,7 +132,7 @@ const AboutKiloCodeTab: Component<AboutKiloCodeTabProps> = (props) => {
         </p>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default AboutKiloCodeTab;
+export default AboutKiloCodeTab
