@@ -59,6 +59,7 @@ test("can close a project via project header more options menu", async ({ page, 
         const trigger = header.locator(`[data-action="project-menu"][data-project="${otherSlug}"]`).first()
         await expect(trigger).toHaveCount(1)
         await trigger.focus()
+        await page.waitForTimeout(100) // kilocode_change
         await page.keyboard.press("Enter")
 
         const menu = page.locator('[data-component="dropdown-menu-content"]').first()

@@ -245,6 +245,7 @@ export async function openSessionMoreMenu(page: Page, sessionID: string) {
 
   const menuTrigger = scroller.getByRole("button", { name: /more options/i }).first()
   await expect(menuTrigger).toBeVisible()
+  await page.waitForTimeout(100) // kilocode_change
   await menuTrigger.click()
 
   await expect(menu).toBeVisible()
@@ -254,6 +255,8 @@ export async function openSessionMoreMenu(page: Page, sessionID: string) {
 export async function clickMenuItem(menu: Locator, itemName: string | RegExp, options?: { force?: boolean }) {
   const item = menu.getByRole("menuitem").filter({ hasText: itemName }).first()
   await expect(item).toBeVisible()
+  await item.waitFor({ state: "visible", timeout: 5000 }) // kilocode_change
+  await menu.page().waitForTimeout(100) // kilocode_change
   await item.click({ force: options?.force })
 }
 
@@ -400,6 +403,7 @@ export async function setWorkspacesEnabled(page: Page, projectSlug: string, enab
 
   const toggle = page.locator(projectWorkspacesToggleSelector(projectSlug)).first()
   await expect(toggle).toBeVisible()
+  await page.waitForTimeout(100) // kilocode_change
   await toggle.click({ force: true })
 
   const expected = enabled ? "New workspace" : "New session"
@@ -410,9 +414,11 @@ export async function openWorkspaceMenu(page: Page, workspaceSlug: string) {
   const item = page.locator(workspaceItemSelector(workspaceSlug)).first()
   await expect(item).toBeVisible()
   await item.hover()
+  await page.waitForTimeout(200) // kilocode_change
 
   const trigger = page.locator(workspaceMenuTriggerSelector(workspaceSlug)).first()
   await expect(trigger).toBeVisible()
+  await page.waitForTimeout(100) // kilocode_change
   await trigger.click({ force: true })
 
   const menu = page.locator(dropdownMenuContentSelector).first()
