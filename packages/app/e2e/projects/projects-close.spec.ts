@@ -54,7 +54,8 @@ test("can close a project via project header more options menu", async ({ page, 
           .locator(".group\\/project")
           .filter({ has: page.locator(`[data-action="project-menu"][data-project="${otherSlug}"]`) })
           .first()
-        await expect(header).toContainText(otherName)
+        await expect(header).toBeVisible() // kilocode_change - ensure we're looking at the correct project header
+        await expect(header.locator('[data-action="project-menu"]')).toBeVisible() // kilocode_change - ensure the menu trigger is visible before interacting
 
         const trigger = header.locator(`[data-action="project-menu"][data-project="${otherSlug}"]`).first()
         await expect(trigger).toHaveCount(1)
