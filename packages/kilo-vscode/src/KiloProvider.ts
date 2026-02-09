@@ -388,6 +388,11 @@ export class KiloProvider implements vscode.WebviewViewProvider {
 
   /**
    * Fetch providers from the backend and send to webview.
+   *
+   * The backend `/provider` endpoint returns `all` as an array-like object with
+   * numeric keys ("0", "1", …). The webview and sendMessage both need providers
+   * keyed by their real `provider.id` (e.g. "anthropic", "openai"). We re-key
+   * the map here so the rest of the code can use provider.id everywhere.
    */
   private async fetchAndSendProviders(): Promise<void> {
     if (!this.httpClient) {
@@ -397,12 +402,19 @@ export class KiloProvider implements vscode.WebviewViewProvider {
     try {
       const workspaceDir = this.getWorkspaceDirectory()
       const response = await this.httpClient.listProviders(workspaceDir)
+
+      // Re-key providers from numeric indices to provider.id
+      const normalized: typeof response.all = {}
+      for (const provider of Object.values(response.all)) {
+        normalized[provider.id] = provider
+      }
+
       const config = vscode.workspace.getConfiguration("kilo-code.new.model")
       const providerID = config.get<string>("providerID", "")
       const modelID = config.get<string>("modelID", "")
 
       console.log("[Kilo New] KiloProvider: 📦 Providers loaded, sending to webview", {
-        providerCount: Object.keys(response.all).length,
+        providerCount: Object.keys(normalized).length,
         connectedCount: response.connected.length,
         savedProvider: providerID,
         savedModel: modelID,
@@ -410,7 +422,7 @@ export class KiloProvider implements vscode.WebviewViewProvider {
 
       this.postMessage({
         type: "providersLoaded",
-        providers: response.all,
+        providers: normalized,
         connected: response.connected,
         defaults: response.default,
         savedSelection: providerID || modelID ? { providerID, modelID } : undefined,

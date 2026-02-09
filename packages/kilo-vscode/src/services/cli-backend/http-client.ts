@@ -52,18 +52,48 @@ export class HttpClient {
       body: body !== undefined ? JSON.stringify(body) : undefined,
     })
 
+    // Read the raw response first so we can produce useful errors when JSON is empty/truncated.
+    const rawText = await response.text()
+
+    // Non-2xx: try to extract an error message from JSON, otherwise fall back to raw text.
     if (!response.ok) {
-      let errorMessage: string
-      try {
-        const errorJson = (await response.json()) as { error?: string; message?: string }
-        errorMessage = errorJson.error || errorJson.message || response.statusText
-      } catch {
-        errorMessage = response.statusText
+      let errorMessage = response.statusText
+      if (rawText.trim().length > 0) {
+        try {
+          const errorJson = JSON.parse(rawText) as { error?: string; message?: string }
+          errorMessage = errorJson.error || errorJson.message || errorMessage
+        } catch {
+          errorMessage = rawText
+        }
       }
+
+      console.error("[Kilo New] HTTP: ❌ Request failed", {
+        method,
+        path,
+        status: response.status,
+        errorMessage,
+      })
+
       throw new Error(`HTTP ${response.status}: ${errorMessage}`)
     }
 
-    return response.json() as Promise<T>
+    // 2xx but empty body: return undefined (cast to T). Some endpoints like
+    // POST /session/{id}/message return 200 with no body; results arrive via SSE.
+    if (rawText.trim().length === 0) {
+      return undefined as T
+    }
+
+    try {
+      return JSON.parse(rawText) as T
+    } catch (error) {
+      console.error("[Kilo New] HTTP: ❌ Invalid JSON response", {
+        method,
+        path,
+        status: response.status,
+        rawSnippet: rawText.slice(0, 400),
+      })
+      throw error
+    }
   }
 
   // ============================================
@@ -120,6 +150,19 @@ export class HttpClient {
       // Backend expects model selection as a nested object: { model: { providerID, modelID } }
       body.model = { providerID: options.providerID, modelID: options.modelID }
     }
+
+    // Diagnostic logging (redacts message contents).
+    const debugBody = {
+      ...body,
+      parts: parts.map((p) => {
+        if (p.type === "text") {
+          return { type: "text", textLength: p.text.length }
+        }
+        return { type: "file", mime: p.mime, urlLength: p.url.length }
+      }),
+    }
+    console.log("[Kilo New] HTTP: 📨 sendMessage request body", JSON.stringify(debugBody))
+
     return this.request<{ info: MessageInfo; parts: MessagePart[] }>(
       "POST",
       `/session/${sessionId}/message`,
