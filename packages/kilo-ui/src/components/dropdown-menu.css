@@ -20,6 +20,11 @@
       background-color: var(--surface-interactive-base);
       color: var(--text-on-interactive-base, var(--text-strong));
     }
+
+    &[data-disabled] {
+      cursor: default;
+      pointer-events: none;
+    }
   }
 
   [data-slot="dropdown-menu-separator"] {

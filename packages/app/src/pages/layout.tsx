@@ -2664,9 +2664,7 @@ export default function Layout(props: ParentProps) {
                       variant="ghost"
                       data-action="project-menu"
                       data-project={base64Encode(p().worktree)}
-                      // kilocode_change start
-                      class="shrink-0 size-6 rounded-md opacity-0 group-hover/project:opacity-100 data-[expanded]:opacity-100 data-[expanded]:bg-surface-base-active pointer-events-auto"
-                      // kilocode_change end
+                      class="shrink-0 size-6 rounded-md opacity-0 group-hover/project:opacity-100 data-[expanded]:opacity-100 data-[expanded]:bg-surface-base-active"
                       aria-label={language.t("common.moreOptions")}
                     />
                     <DropdownMenu.Portal mount={!panelProps.mobile ? state.nav : undefined}>
