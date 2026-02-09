@@ -41,6 +41,7 @@ Single test: `pnpm test -- --grep "test name"`
 ## Style
 
 Follow monorepo root AGENTS.md style guide:
+
 - Prefer `const` over `let`, early returns over `else`
 - Single-word variable names when possible
 - Avoid `try`/`catch`, avoid `any` type

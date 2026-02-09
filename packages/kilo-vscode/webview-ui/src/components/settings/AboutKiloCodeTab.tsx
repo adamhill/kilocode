@@ -35,99 +35,125 @@ const AboutKiloCodeTab: Component<AboutKiloCodeTabProps> = (props) => {
 
   return (
     <div>
-      <div style={{
-        background: "var(--vscode-editor-background)",
-        border: "1px solid var(--vscode-panel-border)",
-        "border-radius": "4px",
-        padding: "16px",
-        "margin-bottom": "16px",
-      }}>
-        <h4 style={{
-          "font-size": "13px",
-          "font-weight": "600",
-          "margin-bottom": "12px",
-          "margin-top": "0",
-          color: "var(--vscode-foreground)",
-        }}>
+      <div
+        style={{
+          background: "var(--vscode-editor-background)",
+          border: "1px solid var(--vscode-panel-border)",
+          "border-radius": "4px",
+          padding: "16px",
+          "margin-bottom": "16px",
+        }}
+      >
+        <h4
+          style={{
+            "font-size": "13px",
+            "font-weight": "600",
+            "margin-bottom": "12px",
+            "margin-top": "0",
+            color: "var(--vscode-foreground)",
+          }}
+        >
           CLI Server
         </h4>
 
         {/* Connection Status */}
-        <div style={{
-          display: "flex",
-          "align-items": "center",
-          "margin-bottom": "12px",
-        }}>
-          <span style={{
-            "font-size": "12px",
-            color: "var(--vscode-descriptionForeground)",
-            width: "100px",
-          }}>
-            Status:
-          </span>
-          <div style={{
+        <div
+          style={{
             display: "flex",
             "align-items": "center",
-            gap: "8px",
-          }}>
-            <span style={{
-              width: "8px",
-              height: "8px",
-              "border-radius": "50%",
-              background: getStatusColor(),
-              display: "inline-block",
-            }} />
-            <span style={{
+            "margin-bottom": "12px",
+          }}
+        >
+          <span
+            style={{
               "font-size": "12px",
-              color: "var(--vscode-foreground)",
-            }}>
+              color: "var(--vscode-descriptionForeground)",
+              width: "100px",
+            }}
+          >
+            Status:
+          </span>
+          <div
+            style={{
+              display: "flex",
+              "align-items": "center",
+              gap: "8px",
+            }}
+          >
+            <span
+              style={{
+                width: "8px",
+                height: "8px",
+                "border-radius": "50%",
+                background: getStatusColor(),
+                display: "inline-block",
+              }}
+            />
+            <span
+              style={{
+                "font-size": "12px",
+                color: "var(--vscode-foreground)",
+              }}
+            >
               {getStatusText()}
             </span>
           </div>
         </div>
 
         {/* Port Number */}
-        <div style={{
-          display: "flex",
-          "align-items": "center",
-        }}>
-          <span style={{
-            "font-size": "12px",
-            color: "var(--vscode-descriptionForeground)",
-            width: "100px",
-          }}>
+        <div
+          style={{
+            display: "flex",
+            "align-items": "center",
+          }}
+        >
+          <span
+            style={{
+              "font-size": "12px",
+              color: "var(--vscode-descriptionForeground)",
+              width: "100px",
+            }}
+          >
             Port:
           </span>
-          <span style={{
-            "font-size": "12px",
-            color: "var(--vscode-foreground)",
-            "font-family": "var(--vscode-editor-font-family, monospace)",
-          }}>
+          <span
+            style={{
+              "font-size": "12px",
+              color: "var(--vscode-foreground)",
+              "font-family": "var(--vscode-editor-font-family, monospace)",
+            }}
+          >
             {props.port !== null ? props.port : "—"}
           </span>
         </div>
       </div>
 
-      <div style={{
-        background: "var(--vscode-editor-background)",
-        border: "1px solid var(--vscode-panel-border)",
-        "border-radius": "4px",
-        padding: "16px",
-      }}>
-        <h4 style={{
-          "font-size": "13px",
-          "font-weight": "600",
-          "margin-bottom": "12px",
-          "margin-top": "0",
-          color: "var(--vscode-foreground)",
-        }}>
+      <div
+        style={{
+          background: "var(--vscode-editor-background)",
+          border: "1px solid var(--vscode-panel-border)",
+          "border-radius": "4px",
+          padding: "16px",
+        }}
+      >
+        <h4
+          style={{
+            "font-size": "13px",
+            "font-weight": "600",
+            "margin-bottom": "12px",
+            "margin-top": "0",
+            color: "var(--vscode-foreground)",
+          }}
+        >
           Version Information
         </h4>
-        <p style={{
-          "font-size": "12px",
-          color: "var(--vscode-descriptionForeground)",
-          margin: 0,
-        }}>
+        <p
+          style={{
+            "font-size": "12px",
+            color: "var(--vscode-descriptionForeground)",
+            margin: 0,
+          }}
+        >
           Kilo Code Extension
         </p>
       </div>

@@ -3,10 +3,10 @@
  * Main chat container that combines all chat components
  */
 
-import { Component } from 'solid-js';
-import { MessageList } from './MessageList';
-import { PromptInput } from './PromptInput';
-import { PermissionDialog } from './PermissionDialog';
+import { Component } from "solid-js"
+import { MessageList } from "./MessageList"
+import { PromptInput } from "./PromptInput"
+import { PermissionDialog } from "./PermissionDialog"
 
 export const ChatView: Component = () => {
   return (
@@ -14,12 +14,12 @@ export const ChatView: Component = () => {
       <div class="chat-messages">
         <MessageList />
       </div>
-      
+
       <div class="chat-input">
         <PromptInput />
       </div>
-      
+
       <PermissionDialog />
     </div>
-  );
-};
+  )
+}
