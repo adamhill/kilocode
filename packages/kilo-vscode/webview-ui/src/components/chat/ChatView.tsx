@@ -4,7 +4,6 @@
  */
 
 import { Component } from 'solid-js';
-import { StatusIndicator } from './StatusIndicator';
 import { MessageList } from './MessageList';
 import { PromptInput } from './PromptInput';
 import { PermissionDialog } from './PermissionDialog';
@@ -12,10 +11,6 @@ import { PermissionDialog } from './PermissionDialog';
 export const ChatView: Component = () => {
   return (
     <div class="chat-view">
-      <div class="chat-header">
-        <StatusIndicator />
-      </div>
-      
       <div class="chat-messages">
         <MessageList />
       </div>

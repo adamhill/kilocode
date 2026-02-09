@@ -14,12 +14,6 @@
   overflow: hidden;
 }
 
-.chat-header {
-  flex-shrink: 0;
-  padding: 8px 12px;
-  border-bottom: 1px solid var(--vscode-panel-border);
-}
-
 .chat-messages {
   flex: 1;
   overflow: hidden;
@@ -29,56 +23,6 @@
 .chat-input {
   flex-shrink: 0;
   border-top: 1px solid var(--vscode-panel-border);
-}
-
-/* ============================================
-   Status Indicator
-   ============================================ */
-
-.status-indicator {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-}
-
-.status-icon {
-  font-size: 10px;
-}
-
-.status-label {
-  color: var(--vscode-descriptionForeground);
-}
-
-.status-error-message {
-  color: var(--vscode-errorForeground);
-  font-size: 11px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  max-width: 200px;
-}
-
-.status-connecting .status-icon {
-  color: var(--vscode-charts-yellow);
-  animation: pulse 1.5s ease-in-out infinite;
-}
-
-.status-connected .status-icon {
-  color: var(--vscode-charts-green);
-}
-
-.status-disconnected .status-icon {
-  color: var(--vscode-disabledForeground);
-}
-
-.status-error .status-icon {
-  color: var(--vscode-errorForeground);
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
 }
 
 /* ============================================
