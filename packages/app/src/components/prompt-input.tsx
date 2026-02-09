@@ -1725,6 +1725,7 @@ export const PromptInput: Component<PromptInputProps> = (props) => {
         </div>
       </Show>
       <form
+        data-component="prompt-input-form" // kilocode_change
         onSubmit={handleSubmit}
         classList={{
           "group/prompt-input": true,
@@ -1852,7 +1853,11 @@ export const PromptInput: Component<PromptInputProps> = (props) => {
             </For>
           </div>
         </Show>
-        <div class="relative max-h-[240px] overflow-y-auto" ref={(el) => (scrollRef = el)}>
+        <div
+          data-slot="prompt-input-scroll" // kilocode_change
+          class="relative max-h-[240px] overflow-y-auto"
+          ref={(el) => (scrollRef = el)}
+        >
           <div
             data-component="prompt-input"
             ref={(el) => {
@@ -1885,7 +1890,10 @@ export const PromptInput: Component<PromptInputProps> = (props) => {
             }}
           />
           <Show when={!prompt.dirty()}>
-            <div class="absolute top-0 inset-x-0 p-3 pr-12 text-14-regular text-text-weak pointer-events-none whitespace-nowrap truncate">
+            <div
+              data-slot="prompt-input-placeholder" // kilocode_change
+              class="absolute top-0 inset-x-0 p-3 pr-12 text-14-regular text-text-weak pointer-events-none whitespace-nowrap truncate"
+            >
               {store.mode === "shell"
                 ? language.t("prompt.placeholder.shell")
                 : commentCount() > 1
@@ -1896,7 +1904,10 @@ export const PromptInput: Component<PromptInputProps> = (props) => {
             </div>
           </Show>
         </div>
-        <div class="relative p-3 flex items-center justify-between gap-2">
+        <div
+          data-slot="prompt-input-toolbar" // kilocode_change
+          class="relative p-3 flex items-center justify-between gap-2"
+        >
           <div class="flex items-center gap-2 min-w-0 flex-1">
             <Switch>
               <Match when={store.mode === "shell"}>

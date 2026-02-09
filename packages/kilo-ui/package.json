@@ -1,0 +1,33 @@
+{
+  "name": "@kilocode/kilo-ui",
+  "version": "1.0.14",
+  "type": "module",
+  "license": "MIT",
+  "exports": {
+    "./*": "./src/components/*.tsx",
+    "./i18n/*": "./src/i18n/*.ts",
+    "./pierre": "./src/pierre/index.ts",
+    "./pierre/*": "./src/pierre/*.ts",
+    "./hooks": "./src/hooks/index.ts",
+    "./context": "./src/context/index.ts",
+    "./context/*": "./src/context/*.tsx",
+    "./styles": "./src/styles/index.css",
+    "./styles/tailwind": "./src/styles/tailwind/index.css",
+    "./theme": "./src/theme/index.ts",
+    "./theme/*": "./src/theme/*.ts",
+    "./theme/context": "./src/theme/context.tsx",
+    "./icons/provider": "./src/components/provider-icons/types.ts",
+    "./icons/file-type": "./src/components/file-icons/types.ts",
+    "./fonts/*": "./src/assets/fonts/*",
+    "./audio/*": "./src/assets/audio/*"
+  },
+  "peerDependencies": {
+    "@opencode-ai/ui": "workspace:*",
+    "solid-js": "catalog:"
+  },
+  "devDependencies": {
+    "@tsconfig/node22": "catalog:",
+    "@types/bun": "catalog:",
+    "typescript": "catalog:"
+  }
+}
