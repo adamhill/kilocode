@@ -63,8 +63,8 @@ export const VSCodeProvider: ParentComponent = (props) => {
       handlers.add(handler);
       return () => handlers.delete(handler);
     },
-    getState: <T>() => api.getState() as T | undefined,
-    setState: <T>(state: T) => api.setState(state),
+    getState: <T,>() => api.getState() as T | undefined,
+    setState: <T,>(state: T) => api.setState(state),
   };
 
   return (
