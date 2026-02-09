@@ -116,13 +116,13 @@
       "properties": {
         "kilo-code.new.model.providerID": {
           "type": "string",
-          "default": "",
-          "description": "Selected model provider ID"
+          "default": "kilo",
+          "description": "Default model provider ID for new sessions"
         },
         "kilo-code.new.model.modelID": {
           "type": "string",
-          "default": "",
-          "description": "Selected model ID"
+          "default": "auto",
+          "description": "Default model ID for new sessions"
         }
       }
     }

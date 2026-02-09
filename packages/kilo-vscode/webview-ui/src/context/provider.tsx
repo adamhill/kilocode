@@ -1,6 +1,7 @@
 /**
  * Provider/model context
- * Manages available providers, models, and user's model selection
+ * Manages available providers, models, and the global default selection.
+ * Selection is now per-session — see session.tsx.
  */
 
 import { createContext, useContext, createSignal, createMemo, onMount, onCleanup, ParentComponent, Accessor } from "solid-js"
@@ -13,11 +14,12 @@ interface ProviderContextValue {
   providers: Accessor<Record<string, Provider>>
   connected: Accessor<string[]>
   defaults: Accessor<Record<string, string>>
-  selected: Accessor<ModelSelection | null>
+  defaultSelection: Accessor<ModelSelection>
   models: Accessor<EnrichedModel[]>
-  selectedModel: Accessor<EnrichedModel | undefined>
-  selectModel: (providerID: string, modelID: string) => void
+  findModel: (selection: ModelSelection | null) => EnrichedModel | undefined
 }
+
+const KILO_AUTO: ModelSelection = { providerID: "kilo", modelID: "auto" }
 
 const ProviderContext = createContext<ProviderContextValue>()
 
@@ -27,7 +29,7 @@ export const ProviderProvider: ParentComponent = (props) => {
   const [providers, setProviders] = createSignal<Record<string, Provider>>({})
   const [connected, setConnected] = createSignal<string[]>([])
   const [defaults, setDefaults] = createSignal<Record<string, string>>({})
-  const [selected, setSelected] = createSignal<ModelSelection | null>(null)
+  const [defaultSelection, setDefaultSelection] = createSignal<ModelSelection>(KILO_AUTO)
 
   // Flat list of all models enriched with provider info
   const models = createMemo<EnrichedModel[]>(() => {
@@ -46,14 +48,13 @@ export const ProviderProvider: ParentComponent = (props) => {
     return result
   })
 
-  // Full model object for the current selection
-  const selectedModel = createMemo<EnrichedModel | undefined>(() => {
-    const sel = selected()
-    if (!sel) {
+  // Look up an enriched model by selection
+  function findModel(selection: ModelSelection | null): EnrichedModel | undefined {
+    if (!selection) {
       return undefined
     }
-    return models().find((m) => m.providerID === sel.providerID && m.id === sel.modelID)
-  })
+    return models().find((m) => m.providerID === selection.providerID && m.id === selection.modelID)
+  }
 
   onMount(() => {
     const unsubscribe = vscode.onMessage((message: ExtensionMessage) => {
@@ -66,48 +67,19 @@ export const ProviderProvider: ParentComponent = (props) => {
       setProviders(message.providers)
       setConnected(message.connected)
       setDefaults(message.defaults)
-
-      // Determine initial selection
-      const saved = message.savedSelection
-      if (saved?.providerID && saved?.modelID) {
-        // Validate saved selection: provider must be connected and model must exist
-        const provider = message.providers[saved.providerID]
-        const isConnected = message.connected.includes(saved.providerID)
-        if (isConnected && provider?.models[saved.modelID]) {
-          setSelected({ providerID: saved.providerID, modelID: saved.modelID })
-          return
-        }
-      }
-
-      // Fall back to first connected provider's default model
-      const firstConnected = message.connected[0]
-      if (!firstConnected) {
-        return
-      }
-
-      const defaultModel = message.defaults[firstConnected]
-      if (defaultModel) {
-        setSelected({ providerID: firstConnected, modelID: defaultModel })
-      }
+      setDefaultSelection(message.defaultSelection)
     })
 
     onCleanup(unsubscribe)
   })
 
-  function selectModel(providerID: string, modelID: string) {
-    console.log("[Kilo New] Model selected:", providerID, modelID)
-    setSelected({ providerID, modelID })
-    vscode.postMessage({ type: "saveModel", providerID, modelID })
-  }
-
   const value: ProviderContextValue = {
     providers,
     connected,
     defaults,
-    selected,
+    defaultSelection,
     models,
-    selectedModel,
-    selectModel,
+    findModel,
   }
 
   return <ProviderContext.Provider value={value}>{props.children}</ProviderContext.Provider>

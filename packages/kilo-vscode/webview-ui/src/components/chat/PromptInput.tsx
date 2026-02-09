@@ -6,13 +6,11 @@
 import { Component, createSignal, Show } from "solid-js"
 import { useSession } from "../../context/session"
 import { useServer } from "../../context/server"
-import { useProvider } from "../../context/provider"
 import { ModelSelector } from "./ModelSelector"
 
 export const PromptInput: Component = () => {
   const session = useSession()
   const server = useServer()
-  const provider = useProvider()
 
   const [text, setText] = createSignal("")
   let textareaRef: HTMLTextAreaElement | undefined
@@ -46,7 +44,7 @@ export const PromptInput: Component = () => {
     const message = text().trim()
     if (!message || isBusy() || isDisabled()) return
 
-    const sel = provider.selected()
+    const sel = session.selected()
     session.sendMessage(message, sel?.providerID, sel?.modelID)
     setText("")
 

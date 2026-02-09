@@ -177,9 +177,6 @@ export class KiloProvider implements vscode.WebviewViewProvider {
             vscode.env.openExternal(vscode.Uri.parse(message.url))
           }
           break
-        case "saveModel":
-          await this.handleSaveModel(message.providerID, message.modelID)
-          break
       }
     })
   }
@@ -410,14 +407,14 @@ export class KiloProvider implements vscode.WebviewViewProvider {
       }
 
       const config = vscode.workspace.getConfiguration("kilo-code.new.model")
-      const providerID = config.get<string>("providerID", "")
-      const modelID = config.get<string>("modelID", "")
+      const providerID = config.get<string>("providerID", "kilo")
+      const modelID = config.get<string>("modelID", "auto")
 
       console.log("[Kilo New] KiloProvider: 📦 Providers loaded, sending to webview", {
         providerCount: Object.keys(normalized).length,
         connectedCount: response.connected.length,
-        savedProvider: providerID,
-        savedModel: modelID,
+        defaultProvider: providerID,
+        defaultModel: modelID,
       })
 
       this.postMessage({
@@ -425,24 +422,10 @@ export class KiloProvider implements vscode.WebviewViewProvider {
         providers: normalized,
         connected: response.connected,
         defaults: response.default,
-        savedSelection: providerID || modelID ? { providerID, modelID } : undefined,
+        defaultSelection: { providerID, modelID },
       })
     } catch (error) {
       console.error("[Kilo New] KiloProvider: Failed to fetch providers:", error)
-    }
-  }
-
-  /**
-   * Handle saving model selection to VS Code settings.
-   */
-  private async handleSaveModel(providerID: string, modelID: string): Promise<void> {
-    const config = vscode.workspace.getConfiguration("kilo-code.new.model")
-    try {
-      await config.update("providerID", providerID, vscode.ConfigurationTarget.Global)
-      await config.update("modelID", modelID, vscode.ConfigurationTarget.Global)
-      console.log("[Kilo New] KiloProvider: 💾 Model selection saved:", { providerID, modelID })
-    } catch (error) {
-      console.error("[Kilo New] KiloProvider: Failed to save model selection:", error)
     }
   }
 

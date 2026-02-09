@@ -5,6 +5,7 @@
 
 import { Component, createSignal, createMemo, createEffect, onCleanup, For, Show } from "solid-js"
 import { useProvider, EnrichedModel } from "../../context/provider"
+import { useSession } from "../../context/session"
 
 interface ModelGroup {
   providerName: string
@@ -22,7 +23,9 @@ function providerSortKey(providerID: string): number {
 }
 
 export const ModelSelector: Component = () => {
-  const { connected, models, selectedModel, selectModel } = useProvider()
+  const { connected, models, findModel } = useProvider()
+  const session = useSession()
+  const selectedModel = () => findModel(session.selected())
 
   const [open, setOpen] = createSignal(false)
   const [search, setSearch] = createSignal("")
@@ -109,7 +112,7 @@ export const ModelSelector: Component = () => {
   }
 
   function pick(model: EnrichedModel) {
-    selectModel(model.providerID, model.id)
+    session.selectModel(model.providerID, model.id)
     setOpen(false)
   }
 

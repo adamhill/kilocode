@@ -256,7 +256,7 @@ export interface ProvidersLoadedMessage {
   providers: Record<string, Provider>
   connected: string[]
   defaults: Record<string, string>
-  savedSelection?: Partial<ModelSelection>
+  defaultSelection: ModelSelection
 }
 
 export type ExtensionMessage =
@@ -341,12 +341,6 @@ export interface WebviewReadyRequest {
   type: "webviewReady"
 }
 
-export interface SaveModelMessage {
-  type: "saveModel"
-  providerID: string
-  modelID: string
-}
-
 export type WebviewMessage =
   | SendMessageRequest
   | AbortRequest
@@ -360,7 +354,6 @@ export type WebviewMessage =
   | OpenExternalRequest
   | CancelLoginRequest
   | WebviewReadyRequest
-  | SaveModelMessage
 
 // ============================================
 // VS Code API type
