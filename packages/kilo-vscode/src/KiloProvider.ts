@@ -15,6 +15,7 @@ export class KiloProvider implements vscode.WebviewViewProvider {
   private httpClient: HttpClient | null = null
   private sseClient: SSEClient | null = null
   private webviewView: vscode.WebviewView | null = null
+  private webview: vscode.Webview | null = null
   private currentSession: SessionInfo | null = null
   private serverInfo: { port: number } | null = null
   private connectionState: "connecting" | "connected" | "disconnected" | "error" = "connecting"
@@ -84,9 +85,10 @@ export class KiloProvider implements vscode.WebviewViewProvider {
     _context: vscode.WebviewViewResolveContext,
     _token: vscode.CancellationToken,
   ) {
-    // Store the webview reference
+    // Store the webview references
     this.webviewView = webviewView
     this.isWebviewReady = false
+    this.webview = webviewView.webview
 
     // Set up webview options
     webviewView.webview.options = {
@@ -145,6 +147,45 @@ export class KiloProvider implements vscode.WebviewViewProvider {
     })
 
     // Initialize connection to CLI backend
+    this.initializeConnection()
+  }
+
+  /**
+   * Resolve a WebviewPanel for displaying the Kilo webview in an editor tab.
+   */
+  public resolveWebviewPanel(panel: vscode.WebviewPanel): void {
+    this.webview = panel.webview
+
+    panel.webview.options = {
+      enableScripts: true,
+      localResourceRoots: [this.extensionUri],
+    }
+
+    panel.webview.html = this._getHtmlForWebview(panel.webview)
+
+    panel.webview.onDidReceiveMessage(async (message) => {
+      switch (message.type) {
+        case "sendMessage":
+          await this.handleSendMessage(message.text, message.sessionID)
+          break
+        case "abort":
+          await this.handleAbort(message.sessionID)
+          break
+        case "permissionResponse":
+          await this.handlePermissionResponse(message.permissionId, message.sessionID, message.response)
+          break
+        case "createSession":
+          await this.handleCreateSession()
+          break
+        case "loadMessages":
+          await this.handleLoadMessages(message.sessionID)
+          break
+        case "loadSessions":
+          await this.handleLoadSessions()
+          break
+      }
+    })
+
     this.initializeConnection()
   }
 
@@ -614,7 +655,7 @@ export class KiloProvider implements vscode.WebviewViewProvider {
    * Public so toolbar button commands can send messages.
    */
   public postMessage(message: unknown): void {
-    this.webviewView?.webview.postMessage(message)
+    this.webview?.postMessage(message)
   }
 
   /**
