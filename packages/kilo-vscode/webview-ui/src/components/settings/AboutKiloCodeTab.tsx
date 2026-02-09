@@ -31,7 +31,7 @@ const AboutKiloCodeTab: Component<AboutKiloCodeTabProps> = (props) => {
   };
 
   return (
-    <div>
+    <div style={{ width: "100%" }}>
       <div style={{
         background: "var(--vscode-editor-background)",
         border: "1px solid var(--vscode-panel-border)",
