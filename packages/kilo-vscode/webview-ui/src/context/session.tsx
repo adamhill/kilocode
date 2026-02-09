@@ -7,6 +7,7 @@ import {
   createContext,
   useContext,
   createSignal,
+  createMemo,
   onMount,
   onCleanup,
   ParentComponent,
@@ -41,6 +42,9 @@ interface SessionContextValue {
   currentSession: Accessor<SessionInfo | undefined>;
   setCurrentSessionID: (id: string | undefined) => void;
   
+  // All sessions (sorted most recent first)
+  sessions: Accessor<SessionInfo[]>;
+  
   // Session status
   status: Accessor<SessionStatus>;
   
@@ -61,6 +65,8 @@ interface SessionContextValue {
   abort: () => void;
   respondToPermission: (permissionId: string, response: 'once' | 'always' | 'reject') => void;
   createSession: () => void;
+  loadSessions: () => void;
+  selectSession: (id: string) => void;
 }
 
 const SessionContext = createContext<SessionContextValue>();
@@ -116,6 +122,10 @@ export const SessionProvider: ParentComponent = (props) => {
           
         case 'todoUpdated':
           handleTodoUpdated(message.sessionID, message.items);
+          break;
+          
+        case 'sessionsLoaded':
+          handleSessionsLoaded(message.sessions);
           break;
       }
     });
@@ -217,6 +227,15 @@ export const SessionProvider: ParentComponent = (props) => {
     setStore('todos', sessionID, items);
   }
 
+  function handleSessionsLoaded(loaded: SessionInfo[]) {
+    console.log('[Kilo New] Sessions loaded:', loaded.length);
+    batch(() => {
+      for (const s of loaded) {
+        setStore('sessions', s.id, s);
+      }
+    });
+  }
+
   // Actions
   function sendMessage(text: string) {
     if (!server.isConnected()) {
@@ -268,6 +287,26 @@ export const SessionProvider: ParentComponent = (props) => {
     vscode.postMessage({ type: 'createSession' });
   }
 
+  function loadSessions() {
+    if (!server.isConnected()) {
+      console.warn('[Kilo New] Cannot load sessions: not connected');
+      return;
+    }
+    console.log('[Kilo New] Loading sessions');
+    vscode.postMessage({ type: 'loadSessions' });
+  }
+
+  function selectSession(id: string) {
+    if (!server.isConnected()) {
+      console.warn('[Kilo New] Cannot select session: not connected');
+      return;
+    }
+    console.log('[Kilo New] Selecting session:', id);
+    setCurrentSessionID(id);
+    setStatus('idle');
+    vscode.postMessage({ type: 'loadMessages', sessionID: id });
+  }
+
   // Computed values
   const currentSession = () => {
     const id = currentSessionID();
@@ -288,10 +327,17 @@ export const SessionProvider: ParentComponent = (props) => {
     return id ? store.todos[id] || [] : [];
   };
 
+  const sessions = createMemo(() =>
+    Object.values(store.sessions).sort(
+      (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+    )
+  );
+
   const value: SessionContextValue = {
     currentSessionID,
     currentSession,
     setCurrentSessionID,
+    sessions,
     status,
     messages,
     getParts,
@@ -301,6 +347,8 @@ export const SessionProvider: ParentComponent = (props) => {
     abort,
     respondToPermission,
     createSession,
+    loadSessions,
+    selectSession,
   };
 
   return (

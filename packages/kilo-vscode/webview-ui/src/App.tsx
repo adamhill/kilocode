@@ -1,9 +1,10 @@
-import { Component, createSignal, Switch, Match } from "solid-js";
+import { Component, createSignal, Switch, Match, onMount, onCleanup } from "solid-js";
 import Settings from "./components/Settings";
 import { VSCodeProvider } from "./context/vscode";
 import { ServerProvider } from "./context/server";
-import { SessionProvider } from "./context/session";
+import { SessionProvider, useSession } from "./context/session";
 import { ChatView } from "./components/chat";
+import SessionList from "./components/history/SessionList";
 import "./styles/chat.css";
 
 type ViewType = 
@@ -32,6 +33,7 @@ const DummyView: Component<{ title: string }> = (props) => {
 // Inner app component that uses the contexts
 const AppContent: Component = () => {
   const [currentView, setCurrentView] = createSignal<ViewType>("newTask");
+  const session = useSession();
 
   // Handle action messages from extension for view switching
   // This is handled at the VSCode context level, but we need to expose it here
@@ -39,6 +41,9 @@ const AppContent: Component = () => {
   const handleViewAction = (action: string) => {
     switch (action) {
       case "plusButtonClicked":
+        if (session.messages().length > 0 || !session.currentSessionID()) {
+          session.createSession();
+        }
         setCurrentView("newTask");
         break;
       case "marketplaceButtonClicked":
@@ -58,13 +63,22 @@ const AppContent: Component = () => {
 
   // Listen for action messages at the window level
   // (These are separate from the typed messages handled by contexts)
-  window.addEventListener("message", (event) => {
-    const message = event.data;
-    if (message?.type === "action" && message.action) {
-      console.log("[Kilo New] App: 🎬 action:", message.action);
-      handleViewAction(message.action);
-    }
+  onMount(() => {
+    const handler = (event: MessageEvent) => {
+      const message = event.data;
+      if (message?.type === "action" && message.action) {
+        console.log("[Kilo New] App: 🎬 action:", message.action);
+        handleViewAction(message.action);
+      }
+    };
+    window.addEventListener("message", handler);
+    onCleanup(() => window.removeEventListener("message", handler));
   });
+
+  const handleSelectSession = (id: string) => {
+    session.selectSession(id);
+    setCurrentView("newTask");
+  };
 
   return (
     <div class="container">
@@ -76,7 +90,7 @@ const AppContent: Component = () => {
           <DummyView title="Marketplace" />
         </Match>
         <Match when={currentView() === "history"}>
-          <DummyView title="History" />
+          <SessionList onSelectSession={handleSelectSession} />
         </Match>
         <Match when={currentView() === "profile"}>
           <DummyView title="Profile" />
