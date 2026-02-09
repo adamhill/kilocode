@@ -152,6 +152,9 @@ export namespace Session {
     // kilocode_change end
   }
 
+  // kilocode_change
+  export type CloseReason = z.infer<typeof Event.TurnClose.properties>["reason"]
+
   export const create = fn(
     z
       .object({

@@ -1,5 +1,6 @@
 import { ulid } from "ulid"
 import type * as SDK from "@kilocode/sdk/v2"
+import type { Session } from "@/session"
 
 export namespace IngestQueue {
   export type Client = {
@@ -7,7 +8,7 @@ export namespace IngestQueue {
     fetch: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>
   }
 
-  export type CloseReason = "completed" | "error" | "interrupted"
+  export type CloseReason = Session.CloseReason
 
   export type Data =
     | {
