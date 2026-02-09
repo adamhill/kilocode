@@ -121,13 +121,14 @@ export class KiloProvider implements vscode.WebviewViewProvider {
 				},
 			});
 			console.log('[Kilo New] KiloProvider: ✅ initializeConnection completed successfully');
-		} catch (error) {
-			console.error('[Kilo New] KiloProvider: ❌ Failed to initialize connection:', error);
-			this.postMessage({
-				type: 'error',
-				message: error instanceof Error ? error.message : 'Failed to connect to CLI backend',
-			});
-		}
+	} catch (error) {
+		console.error('[Kilo New] KiloProvider: ❌ Failed to initialize connection:', error);
+		this.postMessage({
+			type: 'connectionState',
+			state: 'error',
+			error: error instanceof Error ? error.message : 'Failed to connect to CLI backend',
+		});
+	}
 	}
 
 	/**
