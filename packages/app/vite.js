@@ -4,7 +4,7 @@ import { fileURLToPath } from "url"
 import { resolve as resolvePath } from "path"
 
 // kilocode_change start
-const kiloUiDir = resolvePath(fileURLToPath(new URL(".", import.meta.url)), "../kilo-ui")
+const kiloUiDir = resolvePath(fileURLToPath(new URL(".", import.meta.url)), "../kilo-ui").replace(/\\/g, "/") // Normalize to forward slashes for cross-platform compatibility
 
 /**
  * Vite plugin that redirects @opencode-ai/ui imports to @kilocode/kilo-ui,
@@ -18,7 +18,8 @@ const kiloUiAlias = {
   enforce: "pre",
   resolveId(source, importer) {
     if (!source.startsWith("@opencode-ai/ui")) return
-    if (importer?.startsWith(kiloUiDir)) return
+    const normalizedImporter = importer?.replace(/\\/g, "/")
+    if (normalizedImporter?.startsWith(kiloUiDir)) return
     const sub = source.replace("@opencode-ai/ui", "")
     if (sub.startsWith("/audio/") || sub.startsWith("/fonts/")) return
     return this.resolve(source.replace("@opencode-ai/ui", "@kilocode/kilo-ui"), importer, {
