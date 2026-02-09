@@ -26,12 +26,7 @@ export class HttpClient {
   /**
    * Make an HTTP request to the CLI backend server.
    */
-  private async request<T>(
-    method: string,
-    path: string,
-    body?: unknown,
-    options?: { directory?: string }
-  ): Promise<T> {
+  private async request<T>(method: string, path: string, body?: unknown, options?: { directory?: string }): Promise<T> {
     const url = `${this.baseUrl}${path}`
 
     const headers: Record<string, string> = {
@@ -98,28 +93,25 @@ export class HttpClient {
   async sendMessage(
     sessionId: string,
     parts: Array<{ type: "text"; text: string } | { type: "file"; mime: string; url: string }>,
-    directory: string
+    directory: string,
   ): Promise<{ info: MessageInfo; parts: MessagePart[] }> {
     return this.request<{ info: MessageInfo; parts: MessagePart[] }>(
       "POST",
       `/session/${sessionId}/message`,
       { parts },
-      { directory }
+      { directory },
     )
   }
 
   /**
    * Get all messages for a session.
    */
-  async getMessages(
-    sessionId: string,
-    directory: string
-  ): Promise<Array<{ info: MessageInfo; parts: MessagePart[] }>> {
+  async getMessages(sessionId: string, directory: string): Promise<Array<{ info: MessageInfo; parts: MessagePart[] }>> {
     return this.request<Array<{ info: MessageInfo; parts: MessagePart[] }>>(
       "GET",
       `/session/${sessionId}/message`,
       undefined,
-      { directory }
+      { directory },
     )
   }
 
@@ -146,14 +138,9 @@ export class HttpClient {
     sessionId: string,
     permissionId: string,
     response: "once" | "always" | "reject",
-    directory: string
+    directory: string,
   ): Promise<boolean> {
-    await this.request<void>(
-      "POST",
-      `/session/${sessionId}/permissions/${permissionId}`,
-      { response },
-      { directory }
-    )
+    await this.request<void>("POST", `/session/${sessionId}/permissions/${permissionId}`, { response }, { directory })
     return true
   }
 }
