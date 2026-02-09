@@ -1,4 +1,4 @@
-import { Component, createSignal, For, JSX } from "solid-js";
+import { Component, createSignal, For, JSX } from "solid-js"
 import {
   Plug,
   Users2,
@@ -15,28 +15,26 @@ import {
   Globe,
   Info,
   ArrowLeft,
-} from "lucide-solid";
-import ProvidersTab from "./settings/ProvidersTab";
-import AgentBehaviourTab from "./settings/AgentBehaviourTab";
-import AutoApproveTab from "./settings/AutoApproveTab";
-import BrowserTab from "./settings/BrowserTab";
-import CheckpointsTab from "./settings/CheckpointsTab";
-import DisplayTab from "./settings/DisplayTab";
-import AutocompleteTab from "./settings/AutocompleteTab";
-import NotificationsTab from "./settings/NotificationsTab";
-import ContextTab from "./settings/ContextTab";
-import TerminalTab from "./settings/TerminalTab";
-import PromptsTab from "./settings/PromptsTab";
-import ExperimentalTab from "./settings/ExperimentalTab";
-import LanguageTab from "./settings/LanguageTab";
-import AboutKiloCodeTab from "./settings/AboutKiloCodeTab";
-
-export type ConnectionState = "connecting" | "connected" | "disconnected";
+} from "lucide-solid"
+import ProvidersTab from "./settings/ProvidersTab"
+import AgentBehaviourTab from "./settings/AgentBehaviourTab"
+import AutoApproveTab from "./settings/AutoApproveTab"
+import BrowserTab from "./settings/BrowserTab"
+import CheckpointsTab from "./settings/CheckpointsTab"
+import DisplayTab from "./settings/DisplayTab"
+import AutocompleteTab from "./settings/AutocompleteTab"
+import NotificationsTab from "./settings/NotificationsTab"
+import ContextTab from "./settings/ContextTab"
+import TerminalTab from "./settings/TerminalTab"
+import PromptsTab from "./settings/PromptsTab"
+import ExperimentalTab from "./settings/ExperimentalTab"
+import LanguageTab from "./settings/LanguageTab"
+import AboutKiloCodeTab, { type ConnectionState } from "./settings/AboutKiloCodeTab"
 
 export interface SettingsProps {
-  port: number | null;
-  connectionState: ConnectionState;
-  onBack?: () => void;
+  port: number | null
+  connectionState: ConnectionState
+  onBack?: () => void
 }
 
 type TabId =
@@ -53,12 +51,12 @@ type TabId =
   | "prompts"
   | "experimental"
   | "language"
-  | "aboutKiloCode";
+  | "aboutKiloCode"
 
 interface TabConfig {
-  id: TabId;
-  label: string;
-  icon: () => JSX.Element;
+  id: TabId
+  label: string
+  icon: () => JSX.Element
 }
 
 const tabs: TabConfig[] = [
@@ -76,75 +74,81 @@ const tabs: TabConfig[] = [
   { id: "experimental", label: "Experimental", icon: () => <FlaskConical size={18} /> },
   { id: "language", label: "Language", icon: () => <Globe size={18} /> },
   { id: "aboutKiloCode", label: "About Kilo Code", icon: () => <Info size={18} /> },
-];
+]
 
 const Settings: Component<SettingsProps> = (props) => {
-  const [activeTab, setActiveTab] = createSignal<TabId>("providers");
+  const [activeTab, setActiveTab] = createSignal<TabId>("providers")
 
   const getTabIcon = (tabId: TabId) => {
-    const tab = tabs.find((t) => t.id === tabId);
-    return tab ? tab.icon() : null;
-  };
+    const tab = tabs.find((t) => t.id === tabId)
+    return tab ? tab.icon() : null
+  }
 
   const getTabLabel = (tabId: TabId) => {
-    const tab = tabs.find((t) => t.id === tabId);
-    return tab ? tab.label : "";
-  };
+    const tab = tabs.find((t) => t.id === tabId)
+    return tab ? tab.label : ""
+  }
 
   const renderTabContent = () => {
     switch (activeTab()) {
       case "providers":
-        return <ProvidersTab />;
+        return <ProvidersTab />
       case "agentBehaviour":
-        return <AgentBehaviourTab />;
+        return <AgentBehaviourTab />
       case "autoApprove":
-        return <AutoApproveTab />;
+        return <AutoApproveTab />
       case "browser":
-        return <BrowserTab />;
+        return <BrowserTab />
       case "checkpoints":
-        return <CheckpointsTab />;
+        return <CheckpointsTab />
       case "display":
-        return <DisplayTab />;
+        return <DisplayTab />
       case "autocomplete":
-        return <AutocompleteTab />;
+        return <AutocompleteTab />
       case "notifications":
-        return <NotificationsTab />;
+        return <NotificationsTab />
       case "context":
-        return <ContextTab />;
+        return <ContextTab />
       case "terminal":
-        return <TerminalTab />;
+        return <TerminalTab />
       case "prompts":
-        return <PromptsTab />;
+        return <PromptsTab />
       case "experimental":
-        return <ExperimentalTab />;
+        return <ExperimentalTab />
       case "language":
-        return <LanguageTab />;
+        return <LanguageTab />
       case "aboutKiloCode":
-        return <AboutKiloCodeTab port={props.port} connectionState={props.connectionState} />;
+        return <AboutKiloCodeTab port={props.port} connectionState={props.connectionState} />
     }
-  };
+  }
 
   return (
-    <div style={{
-      display: "flex",
-      "flex-direction": "column",
-      height: "100%",
-      color: "var(--vscode-foreground)",
-      "font-family": "var(--vscode-font-family)",
-    }}>
-      {/* Header */}
-      <div style={{
-        padding: "12px 16px",
-        "border-bottom": "1px solid var(--vscode-panel-border)",
+    <div
+      style={{
         display: "flex",
-        "align-items": "center",
-        "justify-content": "space-between",
-      }}>
-        <div style={{
+        "flex-direction": "column",
+        height: "100%",
+        color: "var(--vscode-foreground)",
+        "font-family": "var(--vscode-font-family)",
+      }}
+    >
+      {/* Header */}
+      <div
+        style={{
+          padding: "12px 16px",
+          "border-bottom": "1px solid var(--vscode-panel-border)",
           display: "flex",
           "align-items": "center",
-          gap: "8px",
-        }}>
+          "justify-content": "space-between",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            "align-items": "center",
+            gap: "8px",
+          }}
+        >
           <button
             onClick={() => props.onBack?.()}
             title="Done"
@@ -160,20 +164,22 @@ const Settings: Component<SettingsProps> = (props) => {
               "border-radius": "4px",
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = "var(--vscode-toolbar-hoverBackground)";
+              e.currentTarget.style.background = "var(--vscode-toolbar-hoverBackground)"
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.background = "transparent";
+              e.currentTarget.style.background = "transparent"
             }}
           >
             <ArrowLeft size={18} />
           </button>
-          <h2 style={{
-            "font-size": "16px",
-            "font-weight": "600",
-            margin: 0,
-            color: "var(--vscode-foreground)",
-          }}>
+          <h2
+            style={{
+              "font-size": "16px",
+              "font-weight": "600",
+              margin: 0,
+              color: "var(--vscode-foreground)",
+            }}
+          >
             Settings
           </h2>
         </div>
@@ -195,20 +201,24 @@ const Settings: Component<SettingsProps> = (props) => {
       </div>
 
       {/* Main content area with sidebar and content */}
-      <div style={{
-        display: "flex",
-        flex: 1,
-        overflow: "hidden",
-      }}>
-        {/* Tab sidebar */}
-        <div style={{
-          width: "192px",
-          "flex-shrink": 0,
-          "border-right": "1px solid var(--vscode-panel-border)",
-          "overflow-y": "auto",
+      <div
+        style={{
           display: "flex",
-          "flex-direction": "column",
-        }}>
+          flex: 1,
+          overflow: "hidden",
+        }}
+      >
+        {/* Tab sidebar */}
+        <div
+          style={{
+            width: "192px",
+            "flex-shrink": 0,
+            "border-right": "1px solid var(--vscode-panel-border)",
+            "overflow-y": "auto",
+            display: "flex",
+            "flex-direction": "column",
+          }}
+        >
           <For each={tabs}>
             {(tab) => (
               <button
@@ -218,19 +228,17 @@ const Settings: Component<SettingsProps> = (props) => {
                   height: "48px",
                   padding: "0 16px",
                   border: "none",
-                  background: activeTab() === tab.id
-                    ? "var(--vscode-list-activeSelectionBackground)"
-                    : "transparent",
-                  color: activeTab() === tab.id
-                    ? "var(--vscode-list-activeSelectionForeground)"
-                    : "var(--vscode-foreground)",
+                  background: activeTab() === tab.id ? "var(--vscode-list-activeSelectionBackground)" : "transparent",
+                  color:
+                    activeTab() === tab.id
+                      ? "var(--vscode-list-activeSelectionForeground)"
+                      : "var(--vscode-foreground)",
                   "text-align": "left",
                   cursor: "pointer",
                   "font-size": "13px",
                   "font-family": "var(--vscode-font-family)",
-                  "border-left": activeTab() === tab.id
-                    ? "2px solid var(--vscode-focusBorder)"
-                    : "2px solid transparent",
+                  "border-left":
+                    activeTab() === tab.id ? "2px solid var(--vscode-focusBorder)" : "2px solid transparent",
                   opacity: activeTab() === tab.id ? 1 : 0.7,
                   display: "flex",
                   "align-items": "center",
@@ -238,12 +246,12 @@ const Settings: Component<SettingsProps> = (props) => {
                 }}
                 onMouseEnter={(e) => {
                   if (activeTab() !== tab.id) {
-                    e.currentTarget.style.background = "var(--vscode-list-hoverBackground)";
+                    e.currentTarget.style.background = "var(--vscode-list-hoverBackground)"
                   }
                 }}
                 onMouseLeave={(e) => {
                   if (activeTab() !== tab.id) {
-                    e.currentTarget.style.background = "transparent";
+                    e.currentTarget.style.background = "transparent"
                   }
                 }}
               >
@@ -255,43 +263,51 @@ const Settings: Component<SettingsProps> = (props) => {
         </div>
 
         {/* Content area */}
-        <div style={{
-          flex: 1,
-          "overflow-y": "auto",
-          display: "flex",
-          "flex-direction": "column",
-        }}>
-          {/* Section header */}
-          <div style={{
-            padding: "16px",
-            "border-bottom": "1px solid var(--vscode-panel-border)",
+        <div
+          style={{
+            flex: 1,
+            "overflow-y": "auto",
             display: "flex",
-            "align-items": "center",
-            gap: "8px",
-          }}>
+            "flex-direction": "column",
+          }}
+        >
+          {/* Section header */}
+          <div
+            style={{
+              padding: "16px",
+              "border-bottom": "1px solid var(--vscode-panel-border)",
+              display: "flex",
+              "align-items": "center",
+              gap: "8px",
+            }}
+          >
             {getTabIcon(activeTab())}
-            <h3 style={{
-              "font-size": "14px",
-              "font-weight": "600",
-              margin: 0,
-              color: "var(--vscode-foreground)",
-            }}>
+            <h3
+              style={{
+                "font-size": "14px",
+                "font-weight": "600",
+                margin: 0,
+                color: "var(--vscode-foreground)",
+              }}
+            >
               {getTabLabel(activeTab())}
             </h3>
           </div>
 
           {/* Tab content */}
-          <div style={{
-            flex: 1,
-            padding: "16px",
-            "overflow-y": "auto",
-          }}>
+          <div
+            style={{
+              flex: 1,
+              padding: "16px",
+              "overflow-y": "auto",
+            }}
+          >
             {renderTabContent()}
           </div>
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Settings;
+export default Settings
