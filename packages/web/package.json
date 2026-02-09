@@ -37,5 +37,6 @@
     "@kilocode/cli": "workspace:*",
     "@types/node": "catalog:",
     "typescript": "catalog:"
-  }
+  },
+  "peerDependencies": {}
 }
