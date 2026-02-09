@@ -11,8 +11,10 @@ interface ModelGroup {
   models: EnrichedModel[]
 }
 
+const KILO_GATEWAY_ID = "kilo"
+
 /** Provider display order — popular providers sort first */
-const PROVIDER_ORDER = ["anthropic", "openai", "google"]
+const PROVIDER_ORDER = [KILO_GATEWAY_ID, "anthropic", "openai", "google"]
 
 function providerSortKey(providerID: string): number {
   const idx = PROVIDER_ORDER.indexOf(providerID.toLowerCase())
@@ -29,15 +31,21 @@ export const ModelSelector: Component = () => {
   let containerRef: HTMLDivElement | undefined
   let searchRef: HTMLInputElement | undefined
 
-  const hasProviders = () => connected().length > 0
+  // Only show models from Kilo Gateway or connected providers
+  const visibleModels = createMemo(() => {
+    const c = connected()
+    return models().filter((m) => m.providerID === KILO_GATEWAY_ID || c.includes(m.providerID))
+  })
+
+  const hasProviders = () => visibleModels().length > 0
 
   // Flat filtered list for keyboard navigation
   const filtered = createMemo(() => {
     const q = search().toLowerCase()
     if (!q) {
-      return models()
+      return visibleModels()
     }
-    return models().filter(
+    return visibleModels().filter(
       (m) => m.name.toLowerCase().includes(q) || m.providerName.toLowerCase().includes(q) || m.id.toLowerCase().includes(q),
     )
   })
