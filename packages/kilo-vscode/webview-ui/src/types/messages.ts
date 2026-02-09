@@ -15,27 +15,48 @@ export type ToolState =
   | { status: 'completed'; input: Record<string, unknown>; output: string; title: string }
   | { status: 'error'; input: Record<string, unknown>; error: string };
 
-// Part types from the backend
-export interface TextPart {
-  type: 'text';
+// Base part interface - all parts have these fields
+export interface BasePart {
   id: string;
+  sessionID?: string;
+  messageID?: string;
+}
+
+// Part types from the backend
+export interface TextPart extends BasePart {
+  type: 'text';
   text: string;
 }
 
-export interface ToolPart {
+export interface ToolPart extends BasePart {
   type: 'tool';
-  id: string;
   tool: string;
   state: ToolState;
 }
 
-export interface ReasoningPart {
+export interface ReasoningPart extends BasePart {
   type: 'reasoning';
-  id: string;
   text: string;
 }
 
-export type Part = TextPart | ToolPart | ReasoningPart;
+// Step parts from the backend
+export interface StepStartPart extends BasePart {
+  type: 'step-start';
+}
+
+export interface StepFinishPart extends BasePart {
+  type: 'step-finish';
+  reason?: string;
+  cost?: number;
+  tokens?: {
+    input: number;
+    output: number;
+    reasoning?: number;
+    cache?: { read: number; write: number };
+  };
+}
+
+export type Part = TextPart | ToolPart | ReasoningPart | StepStartPart | StepFinishPart;
 
 // Part delta for streaming updates
 export interface PartDelta {

@@ -146,34 +146,56 @@ export const SessionProvider: ParentComponent = (props) => {
   }
 
   function handleMessageCreated(message: Message) {
-    console.log('[Kilo New] Message created:', message.id, message.role);
-    setStore('messages', message.sessionID, (msgs = []) => [...msgs, message]);
+    console.log('[Kilo New] Message created/updated:', message.id, message.role);
+    
+    setStore('messages', message.sessionID, (msgs = []) => {
+      // Check if message already exists (update case)
+      const existingIndex = msgs.findIndex((m) => m.id === message.id);
+      if (existingIndex >= 0) {
+        // Update existing message
+        const updated = [...msgs];
+        updated[existingIndex] = { ...msgs[existingIndex], ...message };
+        return updated;
+      }
+      // Add new message
+      return [...msgs, message];
+    });
     
     if (message.parts && message.parts.length > 0) {
       setStore('parts', message.id, message.parts);
     }
   }
 
-  function handlePartUpdated(sessionID: string, messageID: string, part: Part, delta?: PartDelta) {
+  function handlePartUpdated(sessionID: string | undefined, messageID: string | undefined, part: Part, delta?: PartDelta) {
+    // Get messageID from the part itself if not provided in the message
+    const effectiveMessageID = messageID || part.messageID;
+    
+    if (!effectiveMessageID) {
+      console.warn('[Kilo New] Part updated without messageID:', part.id, part.type);
+      return;
+    }
+    
+    console.log('[Kilo New] Part updated:', effectiveMessageID, part.id, part.type);
+    
     setStore('parts', produce((parts) => {
-      if (!parts[messageID]) {
-        parts[messageID] = [];
+      if (!parts[effectiveMessageID]) {
+        parts[effectiveMessageID] = [];
       }
       
-      const existingIndex = parts[messageID].findIndex((p) => p.id === part.id);
+      const existingIndex = parts[effectiveMessageID].findIndex((p) => p.id === part.id);
       
       if (existingIndex >= 0) {
         // Update existing part
-        if (delta?.type === 'text-delta' && delta.textDelta && parts[messageID][existingIndex].type === 'text') {
+        if (delta?.type === 'text-delta' && delta.textDelta && parts[effectiveMessageID][existingIndex].type === 'text') {
           // Append text delta
-          (parts[messageID][existingIndex] as { text: string }).text += delta.textDelta;
+          (parts[effectiveMessageID][existingIndex] as { text: string }).text += delta.textDelta;
         } else {
           // Replace entire part
-          parts[messageID][existingIndex] = part;
+          parts[effectiveMessageID][existingIndex] = part;
         }
       } else {
         // Add new part
-        parts[messageID].push(part);
+        parts[effectiveMessageID].push(part);
       }
     }));
   }

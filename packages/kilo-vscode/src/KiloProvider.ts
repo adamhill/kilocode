@@ -333,16 +333,19 @@ export class KiloProvider implements vscode.WebviewViewProvider {
 
     // Forward relevant events to webview
     switch (event.type) {
-      case "message.part.updated":
-        // The part contains the full part data, delta is optional text delta
+      case "message.part.updated": {
+        // The part contains the full part data including messageID, delta is optional text delta
+        const part = event.properties.part as { messageID?: string; sessionID?: string }
+        const messageID = part.messageID || ""
         this.postMessage({
           type: "partUpdated",
-          sessionID: this.currentSession?.id,
-          messageID: "", // Not available in this event type
+          sessionID: part.sessionID || this.currentSession?.id,
+          messageID,
           part: event.properties.part,
           delta: event.properties.delta ? { type: "text-delta", textDelta: event.properties.delta } : undefined,
         })
         break
+      }
 
       case "message.updated":
         // Message info updated

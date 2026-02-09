@@ -109,6 +109,11 @@ const ToolPartView: Component<{ part: ToolPart }> = (props) => {
 
 // Part renderer
 const PartView: Component<{ part: Part }> = (props) => {
+  // Skip step-start and step-finish parts - they're metadata, not displayable content
+  if (props.part.type === 'step-start' || props.part.type === 'step-finish') {
+    return null;
+  }
+  
   return (
     <>
       <Show when={props.part.type === 'text'}>
