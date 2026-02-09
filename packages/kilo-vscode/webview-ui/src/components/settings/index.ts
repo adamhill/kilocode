@@ -1,11 +1,15 @@
-export { default as AboutTab } from "./AboutTab";
-export { default as ApiKeysTab } from "./ApiKeysTab";
 export { default as ProvidersTab } from "./ProvidersTab";
-export { default as ModelsTab } from "./ModelsTab";
+export { default as AgentBehaviourTab } from "./AgentBehaviourTab";
+export { default as AutoApproveTab } from "./AutoApproveTab";
 export { default as BrowserTab } from "./BrowserTab";
-export { default as McpServersTab } from "./McpServersTab";
-export { default as RulesTab } from "./RulesTab";
-export { default as ModesTab } from "./ModesTab";
-export { default as AdvancedTab } from "./AdvancedTab";
-
-export type { ConnectionState, AboutTabProps } from "./AboutTab";
+export { default as CheckpointsTab } from "./CheckpointsTab";
+export { default as DisplayTab } from "./DisplayTab";
+export { default as AutocompleteTab } from "./AutocompleteTab";
+export { default as NotificationsTab } from "./NotificationsTab";
+export { default as ContextTab } from "./ContextTab";
+export { default as TerminalTab } from "./TerminalTab";
+export { default as PromptsTab } from "./PromptsTab";
+export { default as ExperimentalTab } from "./ExperimentalTab";
+export { default as LanguageTab } from "./LanguageTab";
+export { default as AboutKiloCodeTab } from "./AboutKiloCodeTab";
+export type { ConnectionState, AboutKiloCodeTabProps } from "./AboutKiloCodeTab";

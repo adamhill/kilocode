@@ -1,6 +1,6 @@
 import { Component } from "solid-js";
 
-const ProvidersTab: Component = () => {
+const PromptsTab: Component = () => {
   return (
     <div>
       <div style={{
@@ -25,4 +25,4 @@ const ProvidersTab: Component = () => {
   );
 };
 
-export default ProvidersTab;
+export default PromptsTab;

@@ -2,12 +2,12 @@ import { Component } from "solid-js";
 
 export type ConnectionState = "connecting" | "connected" | "disconnected";
 
-export interface AboutTabProps {
+export interface AboutKiloCodeTabProps {
   port: number | null;
   connectionState: ConnectionState;
 }
 
-const AboutTab: Component<AboutTabProps> = (props) => {
+const AboutKiloCodeTab: Component<AboutKiloCodeTabProps> = (props) => {
   const getStatusColor = () => {
     switch (props.connectionState) {
       case "connected":
@@ -32,15 +32,6 @@ const AboutTab: Component<AboutTabProps> = (props) => {
 
   return (
     <div>
-      <h3 style={{
-        "font-size": "14px",
-        "font-weight": "600",
-        "margin-bottom": "16px",
-        color: "var(--vscode-foreground)",
-      }}>
-        About Kilo Code
-      </h3>
-
       <div style={{
         background: "var(--vscode-editor-background)",
         border: "1px solid var(--vscode-panel-border)",
@@ -52,6 +43,7 @@ const AboutTab: Component<AboutTabProps> = (props) => {
           "font-size": "13px",
           "font-weight": "600",
           "margin-bottom": "12px",
+          "margin-top": "0",
           color: "var(--vscode-foreground)",
         }}>
           CLI Server
@@ -123,6 +115,7 @@ const AboutTab: Component<AboutTabProps> = (props) => {
           "font-size": "13px",
           "font-weight": "600",
           "margin-bottom": "12px",
+          "margin-top": "0",
           color: "var(--vscode-foreground)",
         }}>
           Version Information
@@ -139,4 +132,4 @@ const AboutTab: Component<AboutTabProps> = (props) => {
   );
 };
 
-export default AboutTab;
+export default AboutKiloCodeTab;
