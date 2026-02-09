@@ -116,11 +116,9 @@ export class HttpClient {
     options?: { providerID?: string; modelID?: string },
   ): Promise<{ info: MessageInfo; parts: MessagePart[] }> {
     const body: Record<string, unknown> = { parts }
-    if (options?.providerID) {
-      body.providerID = options.providerID
-    }
-    if (options?.modelID) {
-      body.modelID = options.modelID
+    if (options?.providerID && options?.modelID) {
+      // Backend expects model selection as a nested object: { model: { providerID, modelID } }
+      body.model = { providerID: options.providerID, modelID: options.modelID }
     }
     return this.request<{ info: MessageInfo; parts: MessagePart[] }>(
       "POST",
