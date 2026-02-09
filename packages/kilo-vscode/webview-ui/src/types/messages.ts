@@ -208,6 +208,7 @@ export interface AbortRequest {
 export interface PermissionResponseRequest {
   type: 'permissionResponse';
   permissionId: string;
+  sessionID: string;
   response: 'once' | 'always' | 'reject';
 }
 

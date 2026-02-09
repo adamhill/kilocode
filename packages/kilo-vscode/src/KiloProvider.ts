@@ -50,9 +50,9 @@ export class KiloProvider implements vscode.WebviewViewProvider {
 				case 'abort':
 					await this.handleAbort(message.sessionID);
 					break;
-				case 'permissionResponse':
-					await this.handlePermissionResponse(message.permissionId, message.response);
-					break;
+			case 'permissionResponse':
+				await this.handlePermissionResponse(message.permissionId, message.sessionID, message.response);
+				break;
 				case 'createSession':
 					await this.handleCreateSession();
 					break;
@@ -308,16 +308,23 @@ export class KiloProvider implements vscode.WebviewViewProvider {
 	 */
 	private async handlePermissionResponse(
 		permissionId: string,
+		sessionID: string,
 		response: 'once' | 'always' | 'reject'
 	): Promise<void> {
-		if (!this.httpClient || !this.currentSession) {
+		if (!this.httpClient) {
+			return;
+		}
+
+		const targetSessionID = sessionID || this.currentSession?.id;
+		if (!targetSessionID) {
+			console.error('[Kilo New] KiloProvider: No sessionID for permission response');
 			return;
 		}
 
 		try {
 			const workspaceDir = this.getWorkspaceDirectory();
 			await this.httpClient.respondToPermission(
-				this.currentSession.id,
+				targetSessionID,
 				permissionId,
 				response,
 				workspaceDir

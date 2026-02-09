@@ -266,10 +266,15 @@ export const SessionProvider: ParentComponent = (props) => {
   }
 
   function respondToPermission(permissionId: string, response: 'once' | 'always' | 'reject') {
-    console.log('[Kilo New] Permission response:', permissionId, response);
+    // Resolve sessionID from the stored permission request
+    const permission = permissions().find((p) => p.id === permissionId);
+    const sessionID = permission?.sessionID ?? currentSessionID() ?? '';
+
+    console.log('[Kilo New] Permission response:', permissionId, response, 'sessionID:', sessionID);
     vscode.postMessage({
       type: 'permissionResponse',
       permissionId,
+      sessionID,
       response,
     });
     
