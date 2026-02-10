@@ -10,8 +10,8 @@
 
 - **Kilo CLI availability**: Not present.
 - **Migration recommendation**:
-    - Keep the Memory Bank feature in the VS Code extension host.
-    - Optionally define a file convention that Kilo CLI can read, but assume extension ownership until explicitly supported server-side.
+  - Keep the Memory Bank feature in the VS Code extension host.
+  - Optionally define a file convention that Kilo CLI can read, but assume extension ownership until explicitly supported server-side.
 - **Reimplementation required?**: Yes.
 
 ## Implementation notes

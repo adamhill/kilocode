@@ -10,6 +10,6 @@
 
 - **Kilo CLI availability**: Partial.
 - **Migration recommendation**:
-    - Use Kilo CLI's plugin system where it covers the integration (non-IDE-specific).
-    - Keep IDE-specific integrations (VS Code APIs, UI hooks) in the extension and decide per integration.
+  - Use Kilo CLI's plugin system where it covers the integration (non-IDE-specific).
+  - Keep IDE-specific integrations (VS Code APIs, UI hooks) in the extension and decide per integration.
 - **Reimplementation required?**: Partial.

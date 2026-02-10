@@ -6,8 +6,8 @@
 
 - **Kilo CLI availability**: Already.
 - **Migration recommendation**:
-    - Delegate grep/glob/repo scanning to Kilo CLI server endpoints.
-    - Keep VS Code UX (search UI, previews, navigation) in the extension host.
+  - Delegate grep/glob/repo scanning to Kilo CLI server endpoints.
+  - Keep VS Code UX (search UI, previews, navigation) in the extension host.
 - **Reimplementation required?**: No.
 
 ## Primary implementation anchors

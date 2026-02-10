@@ -12,8 +12,8 @@ Interactive terminal output rendering and approval controls for executed command
 - Abort button to kill running processes (shows PID)
 - Exit status indicator - color-coded dot (green=success, red=failure) with tooltip
 - Command pattern selector:
-    - Allow/deny command patterns
-    - Updates auto-approval settings
+  - Allow/deny command patterns
+  - Updates auto-approval settings
 - Real-time output streaming - shows live command output as it executes
 - Syntax highlighting for shell commands
 

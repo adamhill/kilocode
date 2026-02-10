@@ -6,8 +6,8 @@
 
 - **Kilo CLI availability**: Not present.
 - **Migration recommendation**:
-    - Decide storage ownership (server vs extension) and implement purge accordingly.
-    - Until server-side storage is authoritative, keep purge logic in the extension host.
+  - Decide storage ownership (server vs extension) and implement purge accordingly.
+  - Until server-side storage is authoritative, keep purge logic in the extension host.
 - **Reimplementation required?**: Yes.
 
 ## Primary implementation anchors

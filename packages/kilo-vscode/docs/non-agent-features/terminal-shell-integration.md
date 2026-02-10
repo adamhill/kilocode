@@ -10,8 +10,8 @@
 
 - **Kilo CLI availability**: Already.
 - **Migration recommendation**:
-    - Delegate command execution and PTY/shell management to Kilo CLI server endpoints.
-    - Keep VS Code terminal UX (presentation, streaming, approvals) in the extension as an adapter.
+  - Delegate command execution and PTY/shell management to Kilo CLI server endpoints.
+  - Keep VS Code terminal UX (presentation, streaming, approvals) in the extension as an adapter.
 - **Reimplementation required?**: Partial.
 
 ## Implementation notes

@@ -13,10 +13,10 @@ Interactive image viewing and management for both full-size viewer and thumbnail
 
 - Click to open in VS Code editor
 - Full-screen zoom modal with:
-    - Zoom in/out controls with continuous zoom levels
-    - Mouse wheel zoom support
-    - Drag to pan when zoomed
-    - Zoom percentage indicator
+  - Zoom in/out controls with continuous zoom levels
+  - Mouse wheel zoom support
+  - Drag to pan when zoomed
+  - Zoom percentage indicator
 - Copy image path to clipboard
 - Save image as file via VS Code API
 - Hover-activated action buttons

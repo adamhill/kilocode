@@ -38,7 +38,7 @@ Practical implications:
 
 1. **Supported locales (post-migration)** are exactly:
 
-    `ar, br, da, de, en, es, fr, ja, ko, no, pl, ru, zh, zht`
+   `ar, br, da, de, en, es, fr, ja, ko, no, pl, ru, zh, zht`
 
 2. The extension and webview must **not** claim/offer locales that Kilo CLI cannot represent.
 
@@ -70,19 +70,19 @@ When the user’s VS Code UI locale is not supported by Kilo CLI (e.g. `nl`, `it
 ### Required changes (must-do)
 
 - Remove Kilo-only locale assets from:
-    - `src/i18n/locales/`
-    - `webview-ui/src/i18n/locales/`
+  - `src/i18n/locales/`
+  - `webview-ui/src/i18n/locales/`
 - Add a single locale normalization function in the Kilo CLI adapter layer (extension host) to ensure:
-    - consistent mapping (`pt-BR → br`, `zh-CN → zh`, `zh-TW → zht`)
-    - deterministic fallback to `en`
+  - consistent mapping (`pt-BR → br`, `zh-CN → zh`, `zh-TW → zht`)
+  - deterministic fallback to `en`
 - Ensure all Kilo CLI-facing requests/events that depend on locale use the normalized locale.
 
 ### Tests / validation
 
 - Unit tests for locale normalization:
-    - direct pass-through for supported locales
-    - the 3 explicit mappings above
-    - fallback behavior for unsupported locales (e.g. `nl → en`)
+  - direct pass-through for supported locales
+  - the 3 explicit mappings above
+  - fallback behavior for unsupported locales (e.g. `nl → en`)
 
 ### Phase placement
 

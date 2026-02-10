@@ -12,8 +12,8 @@
 
 - **Kilo CLI availability**: Partial.
 - **Migration recommendation**:
-    - Split responsibilities: Kilo CLI handles its own auth/session for server APIs.
-    - The VS Code extension remains responsible for org/MDM enforcement and for supplying/mediating credentials as needed.
+  - Split responsibilities: Kilo CLI handles its own auth/session for server APIs.
+  - The VS Code extension remains responsible for org/MDM enforcement and for supplying/mediating credentials as needed.
 - **Reimplementation required?**: Partial.
 
 ## Primary implementation anchors

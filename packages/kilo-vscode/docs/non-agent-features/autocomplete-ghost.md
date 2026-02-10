@@ -16,8 +16,8 @@
 
 - **Kilo CLI availability**: Not present.
 - **Migration recommendation**:
-    - Keep autocomplete (Ghost) in the VS Code extension host; it is tightly coupled to editor UX (inline completions) and local context tracking.
-    - If Kilo CLI server needs to contribute in the future, add explicit completion endpoints, but keep triggering/rendering IDE-side.
+  - Keep autocomplete (Ghost) in the VS Code extension host; it is tightly coupled to editor UX (inline completions) and local context tracking.
+  - If Kilo CLI server needs to contribute in the future, add explicit completion endpoints, but keep triggering/rendering IDE-side.
 - **Reimplementation required?**: Yes.
 
 ## Primary implementation anchors

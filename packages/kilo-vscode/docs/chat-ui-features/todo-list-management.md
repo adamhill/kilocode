@@ -21,6 +21,6 @@ Interactive editing for todo lists surfaced by the agent/tool messages.
 **Reimplement?** Likely yes (Kilo-specific tool/UI).
 
 - This is driven by a Kilo tool message (`UpdateTodoListToolBlock`). Unless Kilo CLI provides an equivalent “todo list” tool/event, you will need to:
-    - either keep a Kilo-side todo-state feature (maintained by the extension host and surfaced to the webview), or
-    - add an Kilo CLI tool/plugin that emits todo-list state changes as events.
+  - either keep a Kilo-side todo-state feature (maintained by the extension host and surfaced to the webview), or
+  - add an Kilo CLI tool/plugin that emits todo-list state changes as events.
 - Recommended: treat as optional until Phase 3+ in [`docs/opencode-core/opencode-migration-plan.md`](docs/opencode-core/opencode-migration-plan.md:1), unless todo tracking is considered core UX.

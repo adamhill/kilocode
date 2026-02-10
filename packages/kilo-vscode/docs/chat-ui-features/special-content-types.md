@@ -19,6 +19,6 @@ Interactive elements for specialized message content beyond plain markdown/code.
 
 - UI components like collapsible reasoning and expandable errors can remain in the webview.
 - MCP tool/resource interactions should be revalidated:
-    - If the extension remains the MCP host, keep current behavior.
-    - If MCP moves to Kilo CLI (`GET /mcp` / `POST /mcp` are referenced in [`docs/opencode-core/opencode-migration-plan.md`](docs/opencode-core/opencode-migration-plan.md:1)), you’ll need adapter work to map Kilo CLI MCP events/results into the existing Kilo MCP rows.
+  - If the extension remains the MCP host, keep current behavior.
+  - If MCP moves to Kilo CLI (`GET /mcp` / `POST /mcp` are referenced in [`docs/opencode-core/opencode-migration-plan.md`](docs/opencode-core/opencode-migration-plan.md:1)), you’ll need adapter work to map Kilo CLI MCP events/results into the existing Kilo MCP rows.
 - “Open markdown preview in VS Code” is inherently a VS Code integration; keep it in the extension/webview.

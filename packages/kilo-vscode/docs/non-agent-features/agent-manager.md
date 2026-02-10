@@ -10,6 +10,6 @@
 
 - **Kilo CLI availability**: Not present.
 - **Migration recommendation**:
-    - Keep/reimplement agent/session orchestration in the extension (spawning/managing multiple Kilo CLI servers/sessions).
-    - Treat Kilo CLI as the execution backend per session, not the orchestrator.
+  - Keep/reimplement agent/session orchestration in the extension (spawning/managing multiple Kilo CLI servers/sessions).
+  - Treat Kilo CLI as the execution backend per session, not the orchestrator.
 - **Reimplementation required?**: Yes.

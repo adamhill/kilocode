@@ -15,8 +15,8 @@
 
 - **Kilo CLI availability**: Partial.
 - **Migration recommendation**:
-    - Keep Kilo's review-mode UX in the VS Code extension host.
-    - Optionally reuse Kilo CLI review templates/prompts server-side, but avoid depending on server UI that doesn't exist.
+  - Keep Kilo's review-mode UX in the VS Code extension host.
+  - Optionally reuse Kilo CLI review templates/prompts server-side, but avoid depending on server UI that doesn't exist.
 - **Reimplementation required?**: Partial.
 
 ## Primary implementation anchors

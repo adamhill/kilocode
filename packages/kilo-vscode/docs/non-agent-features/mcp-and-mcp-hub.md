@@ -17,8 +17,8 @@
 
 - **Kilo CLI availability**: Already.
 - **Migration recommendation**:
-    - Prefer Kilo CLI server MCP endpoints for MCP lifecycle, tool routing, and execution.
-    - Keep VS Code UI and approval/consent surfaces in the extension host.
+  - Prefer Kilo CLI server MCP endpoints for MCP lifecycle, tool routing, and execution.
+  - Keep VS Code UI and approval/consent surfaces in the extension host.
 - **Reimplementation required?**: No.
 
 ## Primary implementation anchors

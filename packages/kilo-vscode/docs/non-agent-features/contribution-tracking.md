@@ -12,8 +12,8 @@
 
 - **Kilo CLI availability**: Not present.
 - **Migration recommendation**:
-    - Keep contribution tracking in the VS Code extension host.
-    - If required later, add server-side storage/aggregation, but assume extension ownership for now.
+  - Keep contribution tracking in the VS Code extension host.
+  - If required later, add server-side storage/aggregation, but assume extension ownership for now.
 - **Reimplementation required?**: Yes.
 
 ## Primary implementation anchors

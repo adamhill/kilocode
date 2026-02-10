@@ -17,8 +17,8 @@
 
 - **Kilo CLI availability**: Not present.
 - **Migration recommendation**:
-    - Keep commit message generation in the VS Code extension host (Git integration, UX, and local repo context).
-    - Reimplement any agent-loop dependencies as needed, but do not block on server support.
+  - Keep commit message generation in the VS Code extension host (Git integration, UX, and local repo context).
+  - Reimplement any agent-loop dependencies as needed, but do not block on server support.
 - **Reimplementation required?**: Yes.
 
 ## Primary implementation anchors

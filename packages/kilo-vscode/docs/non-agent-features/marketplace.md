@@ -12,8 +12,8 @@
 
 - **Kilo CLI availability**: Not present.
 - **Migration recommendation**:
-    - Keep the Marketplace feature in the VS Code extension host (install/update UX and IDE integration).
-    - Reimplement server-side support only if Kilo CLI introduces a marketplace concept later.
+  - Keep the Marketplace feature in the VS Code extension host (install/update UX and IDE integration).
+  - Reimplement server-side support only if Kilo CLI introduces a marketplace concept later.
 - **Reimplementation required?**: Yes.
 
 ## Primary implementation anchors

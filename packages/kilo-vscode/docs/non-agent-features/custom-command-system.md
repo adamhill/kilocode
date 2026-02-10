@@ -12,8 +12,8 @@
 
 - **Kilo CLI availability**: Already.
 - **Migration recommendation**:
-    - Prefer Kilo CLI's custom command system for definition and execution.
-    - Keep VS Code UI entry points (command palette, menus) in the extension host as an adapter.
+  - Prefer Kilo CLI's custom command system for definition and execution.
+  - Keep VS Code UI entry points (command palette, menus) in the extension host as an adapter.
 - **Reimplementation required?**: Partial.
 
 ## Primary implementation anchors

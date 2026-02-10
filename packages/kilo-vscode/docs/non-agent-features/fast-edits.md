@@ -11,8 +11,8 @@
 
 - **Kilo CLI availability**: Already.
 - **Migration recommendation**:
-    - Prefer Kilo CLI server patch/apply tooling for generating and applying edits.
-    - Keep VS Code-specific diff/preview/confirmation UX in the extension host.
+  - Prefer Kilo CLI server patch/apply tooling for generating and applying edits.
+  - Keep VS Code-specific diff/preview/confirmation UX in the extension host.
 - **Reimplementation required?**: Partial.
 
 ## Implementation notes

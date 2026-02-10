@@ -10,6 +10,6 @@
 
 - **Kilo CLI availability**: Not present.
 - **Migration recommendation**:
-    - Keep deploy/security approval and policy UX in the VS Code extension host.
-    - Add server-side policy surfaces only if/when Kilo CLI needs centralized enforcement beyond basic permissions.
+  - Keep deploy/security approval and policy UX in the VS Code extension host.
+  - Add server-side policy surfaces only if/when Kilo CLI needs centralized enforcement beyond basic permissions.
 - **Reimplementation required?**: Yes.

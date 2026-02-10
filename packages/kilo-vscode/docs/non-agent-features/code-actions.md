@@ -15,8 +15,8 @@
 
 - **Kilo CLI availability**: Not present.
 - **Migration recommendation**:
-    - Keep code actions in the VS Code extension host (VS Code APIs, diagnostics, and editor-specific UX).
-    - Reimplement any backing logic that currently depends on the core agent loop, but keep action registration and application IDE-side.
+  - Keep code actions in the VS Code extension host (VS Code APIs, diagnostics, and editor-specific UX).
+  - Reimplement any backing logic that currently depends on the core agent loop, but keep action registration and application IDE-side.
 - **Reimplementation required?**: Yes.
 
 ## Primary implementation anchors (partial)
