@@ -107,7 +107,7 @@ Add to [`package.json`](../package.json) `dependencies`:
 }
 ```
 
-`solid-js` is already present. `lucide-solid` can be removed once all icons are migrated to kilo-ui's `Icon` component (Phase 1+).
+`solid-js` is already present. `lucide-solid` can be removed once all 15 icons in [`Settings.tsx`](../webview-ui/src/components/Settings.tsx) are migrated to kilo-ui's `Icon` component (Phase 1, §1.5). This requires adding 6 missing icons to kilo-ui first — see the [Icon Migration](#15-replace-icons-with-icon) section for details.
 
 ### 4.2 esbuild.js changes
 
@@ -303,7 +303,7 @@ import { Card } from "@kilocode/kilo-ui/card"
 
 #### 1.5 Replace icons with `Icon`
 
-**File**: [`Settings.tsx`](../webview-ui/src/components/Settings.tsx) — currently uses 14 `lucide-solid` icons
+**File**: [`Settings.tsx`](../webview-ui/src/components/Settings.tsx) — all 15 `lucide-solid` icons are used in this single file (settings tab icons). The kilo-ui [`Icon`](../../../kilo-ui/src/components/icon.tsx) component uses a string `name` prop with inline SVG paths.
 
 ```tsx
 // Before
@@ -314,14 +314,47 @@ import { Icon } from "@kilocode/kilo-ui/icon"
 <Icon name="sliders" />
 ```
 
-Once all lucide icons are replaced, remove `lucide-solid` from `package.json` dependencies.
+##### Prerequisite: Add 6 missing icons to kilo-ui
+
+Before migrating, the following icons must be added to the `icons` map in [`ui/src/components/icon.tsx`](../../../ui/src/components/icon.tsx) (SVG paths can be sourced from Lucide's MIT-licensed icon set, converted to 20×20 viewBox):
+
+- `monitor` — for Display tab
+- `bot` — for Autocomplete tab
+- `bell` — for Notifications tab
+- `users` — for Agent Behaviour tab
+- `flask` — for Experimental tab
+- `globe` — for Language tab
+
+##### Migration mapping
+
+| Settings Tab | lucide-solid | kilo-ui `name` | Notes |
+|---|---|---|---|
+| Back button | `ArrowLeft` | `arrow-left` | Exact match |
+| Providers | `Plug` | `providers` | Semantic match |
+| Terminal | `SquareTerminal` | `console` | Good match |
+| Prompts | `MessageSquare` | `speech-bubble` | Good match |
+| Checkpoints | `GitBranch` | `branch` | Good match |
+| Browser | `SquareMousePointer` | `window-cursor` | Approximate — review visually |
+| About | `Info` | `help` | Approximate — `?` vs `i` icon |
+| Context | `Database` | `server` | Approximate — review visually |
+| Auto-Approve | `CheckCheck` | `checklist` | Approximate — review visually |
+| Display | `Monitor` | `monitor` | **New icon needed** |
+| Autocomplete | `Bot` | `bot` | **New icon needed** |
+| Notifications | `Bell` | `bell` | **New icon needed** |
+| Agent Behaviour | `Users2` | `users` | **New icon needed** |
+| Experimental | `FlaskConical` | `flask` | **New icon needed** |
+| Language | `Globe` | `globe` | **New icon needed** |
+
+Once all lucide icons are replaced and the 6 new icons are added to kilo-ui, remove `lucide-solid` from `package.json` dependencies.
 
 #### Acceptance criteria
+- 6 missing icons (`monitor`, `bot`, `bell`, `users`, `flask`, `globe`) added to [`ui/src/components/icon.tsx`](../../../ui/src/components/icon.tsx)
+- All 15 lucide-solid icons in `Settings.tsx` replaced with kilo-ui `Icon` component
 - All buttons use `Button` or `IconButton` with appropriate variants
 - Spinners replace emoji loading indicators
 - Permission dialog uses `Dialog` component
 - Profile/auth cards use `Card` component
-- `lucide-solid` dependency removed
+- `lucide-solid` dependency removed from `package.json`
 - No visual regressions in existing functionality
 
 ---
