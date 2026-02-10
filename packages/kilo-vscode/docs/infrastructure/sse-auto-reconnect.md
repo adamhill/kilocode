@@ -54,6 +54,7 @@ this.reconnectDelay = 2000
 ```
 
 Files to change:
+
 - [`src/services/cli-backend/sse-client.ts`](../../src/services/cli-backend/sse-client.ts) — add reconnect logic
 - [`src/services/cli-backend/connection-service.ts`](../../src/services/cli-backend/connection-service.ts) — add `"reconnecting"` to `ConnectionState`
 - [`webview-ui/src/types/messages.ts`](../../webview-ui/src/types/messages.ts) — add `"reconnecting"` to webview `ConnectionState`

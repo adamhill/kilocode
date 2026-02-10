@@ -42,7 +42,7 @@ No markdown library is imported. No syntax highlighting exists.
 
 The JetBrains plugin optimizes streaming by tracking code block count:
 
-```typescript
+````typescript
 const newCodeBlockCount = (newText.match(/```/g) || []).length
 if (newCodeBlockCount !== lastCodeBlockCount) {
   // Structure changed — full re-parse
@@ -51,15 +51,17 @@ if (newCodeBlockCount !== lastCodeBlockCount) {
   // Append to last text node (fast path)
   appendToLastTextNode(delta)
 }
-```
+````
 
 For the initial implementation, a simpler approach works:
+
 1. Use `marked` or `markdown-it` for parsing
 2. Use `highlight.js` for syntax highlighting
 3. Debounce re-render during streaming (e.g., 50ms)
 4. Use `innerHTML` with CSP nonce for rendered HTML
 
 Files to change:
+
 - [`webview-ui/src/components/chat/Message.tsx`](../../webview-ui/src/components/chat/Message.tsx) — replace `TextPartView` with markdown renderer
 - New file `webview-ui/src/components/chat/MarkdownRenderer.tsx` — markdown rendering component
 - [`webview-ui/src/styles/chat.css`](../../webview-ui/src/styles/chat.css) — markdown and syntax highlighting styles

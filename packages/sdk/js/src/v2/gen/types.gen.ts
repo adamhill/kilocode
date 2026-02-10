@@ -1722,6 +1722,8 @@ export type Config = {
   agent?: {
     plan?: AgentConfig
     build?: AgentConfig
+    debug?: AgentConfig
+    orchestrator?: AgentConfig
     general?: AgentConfig
     explore?: AgentConfig
     title?: AgentConfig

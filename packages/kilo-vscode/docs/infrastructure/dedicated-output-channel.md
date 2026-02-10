@@ -44,6 +44,7 @@ function log(level: string, message: string): void {
 ```
 
 Files to change:
+
 - [`src/extension.ts`](../../src/extension.ts) — create output channel
 - New file `src/utils/logger.ts` — centralized logging utility
 - All files currently using `console.log("[Kilo New] ...")` — optionally migrate
