@@ -26,6 +26,20 @@ const esbuildProblemMatcherPlugin = {
   },
 }
 
+const cssPackageResolvePlugin = {
+  name: "css-package-resolve",
+  setup(build) {
+    build.onResolve({ filter: /^@/, namespace: "file" }, (args) => {
+      if (args.kind === "import-rule") {
+        return build.resolve(args.path, {
+          kind: "import-statement",
+          resolveDir: args.resolveDir,
+        })
+      }
+    })
+  },
+}
+
 async function main() {
   // Build extension
   const extensionCtx = await esbuild.context({
@@ -53,7 +67,12 @@ async function main() {
     platform: "browser",
     outfile: "dist/webview.js",
     logLevel: "silent",
-    plugins: [solidPlugin(), esbuildProblemMatcherPlugin],
+    loader: {
+      ".woff": "file",
+      ".woff2": "file",
+      ".ttf": "file",
+    },
+    plugins: [cssPackageResolvePlugin, solidPlugin(), esbuildProblemMatcherPlugin],
   })
 
   if (watch) {

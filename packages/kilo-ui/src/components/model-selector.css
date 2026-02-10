@@ -1,14 +1,15 @@
 /* kilocode_change - new file */
-/* Kilo Model Selector Popover overrides – styled to match legacy SelectDropdown look */
+/* Kilo Model Selector Popover overrides – styled to match VSCode look */
 
 /* ModelSelectorPopover content panel */
 [data-component="model-selector-popover"] {
   border-radius: 2px;
-  border: 1px solid var(--border-base);
-  background-color: var(--surface-raised-stronger-non-alpha);
+  border: 1px solid var(--border-focus, var(--vscode-focusBorder, #007fd4));
+  background-color: var(--background-stronger);
   padding: 0;
   width: 288px;
   height: 320px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.36);
 
   /* List inside the popover */
   [data-component="list"] {
@@ -17,12 +18,20 @@
 
     /* Search area */
     [data-slot="list-search-wrapper"] {
+      border-radius: 6px;
+      padding: 4px 8px;
       margin-bottom: 0;
-      border-bottom: 1px solid var(--border-weak-base);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      margin: 8px;
+      background-color: var(--input-base, var(--vscode-input-background, #3c3c3c));
+
+      [data-component="input"] input {
+        font-size: 12px;
+      }
     }
 
     [data-slot="list-search"] {
-      padding: 8px;
+      padding: 0;
       border-radius: 0;
       background: transparent;
       gap: 8px;
@@ -35,6 +44,10 @@
     /* Scroll container */
     [data-slot="list-scroll"] {
       gap: 0;
+      padding: 4px 0;
+      max-height: 328px;
+      overflow-y: auto;
+      overscroll-behavior: contain;
     }
 
     /* Group headers */
@@ -45,7 +58,7 @@
       text-transform: uppercase;
       letter-spacing: 0.05em;
       color: var(--text-weak);
-      background: var(--surface-raised-stronger-non-alpha);
+      background: var(--background-stronger);
 
       &::after {
         display: none;
@@ -59,10 +72,11 @@
 
     /* List items */
     [data-slot="list-item"] {
-      padding: 4px 12px;
-      font-size: 13px;
-      line-height: 20px;
+      padding: 6px 12px;
+      font-size: 12px;
+      line-height: 16px;
       border-radius: 0;
+      cursor: pointer;
 
       &[data-active="true"] {
         border-radius: 0;
@@ -81,7 +95,7 @@
       padding: 16px 12px;
 
       [data-slot="list-message"] {
-        font-size: 13px;
+        font-size: 12px;
       }
     }
   }
