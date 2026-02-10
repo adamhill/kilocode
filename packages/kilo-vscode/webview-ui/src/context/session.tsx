@@ -96,6 +96,7 @@ export const SessionProvider: ParentComponent = (props) => {
 
   // Pending model selection for before a session exists
   const [pendingModelSelection, setPendingModelSelection] = createSignal<ModelSelection | null>(null)
+  const [pendingWasUserSet, setPendingWasUserSet] = createSignal(false)
 
   // Store for sessions, messages, parts, todos, modelSelections
   const [store, setStore] = createStore<SessionStore>({
@@ -106,11 +107,25 @@ export const SessionProvider: ParentComponent = (props) => {
     modelSelections: {},
   })
 
-  // Initialize pending selection from provider's defaultSelection once it loads
+  // Keep pending selection in sync with provider default until the user
+  // explicitly changes it (or a session exists).
   createEffect(() => {
     const def = provider.defaultSelection()
+    if (currentSessionID()) {
+      return
+    }
+
+    if (pendingWasUserSet()) {
+      return
+    }
+
+    setPendingModelSelection(def)
+  })
+
+  // If we have no pending yet, initialize it from provider default.
+  createEffect(() => {
     if (!pendingModelSelection()) {
-      setPendingModelSelection(def)
+      setPendingModelSelection(provider.defaultSelection())
     }
   })
 
@@ -129,6 +144,7 @@ export const SessionProvider: ParentComponent = (props) => {
     if (id) {
       setStore("modelSelections", id, selection)
     } else {
+      setPendingWasUserSet(true)
       setPendingModelSelection(selection)
     }
   }
@@ -185,6 +201,7 @@ export const SessionProvider: ParentComponent = (props) => {
       if (pending) {
         setStore("modelSelections", session.id, pending)
         setPendingModelSelection(null)
+        setPendingWasUserSet(false)
       }
 
       setCurrentSessionID(session.id)
@@ -340,6 +357,7 @@ export const SessionProvider: ParentComponent = (props) => {
 
     // Reset pending selection to default for the new session
     setPendingModelSelection(provider.defaultSelection())
+    setPendingWasUserSet(false)
     vscode.postMessage({ type: "createSession" })
   }
 
