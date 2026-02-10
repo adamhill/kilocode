@@ -120,6 +120,16 @@ export const ModelSelector: Component = () => {
     const items = flatFiltered()
     const len = items.length
 
+    if (e.key === "Escape") {
+      e.preventDefault()
+      setOpen(false)
+      return
+    }
+
+    if (len === 0) {
+      return
+    }
+
     if (e.key === "ArrowDown") {
       e.preventDefault()
       setActiveIndex((i) => (i + 1) % len)
@@ -134,9 +144,6 @@ export const ModelSelector: Component = () => {
       if (item) {
         pick(item)
       }
-    } else if (e.key === "Escape") {
-      e.preventDefault()
-      setOpen(false)
     }
   }
 
