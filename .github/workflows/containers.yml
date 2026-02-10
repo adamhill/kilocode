@@ -16,9 +16,6 @@ permissions:
 
 jobs:
   build:
-    # kilocode_change start - disabled for kilo-cli fork (OpenCode infrastructure deployment)
-    if: false
-    # kilocode_change end
     runs-on: blacksmith-4vcpu-ubuntu-2404
     env:
       REGISTRY: ghcr.io/${{ github.repository_owner }}
