@@ -385,7 +385,6 @@ Replace the custom signal-based tab navigation (~80 lines of inline styles) with
 
 ```tsx
 import { Tabs } from "@kilocode/kilo-ui/tabs"
-
 ;<Tabs orientation="vertical" variant="settings" defaultValue="providers">
   <Tabs.List>
     <Tabs.SectionTitle>Configuration</Tabs.SectionTitle>
@@ -507,7 +506,6 @@ Replace raw `<pre>` tags with:
 
 ```tsx
 import { Code } from "@kilocode/kilo-ui/code"
-
 ;<Code language="json" content={toolOutput} />
 ```
 
@@ -529,7 +527,6 @@ These components handle the rendering of message parts (text, tool calls, reason
 
 ```tsx
 import { DataProvider } from "@kilocode/kilo-ui/context/data"
-
 ;<DataProvider data={adaptedSessionData} directory={workspaceDir} onPermissionRespond={handlePermission}>
   {/* chat content */}
 </DataProvider>
@@ -549,7 +546,6 @@ Use when displaying file modifications from tool calls.
 
 ```tsx
 import { Collapsible } from "@kilocode/kilo-ui/collapsible"
-
 ;<Collapsible>
   <Collapsible.Trigger>Thinking...</Collapsible.Trigger>
   <Collapsible.Content>{reasoningText}</Collapsible.Content>
@@ -574,7 +570,6 @@ import { Collapsible } from "@kilocode/kilo-ui/collapsible"
 
 ```tsx
 import { Tooltip } from "@kilocode/kilo-ui/tooltip"
-
 ;<Tooltip content="Send message">
   <IconButton onClick={send}>
     <Icon name="send" />
@@ -619,7 +614,6 @@ Replace custom list with kilo-ui `List` for keyboard navigation and accessibilit
 
 ```tsx
 import { List } from "@kilocode/kilo-ui/list"
-
 ;<List items={sessions()} onSelect={(session) => onSelectSession(session.id)}>
   {(session) => (
     <List.Item>
@@ -786,3 +780,27 @@ Each phase has specific acceptance criteria (listed above). The general verifica
 | Sidebar ↔ tab       | Both webview hosts render identically                            |
 | Markdown content    | Headers, lists, code blocks, links render correctly              |
 | Long conversations  | Auto-scroll works, performance is acceptable                     |
+
+---
+
+## 9. Progress Tracker
+
+| Phase                        | Status        | Date       | Notes                                                                                                                                                                                                                                                                                |
+| ---------------------------- | ------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Phase 0: Foundation          | ✅ Complete   | 2026-02-10 | Build system, CSP, providers, styles wired up. `I18nProvider` locale corrected to accessor. Font loaders (`.woff`, `.woff2`, `.ttf`) added to esbuild.                                                                                                                               |
+| Phase 1.1: Buttons           | ✅ Complete   | 2026-02-10 | All buttons in PromptInput, PermissionDialog, ProfileView, DeviceAuthCard, Settings replaced with `Button`. `IconButton` not used — requires named `icon` prop incompatible with inline SVGs. Settings tab sidebar buttons left as native `<button>` (complex active state styling). |
+| Phase 1.2: Spinners          | ✅ Complete   | 2026-02-10 | Emoji loading indicators (`⏳`, `⚙️`) in Message.tsx and DeviceAuthCard.tsx replaced with `Spinner`. Status icons (`✓`, `✕`) kept as-is.                                                                                                                                             |
+| Phase 1.3: Permission Dialog | ⬚ Not started | —          |                                                                                                                                                                                                                                                                                      |
+| Phase 1.4: Cards             | ⬚ Not started | —          |                                                                                                                                                                                                                                                                                      |
+| Phase 1.5: Icons             | ⬚ Not started | —          | Requires adding 6 missing icons to kilo-ui first                                                                                                                                                                                                                                     |
+| Phase 2: Settings UI         | ⬚ Not started | —          |                                                                                                                                                                                                                                                                                      |
+| Phase 3: Chat UI             | ⬚ Not started | —          |                                                                                                                                                                                                                                                                                      |
+| Phase 4: Advanced            | ⬚ Not started | —          |                                                                                                                                                                                                                                                                                      |
+
+### Deviations from plan
+
+1. **`I18nProvider` locale type**: The plan specified `locale: "en"` (string) but the actual `UiI18n` type requires `Accessor<string>`, so it was implemented as `locale: () => "en"`.
+2. **`IconButton` not used**: The plan suggested using `IconButton` for icon-only buttons (send, abort). However, `IconButton` requires a named `icon` prop (not children), making it incompatible with inline SVGs. All buttons use `Button` instead.
+3. **Font loaders added to esbuild**: The plan didn't mention font file handling, but kilo-ui's katex dependency bundles `.woff`, `.woff2`, and `.ttf` fonts that needed `file` loaders in esbuild.
+4. **`Spinner` has no `size` prop**: The plan assumed `Spinner` would accept a `size` prop. The actual component is sized via CSS `style` prop (`width`/`height`).
+5. **Settings tab sidebar buttons**: Left as native `<button>` elements because they have complex active/hover state styling that would need significant rework to use `Button`.
