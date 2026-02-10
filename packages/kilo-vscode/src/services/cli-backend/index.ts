@@ -15,6 +15,10 @@ export type {
   KilocodeProfile,
   KilocodeBalance,
   ProfileData,
+  ProviderModel,
+  Provider,
+  ProviderListResponse,
+  ModelSelection,
 } from "./types"
 
 export { ServerManager } from "./server-manager"

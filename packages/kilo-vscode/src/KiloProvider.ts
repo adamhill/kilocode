@@ -9,6 +9,8 @@ export class KiloProvider implements vscode.WebviewViewProvider {
   private connectionState: "connecting" | "connected" | "disconnected" | "error" = "connecting"
   private loginAttempt = 0
   private isWebviewReady = false
+  /** Cached providersLoaded payload so requestProviders can be served before httpClient is ready */
+  private cachedProvidersMessage: unknown = null
 
   private trackedSessionIds: Set<string> = new Set()
   private unsubscribeEvent: (() => void) | null = null
@@ -142,7 +144,7 @@ export class KiloProvider implements vscode.WebviewViewProvider {
           await this.syncWebviewState("webviewReady")
           break
         case "sendMessage":
-          await this.handleSendMessage(message.text, message.sessionID)
+          await this.handleSendMessage(message.text, message.sessionID, message.providerID, message.modelID)
           break
         case "abort":
           await this.handleAbort(message.sessionID)
@@ -176,6 +178,9 @@ export class KiloProvider implements vscode.WebviewViewProvider {
           if (message.url) {
             vscode.env.openExternal(vscode.Uri.parse(message.url))
           }
+          break
+        case "requestProviders":
+          await this.fetchAndSendProviders()
           break
       }
     })
@@ -248,6 +253,10 @@ export class KiloProvider implements vscode.WebviewViewProvider {
 
       this.postMessage({ type: "connectionState", state: this.connectionState })
       await this.syncWebviewState("initializeConnection")
+
+      // Fetch providers and send to webview
+      await this.fetchAndSendProviders()
+
       console.log("[Kilo New] KiloProvider: ✅ initializeConnection completed successfully")
     } catch (error) {
       console.error("[Kilo New] KiloProvider: ❌ Failed to initialize connection:", error)
@@ -380,9 +389,59 @@ export class KiloProvider implements vscode.WebviewViewProvider {
   }
 
   /**
+   * Fetch providers from the backend and send to webview.
+   *
+   * The backend `/provider` endpoint returns `all` as an array-like object with
+   * numeric keys ("0", "1", …). The webview and sendMessage both need providers
+   * keyed by their real `provider.id` (e.g. "anthropic", "openai"). We re-key
+   * the map here so the rest of the code can use provider.id everywhere.
+   */
+  private async fetchAndSendProviders(): Promise<void> {
+    if (!this.httpClient) {
+      // httpClient not ready — serve from cache if available
+      if (this.cachedProvidersMessage) {
+        this.postMessage(this.cachedProvidersMessage)
+      }
+      return
+    }
+
+    try {
+      const workspaceDir = this.getWorkspaceDirectory()
+      const response = await this.httpClient.listProviders(workspaceDir)
+
+      // Re-key providers from numeric indices to provider.id
+      const normalized: typeof response.all = {}
+      for (const provider of Object.values(response.all)) {
+        normalized[provider.id] = provider
+      }
+
+      const config = vscode.workspace.getConfiguration("kilo-code.new.model")
+      const providerID = config.get<string>("providerID", "kilo")
+      const modelID = config.get<string>("modelID", "kilo/auto")
+
+      const message = {
+        type: "providersLoaded",
+        providers: normalized,
+        connected: response.connected,
+        defaults: response.default,
+        defaultSelection: { providerID, modelID },
+      }
+      this.cachedProvidersMessage = message
+      this.postMessage(message)
+    } catch (error) {
+      console.error("[Kilo New] KiloProvider: Failed to fetch providers:", error)
+    }
+  }
+
+  /**
    * Handle sending a message from the webview.
    */
-  private async handleSendMessage(text: string, sessionID?: string): Promise<void> {
+  private async handleSendMessage(
+    text: string,
+    sessionID?: string,
+    providerID?: string,
+    modelID?: string,
+  ): Promise<void> {
     if (!this.httpClient) {
       this.postMessage({
         type: "error",
@@ -410,8 +469,11 @@ export class KiloProvider implements vscode.WebviewViewProvider {
         throw new Error("No session available")
       }
 
-      // Send message with text part
-      await this.httpClient.sendMessage(targetSessionID, [{ type: "text", text }], workspaceDir)
+      // Send message with text part and optional model selection
+      await this.httpClient.sendMessage(targetSessionID, [{ type: "text", text }], workspaceDir, {
+        providerID,
+        modelID,
+      })
     } catch (error) {
       console.error("[Kilo New] KiloProvider: Failed to send message:", error)
       this.postMessage({
@@ -671,7 +733,21 @@ export class KiloProvider implements vscode.WebviewViewProvider {
    * Public so toolbar button commands can send messages.
    */
   public postMessage(message: unknown): void {
-    this.webview?.postMessage(message)
+    if (!this.webview) {
+      const type =
+        typeof message === "object" &&
+        message !== null &&
+        "type" in message &&
+        typeof (message as { type?: unknown }).type === "string"
+          ? (message as { type: string }).type
+          : "<unknown>"
+      console.warn("[Kilo New] KiloProvider: ⚠️ postMessage dropped (no webview)", { type })
+      return
+    }
+
+    void this.webview.postMessage(message).then(undefined, (error) => {
+      console.error("[Kilo New] KiloProvider: ❌ postMessage failed", error)
+    })
   }
 
   /**
