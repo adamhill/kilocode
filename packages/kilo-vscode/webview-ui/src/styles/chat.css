@@ -376,124 +376,17 @@
    Permission Dialog
    ============================================ */
 
-.permission-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  z-index: 100;
-}
-
-.permission-dialog {
-  background: var(--vscode-editor-background);
-  border: 1px solid var(--vscode-panel-border);
-  border-radius: 8px;
-  max-width: 400px;
-  width: 100%;
-  max-height: 80%;
-  overflow-y: auto;
-}
-
-.permission-item {
-  padding: 16px;
-}
-
-.permission-item + .permission-item {
-  border-top: 1px solid var(--vscode-panel-border);
-}
-
-.permission-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 12px;
-}
-
-.permission-icon {
-  font-size: 20px;
-}
-
-.permission-title {
-  font-weight: 600;
-  font-size: 14px;
-}
-
-.permission-content {
-  margin-bottom: 16px;
-}
-
-.permission-message {
-  margin: 0 0 8px 0;
-  line-height: 1.5;
-}
-
-.permission-details-toggle {
-  background: none;
-  border: none;
-  color: var(--vscode-textLink-foreground);
-  cursor: pointer;
-  padding: 0;
-  font-size: 12px;
-}
-
-.permission-details-toggle:hover {
-  text-decoration: underline;
-}
-
 .permission-details {
-  margin-top: 8px;
   padding: 8px;
-  background: var(--vscode-input-background);
-  border-radius: 4px;
   font-size: 12px;
 }
 
 .permission-details pre {
-  margin: 4px 0 0 0;
+  margin: 0;
   font-family: var(--vscode-editor-font-family);
   font-size: 11px;
   white-space: pre-wrap;
   word-break: break-word;
-}
-
-.permission-actions {
-  display: flex;
-  gap: 8px;
-  justify-content: flex-end;
-}
-
-.permission-button {
-  padding: 6px 12px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 12px;
-  transition: opacity 0.2s;
-}
-
-.permission-button:hover {
-  opacity: 0.9;
-}
-
-.permission-button-reject {
-  background: var(--vscode-button-secondaryBackground);
-  color: var(--vscode-button-secondaryForeground);
-}
-
-.permission-button-once {
-  background: var(--vscode-button-secondaryBackground);
-  color: var(--vscode-button-secondaryForeground);
-}
-
-.permission-button-always {
-  background: var(--vscode-button-background);
-  color: var(--vscode-button-foreground);
 }
 
 /* ============================================

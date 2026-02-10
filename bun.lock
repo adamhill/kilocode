@@ -340,9 +340,6 @@
       "dependencies": {
         "@kilocode/kilo-ui": "workspace:*",
         "@kilocode/sdk": "workspace:*",
-        "@kobalte/core": "catalog:",
-        "@opencode-ai/ui": "workspace:*",
-        "@opencode-ai/util": "workspace:*",
         "eventsource": "^2.0.2",
         "lucide-solid": "^0.563.0",
         "solid-js": "^1.9.11",
