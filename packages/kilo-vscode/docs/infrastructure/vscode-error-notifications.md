@@ -32,14 +32,12 @@ The CLI binary check at [`ServerManager.startServer()`](../../src/services/cli-b
 
 ```typescript
 // In initializeConnection() catch block:
-vscode.window.showErrorMessage(
-  `Kilo Code: Failed to start CLI server — ${error.message}`,
-  "Retry"
-).then(action => {
+vscode.window.showErrorMessage(`Kilo Code: Failed to start CLI server — ${error.message}`, "Retry").then((action) => {
   if (action === "Retry") this.initializeConnection()
 })
 ```
 
 Files to change:
+
 - [`src/KiloProvider.ts`](../../src/KiloProvider.ts) — add `vscode.window.showErrorMessage()` calls in error paths
 - [`src/services/cli-backend/connection-service.ts`](../../src/services/cli-backend/connection-service.ts) — optionally surface critical errors to callers

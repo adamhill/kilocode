@@ -42,4 +42,5 @@ try {
 ```
 
 Files to change:
+
 - [`src/services/cli-backend/http-client.ts`](../../src/services/cli-backend/http-client.ts) — add `AbortController` with timeout to `request()`

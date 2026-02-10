@@ -46,6 +46,7 @@ The chat view renders regardless of connection state. When the extension is conn
 ```
 
 Files to change:
+
 - [`webview-ui/src/App.tsx`](../../webview-ui/src/App.tsx) or [`webview-ui/src/components/chat/ChatView.tsx`](../../webview-ui/src/components/chat/ChatView.tsx) — add connection state gating
 - New file `webview-ui/src/components/LoadingPanel.tsx` — loading spinner component
 - New file `webview-ui/src/components/ErrorPanel.tsx` — error display with retry
