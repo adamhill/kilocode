@@ -1,10 +1,5 @@
 import * as vscode from "vscode"
-import {
-  type HttpClient,
-  type SessionInfo,
-  type SSEEvent,
-  type KiloConnectionService,
-} from "./services/cli-backend"
+import { type HttpClient, type SessionInfo, type SSEEvent, type KiloConnectionService } from "./services/cli-backend"
 
 export class KiloProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = "kilo-code.new.sidebarView"

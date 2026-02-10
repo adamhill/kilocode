@@ -38,8 +38,8 @@ export class KiloConnectionService {
       return
     }
 
-     // Mark as connecting early so concurrent callers won't start another connection attempt.
-     this.setState("connecting")
+    // Mark as connecting early so concurrent callers won't start another connection attempt.
+    this.setState("connecting")
 
     this.connectPromise = this.doConnect(workspaceDir)
     try {
