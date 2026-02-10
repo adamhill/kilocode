@@ -7,6 +7,7 @@ import type { ServerConfig, SSEEvent } from "./types"
 export type ConnectionState = "connecting" | "connected" | "disconnected" | "error"
 type SSEEventListener = (event: SSEEvent) => void
 type StateListener = (state: ConnectionState) => void
+type SSEEventFilter = (event: SSEEvent) => boolean
 
 /**
  * Shared connection service that owns the single ServerManager, HttpClient, and SSEClient.
@@ -22,6 +23,12 @@ export class KiloConnectionService {
 
   private readonly eventListeners: Set<SSEEventListener> = new Set()
   private readonly stateListeners: Set<StateListener> = new Set()
+
+  /**
+   * Shared mapping used to resolve session scope for events that don't reliably include a sessionID.
+   * Used primarily for message.part.updated where only messageID may be present.
+   */
+  private readonly messageSessionIdsByMessageId: Map<string, string> = new Map()
 
   constructor(context: vscode.ExtensionContext) {
     this.serverManager = new ServerManager(context)
@@ -84,6 +91,63 @@ export class KiloConnectionService {
   }
 
   /**
+   * Subscribe to SSE events with a filter. The filter runs for every incoming SSE event.
+   */
+  onEventFiltered(filter: SSEEventFilter, listener: SSEEventListener): () => void {
+    const wrapped: SSEEventListener = (event) => {
+      if (!filter(event)) {
+        return
+      }
+      listener(event)
+    }
+    return this.onEvent(wrapped)
+  }
+
+  /**
+   * Record a messageID -> sessionID mapping, typically from message.updated or from HTTP message history.
+   */
+  recordMessageSessionId(messageId: string, sessionId: string): void {
+    if (!messageId || !sessionId) {
+      return
+    }
+    this.messageSessionIdsByMessageId.set(messageId, sessionId)
+  }
+
+  /**
+   * Best-effort sessionID extraction for an SSE event.
+   * Returns undefined for global events.
+   */
+  resolveEventSessionId(event: SSEEvent): string | undefined {
+    switch (event.type) {
+      case "session.created":
+      case "session.updated":
+        return event.properties.info.id
+      case "session.status":
+      case "session.idle":
+      case "todo.updated":
+        return event.properties.sessionID
+      case "message.updated":
+        this.recordMessageSessionId(event.properties.info.id, event.properties.info.sessionID)
+        return event.properties.info.sessionID
+      case "message.part.updated": {
+        const part = event.properties.part as { messageID?: string; sessionID?: string }
+        if (part.sessionID) {
+          return part.sessionID
+        }
+        if (!part.messageID) {
+          return undefined
+        }
+        return this.messageSessionIdsByMessageId.get(part.messageID)
+      }
+      case "permission.asked":
+      case "permission.replied":
+        return event.properties.sessionID
+      default:
+        return undefined
+    }
+  }
+
+  /**
    * Subscribe to connection state changes. Returns unsubscribe function.
    */
   onStateChange(listener: StateListener): () => void {
@@ -101,6 +165,7 @@ export class KiloConnectionService {
     this.serverManager.dispose()
     this.eventListeners.clear()
     this.stateListeners.clear()
+    this.messageSessionIdsByMessageId.clear()
     this.client = null
     this.sseClient = null
     this.info = null
@@ -137,6 +202,8 @@ export class KiloConnectionService {
       rejectConnected = reject
     })
 
+    let didConnect = false
+
     // Wire SSE events → broadcast to all registered listeners
     this.sseClient.onEvent((event) => {
       for (const listener of this.eventListeners) {
@@ -144,18 +211,26 @@ export class KiloConnectionService {
       }
     })
 
+    this.sseClient.onError((error) => {
+      this.setState("error")
+      rejectConnected?.(error)
+      resolveConnected = null
+      rejectConnected = null
+    })
+
     // Wire SSE state → broadcast to all registered state listeners
     this.sseClient.onStateChange((sseState) => {
       this.setState(sseState)
 
       if (sseState === "connected") {
+        didConnect = true
         resolveConnected?.()
         resolveConnected = null
         rejectConnected = null
         return
       }
 
-      if (sseState === "error" || sseState === "disconnected") {
+      if (!didConnect && sseState === "disconnected") {
         rejectConnected?.(new Error(`SSE connection ended in state: ${sseState}`))
         resolveConnected = null
         rejectConnected = null

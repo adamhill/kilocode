@@ -11,7 +11,6 @@ export class KiloProvider implements vscode.WebviewViewProvider {
   private isWebviewReady = false
 
   private trackedSessionIds: Set<string> = new Set()
-  private readonly messageSessionIdsByMessageId: Map<string, string> = new Map()
   private unsubscribeEvent: (() => void) | null = null
   private unsubscribeState: (() => void) | null = null
 
@@ -197,10 +196,22 @@ export class KiloProvider implements vscode.WebviewViewProvider {
       // Connect the shared service (no-op if already connected)
       await this.connectionService.connect(workspaceDir)
 
-      // Subscribe to SSE events for this webview
-      this.unsubscribeEvent = this.connectionService.onEvent((event) => {
-        this.handleSSEEvent(event)
-      })
+      // Subscribe to SSE events for this webview (filtered by tracked sessions)
+      this.unsubscribeEvent = this.connectionService.onEventFiltered(
+        (event) => {
+          const sessionId = this.connectionService.resolveEventSessionId(event)
+
+          // message.part.updated is always session-scoped; if we can't determine the session, drop it.
+          if (!sessionId) {
+            return event.type !== "message.part.updated"
+          }
+
+          return this.trackedSessionIds.has(sessionId)
+        },
+        (event) => {
+          this.handleSSEEvent(event)
+        },
+      )
 
       // Subscribe to connection state changes
       this.unsubscribeState = this.connectionService.onStateChange(async (state) => {
@@ -320,7 +331,7 @@ export class KiloProvider implements vscode.WebviewViewProvider {
       }))
 
       for (const message of messages) {
-        this.messageSessionIdsByMessageId.set(message.id, message.sessionID)
+        this.connectionService.recordMessageSessionId(message.id, message.sessionID)
       }
 
       this.postMessage({
@@ -554,32 +565,7 @@ export class KiloProvider implements vscode.WebviewViewProvider {
    * Returns undefined for global events (server.connected, server.heartbeat).
    */
   private extractSessionID(event: SSEEvent): string | undefined {
-    switch (event.type) {
-      case "session.created":
-      case "session.updated":
-        return event.properties.info.id
-      case "session.status":
-      case "session.idle":
-      case "todo.updated":
-        return event.properties.sessionID
-      case "message.updated":
-        return event.properties.info.sessionID
-      case "message.part.updated": {
-        const part = event.properties.part as { messageID?: string; sessionID?: string }
-        if (part.sessionID) {
-          return part.sessionID
-        }
-        if (!part.messageID) {
-          return undefined
-        }
-        return this.messageSessionIdsByMessageId.get(part.messageID)
-      }
-      case "permission.asked":
-      case "permission.replied":
-        return event.properties.sessionID
-      default:
-        return undefined
-    }
+    return this.connectionService.resolveEventSessionId(event)
   }
 
   /**
@@ -622,7 +608,6 @@ export class KiloProvider implements vscode.WebviewViewProvider {
       }
 
       case "message.updated":
-        this.messageSessionIdsByMessageId.set(event.properties.info.id, event.properties.info.sessionID)
         // Message info updated
         this.postMessage({
           type: "messageCreated",
@@ -763,7 +748,6 @@ export class KiloProvider implements vscode.WebviewViewProvider {
     this.unsubscribeEvent?.()
     this.unsubscribeState?.()
     this.trackedSessionIds.clear()
-    this.messageSessionIdsByMessageId.clear()
   }
 }
 
