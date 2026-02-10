@@ -196,9 +196,11 @@ export const SessionProvider: ParentComponent = (props) => {
       setStore("sessions", session.id, session)
       setStore("messages", session.id, [])
 
-      // If there's a pending model selection, assign it to this new session
+      // If there's a pending model selection, assign it to this new session.
+      // Guard against duplicate sessionCreated events (HTTP response + SSE)
+      // which would overwrite the user's selection with the effect-restored default.
       const pending = pendingModelSelection()
-      if (pending) {
+      if (pending && !store.modelSelections[session.id]) {
         setStore("modelSelections", session.id, pending)
         setPendingModelSelection(null)
         setPendingWasUserSet(false)
