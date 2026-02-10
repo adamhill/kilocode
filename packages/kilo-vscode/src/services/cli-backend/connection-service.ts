@@ -51,6 +51,10 @@ export class KiloConnectionService {
     this.connectPromise = this.doConnect(workspaceDir)
     try {
       await this.connectPromise
+    } catch (error) {
+      // If doConnect() fails before SSE can emit a state transition, avoid leaving consumers stuck in "connecting".
+      this.setState("error")
+      throw error
     } finally {
       this.connectPromise = null
     }
