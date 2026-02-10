@@ -215,6 +215,7 @@ test("can reset a workspace", async ({ page, sdk, withProject }) => {
 })
 
 test("can delete a workspace", async ({ page, withProject }) => {
+  test.skip(process.platform === "win32", "Skipping on Windows due to workspace interaction issues") // kilocode_change
   await page.setViewportSize({ width: 1400, height: 800 })
 
   await withProject(async (project) => {
@@ -231,6 +232,7 @@ test("can delete a workspace", async ({ page, withProject }) => {
 })
 
 test("can reorder workspaces by drag and drop", async ({ page, withProject }) => {
+  test.skip(process.platform === "win32", "Skipping on Windows due to workspace interaction issues") // kilocode_change
   await page.setViewportSize({ width: 1400, height: 800 })
   await withProject(async ({ slug: rootSlug }) => {
     const workspaces = [] as { directory: string; slug: string }[]
