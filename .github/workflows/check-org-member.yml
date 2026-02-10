@@ -20,7 +20,7 @@ jobs:
   check:
     runs-on: blacksmith-2vcpu-ubuntu-2404
     outputs:
-      is-member: ${{ steps.check.outputs.is-member }}
+      is-member: ${{ steps.check.outputs['is-member'] }}
     steps:
       - name: Create app token
         id: apptoken
