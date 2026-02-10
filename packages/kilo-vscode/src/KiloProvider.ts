@@ -9,7 +9,6 @@ import {
 export class KiloProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = "kilo-code.new.sidebarView"
 
-  private webviewView: vscode.WebviewView | null = null
   private webview: vscode.Webview | null = null
   private currentSession: SessionInfo | null = null
   private connectionState: "connecting" | "connected" | "disconnected" | "error" = "connecting"
@@ -93,7 +92,6 @@ export class KiloProvider implements vscode.WebviewViewProvider {
     _token: vscode.CancellationToken,
   ) {
     // Store the webview references
-    this.webviewView = webviewView
     this.isWebviewReady = false
     this.webview = webviewView.webview
 
