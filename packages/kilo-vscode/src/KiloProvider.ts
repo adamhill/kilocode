@@ -13,6 +13,7 @@ export class KiloProvider implements vscode.WebviewViewProvider {
   private trackedSessionIds: Set<string> = new Set()
   private unsubscribeEvent: (() => void) | null = null
   private unsubscribeState: (() => void) | null = null
+  private webviewMessageDisposable: vscode.Disposable | null = null
 
   constructor(
     private readonly extensionUri: vscode.Uri,
@@ -132,7 +133,8 @@ export class KiloProvider implements vscode.WebviewViewProvider {
    * Handles ALL message types so tabs have full functionality.
    */
   private setupWebviewMessageHandler(webview: vscode.Webview): void {
-    webview.onDidReceiveMessage(async (message) => {
+    this.webviewMessageDisposable?.dispose()
+    this.webviewMessageDisposable = webview.onDidReceiveMessage(async (message) => {
       switch (message.type) {
         case "webviewReady":
           console.log("[Kilo New] KiloProvider: ✅ webviewReady received")
@@ -747,6 +749,7 @@ export class KiloProvider implements vscode.WebviewViewProvider {
   dispose(): void {
     this.unsubscribeEvent?.()
     this.unsubscribeState?.()
+    this.webviewMessageDisposable?.dispose()
     this.trackedSessionIds.clear()
   }
 }
