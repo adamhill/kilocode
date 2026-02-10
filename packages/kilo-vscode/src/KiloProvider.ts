@@ -446,7 +446,12 @@ export class KiloProvider implements vscode.WebviewViewProvider {
   /**
    * Handle sending a message from the webview.
    */
-  private async handleSendMessage(text: string, sessionID?: string, providerID?: string, modelID?: string): Promise<void> {
+  private async handleSendMessage(
+    text: string,
+    sessionID?: string,
+    providerID?: string,
+    modelID?: string,
+  ): Promise<void> {
     if (!this.httpClient) {
       this.postMessage({
         type: "error",

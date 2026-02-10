@@ -572,7 +572,9 @@
   font-size: 11px;
   font-family: var(--vscode-font-family);
   max-width: 220px;
-  transition: border-color 0.15s, color 0.15s;
+  transition:
+    border-color 0.15s,
+    color 0.15s;
 }
 
 .model-selector-trigger:hover:not(:disabled) {

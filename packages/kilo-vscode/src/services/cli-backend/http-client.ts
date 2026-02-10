@@ -177,12 +177,7 @@ export class HttpClient {
     }
     console.log("[Kilo New] HTTP: 📨 sendMessage request body", JSON.stringify(debugBody))
 
-    await this.request<void>(
-      "POST",
-      `/session/${sessionId}/message`,
-      body,
-      { directory, allowEmpty: true },
-    )
+    await this.request<void>("POST", `/session/${sessionId}/message`, body, { directory, allowEmpty: true })
   }
 
   /**
@@ -222,7 +217,12 @@ export class HttpClient {
     response: "once" | "always" | "reject",
     directory: string,
   ): Promise<boolean> {
-    await this.request<void>("POST", `/session/${sessionId}/permissions/${permissionId}`, { response }, { directory, allowEmpty: true })
+    await this.request<void>(
+      "POST",
+      `/session/${sessionId}/permissions/${permissionId}`,
+      { response },
+      { directory, allowEmpty: true },
+    )
     return true
   }
 

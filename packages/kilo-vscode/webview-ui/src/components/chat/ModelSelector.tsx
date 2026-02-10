@@ -49,7 +49,8 @@ export const ModelSelector: Component = () => {
       return visibleModels()
     }
     return visibleModels().filter(
-      (m) => m.name.toLowerCase().includes(q) || m.providerName.toLowerCase().includes(q) || m.id.toLowerCase().includes(q),
+      (m) =>
+        m.name.toLowerCase().includes(q) || m.providerName.toLowerCase().includes(q) || m.id.toLowerCase().includes(q),
     )
   })
 
@@ -65,9 +66,7 @@ export const ModelSelector: Component = () => {
       group.models.push(m)
     }
 
-    return [...map.entries()]
-      .sort(([a], [b]) => providerSortKey(a) - providerSortKey(b))
-      .map(([, g]) => g)
+    return [...map.entries()].sort(([a], [b]) => providerSortKey(a) - providerSortKey(b)).map(([, g]) => g)
   })
 
   // Flat list for keyboard indexing (mirrors render order)
