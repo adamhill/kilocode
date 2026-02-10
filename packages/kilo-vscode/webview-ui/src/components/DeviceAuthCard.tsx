@@ -1,5 +1,6 @@
 import { Component, Show, Switch, Match, createSignal, createEffect, onCleanup } from "solid-js"
 import { Button } from "@kilocode/kilo-ui/button"
+import { Spinner } from "@kilocode/kilo-ui/spinner"
 import { useVSCode } from "../context/vscode"
 import { generateQRCode } from "../utils/qrcode"
 import type { DeviceAuthStatus } from "../types/messages"
@@ -81,7 +82,7 @@ const DeviceAuthCard: Component<DeviceAuthCardProps> = (props) => {
       <Match when={props.status === "initiating"}>
         <div style={cardStyle}>
           <div style={{ display: "flex", "align-items": "center", gap: "8px" }}>
-            <span style={{ "font-size": "14px", animation: "spin 1s linear infinite" }}>⏳</span>
+            <Spinner style={{ width: "14px", height: "14px" }} />
             <span style={{ "font-size": "13px", color: "var(--vscode-descriptionForeground)" }}>Starting login...</span>
           </div>
         </div>
@@ -230,13 +231,14 @@ const DeviceAuthCard: Component<DeviceAuthCardProps> = (props) => {
               "margin-bottom": "12px",
             }}
           >
+            <Spinner style={{ width: "12px", height: "12px" }} />
             <span
               style={{
                 "font-size": "12px",
                 color: "var(--vscode-descriptionForeground)",
               }}
             >
-              ⏳ Waiting for authorization... ({formatTime(timeRemaining())})
+              Waiting for authorization... ({formatTime(timeRemaining())})
             </span>
           </div>
 
