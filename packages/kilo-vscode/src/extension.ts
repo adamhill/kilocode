@@ -2,12 +2,16 @@ import * as vscode from "vscode"
 import { KiloProvider } from "./KiloProvider"
 import { AgentManagerProvider } from "./AgentManagerProvider"
 import { EXTENSION_DISPLAY_NAME } from "./constants"
+import { KiloConnectionService } from "./services/cli-backend"
 
 export function activate(context: vscode.ExtensionContext) {
   console.log("Kilo Code extension is now active")
 
-  // Create the provider with extensionUri and context
-  const provider = new KiloProvider(context.extensionUri, context)
+  // Create shared connection service (one server for all webviews)
+  const connectionService = new KiloConnectionService(context)
+
+  // Create the provider with shared service
+  const provider = new KiloProvider(context.extensionUri, connectionService)
 
   // Register the webview view provider for the sidebar
   context.subscriptions.push(vscode.window.registerWebviewViewProvider(KiloProvider.viewType, provider))
@@ -37,19 +41,25 @@ export function activate(context: vscode.ExtensionContext) {
       provider.postMessage({ type: "action", action: "settingsButtonClicked" })
     }),
     vscode.commands.registerCommand("kilo-code.new.openInTab", () => {
-      openKiloInNewTab(context)
+      openKiloInNewTab(context, connectionService)
     }),
   )
 
-  // Add dispose handler to subscriptions
+  // Dispose service when extension deactivates (kills the server)
   context.subscriptions.push({
-    dispose: () => provider.dispose(),
+    dispose: () => {
+      provider.dispose()
+      connectionService.dispose()
+    },
   })
 }
 
 export function deactivate() {}
 
-async function openKiloInNewTab(context: vscode.ExtensionContext) {
+async function openKiloInNewTab(
+  context: vscode.ExtensionContext,
+  connectionService: KiloConnectionService,
+) {
   const lastCol = Math.max(
     ...vscode.window.visibleTextEditors.map((e) => e.viewColumn || 0),
     0,
@@ -80,7 +90,7 @@ async function openKiloInNewTab(context: vscode.ExtensionContext) {
     dark: vscode.Uri.joinPath(context.extensionUri, "assets", "icons", "kilo-dark.svg"),
   }
 
-  const tabProvider = new KiloProvider(context.extensionUri, context)
+  const tabProvider = new KiloProvider(context.extensionUri, connectionService)
   tabProvider.resolveWebviewPanel(panel)
 
   await new Promise((r) => setTimeout(r, 100))
