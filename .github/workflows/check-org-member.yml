@@ -1,0 +1,36 @@
+name: Check Organization Member
+
+on:
+  workflow_call:
+    inputs:
+      username:
+        required: true
+        type: string
+    outputs:
+      is-member:
+        description: Whether the user is an org member or kilo-maintainer bot
+        value: ${{ jobs.check.outputs.is-member }}
+
+jobs:
+  check:
+    # kilocode_change - new file
+    runs-on: blacksmith-2vcpu-ubuntu-2404
+    outputs:
+      is-member: ${{ steps.check.outputs.is-member }}
+    steps:
+      - name: Check if author is org member or kilo-maintainer bot
+        id: check
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          USERNAME: ${{ inputs.username }}
+        run: |
+          if [[ "$USERNAME" == "kilo-maintainer[bot]" ]]; then
+            echo "is-member=true" >> "$GITHUB_OUTPUT"
+            echo "User is kilo-maintainer bot"
+          elif gh api orgs/Kilo-Org/members/"$USERNAME" --silent 2>/dev/null; then
+            echo "is-member=true" >> "$GITHUB_OUTPUT"
+            echo "User is an org member"
+          else
+            echo "is-member=false" >> "$GITHUB_OUTPUT"
+            echo "User is not an org member"
+          fi
