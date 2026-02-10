@@ -1,6 +1,4 @@
 // kilocode_change - new file
-import { dict as en } from "./en"
-type Keys = keyof typeof en
 export const dict = {
   // Kilo Gateway provider translations
   "provider.connect.kiloGateway.line1":
@@ -19,4 +17,4 @@ export const dict = {
   "desktop.menu.reloadWebview": "Ponovno učitavanje webview-a",
   "desktop.updater.installFailed.message": "Neuspjelo instaliranje ažuriranja",
   "desktop.cli.installed.message": "CLI je instaliran u {{path}}\n\nRestartuj terminal da bi koristio komandu 'kilo'.",
-} satisfies Partial<Record<Keys, string>>
+}
