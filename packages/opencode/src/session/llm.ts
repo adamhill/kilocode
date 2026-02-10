@@ -24,6 +24,10 @@ import { PermissionNext } from "@/permission/next"
 import { Auth } from "@/auth"
 import { DEFAULT_HEADERS } from "@/kilocode/const" // kilocode_change
 import { Telemetry } from "@kilocode/kilo-telemetry" // kilocode_change
+// kilocode_change start
+import { getKiloProjectId } from "@/kilocode/project-id"
+import { HEADER_PROJECTID } from "@kilocode/kilo-gateway"
+// kilocode_change end
 
 export namespace LLM {
   const log = Log.create({ service: "llm" })
@@ -155,6 +159,11 @@ export namespace LLM {
       },
     )
 
+    // kilocode_change start - resolve project ID for kilo provider
+    const kiloProjectId =
+      input.model.api.npm === "@kilocode/kilo-gateway" ? await getKiloProjectId().catch(() => undefined) : undefined
+    // kilocode_change end
+
     const maxOutputTokens =
       isCodex || provider.id.includes("github-copilot")
         ? undefined
@@ -236,6 +245,11 @@ export namespace LLM {
         ...(input.model.api.npm === "@kilocode/kilo-gateway" && input.agent.name
           ? { "x-kilocode-mode": input.agent.name.toLowerCase() }
           : {}),
+        // kilocode_change start - add project ID header for kilo provider
+        ...(input.model.api.npm === "@kilocode/kilo-gateway" && kiloProjectId
+          ? { [HEADER_PROJECTID]: kiloProjectId }
+          : {}),
+        // kilocode_change end
         ...input.model.headers,
         ...headers,
       },
