@@ -26,7 +26,7 @@ jobs:
         id: apptoken
         uses: actions/create-github-app-token@v2
         with:
-          app-id: ${{ secrets.kilo-maintainer-app-id }}
+          app-id: ${{ secrets['kilo-maintainer-app-id'] }}
           private-key: ${{ secrets.kilo-maintainer-app-secret }}
           owner: ${{ github.repository_owner }}
 
