@@ -27,7 +27,7 @@ jobs:
         uses: actions/create-github-app-token@v2
         with:
           app-id: ${{ secrets['kilo-maintainer-app-id'] }}
-          private-key: ${{ secrets.kilo-maintainer-app-secret }}
+          private-key: ${{ secrets['kilo-maintainer-app-secret'] }}
           owner: ${{ github.repository_owner }}
 
       - name: Check if author is org member or kilo-maintainer bot
