@@ -80,7 +80,9 @@ async function openKiloInNewTab(context: vscode.ExtensionContext, connectionServ
   const tabProvider = new KiloProvider(context.extensionUri, connectionService)
   tabProvider.resolveWebviewPanel(panel)
 
-  await new Promise((r) => setTimeout(r, 100))
+  // Wait for the new panel to become active before locking the editor group.
+  // This avoids the race where VS Code hasn't switched focus yet.
+  await waitForWebviewPanelToBeActive(panel)
   await vscode.commands.executeCommand("workbench.action.lockEditorGroup")
 
   panel.onDidDispose(
@@ -91,4 +93,20 @@ async function openKiloInNewTab(context: vscode.ExtensionContext, connectionServ
     null,
     context.subscriptions,
   )
+}
+
+function waitForWebviewPanelToBeActive(panel: vscode.WebviewPanel): Promise<void> {
+  if (panel.active) {
+    return Promise.resolve()
+  }
+
+  return new Promise((resolve) => {
+    const disposable = panel.onDidChangeViewState((event) => {
+      if (!event.webviewPanel.active) {
+        return
+      }
+      disposable.dispose()
+      resolve()
+    })
+  })
 }

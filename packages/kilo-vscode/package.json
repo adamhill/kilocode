@@ -110,6 +110,21 @@
           "when": "true"
         }
       ]
+    },
+    "configuration": {
+      "title": "Kilo Code",
+      "properties": {
+        "kilo-code.new.model.providerID": {
+          "type": "string",
+          "default": "kilo",
+          "description": "Default model provider ID for new sessions"
+        },
+        "kilo-code.new.model.modelID": {
+          "type": "string",
+          "default": "kilo/auto",
+          "description": "Default model ID for new sessions"
+        }
+      }
     }
   },
   "scripts": {
