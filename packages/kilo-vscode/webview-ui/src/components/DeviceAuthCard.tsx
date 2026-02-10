@@ -1,4 +1,6 @@
 import { Component, Show, Switch, Match, createSignal, createEffect, onCleanup } from "solid-js"
+import { Button } from "@kilocode/kilo-ui/button"
+import { Spinner } from "@kilocode/kilo-ui/spinner"
 import { useVSCode } from "../context/vscode"
 import { generateQRCode } from "../utils/qrcode"
 import type { DeviceAuthStatus } from "../types/messages"
@@ -80,7 +82,7 @@ const DeviceAuthCard: Component<DeviceAuthCardProps> = (props) => {
       <Match when={props.status === "initiating"}>
         <div style={cardStyle}>
           <div style={{ display: "flex", "align-items": "center", gap: "8px" }}>
-            <span style={{ "font-size": "14px", animation: "spin 1s linear infinite" }}>⏳</span>
+            <Spinner style={{ width: "14px", height: "14px" }} />
             <span style={{ "font-size": "13px", color: "var(--vscode-descriptionForeground)" }}>Starting login...</span>
           </div>
         </div>
@@ -138,37 +140,12 @@ const DeviceAuthCard: Component<DeviceAuthCardProps> = (props) => {
               >
                 {props.verificationUrl}
               </div>
-              <button
-                onClick={handleCopyUrl}
-                title="Copy URL"
-                style={{
-                  background: "var(--vscode-button-secondaryBackground)",
-                  color: "var(--vscode-button-secondaryForeground)",
-                  border: "none",
-                  "border-radius": "3px",
-                  padding: "6px 8px",
-                  cursor: "pointer",
-                  "font-size": "12px",
-                  "white-space": "nowrap",
-                }}
-              >
+              <Button variant="secondary" size="small" onClick={handleCopyUrl} title="Copy URL">
                 {copied() ? "✓" : "📋"}
-              </button>
-              <button
-                onClick={handleOpenBrowser}
-                style={{
-                  background: "var(--vscode-button-secondaryBackground)",
-                  color: "var(--vscode-button-secondaryForeground)",
-                  border: "none",
-                  "border-radius": "3px",
-                  padding: "6px 8px",
-                  cursor: "pointer",
-                  "font-size": "12px",
-                  "white-space": "nowrap",
-                }}
-              >
+              </Button>
+              <Button variant="secondary" size="small" onClick={handleOpenBrowser}>
                 Open Browser
-              </button>
+              </Button>
             </div>
           </div>
 
@@ -254,32 +231,21 @@ const DeviceAuthCard: Component<DeviceAuthCardProps> = (props) => {
               "margin-bottom": "12px",
             }}
           >
+            <Spinner style={{ width: "12px", height: "12px" }} />
             <span
               style={{
                 "font-size": "12px",
                 color: "var(--vscode-descriptionForeground)",
               }}
             >
-              ⏳ Waiting for authorization... ({formatTime(timeRemaining())})
+              Waiting for authorization... ({formatTime(timeRemaining())})
             </span>
           </div>
 
           {/* Cancel button */}
-          <button
-            onClick={props.onCancel}
-            style={{
-              width: "100%",
-              background: "none",
-              color: "var(--vscode-descriptionForeground)",
-              border: "1px solid var(--vscode-panel-border)",
-              "border-radius": "4px",
-              padding: "8px 12px",
-              cursor: "pointer",
-              "font-size": "13px",
-            }}
-          >
+          <Button variant="ghost" onClick={props.onCancel} style={{ width: "100%" }}>
             Cancel
-          </button>
+          </Button>
         </div>
       </Match>
 
@@ -316,21 +282,9 @@ const DeviceAuthCard: Component<DeviceAuthCardProps> = (props) => {
             >
               {props.error || "Login failed"}
             </p>
-            <button
-              onClick={props.onRetry}
-              style={{
-                background: "var(--vscode-button-background)",
-                color: "var(--vscode-button-foreground)",
-                border: "none",
-                "border-radius": "4px",
-                padding: "8px 16px",
-                cursor: "pointer",
-                "font-size": "13px",
-                "font-weight": "600",
-              }}
-            >
+            <Button variant="primary" onClick={props.onRetry}>
               Retry
-            </button>
+            </Button>
           </div>
         </div>
       </Match>
@@ -348,21 +302,9 @@ const DeviceAuthCard: Component<DeviceAuthCardProps> = (props) => {
             >
               Login cancelled
             </p>
-            <button
-              onClick={props.onRetry}
-              style={{
-                background: "var(--vscode-button-background)",
-                color: "var(--vscode-button-foreground)",
-                border: "none",
-                "border-radius": "4px",
-                padding: "8px 16px",
-                cursor: "pointer",
-                "font-size": "13px",
-                "font-weight": "600",
-              }}
-            >
+            <Button variant="primary" onClick={props.onRetry}>
               Try Again
-            </button>
+            </Button>
           </div>
         </div>
       </Match>

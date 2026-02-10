@@ -4,6 +4,7 @@
  */
 
 import { Component, createSignal, Show } from "solid-js"
+import { Button } from "@kilocode/kilo-ui/button"
 import { useSession } from "../../context/session"
 import { useServer } from "../../context/server"
 import { ModelSelector } from "./ModelSelector"
@@ -75,18 +76,24 @@ export const PromptInput: Component = () => {
           <Show
             when={isBusy()}
             fallback={
-              <button class="prompt-send-button" onClick={handleSend} disabled={!canSend()} aria-label="Send message">
+              <Button
+                variant="primary"
+                size="small"
+                onClick={handleSend}
+                disabled={!canSend()}
+                aria-label="Send message"
+              >
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
                   <path d="M1.5 1.5L14.5 8L1.5 14.5V9L10 8L1.5 7V1.5Z" />
                 </svg>
-              </button>
+              </Button>
             }
           >
-            <button class="prompt-abort-button" onClick={handleAbort} aria-label="Stop generation">
+            <Button variant="ghost" size="small" onClick={handleAbort} aria-label="Stop generation">
               <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
                 <rect x="3" y="3" width="10" height="10" rx="1" />
               </svg>
-            </button>
+            </Button>
           </Show>
         </div>
       </div>
