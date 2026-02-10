@@ -34,7 +34,12 @@ export class HttpClient {
   /**
    * Make an HTTP request to the CLI backend server.
    */
-  private async request<T>(method: string, path: string, body?: unknown, options?: { directory?: string }): Promise<T> {
+  private async request<T>(
+    method: string,
+    path: string,
+    body?: unknown,
+    options?: { directory?: string; allowEmpty?: boolean },
+  ): Promise<T> {
     const url = `${this.baseUrl}${path}`
 
     const headers: Record<string, string> = {
@@ -78,9 +83,18 @@ export class HttpClient {
     }
 
     // 2xx but empty body: return undefined (cast to T). Some endpoints like
-    // POST /session/{id}/message return 200 with no body; results arrive via SSE.
+    // POST /session/{id}/message can return 200 with no body; results arrive via SSE.
     if (rawText.trim().length === 0) {
-      return undefined as T
+      if (options?.allowEmpty) {
+        return undefined as T
+      }
+
+      console.error("[Kilo New] HTTP: ❌ Empty response body", {
+        method,
+        path,
+        status: response.status,
+      })
+      throw new Error(`HTTP ${response.status}: Empty response body`)
     }
 
     try {
@@ -144,7 +158,7 @@ export class HttpClient {
     parts: Array<{ type: "text"; text: string } | { type: "file"; mime: string; url: string }>,
     directory: string,
     options?: { providerID?: string; modelID?: string },
-  ): Promise<{ info: MessageInfo; parts: MessagePart[] }> {
+  ): Promise<void> {
     const body: Record<string, unknown> = { parts }
     if (options?.providerID && options?.modelID) {
       // Backend expects model selection as a nested object: { model: { providerID, modelID } }
@@ -163,11 +177,11 @@ export class HttpClient {
     }
     console.log("[Kilo New] HTTP: 📨 sendMessage request body", JSON.stringify(debugBody))
 
-    return this.request<{ info: MessageInfo; parts: MessagePart[] }>(
+    await this.request<void>(
       "POST",
       `/session/${sessionId}/message`,
       body,
-      { directory },
+      { directory, allowEmpty: true },
     )
   }
 
@@ -191,7 +205,7 @@ export class HttpClient {
    * Abort the current operation in a session.
    */
   async abortSession(sessionId: string, directory: string): Promise<boolean> {
-    await this.request<void>("POST", `/session/${sessionId}/abort`, {}, { directory })
+    await this.request<void>("POST", `/session/${sessionId}/abort`, {}, { directory, allowEmpty: true })
     return true
   }
 
@@ -208,7 +222,7 @@ export class HttpClient {
     response: "once" | "always" | "reject",
     directory: string,
   ): Promise<boolean> {
-    await this.request<void>("POST", `/session/${sessionId}/permissions/${permissionId}`, { response }, { directory })
+    await this.request<void>("POST", `/session/${sessionId}/permissions/${permissionId}`, { response }, { directory, allowEmpty: true })
     return true
   }
 
