@@ -13,15 +13,22 @@ on:
 
 jobs:
   check:
-    # kilocode_change - new file
     runs-on: blacksmith-2vcpu-ubuntu-2404
     outputs:
       is-member: ${{ steps.check.outputs.is-member }}
     steps:
+      - name: Create app token
+        id: apptoken
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.KILO_MAINTAINER_APP_ID }}
+          private-key: ${{ secrets.KILO_MAINTAINER_APP_SECRET }}
+          owner: ${{ github.repository_owner }}
+
       - name: Check if author is org member or kilo-maintainer bot
         id: check
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.apptoken.outputs.token }}
           USERNAME: ${{ inputs.username }}
         run: |
           if [[ "$USERNAME" == "kilo-maintainer[bot]" ]]; then
