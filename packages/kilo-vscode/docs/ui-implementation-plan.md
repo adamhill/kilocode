@@ -81,45 +81,6 @@ The `MarkedProvider`, `DiffComponentProvider`, and `CodeComponentProvider` are o
 ThemeProvider → I18nProvider → DialogProvider → [existing providers] → AppContent
 ```
 
-### Component mapping: current → kilo-ui
-
-```mermaid
-graph LR
-    subgraph Current Hand-Built
-        A[raw button elements]
-        B[custom overlay div]
-        C[inline-styled cards]
-        D[signal-based tabs]
-        E[custom div list items]
-        F[emoji spinners]
-        G[raw pre tags]
-        H[plain text messages]
-        I[custom toggle buttons]
-    end
-
-    subgraph kilo-ui Replacements
-        A1[Button / IconButton]
-        B1[Dialog]
-        C1[Card]
-        D1[Tabs]
-        E1[List]
-        F1[Spinner]
-        G1[Code]
-        H1[Markdown]
-        I1[Collapsible / Accordion]
-    end
-
-    A --> A1
-    B --> B1
-    C --> C1
-    D --> D1
-    E --> E1
-    F --> F1
-    G --> G1
-    H --> H1
-    I --> I1
-```
-
 ### HTML template changes
 
 The `<html>` element needs `data-theme="kilo-vscode"` to activate the VS Code bridge CSS:
