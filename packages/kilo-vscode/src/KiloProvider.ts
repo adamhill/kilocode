@@ -16,6 +16,7 @@ export class KiloProvider implements vscode.WebviewViewProvider {
   private isWebviewReady = false
 
   private trackedSessionIds: Set<string> = new Set()
+  private readonly messageSessionIdsByMessageId: Map<string, string> = new Map()
   private unsubscribeEvent: (() => void) | null = null
   private unsubscribeState: (() => void) | null = null
 
@@ -315,6 +316,10 @@ export class KiloProvider implements vscode.WebviewViewProvider {
         createdAt: new Date(m.info.time.created).toISOString(),
       }))
 
+      for (const message of messages) {
+        this.messageSessionIdsByMessageId.set(message.id, message.sessionID)
+      }
+
       this.postMessage({
         type: "messagesLoaded",
         sessionID,
@@ -557,8 +562,14 @@ export class KiloProvider implements vscode.WebviewViewProvider {
       case "message.updated":
         return event.properties.info.sessionID
       case "message.part.updated": {
-        const part = event.properties.part as { sessionID?: string }
-        return part.sessionID
+        const part = event.properties.part as { messageID?: string; sessionID?: string }
+        if (part.sessionID) {
+          return part.sessionID
+        }
+        if (!part.messageID) {
+          return undefined
+        }
+        return this.messageSessionIdsByMessageId.get(part.messageID)
       }
       case "permission.asked":
       case "permission.replied":
@@ -578,6 +589,10 @@ export class KiloProvider implements vscode.WebviewViewProvider {
 
     // Events without sessionID (server.connected, server.heartbeat) → always forward
     // Events with sessionID → only forward if this webview tracks that session
+    // message.part.updated is always session-scoped; if we can't determine the session, drop it to avoid cross-webview leakage.
+    if (!sessionID && event.type === "message.part.updated") {
+      return
+    }
     if (sessionID && !this.trackedSessionIds.has(sessionID)) {
       return
     }
@@ -588,9 +603,14 @@ export class KiloProvider implements vscode.WebviewViewProvider {
         // The part contains the full part data including messageID, delta is optional text delta
         const part = event.properties.part as { messageID?: string; sessionID?: string }
         const messageID = part.messageID || ""
+
+        const resolvedSessionID = sessionID
+        if (!resolvedSessionID) {
+          return
+        }
         this.postMessage({
           type: "partUpdated",
-          sessionID: part.sessionID || this.currentSession?.id,
+          sessionID: resolvedSessionID,
           messageID,
           part: event.properties.part,
           delta: event.properties.delta ? { type: "text-delta", textDelta: event.properties.delta } : undefined,
@@ -599,6 +619,7 @@ export class KiloProvider implements vscode.WebviewViewProvider {
       }
 
       case "message.updated":
+        this.messageSessionIdsByMessageId.set(event.properties.info.id, event.properties.info.sessionID)
         // Message info updated
         this.postMessage({
           type: "messageCreated",
@@ -739,6 +760,7 @@ export class KiloProvider implements vscode.WebviewViewProvider {
     this.unsubscribeEvent?.()
     this.unsubscribeState?.()
     this.trackedSessionIds.clear()
+    this.messageSessionIdsByMessageId.clear()
   }
 }
 
