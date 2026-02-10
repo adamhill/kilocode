@@ -4,7 +4,7 @@ type Keys = keyof typeof en
 export const dict = {
   // Kilo Gateway provider translations
   "provider.connect.kiloGateway.line1":
-    "Kilo Gateway omogućava pristup pažljivo odabranom skupu pouzdanih modela optimizovanih za rad sa agentima za kodiranje.",
+    "Kilo Gateway vam daje pristup kuriranom skupu pouzdanih, optimizovanih modela za coding agente.",
   "provider.connect.kiloGateway.line2":
     "Sa jednim API ključem dobijate pristup modelima kao što su Claude, GPT, Gemini, GLM i drugi.",
   "provider.connect.kiloGateway.visit.prefix": "Posjetite ",
