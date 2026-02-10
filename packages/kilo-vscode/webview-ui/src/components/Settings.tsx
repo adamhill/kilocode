@@ -1,4 +1,5 @@
 import { Component, createSignal, For, JSX } from "solid-js"
+import { Button } from "@kilocode/kilo-ui/button"
 import {
   Plug,
   Users2,
@@ -149,29 +150,9 @@ const Settings: Component<SettingsProps> = (props) => {
             gap: "8px",
           }}
         >
-          <button
-            onClick={() => props.onBack?.()}
-            title="Done"
-            style={{
-              background: "transparent",
-              border: "none",
-              color: "var(--vscode-foreground)",
-              cursor: "pointer",
-              padding: "4px",
-              display: "flex",
-              "align-items": "center",
-              "justify-content": "center",
-              "border-radius": "4px",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = "var(--vscode-toolbar-hoverBackground)"
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = "transparent"
-            }}
-          >
+          <Button variant="ghost" size="small" onClick={() => props.onBack?.()} title="Done">
             <ArrowLeft size={18} />
-          </button>
+          </Button>
           <h2
             style={{
               "font-size": "16px",
@@ -183,21 +164,9 @@ const Settings: Component<SettingsProps> = (props) => {
             Settings
           </h2>
         </div>
-        <button
-          disabled
-          style={{
-            background: "var(--vscode-button-background)",
-            color: "var(--vscode-button-foreground)",
-            border: "none",
-            padding: "6px 14px",
-            "border-radius": "2px",
-            "font-size": "13px",
-            cursor: "not-allowed",
-            opacity: 0.5,
-          }}
-        >
+        <Button variant="primary" size="small" disabled>
           Save
-        </button>
+        </Button>
       </div>
 
       {/* Main content area with sidebar and content */}
