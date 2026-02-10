@@ -12,9 +12,11 @@ The rebuild has a working foundation:
 
 - **CLI backend**: server lifecycle (spawn, port detection, auth, dispose) in [`server-manager.ts`](../src/services/cli-backend/server-manager.ts), HTTP client with 11 endpoints in [`http-client.ts`](../src/services/cli-backend/http-client.ts), SSE client with event subscriptions in [`sse-client.ts`](../src/services/cli-backend/sse-client.ts)
 - **Chat UI**: message list with text/tool/reasoning parts, streaming text deltas, auto-scroll in [`ChatView.tsx`](../webview-ui/src/components/chat/ChatView.tsx) and [`MessageList.tsx`](../webview-ui/src/components/chat/MessageList.tsx)
+- **Tool parts**: status icons (⏳⚙️✓✕), expandable input/output sections, status-based CSS classes in [`Message.tsx`](../webview-ui/src/components/chat/Message.tsx)
 - **Prompt input**: send/abort controls in [`PromptInput.tsx`](../webview-ui/src/components/chat/PromptInput.tsx)
-- **Permissions**: reject/once/always dialog in [`PermissionDialog.tsx`](../webview-ui/src/components/chat/PermissionDialog.tsx)
+- **Permissions**: reject/once/always dialog with expandable tool details in [`PermissionDialog.tsx`](../webview-ui/src/components/chat/PermissionDialog.tsx)
 - **Sessions**: create, list, select, load messages via [`session.tsx`](../webview-ui/src/context/session.tsx)
+- **Todo pipeline**: `todo.updated` SSE event handled through KiloProvider → webview store (no rendering UI yet)
 - **Auth**: full device auth flow with QR code, verification code, countdown in [`DeviceAuthCard.tsx`](../webview-ui/src/components/DeviceAuthCard.tsx)
 - **Profile**: login state, balance, dashboard link, logout in [`ProfileView.tsx`](../webview-ui/src/components/ProfileView.tsx)
 - **Session history**: list with relative dates in [`SessionList.tsx`](../webview-ui/src/components/history/SessionList.tsx)
@@ -38,11 +40,11 @@ The rebuild has a working foundation:
 | [File Permission Dialogs](chat-ui-features/file-permission-dialogs.md) | 🔨 Partial | Basic permission dialog exists (reject/once/always). Missing batch file read approval and per-file granularity. | CLI permission model; webview UI | P1 |
 | [Follow-Up Questions](chat-ui-features/follow-up-questions.md) | ❌ Not started | No suggested reply chips, click-to-submit, auto-approval countdown, or mode indicators. | Likely extension-side generation | P2 |
 | [Image Handling](chat-ui-features/image-handling.md) | ❌ Not started | No image viewer, zoom/pan modal, thumbnails, file attachment support in prompt input, or image paste support. | CLI provides image data; webview renders + VS Code integration | P1 |
-| [Inline Actions on Tool Messages](chat-ui-features/inline-actions-on-tool-messages.md) | ❌ Not started | No jump-to-file links, progress indicators, or inline action buttons on tool result messages. | CLI provides tool metadata; webview renders | P1 |
+| [Inline Actions on Tool Messages](chat-ui-features/inline-actions-on-tool-messages.md) | 🔨 Partial | Tool parts render with status icons (⏳⚙️✓✕), expandable sections with input/output, and status-based CSS classes. Missing: jump-to-file links and inline action buttons. | CLI provides tool metadata; webview renders | P1 |
 | [Mermaid Diagram Features](chat-ui-features/mermaid-diagram-features.md) | ❌ Not started | No mermaid rendering, "Fix with AI" button, copy, or open-as-PNG. Requires markdown rendering first. | Webview-only (rendering); CLI for "Fix with AI" | P2 |
 | [Message Editing & Management](chat-ui-features/message-editing-management.md) | ❌ Not started | No inline editing, deletion, or timestamp display on user messages. | CLI session fork/undo for edit semantics | P1 |
 | [Special Content Types](chat-ui-features/special-content-types.md) | 🔨 Partial | Reasoning blocks render (collapsible). Missing: open-markdown-preview button, MCP tool/resource rows, expandable error rows with copy. | Mixed: CLI for MCP data; webview for rendering | P1 |
-| [Todo List Management](chat-ui-features/todo-list-management.md) | ❌ Not started | No interactive todo list editing, status toggles, or add/delete items. | CLI tool or extension-side feature | P2 |
+| [Todo List Management](chat-ui-features/todo-list-management.md) | 🔨 Partial | `todo.updated` SSE event is handled through the full pipeline: KiloProvider → webview message → session store with `todos()` accessor. Missing: UI component to render, display, or interact with todo items. | CLI tool or extension-side feature | P2 |
 
 ---
 
@@ -62,14 +64,12 @@ The rebuild has a working foundation:
 | [Contribution Tracking](non-agent-features/contribution-tracking.md) | ❌ Not started | No AI attribution tracking, line fingerprinting, or reporting. | Extension-side | P3 |
 | [Custom Commands](non-agent-features/custom-command-system.md) | ❌ Not started | No slash commands, project-level command discovery, or YAML frontmatter support. | CLI has custom commands; extension provides UI entry points | P2 |
 | [Deploy & Secure Surfaces](non-agent-features/deploy-and-secure-surfaces.md) | ❌ Not started | No deploy workflows, managed indexing UI, or security review surfaces. | Extension-side | P3 |
-| [Fast Edits](non-agent-features/fast-edits.md) | 🚫 Intentionally skipped | CLI handles edit application (diff/patch). Extension does not need its own fast-edit strategy. | CLI-side | — |
 | [Git Commit Message Generation](non-agent-features/git-commit-message-generation.md) | ❌ Not started | No AI commit message generation or VS Code Source Control integration. | Extension-side (VS Code Git API) | P2 |
 | [Integrations](non-agent-features/integrations.md) | ❌ Not started | No external system integrations (GitHub, etc.) beyond basic auth. | CLI plugin system (partial); extension for IDE hooks | P3 |
 | [Localization](non-agent-features/localization-and-locale-alignment.md) | ❌ Not started | No i18n or locale normalization. All UI is English-only. | Extension + webview; CLI locale mapping needed | P3 |
 | [Marketplace](non-agent-features/marketplace.md) | 🔨 Partial | Placeholder view exists but is non-functional. No catalog, install, or update capabilities. | Extension-side | P2 |
 | [MCP & MCP Hub](non-agent-features/mcp-and-mcp-hub.md) | ❌ Not started | No MCP configuration UI, server management, tool allowlisting, or connection status. CLI owns MCP runtime. | CLI owns MCP lifecycle; extension provides config UI | P1 |
 | [Memory Bank](non-agent-features/memory-bank.md) | ❌ Not started | No `.kilocode` project documentation loading at task start. | Extension-side (file convention) | P2 |
-| [Search & Repo Scanning](non-agent-features/search-and-repo-scanning-infrastructure.md) | 🚫 Intentionally skipped | CLI owns grep/glob/search via its tool endpoints. No extension-side search infrastructure needed. | CLI-side | — |
 | [Settings Sync](non-agent-features/settings-sync-integration.md) | ❌ Not started | No VS Code Settings Sync allowlist registration. Settings tabs are all stubs. | Extension-side (VS Code API) | P3 |
 | [Skills System](non-agent-features/skills-system.md) | ❌ Not started | No skill discovery, management, or hot-reload in extension. | CLI has skills runtime; extension provides packaging/UI | P2 |
 | [Speech-to-Text](non-agent-features/speech-to-text.md) | ❌ Not started | No voice input or streaming STT. | Webview (mic capture); CLI-compatible STT optional | P3 |
@@ -99,7 +99,6 @@ The rebuild has a working foundation:
 | Priority | Count | Description |
 |----------|-------|-------------|
 | **P0** | 3 | Code blocks, command execution output, diff viewing — bare minimum for a usable chat |
-| **P1** | 11 | Auto-approval, checkpoints, image handling, message editing, agent manager, autocomplete, MCP config, terminal integration, etc. |
-| **P2** | 10 | Context menus, follow-ups, mermaid, todo lists, code actions, code reviews, custom commands, marketplace, etc. |
-| **P3** | 8 | Browser automation, auto-purge, contribution tracking, deploy surfaces, integrations, localization, settings sync, speech-to-text |
-| **Skipped** | 2 | Fast edits and search infrastructure (CLI-side) |
+| **P1** | 13 | Auto-approval, checkpoints, file permissions, image handling, inline actions, message editing, special content, agent manager, auth & enterprise, autocomplete, checkpoints (non-agent), MCP config, terminal integration |
+| **P2** | 12 | Context menus, follow-ups, mermaid, todo lists, code actions, code reviews, codebase indexing, custom commands, git commit, marketplace, memory bank, skills |
+| **P3** | 9 | Browser session controls, auto-purge, browser automation, contribution tracking, deploy surfaces, integrations, localization, settings sync, speech-to-text |
