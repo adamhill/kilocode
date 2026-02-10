@@ -17,4 +17,7 @@ export const dict = {
 
   // Add any upstream overrides below this line
   // Example: "some.upstream.key": "Kilo-specific override value",
+  "desktop.menu.reloadWebview": "Reload Webview",
+  "desktop.updater.installFailed.message": "Failed to install update",
+  "desktop.cli.installed.message": "CLI installed to {{path}}\n\nRestart your terminal to use the 'opencode' command.",
 }
