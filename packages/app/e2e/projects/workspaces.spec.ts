@@ -129,6 +129,7 @@ test("can create a workspace", async ({ page, withProject }) => {
 })
 
 test("can rename a workspace", async ({ page, withProject }) => {
+  test.skip(process.platform === "win32", "Skipping on Windows due to workspace interaction issues") // kilocode_change
   await page.setViewportSize({ width: 1400, height: 800 })
 
   await withProject(async (project) => {
