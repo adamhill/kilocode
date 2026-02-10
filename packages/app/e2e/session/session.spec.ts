@@ -53,6 +53,7 @@ test("session can be renamed via header menu", async ({ page, sdk, gotoSession }
 })
 
 test("session can be archived via header menu", async ({ page, sdk, gotoSession }) => {
+  test.skip(process.platform === "win32", "Skipping on Windows due to hover/menu interaction issues") // kilocode_change
   const stamp = Date.now()
   const title = `e2e archive test ${stamp}`
 
@@ -78,6 +79,7 @@ test("session can be archived via header menu", async ({ page, sdk, gotoSession 
 })
 
 test("session can be deleted via header menu", async ({ page, sdk, gotoSession }) => {
+  test.skip(process.platform === "win32", "Skipping on Windows due to hover/menu interaction issues") // kilocode_change
   const stamp = Date.now()
   const title = `e2e delete test ${stamp}`
 

@@ -26,6 +26,7 @@
       "version": "1.0.14",
       "dependencies": {
         "@kilocode/kilo-i18n": "workspace:*",
+        "@kilocode/kilo-ui": "workspace:*",
         "@kilocode/sdk": "workspace:*",
         "@kobalte/core": "catalog:",
         "@opencode-ai/ui": "workspace:*",
@@ -318,6 +319,19 @@
         "@types/bun": "catalog:",
         "@typescript/native-preview": "catalog:",
         "typescript": "catalog:",
+      },
+    },
+    "packages/kilo-ui": {
+      "name": "@kilocode/kilo-ui",
+      "version": "1.0.14",
+      "devDependencies": {
+        "@tsconfig/node22": "catalog:",
+        "@types/bun": "catalog:",
+        "typescript": "catalog:",
+      },
+      "peerDependencies": {
+        "@opencode-ai/ui": "workspace:*",
+        "solid-js": "catalog:",
       },
     },
     "packages/kilo-vscode": {
@@ -1275,6 +1289,8 @@
     "@kilocode/kilo-i18n": ["@kilocode/kilo-i18n@workspace:packages/kilo-i18n"],
 
     "@kilocode/kilo-telemetry": ["@kilocode/kilo-telemetry@workspace:packages/kilo-telemetry"],
+
+    "@kilocode/kilo-ui": ["@kilocode/kilo-ui@workspace:packages/kilo-ui"],
 
     "@kilocode/plugin": ["@kilocode/plugin@workspace:packages/plugin"],
 
