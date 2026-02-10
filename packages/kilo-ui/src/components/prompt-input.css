@@ -3,7 +3,7 @@
 
 /* Form wrapper: VS Code native input look instead of pill shape */
 [data-component="prompt-input-form"] {
-  border-radius: 2px;
+  border-radius: 0.25rem;
   background-color: var(--input-base, var(--vscode-input-background, #3c3c3c));
   border: 1px solid var(--border-weak-base, var(--vscode-input-border, #3c3c3c));
   box-shadow: none;
@@ -49,43 +49,68 @@
  * The model selector trigger & variant cycle buttons use Button variant="ghost"
  * and need to look like the legacy `SelectDropdown` triggers.
  */
-[data-component="prompt-input-form"] [data-slot="prompt-input-toolbar"] [data-component="button"] {
-  height: auto !important;
-  min-height: 22px;
-  padding: 1px 6px !important;
-  font-size: 12px;
-  line-height: normal;
-  border-radius: 3px;
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: none;
-  opacity: 0.9;
-  gap: 6px;
-  white-space: nowrap;
-  transition: all 150ms;
-  color: var(--text-base, var(--vscode-foreground));
 
-  &:hover:not(:disabled) {
-    opacity: 1;
-    background: rgba(255, 255, 255, 0.03);
-    border-color: rgba(255, 255, 255, 0.15);
+[data-component="prompt-input-form"] [data-slot="prompt-input-toolbar"] {
+  > div:first-child {
+    [data-component="button"] {
+      height: auto !important;
+      min-height: 22px;
+      padding: 4px 6px !important;
+      font-size: 12px;
+      line-height: normal;
+      border-radius: 6px;
+      background: var(--surface-base);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: none;
+      opacity: 1;
+      gap: 6px;
+      white-space: nowrap;
+      transition: all 150ms;
+      color: var(--text-base, var(--vscode-foreground));
+
+      &[data-expanded] {
+        background: var(--surface-base-hover) !important;
+        background-color: var(--surface-base-hover) !important;
+      }
+
+      &:hover:not(:disabled) {
+        background: var(--surface-base-hover);
+        background-color: var(--surface-base-hover);
+      }
+
+      &:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 1px var(--border-focus);
+      }
+    }
   }
+  /* Icon buttons in toolbar (attach file, submit) keep their own styling */
+  > div:nth-child(2) {
+    [data-component="button"] {
+      background: transparent;
+      border: none;
 
-  &:focus-visible {
-    outline: none;
-    box-shadow: 0 0 0 1px var(--border-focus);
+      [data-slot="icon-svg"] {
+        color: var(--icon-base);
+      }
+
+      [data-slot="progress-circle-background"] {
+        stroke: var(--icon-base);
+      }
+
+      [data-slot="progress-circle-progress"] {
+        stroke: var(--border-focus, var(--vscode-focusBorder, #007fd4));
+      }
+    }
+    [data-component="icon-button"] {
+      [data-slot="icon-svg"] {
+        color: var(--icon-base) !important;
+      }
+    }
   }
 }
 
-/* Icon buttons in toolbar (attach file, submit) keep their own styling */
-[data-component="prompt-input-form"] [data-slot="prompt-input-toolbar"] [data-component="icon-button"] {
-  height: auto;
-  border: none;
-  background: transparent;
-  opacity: 0.85;
-
-  &:hover:not(:disabled) {
-    opacity: 1;
-    background: rgba(255, 255, 255, 0.03);
-  }
+/* Remove provider icons from prompt input toolbar until we have a good design for them in that context */
+[data-component="prompt-input-form"] [data-slot="prompt-input-toolbar"] [data-component="provider-icon"] {
+  display: none !important;
 }

@@ -1,4 +1,5 @@
 import { Component, Show } from "solid-js"
+import { Button } from "@kilocode/kilo-ui/button"
 import { useVSCode } from "../context/vscode"
 import DeviceAuthCard from "./DeviceAuthCard"
 import type { ProfileData, DeviceAuthState } from "../types/messages"
@@ -77,21 +78,9 @@ const ProfileView: Component<ProfileViewProps> = (props) => {
                   >
                     Not logged in
                   </p>
-                  <button
-                    onClick={handleLogin}
-                    style={{
-                      background: "var(--vscode-button-background)",
-                      color: "var(--vscode-button-foreground)",
-                      border: "none",
-                      "border-radius": "4px",
-                      padding: "10px 16px",
-                      cursor: "pointer",
-                      "font-size": "13px",
-                      "font-weight": "600",
-                    }}
-                  >
+                  <Button variant="primary" onClick={handleLogin}>
                     Login with Kilo Code
-                  </button>
+                  </Button>
                 </>
               }
             >
@@ -177,56 +166,25 @@ const ProfileView: Component<ProfileViewProps> = (props) => {
                       {formatBalance(balance().balance)}
                     </p>
                   </div>
-                  <button
-                    onClick={handleRefresh}
-                    style={{
-                      background: "none",
-                      border: "1px solid var(--vscode-button-secondaryBackground, var(--vscode-panel-border))",
-                      "border-radius": "4px",
-                      color: "var(--vscode-foreground)",
-                      cursor: "pointer",
-                      padding: "4px 8px",
-                      "font-size": "12px",
-                    }}
-                  >
+                  <Button variant="ghost" size="small" onClick={handleRefresh}>
                     ↻ Refresh
-                  </button>
+                  </Button>
                 </div>
               )}
             </Show>
 
             {/* Action buttons */}
             <div style={{ display: "flex", gap: "8px" }}>
-              <button
-                onClick={handleDashboard}
-                style={{
-                  flex: "1",
-                  background: "var(--vscode-button-secondaryBackground)",
-                  color: "var(--vscode-button-secondaryForeground)",
-                  border: "none",
-                  "border-radius": "4px",
-                  padding: "8px 12px",
-                  cursor: "pointer",
-                  "font-size": "13px",
-                }}
-              >
+              <Button variant="secondary" onClick={handleDashboard} style={{ flex: "1" }}>
                 Dashboard
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="ghost"
                 onClick={handleLogout}
-                style={{
-                  flex: "1",
-                  background: "none",
-                  color: "var(--vscode-errorForeground)",
-                  border: "1px solid var(--vscode-panel-border)",
-                  "border-radius": "4px",
-                  padding: "8px 12px",
-                  cursor: "pointer",
-                  "font-size": "13px",
-                }}
+                style={{ flex: "1", color: "var(--vscode-errorForeground)" }}
               >
                 Log Out
-              </button>
+              </Button>
             </div>
           </div>
         )}
