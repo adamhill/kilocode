@@ -1,4 +1,4 @@
-name: Check Organization Member
+name: check-org-member
 
 on:
   workflow_call:
