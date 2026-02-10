@@ -14,7 +14,7 @@ on:
     outputs:
       is-member:
         description: Whether the user is an org member or kilo-maintainer bot
-        value: ${{ jobs.check.outputs.is-member }}
+        value: ${{ jobs.check.outputs['is-member'] }}
 
 jobs:
   check:

@@ -24,8 +24,8 @@ runs:
       uses: actions/create-github-app-token@v2
       with:
         # kilocode_change start
-        app-id: ${{ inputs.kilo-maintainer-app-id }}
-        private-key: ${{ inputs.kilo-maintainer-app-secret }}
+        app-id: ${{ inputs['kilo-maintainer-app-id'] }}
+        private-key: ${{ inputs['kilo-maintainer-app-secret'] }}
         # kilocode_change end
         owner: ${{ github.repository_owner }}
 
