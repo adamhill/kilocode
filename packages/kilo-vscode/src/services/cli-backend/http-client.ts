@@ -165,18 +165,6 @@ export class HttpClient {
       body.model = { providerID: options.providerID, modelID: options.modelID }
     }
 
-    // Diagnostic logging (redacts message contents).
-    const debugBody = {
-      ...body,
-      parts: parts.map((p) => {
-        if (p.type === "text") {
-          return { type: "text", textLength: p.text.length }
-        }
-        return { type: "file", mime: p.mime, urlLength: p.url.length }
-      }),
-    }
-    console.log("[Kilo New] HTTP: 📨 sendMessage request body", JSON.stringify(debugBody))
-
     await this.request<void>("POST", `/session/${sessionId}/message`, body, { directory, allowEmpty: true })
   }
 

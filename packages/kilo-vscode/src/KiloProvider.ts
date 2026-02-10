@@ -9,7 +9,6 @@ export class KiloProvider implements vscode.WebviewViewProvider {
   private connectionState: "connecting" | "connected" | "disconnected" | "error" = "connecting"
   private loginAttempt = 0
   private isWebviewReady = false
-  private messageCounter = 0
   /** Cached providersLoaded payload so requestProviders can be served before httpClient is ready */
   private cachedProvidersMessage: unknown = null
 
@@ -92,7 +91,6 @@ export class KiloProvider implements vscode.WebviewViewProvider {
   ) {
     // Store the webview references
     this.isWebviewReady = false
-    console.log("[Kilo New] KiloProvider: 🧩 resolveWebviewView called")
     this.webview = webviewView.webview
 
     // Set up webview options
@@ -103,7 +101,6 @@ export class KiloProvider implements vscode.WebviewViewProvider {
 
     // Set HTML content
     webviewView.webview.html = this._getHtmlForWebview(webviewView.webview)
-    console.log("[Kilo New] KiloProvider: 🧩 Webview HTML set")
 
     // Handle messages from webview (shared handler)
     this.setupWebviewMessageHandler(webviewView.webview)
@@ -422,13 +419,6 @@ export class KiloProvider implements vscode.WebviewViewProvider {
       const providerID = config.get<string>("providerID", "kilo")
       const modelID = config.get<string>("modelID", "kilo/auto")
 
-      console.log("[Kilo New] KiloProvider: 📦 Providers loaded, sending to webview", {
-        providerCount: Object.keys(normalized).length,
-        connectedCount: response.connected.length,
-        defaultProvider: providerID,
-        defaultModel: modelID,
-      })
-
       const message = {
         type: "providersLoaded",
         providers: normalized,
@@ -743,29 +733,21 @@ export class KiloProvider implements vscode.WebviewViewProvider {
    * Public so toolbar button commands can send messages.
    */
   public postMessage(message: unknown): void {
-    const id = ++this.messageCounter
-
-    const type =
-      typeof message === "object" &&
-      message !== null &&
-      "type" in message &&
-      typeof (message as { type?: unknown }).type === "string"
-        ? ((message as { type: string }).type as string)
-        : "<unknown>"
-
     if (!this.webview) {
-      console.warn("[Kilo New] KiloProvider: ⚠️ postMessage dropped (no webview)", { id, type })
+      const type =
+        typeof message === "object" &&
+        message !== null &&
+        "type" in message &&
+        typeof (message as { type?: unknown }).type === "string"
+          ? (message as { type: string }).type
+          : "<unknown>"
+      console.warn("[Kilo New] KiloProvider: ⚠️ postMessage dropped (no webview)", { type })
       return
     }
 
-    void this.webview.postMessage(message).then(
-      (delivered) => {
-        console.log("[Kilo New] KiloProvider: 📬 postMessage result", { id, type, delivered })
-      },
-      (error) => {
-        console.error("[Kilo New] KiloProvider: ❌ postMessage failed", { id, type, error })
-      },
-    )
+    void this.webview.postMessage(message).then(undefined, (error) => {
+      console.error("[Kilo New] KiloProvider: ❌ postMessage failed", error)
+    })
   }
 
   /**
