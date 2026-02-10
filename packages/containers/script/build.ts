@@ -7,7 +7,7 @@ import { fileURLToPath } from "url"
 const rootDir = fileURLToPath(new URL("../../..", import.meta.url))
 process.chdir(rootDir)
 
-const reg = process.env.REGISTRY ?? "ghcr.io/Kilo-Org" // kilocode_change
+const reg = process.env.REGISTRY ?? "ghcr.io/kilo-org" // kilocode_change
 const tag = process.env.TAG ?? "24.04"
 const push = process.argv.includes("--push") || process.env.PUSH === "1"
 
