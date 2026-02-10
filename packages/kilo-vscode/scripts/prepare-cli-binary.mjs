@@ -80,7 +80,7 @@ function ensureBuiltBinary() {
 
   // Ensure dependencies are installed before building.
   log("Installing dependencies in opencode package...")
-  execSync("bun install", {
+  execSync("bun install --frozen-lockfile", {
     cwd: opencodeDir,
     stdio: "inherit",
     env: process.env,
