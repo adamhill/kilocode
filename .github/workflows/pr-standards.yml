@@ -10,6 +10,9 @@ jobs:
     uses: ./.github/workflows/check-org-member.yml
     with:
       username: ${{ github.event.pull_request.user.login }}
+    secrets:
+      kilo-maintainer-app-id: ${{ secrets.KILO_MAINTAINER_APP_ID }}
+      kilo-maintainer-app-secret: ${{ secrets.KILO_MAINTAINER_APP_SECRET }}
 
   check-standards:
     needs: check-author
