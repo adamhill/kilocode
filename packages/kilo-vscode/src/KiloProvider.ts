@@ -10,6 +10,8 @@ export class KiloProvider implements vscode.WebviewViewProvider {
   private loginAttempt = 0
   private isWebviewReady = false
   private messageCounter = 0
+  /** Cached providersLoaded payload so requestProviders can be served before httpClient is ready */
+  private cachedProvidersMessage: unknown = null
 
   private trackedSessionIds: Set<string> = new Set()
   private unsubscribeEvent: (() => void) | null = null
@@ -399,6 +401,10 @@ export class KiloProvider implements vscode.WebviewViewProvider {
    */
   private async fetchAndSendProviders(): Promise<void> {
     if (!this.httpClient) {
+      // httpClient not ready — serve from cache if available
+      if (this.cachedProvidersMessage) {
+        this.postMessage(this.cachedProvidersMessage)
+      }
       return
     }
 
@@ -414,7 +420,7 @@ export class KiloProvider implements vscode.WebviewViewProvider {
 
       const config = vscode.workspace.getConfiguration("kilo-code.new.model")
       const providerID = config.get<string>("providerID", "kilo")
-      const modelID = config.get<string>("modelID", "auto")
+      const modelID = config.get<string>("modelID", "kilo/auto")
 
       console.log("[Kilo New] KiloProvider: 📦 Providers loaded, sending to webview", {
         providerCount: Object.keys(normalized).length,
@@ -423,13 +429,15 @@ export class KiloProvider implements vscode.WebviewViewProvider {
         defaultModel: modelID,
       })
 
-      this.postMessage({
+      const message = {
         type: "providersLoaded",
         providers: normalized,
         connected: response.connected,
         defaults: response.default,
         defaultSelection: { providerID, modelID },
-      })
+      }
+      this.cachedProvidersMessage = message
+      this.postMessage(message)
     } catch (error) {
       console.error("[Kilo New] KiloProvider: Failed to fetch providers:", error)
     }

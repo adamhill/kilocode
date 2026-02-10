@@ -4,7 +4,7 @@
  * Selection is now per-session — see session.tsx.
  */
 
-import { createContext, useContext, createSignal, createMemo, onMount, onCleanup, ParentComponent, Accessor } from "solid-js"
+import { createContext, useContext, createSignal, createMemo, onCleanup, ParentComponent, Accessor } from "solid-js"
 import { useVSCode } from "./vscode"
 import type { Provider, ProviderModel, ModelSelection, ExtensionMessage } from "../types/messages"
 
@@ -19,7 +19,7 @@ interface ProviderContextValue {
   findModel: (selection: ModelSelection | null) => EnrichedModel | undefined
 }
 
-const KILO_AUTO: ModelSelection = { providerID: "kilo", modelID: "auto" }
+const KILO_AUTO: ModelSelection = { providerID: "kilo", modelID: "kilo/auto" }
 
 const ProviderContext = createContext<ProviderContextValue>()
 
@@ -57,23 +57,40 @@ export const ProviderProvider: ParentComponent = (props) => {
     return models().find((m) => m.providerID === selection.providerID && m.id === selection.modelID)
   }
 
-  onMount(() => {
-    const unsubscribe = vscode.onMessage((message: ExtensionMessage) => {
-      if (message.type !== "providersLoaded") {
-        return
-      }
+  // Register handler immediately (not in onMount) so we never miss
+  // a providersLoaded message that arrives before the DOM mount.
+  const unsubscribe = vscode.onMessage((message: ExtensionMessage) => {
+    if (message.type !== "providersLoaded") {
+      return
+    }
 
-      setProviders(message.providers)
-      setConnected(message.connected)
-      setDefaults(message.defaults)
-      setDefaultSelection(message.defaultSelection)
-    })
-
-    // Request providers from extension in case the initial push was missed
-    vscode.postMessage({ type: "requestProviders" })
-
-    onCleanup(unsubscribe)
+    setProviders(message.providers)
+    setConnected(message.connected)
+    setDefaults(message.defaults)
+    setDefaultSelection(message.defaultSelection)
   })
+
+  onCleanup(unsubscribe)
+
+  // Request providers in case the initial push was missed.
+  // Retry a few times because the extension's httpClient may
+  // not be ready yet when the first request arrives.
+  let retries = 0
+  const maxRetries = 5
+  const retryMs = 500
+
+  vscode.postMessage({ type: "requestProviders" })
+
+  const retryTimer = setInterval(() => {
+    retries++
+    if (Object.keys(providers()).length > 0 || retries >= maxRetries) {
+      clearInterval(retryTimer)
+      return
+    }
+    vscode.postMessage({ type: "requestProviders" })
+  }, retryMs)
+
+  onCleanup(() => clearInterval(retryTimer))
 
   const value: ProviderContextValue = {
     providers,

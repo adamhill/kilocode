@@ -121,7 +121,7 @@
         },
         "kilo-code.new.model.modelID": {
           "type": "string",
-          "default": "auto",
+          "default": "kilo/auto",
           "description": "Default model ID for new sessions"
         }
       }
