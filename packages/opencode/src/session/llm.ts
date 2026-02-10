@@ -24,6 +24,10 @@ import { PermissionNext } from "@/permission/next"
 import { Auth } from "@/auth"
 import { DEFAULT_HEADERS } from "@/kilocode/const" // kilocode_change
 import { Telemetry } from "@kilocode/kilo-telemetry" // kilocode_change
+// kilocode_change start
+import { getKiloProjectId } from "@/kilocode/project-id"
+import { HEADER_PROJECTID } from "@kilocode/kilo-gateway"
+// kilocode_change end
 
 export namespace LLM {
   const log = Log.create({ service: "llm" })
@@ -69,6 +73,9 @@ export namespace LLM {
     const system = []
     system.push(
       [
+        // kilocode_change start - soul defines core identity and personality
+        ...(isCodex ? [] : [SystemPrompt.soul()]),
+        // kilocode_change end
         // use agent prompt otherwise provider prompt
         // For Codex sessions, skip SystemPrompt.provider() since it's sent via options.instructions
         ...(input.agent.prompt ? [input.agent.prompt] : isCodex ? [] : SystemPrompt.provider(input.model)),
@@ -114,7 +121,9 @@ export namespace LLM {
       mergeDeep(variant),
     )
     if (isCodex) {
-      options.instructions = SystemPrompt.instructions()
+      // kilocode_change start - prepend soul to codex instructions
+      options.instructions = SystemPrompt.soul() + "\n" + SystemPrompt.instructions()
+      // kilocode_change end
     }
 
     const params = await Plugin.trigger(
@@ -149,6 +158,11 @@ export namespace LLM {
         headers: {},
       },
     )
+
+    // kilocode_change start - resolve project ID for kilo provider
+    const kiloProjectId =
+      input.model.api.npm === "@kilocode/kilo-gateway" ? await getKiloProjectId().catch(() => undefined) : undefined
+    // kilocode_change end
 
     const maxOutputTokens =
       isCodex || provider.id.includes("github-copilot")
@@ -231,6 +245,11 @@ export namespace LLM {
         ...(input.model.api.npm === "@kilocode/kilo-gateway" && input.agent.name
           ? { "x-kilocode-mode": input.agent.name.toLowerCase() }
           : {}),
+        // kilocode_change start - add project ID header for kilo provider
+        ...(input.model.api.npm === "@kilocode/kilo-gateway" && kiloProjectId
+          ? { [HEADER_PROJECTID]: kiloProjectId }
+          : {}),
+        // kilocode_change end
         ...input.model.headers,
         ...headers,
       },

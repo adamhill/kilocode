@@ -16,7 +16,7 @@
       "activitybar": [
         {
           "id": "kilo-code-sidebar",
-          "title": "Kilo Code",
+          "title": "Kilo Code (NEW)",
           "icon": "$(code)"
         }
       ]
@@ -26,7 +26,7 @@
         {
           "type": "webview",
           "id": "kilo-code.new.sidebarView",
-          "name": "Kilo Code"
+          "name": "Kilo Code (NEW)"
         }
       ]
     },
@@ -60,6 +60,14 @@
         "command": "kilo-code.new.settingsButtonClicked",
         "title": "Settings",
         "icon": "$(settings-gear)"
+      },
+      {
+        "command": "kilo-code.new.openInTab",
+        "title": "Kilo Code (NEW)",
+        "icon": {
+          "light": "assets/icons/kilo-light.svg",
+          "dark": "assets/icons/kilo-dark.svg"
+        }
       }
     ],
     "menus": {
@@ -94,7 +102,29 @@
           "group": "navigation@5",
           "when": "view == kilo-code.new.sidebarView"
         }
+      ],
+      "editor/title": [
+        {
+          "command": "kilo-code.new.openInTab",
+          "group": "navigation",
+          "when": "true"
+        }
       ]
+    },
+    "configuration": {
+      "title": "Kilo Code",
+      "properties": {
+        "kilo-code.new.model.providerID": {
+          "type": "string",
+          "default": "kilo",
+          "description": "Default model provider ID for new sessions"
+        },
+        "kilo-code.new.model.modelID": {
+          "type": "string",
+          "default": "kilo/auto",
+          "description": "Default model ID for new sessions"
+        }
+      }
     }
   },
   "scripts": {
@@ -117,6 +147,7 @@
   "devDependencies": {
     "@types/mocha": "^10.0.10",
     "@types/node": "22.x",
+    "@types/qrcode": "^1.5.6",
     "@types/vscode": "^1.109.0",
     "@vscode/test-cli": "^0.0.12",
     "@vscode/test-electron": "^2.5.2",
@@ -126,10 +157,16 @@
     "eslint-config-prettier": "^10.1.8",
     "npm-run-all": "^4.1.5",
     "prettier": "^3.8.1",
+    "qrcode": "^1.5.4",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.54.0"
   },
   "dependencies": {
+    "@kilocode/kilo-ui": "workspace:*",
+    "@kilocode/sdk": "workspace:*",
+    "@kobalte/core": "catalog:",
+    "@opencode-ai/ui": "workspace:*",
+    "@opencode-ai/util": "workspace:*",
     "eventsource": "^2.0.2",
     "lucide-solid": "^0.563.0",
     "solid-js": "^1.9.11"

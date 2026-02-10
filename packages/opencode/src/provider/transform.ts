@@ -471,17 +471,27 @@ export namespace ProviderTransform {
           }
         }
         // Claude/Anthropic models support reasoning via effort levels through OpenRouter API
-        // OpenRouter maps effort to budget_tokens percentages (xhigh=95%, high=80%, medium=50%, low=20%, minimal=10%)
+        // OpenRouter uses OpenAI-style effort names: xhigh=95%, high=80%, medium=50%, low=20%, minimal=10%
+        // kilocode_change - expose "max" (Anthropic naming) to users, mapped to "xhigh" (OpenRouter naming) on the wire
         if (
           model.id.includes("claude") ||
           model.id.includes("anthropic") ||
           model.api.id.includes("claude") ||
           model.api.id.includes("anthropic")
         ) {
-          return Object.fromEntries(OPENAI_EFFORTS.map((effort) => [effort, { reasoning: { effort } }]))
+          const ANTHROPIC_EFFORTS = ["none", "minimal", ...WIDELY_SUPPORTED_EFFORTS, "max"]
+          return Object.fromEntries(
+            ANTHROPIC_EFFORTS.map((effort) => [effort, { reasoning: { effort: effort === "max" ? "xhigh" : effort } }]),
+          )
         }
         // GPT models via Kilo need encrypted reasoning content to avoid org_id mismatch
         if (!model.id.includes("gpt") && !model.id.includes("gemini-3")) return {}
+        // kilocode_change - Codex models use object-based reasoning format for OpenRouter
+        // OpenRouter expects { reasoning: { effort: "high" } } format
+        // See: https://openrouter.ai/docs/api/api-reference/chat/send-chat-completion-request#request.body.reasoning
+        if (model.id.includes("codex")) {
+          return Object.fromEntries(OPENAI_EFFORTS.map((effort) => [effort, { reasoning: { effort } }]))
+        }
         return Object.fromEntries(
           OPENAI_EFFORTS.map((effort) => [
             effort,
@@ -509,7 +519,8 @@ export namespace ProviderTransform {
           }
         }
         const copilotEfforts = iife(() => {
-          if (id.includes("5.1-codex-max") || id.includes("5.2")) return [...WIDELY_SUPPORTED_EFFORTS, "xhigh"]
+          if (id.includes("5.1-codex-max") || id.includes("5.2") || id.includes("5.3"))
+            return [...WIDELY_SUPPORTED_EFFORTS, "xhigh"]
           return WIDELY_SUPPORTED_EFFORTS
         })
         return Object.fromEntries(
@@ -556,7 +567,7 @@ export namespace ProviderTransform {
         if (id === "gpt-5-pro") return {}
         const openaiEfforts = iife(() => {
           if (id.includes("codex")) {
-            if (id.includes("5.2")) return [...WIDELY_SUPPORTED_EFFORTS, "xhigh"]
+            if (id.includes("5.2") || id.includes("5.3")) return [...WIDELY_SUPPORTED_EFFORTS, "xhigh"]
             return WIDELY_SUPPORTED_EFFORTS
           }
           const arr = [...WIDELY_SUPPORTED_EFFORTS]
@@ -796,6 +807,18 @@ export namespace ProviderTransform {
       }
       if (input.model.api.id.includes("gemini-3")) {
         result["thinkingConfig"]["thinkingLevel"] = "high"
+      }
+    }
+
+    // Enable thinking by default for kimi-k2.5/k2p5 models using anthropic SDK
+    const modelId = input.model.api.id.toLowerCase()
+    if (
+      (input.model.api.npm === "@ai-sdk/anthropic" || input.model.api.npm === "@ai-sdk/google-vertex/anthropic") &&
+      (modelId.includes("k2p5") || modelId.includes("kimi-k2.5") || modelId.includes("kimi-k2p5"))
+    ) {
+      result["thinking"] = {
+        type: "enabled",
+        budgetTokens: Math.min(16_000, Math.floor(input.model.limit.output / 2 - 1)),
       }
     }
 

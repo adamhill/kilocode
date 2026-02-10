@@ -78,8 +78,71 @@ export interface TodoItem {
   status: "pending" | "in_progress" | "completed"
 }
 
+// Provider/model types from provider catalog
+
+// Model definition from provider catalog
+export interface ProviderModel {
+  id: string
+  name: string
+  inputPrice?: number
+  outputPrice?: number
+  contextLength?: number
+  releaseDate?: string
+  latest?: boolean
+}
+
+// Provider definition
+export interface Provider {
+  id: string
+  name: string
+  models: Record<string, ProviderModel>
+}
+
+// Response from provider list endpoint
+export interface ProviderListResponse {
+  all: Record<string, Provider>
+  connected: string[]
+  default: Record<string, string> // providerID → default modelID
+}
+
+// Model selection (providerID + modelID pair)
+export interface ModelSelection {
+  providerID: string
+  modelID: string
+}
+
 // Server connection config
 export interface ServerConfig {
   baseUrl: string
   password: string
+}
+
+// Provider OAuth types
+export interface ProviderAuthAuthorization {
+  url: string
+  method: "auto" | "code"
+  instructions: string
+}
+
+// Profile types from kilo-gateway
+export interface KilocodeOrganization {
+  id: string
+  name: string
+  role: string
+}
+
+export interface KilocodeProfile {
+  email: string
+  name?: string
+  organizations?: KilocodeOrganization[]
+}
+
+export interface KilocodeBalance {
+  balance: number
+}
+
+export interface ProfileData {
+  profile: KilocodeProfile
+  balance: KilocodeBalance | null
+  currentOrgId: string | null
 }

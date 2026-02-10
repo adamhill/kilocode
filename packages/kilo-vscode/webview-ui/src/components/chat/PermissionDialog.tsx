@@ -4,6 +4,7 @@
  */
 
 import { Component, Show, For, createSignal } from "solid-js"
+import { Button } from "@kilocode/kilo-ui/button"
 import { useSession } from "../../context/session"
 import type { PermissionRequest } from "../../types/messages"
 
@@ -31,9 +32,9 @@ const PermissionItem: Component<PermissionDialogProps> = (props) => {
           {props.permission.message || `The assistant wants to use: ${props.permission.toolName}`}
         </p>
 
-        <button class="permission-details-toggle" onClick={() => setExpanded(!expanded())}>
+        <Button variant="ghost" size="small" onClick={() => setExpanded(!expanded())}>
           {expanded() ? "Hide details" : "Show details"}
-        </button>
+        </Button>
 
         <Show when={expanded()}>
           <div class="permission-details">
@@ -49,15 +50,15 @@ const PermissionItem: Component<PermissionDialogProps> = (props) => {
       </div>
 
       <div class="permission-actions">
-        <button class="permission-button permission-button-reject" onClick={() => handleResponse("reject")}>
+        <Button variant="ghost" size="small" onClick={() => handleResponse("reject")}>
           Reject
-        </button>
-        <button class="permission-button permission-button-once" onClick={() => handleResponse("once")}>
+        </Button>
+        <Button variant="secondary" size="small" onClick={() => handleResponse("once")}>
           Allow Once
-        </button>
-        <button class="permission-button permission-button-always" onClick={() => handleResponse("always")}>
+        </Button>
+        <Button variant="primary" size="small" onClick={() => handleResponse("always")}>
           Always Allow
-        </button>
+        </Button>
       </div>
     </div>
   )

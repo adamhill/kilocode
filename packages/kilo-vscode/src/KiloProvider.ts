@@ -1,27 +1,87 @@
 import * as vscode from "vscode"
-import {
-  ServerManager,
-  HttpClient,
-  SSEClient,
-  type SessionInfo,
-  type SSEEvent,
-  type ServerConfig,
-} from "./services/cli-backend"
+import { type HttpClient, type SessionInfo, type SSEEvent, type KiloConnectionService } from "./services/cli-backend"
 
 export class KiloProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = "kilo-code.new.sidebarView"
 
-  private readonly serverManager: ServerManager
-  private httpClient: HttpClient | null = null
-  private sseClient: SSEClient | null = null
-  private webviewView: vscode.WebviewView | null = null
+  private webview: vscode.Webview | null = null
   private currentSession: SessionInfo | null = null
+  private connectionState: "connecting" | "connected" | "disconnected" | "error" = "connecting"
+  private loginAttempt = 0
+  private isWebviewReady = false
+  /** Cached providersLoaded payload so requestProviders can be served before httpClient is ready */
+  private cachedProvidersMessage: unknown = null
+
+  private trackedSessionIds: Set<string> = new Set()
+  private unsubscribeEvent: (() => void) | null = null
+  private unsubscribeState: (() => void) | null = null
+  private webviewMessageDisposable: vscode.Disposable | null = null
 
   constructor(
     private readonly extensionUri: vscode.Uri,
-    context: vscode.ExtensionContext,
-  ) {
-    this.serverManager = new ServerManager(context)
+    private readonly connectionService: KiloConnectionService,
+  ) {}
+
+  /**
+   * Convenience getter that returns the shared HttpClient or null if not yet connected.
+   * Preserves the existing null-check pattern used throughout handler methods.
+   */
+  private get httpClient(): HttpClient | null {
+    try {
+      return this.connectionService.getHttpClient()
+    } catch {
+      return null
+    }
+  }
+
+  /**
+   * Synchronize current extension-side state to the webview.
+   * This is primarily used after a webview refresh where early postMessage calls
+   * may have been dropped before the webview registered its message listeners.
+   */
+  private async syncWebviewState(reason: string): Promise<void> {
+    const serverInfo = this.connectionService.getServerInfo()
+    console.log("[Kilo New] KiloProvider: 🔄 syncWebviewState()", {
+      reason,
+      isWebviewReady: this.isWebviewReady,
+      connectionState: this.connectionState,
+      hasHttpClient: !!this.httpClient,
+      hasServerInfo: !!serverInfo,
+    })
+
+    if (!this.isWebviewReady) {
+      console.log("[Kilo New] KiloProvider: ⏭️ syncWebviewState skipped (webview not ready)")
+      return
+    }
+
+    // Always push connection state first so the UI can render appropriately.
+    this.postMessage({
+      type: "connectionState",
+      state: this.connectionState,
+    })
+
+    // Re-send ready so the webview can recover after refresh.
+    if (serverInfo) {
+      this.postMessage({
+        type: "ready",
+        serverInfo,
+      })
+    }
+
+    // Always attempt to fetch+push profile when connected.
+    if (this.connectionState === "connected" && this.httpClient) {
+      console.log("[Kilo New] KiloProvider: 👤 syncWebviewState fetching profile...")
+      try {
+        const profileData = await this.httpClient.getProfile()
+        console.log("[Kilo New] KiloProvider: 👤 syncWebviewState profile:", profileData ? "received" : "null")
+        this.postMessage({
+          type: "profileData",
+          data: profileData,
+        })
+      } catch (error) {
+        console.error("[Kilo New] KiloProvider: ❌ syncWebviewState failed to fetch profile:", error)
+      }
+    }
   }
 
   public resolveWebviewView(
@@ -29,8 +89,9 @@ export class KiloProvider implements vscode.WebviewViewProvider {
     _context: vscode.WebviewViewResolveContext,
     _token: vscode.CancellationToken,
   ) {
-    // Store the webview reference
-    this.webviewView = webviewView
+    // Store the webview references
+    this.isWebviewReady = false
+    this.webview = webviewView.webview
 
     // Set up webview options
     webviewView.webview.options = {
@@ -41,11 +102,49 @@ export class KiloProvider implements vscode.WebviewViewProvider {
     // Set HTML content
     webviewView.webview.html = this._getHtmlForWebview(webviewView.webview)
 
-    // Handle messages from webview
-    webviewView.webview.onDidReceiveMessage(async (message) => {
+    // Handle messages from webview (shared handler)
+    this.setupWebviewMessageHandler(webviewView.webview)
+
+    // Initialize connection to CLI backend
+    this.initializeConnection()
+  }
+
+  /**
+   * Resolve a WebviewPanel for displaying the Kilo webview in an editor tab.
+   */
+  public resolveWebviewPanel(panel: vscode.WebviewPanel): void {
+    // WebviewPanel can be restored/reloaded; ensure we don't treat it as ready prematurely.
+    this.isWebviewReady = false
+    this.webview = panel.webview
+
+    panel.webview.options = {
+      enableScripts: true,
+      localResourceRoots: [this.extensionUri],
+    }
+
+    panel.webview.html = this._getHtmlForWebview(panel.webview)
+
+    // Handle messages from webview (shared handler)
+    this.setupWebviewMessageHandler(panel.webview)
+
+    this.initializeConnection()
+  }
+
+  /**
+   * Set up the shared message handler for both sidebar and tab webviews.
+   * Handles ALL message types so tabs have full functionality.
+   */
+  private setupWebviewMessageHandler(webview: vscode.Webview): void {
+    this.webviewMessageDisposable?.dispose()
+    this.webviewMessageDisposable = webview.onDidReceiveMessage(async (message) => {
       switch (message.type) {
+        case "webviewReady":
+          console.log("[Kilo New] KiloProvider: ✅ webviewReady received")
+          this.isWebviewReady = true
+          await this.syncWebviewState("webviewReady")
+          break
         case "sendMessage":
-          await this.handleSendMessage(message.text, message.sessionID)
+          await this.handleSendMessage(message.text, message.sessionID, message.providerID, message.modelID)
           break
         case "abort":
           await this.handleAbort(message.sessionID)
@@ -62,67 +161,106 @@ export class KiloProvider implements vscode.WebviewViewProvider {
         case "loadSessions":
           await this.handleLoadSessions()
           break
+        case "login":
+          await this.handleLogin()
+          break
+        case "cancelLogin":
+          this.loginAttempt++
+          this.postMessage({ type: "deviceAuthCancelled" })
+          break
+        case "logout":
+          await this.handleLogout()
+          break
+        case "refreshProfile":
+          await this.handleRefreshProfile()
+          break
+        case "openExternal":
+          if (message.url) {
+            vscode.env.openExternal(vscode.Uri.parse(message.url))
+          }
+          break
+        case "requestProviders":
+          await this.fetchAndSendProviders()
+          break
       }
     })
-
-    // Initialize connection to CLI backend
-    this.initializeConnection()
   }
 
   /**
    * Initialize connection to the CLI backend server.
+   * Subscribes to the shared KiloConnectionService.
    */
   private async initializeConnection(): Promise<void> {
     console.log("[Kilo New] KiloProvider: 🔧 Starting initializeConnection...")
+
+    // Clean up any existing subscriptions (e.g., sidebar re-shown)
+    this.unsubscribeEvent?.()
+    this.unsubscribeState?.()
+
     try {
-      // Get server from server manager
-      console.log("[Kilo New] KiloProvider: 📡 Requesting server from serverManager...")
-      const server = await this.serverManager.getServer()
-      console.log("[Kilo New] KiloProvider: ✅ Server obtained:", { port: server.port, hasPassword: !!server.password })
-
-      // Create config with baseUrl and password
-      const config: ServerConfig = {
-        baseUrl: `http://127.0.0.1:${server.port}`,
-        password: server.password,
-      }
-      console.log("[Kilo New] KiloProvider: 🔑 Created config:", { baseUrl: config.baseUrl })
-
-      // Create HttpClient and SSEClient instances
-      this.httpClient = new HttpClient(config)
-      this.sseClient = new SSEClient(config)
-      console.log("[Kilo New] KiloProvider: 🔌 Created HttpClient and SSEClient")
-
-      // Set up SSE event handling
-      this.sseClient.onEvent((event) => {
-        console.log("[Kilo New] KiloProvider: 📨 Received SSE event:", event.type)
-        this.handleSSEEvent(event)
-      })
-
-      this.sseClient.onStateChange((state) => {
-        console.log("[Kilo New] KiloProvider: 🔄 SSE state changed to:", state)
-        console.log("[Kilo New] KiloProvider: 📤 Posting connectionState message to webview:", state)
-        this.postMessage({
-          type: "connectionState",
-          state,
-        })
-      })
-
-      // Connect SSE with workspace directory
       const workspaceDir = this.getWorkspaceDirectory()
-      console.log("[Kilo New] KiloProvider: 📂 Connecting SSE with workspace:", workspaceDir)
-      this.sseClient.connect(workspaceDir)
 
-      // Post "ready" message to webview with server info
-      console.log("[Kilo New] KiloProvider: 📤 Posting ready message to webview")
-      this.postMessage({
-        type: "ready",
-        serverInfo: {
-          port: server.port,
+      // Connect the shared service (no-op if already connected)
+      await this.connectionService.connect(workspaceDir)
+
+      // Subscribe to SSE events for this webview (filtered by tracked sessions)
+      this.unsubscribeEvent = this.connectionService.onEventFiltered(
+        (event) => {
+          const sessionId = this.connectionService.resolveEventSessionId(event)
+
+          // message.part.updated is always session-scoped; if we can't determine the session, drop it.
+          if (!sessionId) {
+            return event.type !== "message.part.updated"
+          }
+
+          return this.trackedSessionIds.has(sessionId)
         },
+        (event) => {
+          this.handleSSEEvent(event)
+        },
+      )
+
+      // Subscribe to connection state changes
+      this.unsubscribeState = this.connectionService.onStateChange(async (state) => {
+        this.connectionState = state
+        this.postMessage({ type: "connectionState", state })
+
+        if (state === "connected") {
+          try {
+            const client = this.httpClient
+            if (client) {
+              const profileData = await client.getProfile()
+              this.postMessage({ type: "profileData", data: profileData })
+            }
+            await this.syncWebviewState("sse-connected")
+          } catch (error) {
+            console.error("[Kilo New] KiloProvider: ❌ Failed during connected state handling:", error)
+            this.postMessage({
+              type: "error",
+              message: error instanceof Error ? error.message : "Failed to sync after connecting",
+            })
+          }
+        }
       })
+
+      // Get current state and push to webview
+      const serverInfo = this.connectionService.getServerInfo()
+      this.connectionState = this.connectionService.getConnectionState()
+
+      if (serverInfo) {
+        this.postMessage({ type: "ready", serverInfo })
+      }
+
+      this.postMessage({ type: "connectionState", state: this.connectionState })
+      await this.syncWebviewState("initializeConnection")
+
+      // Fetch providers and send to webview
+      await this.fetchAndSendProviders()
+
       console.log("[Kilo New] KiloProvider: ✅ initializeConnection completed successfully")
     } catch (error) {
       console.error("[Kilo New] KiloProvider: ❌ Failed to initialize connection:", error)
+      this.connectionState = "error"
       this.postMessage({
         type: "connectionState",
         state: "error",
@@ -159,6 +297,7 @@ export class KiloProvider implements vscode.WebviewViewProvider {
       const workspaceDir = this.getWorkspaceDirectory()
       const session = await this.httpClient.createSession(workspaceDir)
       this.currentSession = session
+      this.trackedSessionIds.add(session.id)
 
       // Notify webview of the new session
       this.postMessage({
@@ -178,6 +317,9 @@ export class KiloProvider implements vscode.WebviewViewProvider {
    * Handle loading messages for a session.
    */
   private async handleLoadMessages(sessionID: string): Promise<void> {
+    // Track the session so we receive its SSE events
+    this.trackedSessionIds.add(sessionID)
+
     if (!this.httpClient) {
       this.postMessage({
         type: "error",
@@ -198,6 +340,10 @@ export class KiloProvider implements vscode.WebviewViewProvider {
         parts: m.parts,
         createdAt: new Date(m.info.time.created).toISOString(),
       }))
+
+      for (const message of messages) {
+        this.connectionService.recordMessageSessionId(message.id, message.sessionID)
+      }
 
       this.postMessage({
         type: "messagesLoaded",
@@ -243,9 +389,59 @@ export class KiloProvider implements vscode.WebviewViewProvider {
   }
 
   /**
+   * Fetch providers from the backend and send to webview.
+   *
+   * The backend `/provider` endpoint returns `all` as an array-like object with
+   * numeric keys ("0", "1", …). The webview and sendMessage both need providers
+   * keyed by their real `provider.id` (e.g. "anthropic", "openai"). We re-key
+   * the map here so the rest of the code can use provider.id everywhere.
+   */
+  private async fetchAndSendProviders(): Promise<void> {
+    if (!this.httpClient) {
+      // httpClient not ready — serve from cache if available
+      if (this.cachedProvidersMessage) {
+        this.postMessage(this.cachedProvidersMessage)
+      }
+      return
+    }
+
+    try {
+      const workspaceDir = this.getWorkspaceDirectory()
+      const response = await this.httpClient.listProviders(workspaceDir)
+
+      // Re-key providers from numeric indices to provider.id
+      const normalized: typeof response.all = {}
+      for (const provider of Object.values(response.all)) {
+        normalized[provider.id] = provider
+      }
+
+      const config = vscode.workspace.getConfiguration("kilo-code.new.model")
+      const providerID = config.get<string>("providerID", "kilo")
+      const modelID = config.get<string>("modelID", "kilo/auto")
+
+      const message = {
+        type: "providersLoaded",
+        providers: normalized,
+        connected: response.connected,
+        defaults: response.default,
+        defaultSelection: { providerID, modelID },
+      }
+      this.cachedProvidersMessage = message
+      this.postMessage(message)
+    } catch (error) {
+      console.error("[Kilo New] KiloProvider: Failed to fetch providers:", error)
+    }
+  }
+
+  /**
    * Handle sending a message from the webview.
    */
-  private async handleSendMessage(text: string, sessionID?: string): Promise<void> {
+  private async handleSendMessage(
+    text: string,
+    sessionID?: string,
+    providerID?: string,
+    modelID?: string,
+  ): Promise<void> {
     if (!this.httpClient) {
       this.postMessage({
         type: "error",
@@ -260,6 +456,7 @@ export class KiloProvider implements vscode.WebviewViewProvider {
       // Create session if needed
       if (!sessionID && !this.currentSession) {
         this.currentSession = await this.httpClient.createSession(workspaceDir)
+        this.trackedSessionIds.add(this.currentSession.id)
         // Notify webview of the new session
         this.postMessage({
           type: "sessionCreated",
@@ -272,8 +469,11 @@ export class KiloProvider implements vscode.WebviewViewProvider {
         throw new Error("No session available")
       }
 
-      // Send message with text part
-      await this.httpClient.sendMessage(targetSessionID, [{ type: "text", text }], workspaceDir)
+      // Send message with text part and optional model selection
+      await this.httpClient.sendMessage(targetSessionID, [{ type: "text", text }], workspaceDir, {
+        providerID,
+        modelID,
+      })
     } catch (error) {
       console.error("[Kilo New] KiloProvider: Failed to send message:", error)
       this.postMessage({
@@ -331,15 +531,123 @@ export class KiloProvider implements vscode.WebviewViewProvider {
   }
 
   /**
-   * Handle SSE events from the CLI backend.
+   * Handle login request from the webview.
+   * Uses the provider OAuth flow: authorize → open browser → callback (polls until complete).
+   * Sends device auth messages so the webview can display a QR code, verification code, and timer.
    */
-  private handleSSEEvent(event: SSEEvent): void {
-    // Filter events by sessionID (only process events for current session)
-    if ("sessionID" in event.properties) {
-      const props = event.properties as { sessionID?: string }
-      if (this.currentSession && props.sessionID !== this.currentSession.id) {
+  private async handleLogin(): Promise<void> {
+    if (!this.httpClient) {
+      return
+    }
+
+    const attempt = ++this.loginAttempt
+
+    console.log("[Kilo New] KiloProvider: 🔐 Starting login flow...")
+
+    try {
+      const workspaceDir = this.getWorkspaceDirectory()
+
+      // Step 1: Initiate OAuth authorization
+      const auth = await this.httpClient.oauthAuthorize("kilo", 0, workspaceDir)
+      console.log("[Kilo New] KiloProvider: 🔐 Got auth URL:", auth.url)
+
+      // Parse code from instructions (format: "Open URL and enter code: ABCD-1234")
+      const codeMatch = auth.instructions?.match(/code:\s*(\S+)/i)
+      const code = codeMatch ? codeMatch[1] : undefined
+
+      // Step 2: Open browser for user to authorize
+      vscode.env.openExternal(vscode.Uri.parse(auth.url))
+
+      // Send device auth details to webview
+      this.postMessage({
+        type: "deviceAuthStarted",
+        code,
+        verificationUrl: auth.url,
+        expiresIn: 900, // 15 minutes default
+      })
+
+      // Step 3: Wait for callback (blocks until polling completes)
+      await this.httpClient.oauthCallback("kilo", 0, workspaceDir)
+
+      // Check if this attempt was cancelled
+      if (attempt !== this.loginAttempt) {
         return
       }
+
+      console.log("[Kilo New] KiloProvider: 🔐 Login successful")
+
+      // Step 4: Fetch profile and push to webview
+      const profileData = await this.httpClient.getProfile()
+      this.postMessage({ type: "profileData", data: profileData })
+      this.postMessage({ type: "deviceAuthComplete" })
+    } catch (error) {
+      if (attempt !== this.loginAttempt) {
+        return
+      }
+      this.postMessage({
+        type: "deviceAuthFailed",
+        error: error instanceof Error ? error.message : "Login failed",
+      })
+    }
+  }
+
+  /**
+   * Handle logout request from the webview.
+   */
+  private async handleLogout(): Promise<void> {
+    if (!this.httpClient) {
+      return
+    }
+
+    console.log("[Kilo New] KiloProvider: 🚪 Logging out...")
+    await this.httpClient.removeAuth("kilo")
+    console.log("[Kilo New] KiloProvider: 🚪 Logged out successfully")
+    this.postMessage({
+      type: "profileData",
+      data: null,
+    })
+  }
+
+  /**
+   * Handle profile refresh request from the webview.
+   */
+  private async handleRefreshProfile(): Promise<void> {
+    if (!this.httpClient) {
+      return
+    }
+
+    console.log("[Kilo New] KiloProvider: 🔄 Refreshing profile...")
+    const profileData = await this.httpClient.getProfile()
+    this.postMessage({
+      type: "profileData",
+      data: profileData,
+    })
+  }
+
+  /**
+   * Extract sessionID from an SSE event, if applicable.
+   * Returns undefined for global events (server.connected, server.heartbeat).
+   */
+  private extractSessionID(event: SSEEvent): string | undefined {
+    return this.connectionService.resolveEventSessionId(event)
+  }
+
+  /**
+   * Handle SSE events from the CLI backend.
+   * Filters events by tracked session IDs so each webview only sees its own sessions.
+   */
+  private handleSSEEvent(event: SSEEvent): void {
+    // Extract sessionID from the event
+    const sessionID = this.extractSessionID(event)
+
+    // Events without sessionID (server.connected, server.heartbeat) → always forward
+    // Events with sessionID → only forward if this webview tracks that session
+    // message.part.updated is always session-scoped; if we can't determine the session, drop it to avoid cross-webview leakage.
+    if (!sessionID && event.type === "message.part.updated") {
+      return
+    }
+    if (sessionID && !this.trackedSessionIds.has(sessionID)) {
+      return
     }
 
     // Forward relevant events to webview
@@ -348,9 +656,14 @@ export class KiloProvider implements vscode.WebviewViewProvider {
         // The part contains the full part data including messageID, delta is optional text delta
         const part = event.properties.part as { messageID?: string; sessionID?: string }
         const messageID = part.messageID || ""
+
+        const resolvedSessionID = sessionID
+        if (!resolvedSessionID) {
+          return
+        }
         this.postMessage({
           type: "partUpdated",
-          sessionID: part.sessionID || this.currentSession?.id,
+          sessionID: resolvedSessionID,
           messageID,
           part: event.properties.part,
           delta: event.properties.delta ? { type: "text-delta", textDelta: event.properties.delta } : undefined,
@@ -404,6 +717,7 @@ export class KiloProvider implements vscode.WebviewViewProvider {
         // Store session if we don't have one yet
         if (!this.currentSession) {
           this.currentSession = event.properties.info
+          this.trackedSessionIds.add(event.properties.info.id)
         }
         // Notify webview
         this.postMessage({
@@ -419,7 +733,21 @@ export class KiloProvider implements vscode.WebviewViewProvider {
    * Public so toolbar button commands can send messages.
    */
   public postMessage(message: unknown): void {
-    this.webviewView?.webview.postMessage(message)
+    if (!this.webview) {
+      const type =
+        typeof message === "object" &&
+        message !== null &&
+        "type" in message &&
+        typeof (message as { type?: unknown }).type === "string"
+          ? (message as { type: string }).type
+          : "<unknown>"
+      console.warn("[Kilo New] KiloProvider: ⚠️ postMessage dropped (no webview)", { type })
+      return
+    }
+
+    void this.webview.postMessage(message).then(undefined, (error) => {
+      console.error("[Kilo New] KiloProvider: ❌ postMessage failed", error)
+    })
   }
 
   /**
@@ -449,12 +777,13 @@ export class KiloProvider implements vscode.WebviewViewProvider {
       "default-src 'none'",
       `style-src 'unsafe-inline' ${webview.cspSource}`,
       `script-src 'nonce-${nonce}'`,
+      `font-src ${webview.cspSource}`,
       "connect-src http://127.0.0.1:* http://localhost:* ws://127.0.0.1:* ws://localhost:*",
       `img-src ${webview.cspSource} data: https:`,
     ].join("; ")
 
     return `<!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="kilo-vscode">
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -491,11 +820,14 @@ export class KiloProvider implements vscode.WebviewViewProvider {
   }
 
   /**
-   * Dispose of the provider and clean up resources.
+   * Dispose of the provider and clean up subscriptions.
+   * Does NOT kill the server — that's the connection service's job.
    */
   dispose(): void {
-    this.sseClient?.dispose()
-    this.serverManager.dispose()
+    this.unsubscribeEvent?.()
+    this.unsubscribeState?.()
+    this.webviewMessageDisposable?.dispose()
+    this.trackedSessionIds.clear()
   }
 }
 
