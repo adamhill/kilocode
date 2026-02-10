@@ -213,12 +213,20 @@ export class KiloProvider implements vscode.WebviewViewProvider {
         this.postMessage({ type: "connectionState", state })
 
         if (state === "connected") {
-          const client = this.httpClient
-          if (client) {
-            const profileData = await client.getProfile()
-            this.postMessage({ type: "profileData", data: profileData })
+          try {
+            const client = this.httpClient
+            if (client) {
+              const profileData = await client.getProfile()
+              this.postMessage({ type: "profileData", data: profileData })
+            }
+            await this.syncWebviewState("sse-connected")
+          } catch (error) {
+            console.error("[Kilo New] KiloProvider: ❌ Failed during connected state handling:", error)
+            this.postMessage({
+              type: "error",
+              message: error instanceof Error ? error.message : "Failed to sync after connecting",
+            })
           }
-          await this.syncWebviewState("sse-connected")
         }
       })
 
