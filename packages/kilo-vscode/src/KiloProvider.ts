@@ -115,6 +115,8 @@ export class KiloProvider implements vscode.WebviewViewProvider {
    * Resolve a WebviewPanel for displaying the Kilo webview in an editor tab.
    */
   public resolveWebviewPanel(panel: vscode.WebviewPanel): void {
+    // WebviewPanel can be restored/reloaded; ensure we don't treat it as ready prematurely.
+    this.isWebviewReady = false
     this.webview = panel.webview
 
     panel.webview.options = {
