@@ -38,6 +38,9 @@ export class KiloConnectionService {
       return
     }
 
+     // Mark as connecting early so concurrent callers won't start another connection attempt.
+     this.setState("connecting")
+
     this.connectPromise = this.doConnect(workspaceDir)
     try {
       await this.connectPromise
@@ -104,7 +107,17 @@ export class KiloConnectionService {
     this.state = "disconnected"
   }
 
+  private setState(state: ConnectionState): void {
+    this.state = state
+    for (const listener of this.stateListeners) {
+      listener(state)
+    }
+  }
+
   private async doConnect(workspaceDir: string): Promise<void> {
+    // If we reconnect, ensure the previous SSE connection is cleaned up first.
+    this.sseClient?.dispose()
+
     const server = await this.serverManager.getServer()
     this.info = { port: server.port }
 
@@ -116,6 +129,14 @@ export class KiloConnectionService {
     this.client = new HttpClient(config)
     this.sseClient = new SSEClient(config)
 
+    // Wait until SSE actually reaches a terminal state before resolving connect().
+    let resolveConnected: (() => void) | null = null
+    let rejectConnected: ((error: Error) => void) | null = null
+    const connectedPromise = new Promise<void>((resolve, reject) => {
+      resolveConnected = resolve
+      rejectConnected = reject
+    })
+
     // Wire SSE events → broadcast to all registered listeners
     this.sseClient.onEvent((event) => {
       for (const listener of this.eventListeners) {
@@ -125,12 +146,24 @@ export class KiloConnectionService {
 
     // Wire SSE state → broadcast to all registered state listeners
     this.sseClient.onStateChange((sseState) => {
-      this.state = sseState
-      for (const listener of this.stateListeners) {
-        listener(sseState)
+      this.setState(sseState)
+
+      if (sseState === "connected") {
+        resolveConnected?.()
+        resolveConnected = null
+        rejectConnected = null
+        return
+      }
+
+      if (sseState === "error" || sseState === "disconnected") {
+        rejectConnected?.(new Error(`SSE connection ended in state: ${sseState}`))
+        resolveConnected = null
+        rejectConnected = null
       }
     })
 
     this.sseClient.connect(workspaceDir)
+
+    await connectedPromise
   }
 }
