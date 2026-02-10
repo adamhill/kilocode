@@ -3,7 +3,8 @@
  * Displays a single chat message with its parts (text, tool calls, reasoning)
  */
 
-import { Component, For, Show, createSignal } from "solid-js"
+import { Component, For, Show, createSignal, JSX } from "solid-js"
+import { Spinner } from "@kilocode/kilo-ui/spinner"
 import { useSession } from "../../context/session"
 import type { Message as MessageType, Part, TextPart, ToolPart, ReasoningPart } from "../../types/messages"
 
@@ -38,12 +39,11 @@ const ReasoningPartView: Component<{ part: ReasoningPart }> = (props) => {
 const ToolPartView: Component<{ part: ToolPart }> = (props) => {
   const [expanded, setExpanded] = createSignal(false)
 
-  const getStatusIcon = () => {
+  const getStatusIcon = (): JSX.Element | string => {
     switch (props.part.state.status) {
       case "pending":
-        return "⏳"
       case "running":
-        return "⚙️"
+        return <Spinner style={{ width: "14px", height: "14px" }} />
       case "completed":
         return "✓"
       case "error":

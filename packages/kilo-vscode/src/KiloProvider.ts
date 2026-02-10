@@ -777,12 +777,13 @@ export class KiloProvider implements vscode.WebviewViewProvider {
       "default-src 'none'",
       `style-src 'unsafe-inline' ${webview.cspSource}`,
       `script-src 'nonce-${nonce}'`,
+      `font-src ${webview.cspSource}`,
       "connect-src http://127.0.0.1:* http://localhost:* ws://127.0.0.1:* ws://localhost:*",
       `img-src ${webview.cspSource} data: https:`,
     ].join("; ")
 
     return `<!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="kilo-vscode">
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
