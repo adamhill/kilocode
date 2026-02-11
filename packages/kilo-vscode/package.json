@@ -165,7 +165,6 @@
     "@kilocode/kilo-ui": "workspace:*",
     "@kilocode/sdk": "workspace:*",
     "eventsource": "^2.0.2",
-    "lucide-solid": "^0.563.0",
     "solid-js": "^1.9.11"
   }
 }
