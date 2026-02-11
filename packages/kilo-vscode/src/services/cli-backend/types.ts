@@ -89,6 +89,16 @@ export interface TodoItem {
   status: "pending" | "in_progress" | "completed"
 }
 
+// Agent/mode info from the CLI /agent endpoint
+export interface AgentInfo {
+  name: string
+  description?: string
+  mode: "subagent" | "primary" | "all"
+  native?: boolean
+  hidden?: boolean
+  color?: string
+}
+
 // Provider/model types from provider catalog
 
 // Model definition from provider catalog

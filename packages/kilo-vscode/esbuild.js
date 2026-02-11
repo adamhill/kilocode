@@ -1,8 +1,37 @@
 const esbuild = require("esbuild")
+const path = require("path")
 const { solidPlugin } = require("esbuild-plugin-solid")
 
 const production = process.argv.includes("--production")
 const watch = process.argv.includes("--watch")
+
+/**
+ * Force all solid-js imports (from kilo-ui and the webview) to resolve to
+ * the **same** copy so SolidJS contexts are shared across packages.
+ * Without this, the monorepo hoists separate copies (pnpm vs bun) and
+ * createContext / useContext can't see each other.
+ *
+ * @type {import('esbuild').Plugin}
+ */
+const solidDedupePlugin = {
+  name: "solid-dedupe",
+  setup(build) {
+    // Resolve these bare specifiers to the kilo-vscode-local copy
+    const solidRoot = path.dirname(require.resolve("solid-js/package.json"))
+    const aliases = {
+      "solid-js": path.join(solidRoot, "dist", "solid.js"),
+      "solid-js/web": path.join(solidRoot, "web", "dist", "web.js"),
+      "solid-js/store": path.join(solidRoot, "store", "dist", "store.js"),
+    }
+
+    build.onResolve({ filter: /^solid-js(\/web|\/store)?$/ }, (args) => {
+      const key = args.path
+      if (aliases[key]) {
+        return { path: aliases[key] }
+      }
+    })
+  },
+}
 
 /**
  * @type {import('esbuild').Plugin}
@@ -72,7 +101,7 @@ async function main() {
       ".woff2": "file",
       ".ttf": "file",
     },
-    plugins: [cssPackageResolvePlugin, solidPlugin(), esbuildProblemMatcherPlugin],
+    plugins: [solidDedupePlugin, cssPackageResolvePlugin, solidPlugin(), esbuildProblemMatcherPlugin],
   })
 
   if (watch) {

@@ -30,6 +30,7 @@ import type {
   TodoItem,
   ModelSelection,
   ContextUsage,
+  AgentInfo,
   ExtensionMessage,
 } from "../types/messages"
 
@@ -74,6 +75,11 @@ interface SessionContextValue {
   totalCost: Accessor<number>
   contextUsage: Accessor<ContextUsage | undefined>
 
+  // Agent/mode selection
+  agents: Accessor<AgentInfo[]>
+  selectedAgent: Accessor<string>
+  selectAgent: (name: string) => void
+
   // Actions
   sendMessage: (text: string, providerID?: string, modelID?: string) => void
   abort: () => void
@@ -103,6 +109,11 @@ export const SessionProvider: ParentComponent = (props) => {
   // Pending model selection for before a session exists
   const [pendingModelSelection, setPendingModelSelection] = createSignal<ModelSelection | null>(null)
   const [pendingWasUserSet, setPendingWasUserSet] = createSignal(false)
+
+  // Agents (modes) loaded from the CLI backend
+  const [agents, setAgents] = createSignal<AgentInfo[]>([])
+  const [defaultAgent, setDefaultAgent] = createSignal("code")
+  const [selectedAgentName, setSelectedAgentName] = createSignal("code")
 
   // Store for sessions, messages, parts, todos, modelSelections
   const [store, setStore] = createStore<SessionStore>({
@@ -154,6 +165,44 @@ export const SessionProvider: ParentComponent = (props) => {
       setPendingModelSelection(selection)
     }
   }
+
+  // Handle agentsLoaded immediately (not in onMount) so we never miss
+  // the initial push that arrives before the DOM mounts. This mirrors the
+  // pattern used by ProviderProvider for providersLoaded.
+  const unsubAgents = vscode.onMessage((message: ExtensionMessage) => {
+    if (message.type !== "agentsLoaded") {
+      return
+    }
+    setAgents(message.agents)
+    setDefaultAgent(message.defaultAgent)
+    // Only override if the user hasn't explicitly selected an agent
+    if (selectedAgentName() === "code" || !message.agents.some((a) => a.name === selectedAgentName())) {
+      setSelectedAgentName(message.defaultAgent)
+    }
+  })
+
+  // Request agents in case the initial push was missed.
+  // Retry a few times because the extension's httpClient may
+  // not be ready yet when the first request arrives.
+  let agentRetries = 0
+  const agentMaxRetries = 5
+  const agentRetryMs = 500
+
+  vscode.postMessage({ type: "requestAgents" })
+
+  const agentRetryTimer = setInterval(() => {
+    agentRetries++
+    if (agents().length > 0 || agentRetries >= agentMaxRetries) {
+      clearInterval(agentRetryTimer)
+      return
+    }
+    vscode.postMessage({ type: "requestAgents" })
+  }, agentRetryMs)
+
+  onCleanup(() => {
+    unsubAgents()
+    clearInterval(agentRetryTimer)
+  })
 
   // Handle messages from extension
   onMount(() => {
@@ -313,11 +362,17 @@ export const SessionProvider: ParentComponent = (props) => {
   }
 
   // Actions
+  function selectAgent(name: string) {
+    setSelectedAgentName(name)
+  }
+
   function sendMessage(text: string, providerID?: string, modelID?: string) {
     if (!server.isConnected()) {
       console.warn("[Kilo New] Cannot send message: not connected")
       return
     }
+
+    const agent = selectedAgentName() !== defaultAgent() ? selectedAgentName() : undefined
 
     vscode.postMessage({
       type: "sendMessage",
@@ -325,6 +380,7 @@ export const SessionProvider: ParentComponent = (props) => {
       sessionID: currentSessionID(),
       providerID,
       modelID,
+      agent,
     })
   }
 
@@ -463,6 +519,9 @@ export const SessionProvider: ParentComponent = (props) => {
     selectModel,
     totalCost,
     contextUsage,
+    agents,
+    selectedAgent: selectedAgentName,
+    selectAgent,
     sendMessage,
     abort,
     compact,
