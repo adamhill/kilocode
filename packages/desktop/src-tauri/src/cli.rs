@@ -8,7 +8,7 @@ use tokio::sync::oneshot;
 
 use crate::constants::{SETTINGS_STORE, WSL_ENABLED_KEY};
 
-const CLI_INSTALL_DIR: &str = ".opencode/bin";
+const CLI_INSTALL_DIR: &str = ".kilo/bin";
 const CLI_BINARY_NAME: &str = "opencode";
 
 #[derive(serde::Deserialize)]
@@ -46,7 +46,7 @@ pub fn get_sidecar_path(app: &tauri::AppHandle) -> std::path::PathBuf {
         .expect("Failed to get current binary")
         .parent()
         .expect("Failed to get parent dir")
-        .join("opencode-cli")
+        .join("kilo-cli")
 }
 
 fn is_cli_installed() -> bool {
@@ -211,7 +211,7 @@ pub fn create_command(app: &tauri::AppHandle, args: &str, extra_env: &[(&str, St
                 "BIN=\"$HOME/.opencode/bin/opencode\"".to_string(),
                 "if [ ! -x \"$BIN\" ]; then".to_string(),
                 format!(
-                    "  curl -fsSL https://opencode.ai/install | bash -s -- --version {} --no-modify-path",
+                    "  curl -fsSL https://kilo.ai/install | bash -s -- --version {} --no-modify-path",
                     shell_escape(&version)
                 ),
                 "fi".to_string(),
@@ -241,7 +241,7 @@ pub fn create_command(app: &tauri::AppHandle, args: &str, extra_env: &[(&str, St
         } else {
             let mut cmd = app
                 .shell()
-                .sidecar("opencode-cli")
+                .sidecar("kilo-cli")
                 .unwrap()
                 .args(args.split_whitespace());
 
