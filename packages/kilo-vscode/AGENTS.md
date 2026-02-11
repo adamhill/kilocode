@@ -24,9 +24,22 @@ Single test: `pnpm test -- --grep "test name"`
 - Webview uses **Solid.js** (not React) - JSX compiles via `esbuild-plugin-solid`
 - Extension code in `src/`, webview code in `webview-ui/src/` with separate tsconfig
 - Tests compile to `out/` via `compile-tests`, not `dist/`
-- CSP requires nonce for scripts - see [`getNonce()`](src/KiloProvider.ts:62)
+- CSP requires nonce for scripts and `font-src` for bundled fonts - see [`KiloProvider.ts`](src/KiloProvider.ts:777)
+- HTML root has `data-theme="kilo-vscode"` to activate kilo-ui's VS Code theme bridge
 - Extension and webview have no shared state - communicate via `vscode.Webview.postMessage()`
 - For editor panels, use [`AgentManagerProvider`](src/AgentManagerProvider.ts) pattern with `retainContextWhenHidden: true`
+- esbuild webview build includes [`cssPackageResolvePlugin`](esbuild.js:29) for CSS `@import` resolution and font loaders (`.woff`, `.woff2`, `.ttf`)
+
+## Webview UI (kilo-ui)
+
+New webview features must use **`@kilocode/kilo-ui`** components instead of raw HTML elements with inline styles. This is a Solid.js component library built on `@kobalte/core`.
+
+- Import via deep subpaths: `import { Button } from "@kilocode/kilo-ui/button"`
+- Available components include `Button`, `IconButton`, `Dialog`, `Spinner`, `Card`, `Tabs`, `Tooltip`, `Toast`, `Code`, `Markdown`, and more — see the [component migration table](docs/ui-implementation-plan.md#6-component-migration-reference-table) for the full list
+- Provider hierarchy in [`App.tsx`](webview-ui/src/App.tsx:113): `ThemeProvider → I18nProvider → DialogProvider → VSCodeProvider → ServerProvider → ProviderProvider → SessionProvider`
+- Global styles imported via `import "@kilocode/kilo-ui/styles"` in [`index.tsx`](webview-ui/src/index.tsx:2)
+- [`chat.css`](webview-ui/src/styles/chat.css) is being progressively migrated — when replacing a component with kilo-ui, remove the corresponding CSS rules from it
+- See [`docs/ui-implementation-plan.md`](docs/ui-implementation-plan.md) for the full migration plan and phased rollout
 
 ## Debugging
 
