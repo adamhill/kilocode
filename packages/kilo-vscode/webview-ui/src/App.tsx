@@ -2,6 +2,7 @@ import { Component, createSignal, Switch, Match, onMount, onCleanup } from "soli
 import { ThemeProvider } from "@kilocode/kilo-ui/theme"
 import { I18nProvider } from "@kilocode/kilo-ui/context"
 import { DialogProvider } from "@kilocode/kilo-ui/context/dialog"
+import { MarkedProvider } from "@kilocode/kilo-ui/context/marked"
 import Settings from "./components/Settings"
 import ProfileView from "./components/ProfileView"
 import { VSCodeProvider } from "./context/vscode"
@@ -116,15 +117,17 @@ const App: Component = () => {
     <ThemeProvider defaultTheme="kilo-vscode">
       <I18nProvider value={{ locale: () => "en", t: (key) => key }}>
         <DialogProvider>
-          <VSCodeProvider>
-            <ServerProvider>
-              <ProviderProvider>
-                <SessionProvider>
-                  <AppContent />
-                </SessionProvider>
-              </ProviderProvider>
-            </ServerProvider>
-          </VSCodeProvider>
+          <MarkedProvider>
+            <VSCodeProvider>
+              <ServerProvider>
+                <ProviderProvider>
+                  <SessionProvider>
+                    <AppContent />
+                  </SessionProvider>
+                </ProviderProvider>
+              </ServerProvider>
+            </VSCodeProvider>
+          </MarkedProvider>
         </DialogProvider>
       </I18nProvider>
     </ThemeProvider>
