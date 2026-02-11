@@ -204,6 +204,12 @@ export class KiloProvider implements vscode.WebviewViewProvider {
             .getConfiguration("kilo-code.new")
             .update("language", message.locale || undefined, vscode.ConfigurationTarget.Global)
           break
+        case "deleteSession":
+          await this.handleDeleteSession(message.sessionID)
+          break
+        case "renameSession":
+          await this.handleRenameSession(message.sessionID, message.title)
+          break
       }
     })
   }
@@ -359,6 +365,12 @@ export class KiloProvider implements vscode.WebviewViewProvider {
 
     try {
       const workspaceDir = this.getWorkspaceDirectory()
+
+      // Update currentSession so fallback logic in handleSendMessage/handleAbort
+      // references the correct session after switching to a historical session.
+      const session = await this.httpClient.getSession(sessionID, workspaceDir)
+      this.currentSession = session
+
       const messagesData = await this.httpClient.getMessages(sessionID, workspaceDir)
 
       // Convert to webview format, including cost/tokens for assistant messages
@@ -415,6 +427,57 @@ export class KiloProvider implements vscode.WebviewViewProvider {
       this.postMessage({
         type: "error",
         message: error instanceof Error ? error.message : "Failed to load sessions",
+      })
+    }
+  }
+
+  /**
+   * Handle deleting a session.
+   */
+  private async handleDeleteSession(sessionID: string): Promise<void> {
+    if (!this.httpClient) {
+      this.postMessage({ type: "error", message: "Not connected to CLI backend" })
+      return
+    }
+
+    try {
+      const workspaceDir = this.getWorkspaceDirectory()
+      await this.httpClient.deleteSession(sessionID, workspaceDir)
+      this.trackedSessionIds.delete(sessionID)
+      if (this.currentSession?.id === sessionID) {
+        this.currentSession = null
+      }
+      this.postMessage({ type: "sessionDeleted", sessionID })
+    } catch (error) {
+      console.error("[Kilo New] KiloProvider: Failed to delete session:", error)
+      this.postMessage({
+        type: "error",
+        message: error instanceof Error ? error.message : "Failed to delete session",
+      })
+    }
+  }
+
+  /**
+   * Handle renaming a session.
+   */
+  private async handleRenameSession(sessionID: string, title: string): Promise<void> {
+    if (!this.httpClient) {
+      this.postMessage({ type: "error", message: "Not connected to CLI backend" })
+      return
+    }
+
+    try {
+      const workspaceDir = this.getWorkspaceDirectory()
+      const updated = await this.httpClient.updateSession(sessionID, { title }, workspaceDir)
+      if (this.currentSession?.id === sessionID) {
+        this.currentSession = updated
+      }
+      this.postMessage({ type: "sessionUpdated", session: this.sessionToWebview(updated) })
+    } catch (error) {
+      console.error("[Kilo New] KiloProvider: Failed to rename session:", error)
+      this.postMessage({
+        type: "error",
+        message: error instanceof Error ? error.message : "Failed to rename session",
       })
     }
   }
