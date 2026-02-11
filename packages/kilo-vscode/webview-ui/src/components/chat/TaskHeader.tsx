@@ -8,11 +8,13 @@ import { Component, Show, createMemo } from "solid-js"
 import { IconButton } from "@kilocode/kilo-ui/icon-button"
 import { Tooltip } from "@kilocode/kilo-ui/tooltip"
 import { useSession } from "../../context/session"
+import { useLanguage } from "../../context/language"
 
 export const TaskHeader: Component = () => {
   const session = useSession()
+  const language = useLanguage()
 
-  const title = createMemo(() => session.currentSession()?.title ?? "New session")
+  const title = createMemo(() => session.currentSession()?.title ?? language.t("command.session.new"))
   const hasMessages = createMemo(() => session.messages().length > 0)
   const busy = createMemo(() => session.status() === "busy")
   const canCompact = createMemo(() => !busy() && hasMessages() && !!session.selected())
@@ -58,14 +60,14 @@ export const TaskHeader: Component = () => {
               </Tooltip>
             )}
           </Show>
-          <Tooltip value="Compact session" placement="bottom">
+          <Tooltip value={language.t("command.session.compact")} placement="bottom">
             <IconButton
               icon="collapse"
               size="small"
               variant="ghost"
               disabled={!canCompact()}
               onClick={() => session.compact()}
-              aria-label="Compact session"
+              aria-label={language.t("command.session.compact")}
             />
           </Tooltip>
         </div>

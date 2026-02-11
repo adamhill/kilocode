@@ -54,7 +54,7 @@ const Settings: Component<SettingsProps> = (props) => {
           <Tabs.SectionTitle>Configuration</Tabs.SectionTitle>
           <Tabs.Trigger value="providers">
             <Icon name="providers" />
-            Providers
+            {language.t("settings.providers.title")}
           </Tabs.Trigger>
           <Tabs.Trigger value="agentBehaviour">
             <Icon name="brain" />
@@ -111,7 +111,7 @@ const Settings: Component<SettingsProps> = (props) => {
         </Tabs.List>
 
         <Tabs.Content value="providers">
-          <h3>Providers</h3>
+          <h3>{language.t("settings.providers.title")}</h3>
           <ProvidersTab />
         </Tabs.Content>
         <Tabs.Content value="agentBehaviour">

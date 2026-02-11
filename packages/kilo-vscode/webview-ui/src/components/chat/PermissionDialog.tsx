@@ -13,6 +13,7 @@ import { Button } from "@kilocode/kilo-ui/button"
 import { BasicTool } from "@kilocode/kilo-ui/basic-tool"
 import { useDialog } from "@kilocode/kilo-ui/context/dialog"
 import { useSession } from "../../context/session"
+import { useLanguage } from "../../context/language"
 import type { PermissionRequest } from "../../types/messages"
 
 interface PermissionItemProps {
@@ -62,6 +63,7 @@ const PermissionItem: Component<PermissionItemProps> = (props) => {
 export const PermissionDialog: Component = () => {
   const session = useSession()
   const dialog = useDialog()
+  const language = useLanguage()
 
   const permissions = () => session.permissions()
   const hasPermissions = () => permissions().length > 0
@@ -73,7 +75,7 @@ export const PermissionDialog: Component = () => {
     on(hasPermissions, (has) => {
       if (has) {
         dialog.show(() => (
-          <Dialog title="Permission Required" fit action={<span />}>
+          <Dialog title={language.t("notification.permission.title")} fit action={<span />}>
             <For each={permissions()}>{(permission) => <PermissionItem permission={permission} />}</For>
           </Dialog>
         ))

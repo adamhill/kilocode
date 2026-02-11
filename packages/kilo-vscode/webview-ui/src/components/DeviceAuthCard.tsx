@@ -4,6 +4,7 @@ import { Card } from "@kilocode/kilo-ui/card"
 import { Spinner } from "@kilocode/kilo-ui/spinner"
 import { showToast } from "@kilocode/kilo-ui/toast"
 import { useVSCode } from "../context/vscode"
+import { useLanguage } from "../context/language"
 import { generateQRCode } from "../utils/qrcode"
 import type { DeviceAuthStatus } from "../types/messages"
 
@@ -25,6 +26,7 @@ const formatTime = (seconds: number): string => {
 
 const DeviceAuthCard: Component<DeviceAuthCardProps> = (props) => {
   const vscode = useVSCode()
+  const language = useLanguage()
   const [timeRemaining, setTimeRemaining] = createSignal(props.expiresIn ?? 900)
   const [qrDataUrl, setQrDataUrl] = createSignal("")
 
@@ -236,7 +238,7 @@ const DeviceAuthCard: Component<DeviceAuthCardProps> = (props) => {
 
           {/* Cancel button */}
           <Button variant="ghost" onClick={props.onCancel} style={{ width: "100%" }}>
-            Cancel
+            {language.t("common.cancel")}
           </Button>
         </Card>
       </Match>
