@@ -81,56 +81,6 @@
 }
 
 /* ============================================
-   Message
-   ============================================ */
-
-.message {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  max-width: 100%;
-}
-
-.message-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.message-role {
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  color: var(--vscode-descriptionForeground);
-}
-
-.message-content {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.message-user .message-content {
-  background: var(--vscode-input-background);
-  border: 1px solid var(--vscode-input-border);
-  border-radius: 8px;
-  padding: 8px 12px;
-}
-
-.message-assistant .message-content {
-  background: var(--vscode-editor-background);
-  border: 1px solid var(--vscode-panel-border);
-  border-radius: 8px;
-  padding: 8px 12px;
-}
-
-.message-text {
-  white-space: pre-wrap;
-  word-break: break-word;
-  line-height: 1.5;
-}
-
-/* ============================================
    Prompt Input
    ============================================ */
 
