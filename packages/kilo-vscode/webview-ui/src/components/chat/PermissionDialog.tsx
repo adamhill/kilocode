@@ -22,6 +22,7 @@ interface PermissionItemProps {
 
 const PermissionItem: Component<PermissionItemProps> = (props) => {
   const session = useSession()
+  const language = useLanguage()
 
   const handleResponse = (response: "once" | "always" | "reject") => {
     session.respondToPermission(props.permission.id, response)
@@ -46,13 +47,13 @@ const PermissionItem: Component<PermissionItemProps> = (props) => {
       <div data-component="permission-prompt">
         <div data-slot="permission-actions">
           <Button variant="ghost" size="small" onClick={() => handleResponse("reject")}>
-            Reject
+            {language.t("ui.permission.deny")}
           </Button>
           <Button variant="secondary" size="small" onClick={() => handleResponse("always")}>
-            Always Allow
+            {language.t("ui.permission.allowAlways")}
           </Button>
           <Button variant="primary" size="small" onClick={() => handleResponse("once")}>
-            Allow Once
+            {language.t("ui.permission.allowOnce")}
           </Button>
         </div>
       </div>

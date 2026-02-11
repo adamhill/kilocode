@@ -88,14 +88,6 @@ locale files before the string can be replaced with `language.t("key")`.
 | ---- | --------------------------------- | -------------------------- | ------------ | ------------------- |
 | 162  | `"No providers"` (fallback label) | `dialog.model.noProviders` | No providers | Keine Anbieter      |
 
-## `webview-ui/src/components/chat/PermissionDialog.tsx`
-
-| Line | Hardcoded String | Suggested Key                   | EN           | DE                  |
-| ---- | ---------------- | ------------------------------- | ------------ | ------------------- |
-| 48   | `"Reject"`       | `permission.action.reject`      | Reject       | Ablehnen            |
-| 51   | `"Always Allow"` | `permission.action.alwaysAllow` | Always Allow | Immer erlauben      |
-| 54   | `"Allow Once"`   | `permission.action.allowOnce`   | Allow Once   | Einmal erlauben     |
-
 ## `webview-ui/src/components/chat/PromptInput.tsx`
 
 | Line | Hardcoded String                                  | Suggested Key                   | EN                                                | DE                                                        |
