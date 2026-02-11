@@ -377,7 +377,9 @@ export class KiloProvider implements vscode.WebviewViewProvider {
       this.httpClient
         .getSession(sessionID, workspaceDir)
         .then((session) => {
-          this.currentSession = session
+          if (!this.currentSession || this.currentSession.id === sessionID) {
+            this.currentSession = session
+          }
         })
         .catch((err) => console.error("[Kilo New] KiloProvider: Failed to fetch session for tracking:", err))
 

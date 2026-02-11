@@ -283,7 +283,7 @@ export const SessionProvider: ParentComponent = (props) => {
   }
 
   function handleMessagesLoaded(sessionID: string, messages: Message[]) {
-    setLoading(false)
+    if (sessionID === currentSessionID()) setLoading(false)
     setStore("messages", sessionID, messages)
 
     // Also extract parts from messages

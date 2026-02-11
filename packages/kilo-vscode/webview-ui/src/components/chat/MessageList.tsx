@@ -92,7 +92,7 @@ export const MessageList: Component<MessageListProps> = (props) => {
       <div ref={containerRef} class="message-list" role="log" aria-live="polite">
         <Show when={isEmpty()}>
           <div class="message-list-empty">
-            <p>Start a conversation by typing a message below.</p>
+            <p>{language.t("session.messages.empty")}</p>
             <Show when={recent().length > 0 && props.onSelectSession}>
               <div class="recent-sessions">
                 <span class="recent-sessions-label">{language.t("session.recent")}</span>
