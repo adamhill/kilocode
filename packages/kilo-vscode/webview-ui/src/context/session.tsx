@@ -160,6 +160,44 @@ export const SessionProvider: ParentComponent = (props) => {
     }
   }
 
+  // Handle agentsLoaded immediately (not in onMount) so we never miss
+  // the initial push that arrives before the DOM mounts. This mirrors the
+  // pattern used by ProviderProvider for providersLoaded.
+  const unsubAgents = vscode.onMessage((message: ExtensionMessage) => {
+    if (message.type !== "agentsLoaded") {
+      return
+    }
+    setAgents(message.agents)
+    setDefaultAgent(message.defaultAgent)
+    // Only override if the user hasn't explicitly selected an agent
+    if (selectedAgentName() === "code" || !message.agents.some((a) => a.name === selectedAgentName())) {
+      setSelectedAgentName(message.defaultAgent)
+    }
+  })
+
+  // Request agents in case the initial push was missed.
+  // Retry a few times because the extension's httpClient may
+  // not be ready yet when the first request arrives.
+  let agentRetries = 0
+  const agentMaxRetries = 5
+  const agentRetryMs = 500
+
+  vscode.postMessage({ type: "requestAgents" })
+
+  const agentRetryTimer = setInterval(() => {
+    agentRetries++
+    if (agents().length > 0 || agentRetries >= agentMaxRetries) {
+      clearInterval(agentRetryTimer)
+      return
+    }
+    vscode.postMessage({ type: "requestAgents" })
+  }, agentRetryMs)
+
+  onCleanup(() => {
+    unsubAgents()
+    clearInterval(agentRetryTimer)
+  })
+
   // Handle messages from extension
   onMount(() => {
     const unsubscribe = vscode.onMessage((message: ExtensionMessage) => {
@@ -194,15 +232,6 @@ export const SessionProvider: ParentComponent = (props) => {
 
         case "sessionsLoaded":
           handleSessionsLoaded(message.sessions)
-          break
-
-        case "agentsLoaded":
-          setAgents(message.agents)
-          setDefaultAgent(message.defaultAgent)
-          // Only override if the user hasn't explicitly selected an agent
-          if (selectedAgentName() === "code" || !message.agents.some((a) => a.name === selectedAgentName())) {
-            setSelectedAgentName(message.defaultAgent)
-          }
           break
       }
     })
