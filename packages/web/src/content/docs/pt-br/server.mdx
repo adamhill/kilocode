@@ -13,7 +13,7 @@ O comando `kilo serve` executa um servidor HTTP sem cabeça que expõe um endpoi
 ### Uso
 
 ```bash
-kilo serve [--port <número>] [--hostname <string>] [--cors <origem>]
+kilo serve [--port <number>] [--hostname <string>] [--cors <origin>]
 ```
 
 #### Opções
@@ -39,7 +39,7 @@ kilo serve --cors http://localhost:5173 --cors https://app.example.com
 Defina `OPENCODE_SERVER_PASSWORD` para proteger o servidor com autenticação básica HTTP. O nome de usuário padrão é `opencode`, ou defina `OPENCODE_SERVER_USERNAME` para substituí-lo. Isso se aplica tanto ao `kilo serve` quanto ao `opencode web`.
 
 ```bash
-OPENCODE_SERVER_PASSWORD=sua-senha kilo serve
+OPENCODE_SERVER_PASSWORD=your-password kilo serve
 ```
 
 ---

@@ -1,11 +1,11 @@
 ---
 title: GitLab
-description: Verwenden Sie Kilo in GitLab-Problemen und Zusammenführungsanfragen.
+description: Verwenden Sie Kilo in GitLab-Issues und Merge Requests.
 ---
 
 Kilo lässt sich über Ihre GitLab CI/CD-Pipeline oder mit GitLab Duo in Ihren GitLab-Workflow integrieren.
 
-In beiden Fällen läuft Kilo auf Ihren GitLab-Läufern.
+In beiden Fällen läuft Kilo auf Ihren GitLab Runners.
 
 ---
 
@@ -53,10 +53,10 @@ Erwähnen Sie `@opencode` in einem Kommentar und Kilo führt Aufgaben innerhalb 
 
 ### Features
 
-- **Triage-Probleme**: Bitten Sie Kilo, ein Problem zu untersuchen und es Ihnen zu erklären.
+- **Issue Triage**: Bitten Sie Kilo, ein Problem zu untersuchen und es Ihnen zu erklären.
 - **Reparieren und implementieren**: Bitten Sie Kilo, ein Problem zu beheben oder eine Funktion zu implementieren.
-  Es wird ein neuer Zweig erstellt und eine Zusammenführungsanforderung mit den Änderungen ausgelöst.
-- **Sicher**: Kilo läuft auf Ihren GitLab-Läufern.
+  Es wird ein neuer Branch erstellt und eine Merge Request mit den Änderungen ausgelöst.
+- **Sicher**: Kilo läuft auf Ihren GitLab Runners.
 
 ---
 
@@ -182,14 +182,14 @@ Sie können die Verwendung einer anderen Triggerphrase als `@opencode` konfiguri
   @opencode fix this
   ```
 
-  Kilo erstellt einen neuen Zweig, implementiert die Änderungen und öffnet eine Zusammenführungsanforderung mit den Änderungen.
+  Kilo erstellt einen neuen Branch, implementiert die Änderungen und öffnet eine Merge Request mit den Änderungen.
 
-- **Zusammenführungsanfragen prüfen**
+- **Merge Requests prüfen**
 
-  Hinterlassen Sie den folgenden Kommentar zu einer GitLab-Merge-Anfrage.
+  Hinterlassen Sie den folgenden Kommentar zu einer GitLab Merge Request.
 
   ```
   @opencode review this merge request
   ```
 
-  Kilo prüft die Zusammenführungsanfrage und gibt Feedback.
+  Kilo prüft die Merge Request und gibt Feedback.

@@ -1,5 +1,5 @@
 ---
-title: 企業
+title: Enterprise
 description: 組織内で Kilo を安全に使用します。
 ---
 
@@ -11,7 +11,7 @@ Kilo Enterprise は、コードとデータがインフラストラクチャか�
 :::note
 Kilo は、コードやコンテキスト データを一切保存しません。
 :::
-To Enterprise を始めるには:
+Kilo Enterprise を始めるには:
 
 1. チーム内でトライアルを実施してください。
 2. 価格や実装オプションについては、**<a href={email}>お問い合わせ</a>**ください。
@@ -140,7 +140,7 @@ Kilo Enterprise は、コードとデータがインフラストラクチャか�
 </details>
 
 <details>
-<summary>Can we use our own private NPM registry?</summary>
+<summary>Can we use our own private npm registry?</summary>
 
 Kilo は、Bun のネイティブ `.npmrc` ファイル サポートを通じてプライベート npm レジストリをサポートします。組織が JFrog Artifactory、Nexus などのプライベート レジストリを使用している場合は、Kilo を実行する前に開発者が認証されていることを確認してください。
 
@@ -156,7 +156,7 @@ npm login --registry=https://your-company.jfrog.io/api/npm/npm-virtual/
 :::caution
 Kilo を実行する前に、プライベート レジストリにログインする必要があります。
 :::
-Alternatively, ファイルを手動で構成することもできます。
+あるいは、.npmrc ファイルを手動で構成することもできます。
 
 ```bash title="~/.npmrc"
 registry=https://your-company.jfrog.io/api/npm/npm-virtual/

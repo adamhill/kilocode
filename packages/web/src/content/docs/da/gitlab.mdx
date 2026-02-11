@@ -1,6 +1,6 @@
 ---
 title: GitLab
-description: Brug Kilo i GitLab-problemer og fletteanmodninger.
+description: Brug Kilo i GitLab-problemer og Merge Requests.
 ---
 
 Kilo integreres med din GitLab-arbejdsgang gennem din GitLab CI/CD-pipeline eller med GitLab Duo.
@@ -27,7 +27,7 @@ Her bruger vi en community-skabt CI/CD-komponent til Kilo — [nagyv/gitlab-open
 
 ### Opsætning
 
-1. Gem din Kilo-godkendelse JSON som en filtype CI-miljøvariabel under **Indstillinger** > **CI/CD** > **Variabler**. Sørg for at markere dem som "Maskede og skjulte".
+1. Gem din Kilo-autentificering JSON som en filtype CI-miljøvariabel under **Indstillinger** > **CI/CD** > **Variabler**. Sørg for at markere dem som "Maskede og skjulte".
 2. Tilføj følgende til din `.gitlab-ci.yml` fil.
 
    ```yaml title=".gitlab-ci.yml"
@@ -55,7 +55,7 @@ Nævn `@opencode` i en kommentar, og Kilo vil udføre opgaver i din GitLab CI-pi
 
 - **Triageproblemer**: Bed Kilo om at undersøge et problem og forklare dig det.
 - **Ret og implementer**: Bed Kilo om at løse et problem eller implementere en funktion.
-  Det vil oprette en ny filial og rejse en fletteanmodning med ændringer.
+  Det vil oprette en ny branch og rejse en Merge Request med ændringer.
 - **Sikker**: Kilo kører på dine GitLab-løbere.
 
 ---
@@ -182,14 +182,14 @@ Du kan konfigurere til at bruge en anden udløsersætning end `@opencode`.
   @opencode fix this
   ```
 
-  Kilo vil oprette en ny filial, implementere ændringer og åbne en fletteanmodning med ændringer.
+  Kilo vil oprette en ny branch, implementere ændringer og åbne en Merge Request med ændringer.
 
-- **Gennemgå anmodninger om fletning**
+- **Gennemgå Merge Requests**
 
-  Efterlad følgende kommentar til en GitLab-fletningsanmodning.
+  Efterlad følgende kommentar til en GitLab-Merge Request.
 
   ```
   @opencode review this merge request
   ```
 
-  Kilo vil gennemgå anmodningen om fletning og give feedback.
+  Kilo vil gennemgå din Merge Request og give feedback.
