@@ -14,7 +14,7 @@ struct DisplayConfig {
 }
 
 fn dir() -> Option<PathBuf> {
-    Some(dirs::data_dir()?.join("ai.opencode.desktop"))
+    Some(dirs::data_dir()?.join("ai.kilo.desktop"))
 }
 
 fn path() -> Option<PathBuf> {

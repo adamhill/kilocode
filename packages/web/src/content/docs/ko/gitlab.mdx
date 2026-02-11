@@ -35,7 +35,7 @@ opencode는 일반 GitLab 파이프라인에서 작동합니다. [CI 구성품](
      - component: $CI_SERVER_FQDN/nagyv/gitlab-opencode/opencode@2
        inputs:
          config_dir: ${CI_PROJECT_DIR}/opencode-config
-         auth_json: $OPENCODE_AUTH_JSON # The variable name for your opencode authentication JSON
+         auth_json: $OPENCODE_AUTH_JSON # The variable name for your kilo authentication JSON
          command: optional-custom-command
          message: "Your prompt here"
    ```
@@ -91,7 +91,7 @@ opencode는 GitLab CI/CD 파이프라인에서 실행되며, 여기서 설정해
       - apt-get install --yes glab
       - echo "Configuring glab"
       - echo $GITLAB_HOST
-      - echo "Creating opencode auth configuration"
+      - echo "Creating kilo auth configuration"
       - mkdir --parents ~/.local/share/opencode
       - |
         cat > ~/.local/share/opencode/auth.json << EOF

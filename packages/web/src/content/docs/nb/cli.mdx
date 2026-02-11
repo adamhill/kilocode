@@ -112,17 +112,17 @@ opencode agent list
 Kommando for å administrere legitimasjon og pålogging for leverandører.
 
 ```bash
-opencode auth [command]
+kilo auth [command]
 ```
 
 ---
 
 #### login
 
-opencode drives av leverandørlisten på [Models.dev](https://models.dev), så du kan bruke `opencode auth login` til å konfigurere API-nøkler for enhver leverandør du vil bruke. Dette er lagret i `~/.local/share/opencode/auth.json`.
+opencode drives av leverandørlisten på [Models.dev](https://models.dev), så du kan bruke `kilo auth login` til å konfigurere API-nøkler for enhver leverandør du vil bruke. Dette er lagret i `~/.local/share/opencode/auth.json`.
 
 ```bash
-opencode auth login
+kilo auth login
 ```
 
 Når opencode starter opp, laster den leverandørene fra legitimasjonsfilen. Og hvis det er noen nøkler definert i miljøene dine eller en `.env`-fil i prosjektet ditt.
@@ -134,13 +134,13 @@ Når opencode starter opp, laster den leverandørene fra legitimasjonsfilen. Og 
 Viser alle de autentiserte leverandørene som er lagret i legitimasjonsfilen.
 
 ```bash
-opencode auth list
+kilo auth list
 ```
 
 Eller kortversjonen.
 
 ```bash
-opencode auth ls
+kilo auth ls
 ```
 
 ---
@@ -150,7 +150,7 @@ opencode auth ls
 Logger deg ut av en leverandør ved å fjerne den fra legitimasjonsfilen.
 
 ```bash
-opencode auth logout
+kilo auth logout
 ```
 
 ---
@@ -323,11 +323,11 @@ Dette er nyttig for skripting, automatisering eller når du vil ha et raskt svar
 opencode run Explain the use of context in Go
 ```
 
-Du kan også koble til en kjørende `opencode serve`-forekomst for å unngå MCP-tjenerkaldoppstartstider ved hver kjøring:
+Du kan også koble til en kjørende `kilo serve`-forekomst for å unngå MCP-tjenerkaldoppstartstider ved hver kjøring:
 
 ```bash
 # Start a headless server in one terminal
-opencode serve
+kilo serve
 
 # In another terminal, run commands that attach to it
 opencode run --attach http://localhost:4096 "Explain async/await in JavaScript"
@@ -357,7 +357,7 @@ opencode run --attach http://localhost:4096 "Explain async/await in JavaScript"
 Start en hodeløs opencode-server for API-tilgang. Sjekk ut [server-dokumentene](/docs/server) for hele HTTP-grensesnittet.
 
 ```bash
-opencode serve
+kilo serve
 ```
 
 Dette starter en HTTP-server som gir API tilgang til opencode-funksjonalitet uten TUI-grensesnittet. Sett `OPENCODE_SERVER_PASSWORD` for å aktivere HTTP grunnleggende autentisering (brukernavn er standard til `opencode`).
@@ -513,19 +513,19 @@ opencode uninstall
 Oppdaterer opencode til siste versjon eller en spesifikk versjon.
 
 ```bash
-opencode upgrade [target]
+kilo upgrade [target]
 ```
 
 For å oppgradere til siste versjon.
 
 ```bash
-opencode upgrade
+kilo upgrade
 ```
 
 For å oppgradere til en bestemt versjon.
 
 ```bash
-opencode upgrade v0.1.48
+kilo upgrade v0.1.48
 ```
 
 #### Flagg

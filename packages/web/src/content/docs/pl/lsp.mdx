@@ -69,7 +69,7 @@ Możesz dostosować serwery LSP poprzez sekcję `lsp` w konfiguracji opencode.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "lsp": {}
 }
 ```
@@ -94,7 +94,7 @@ Zastosowanie `env`, aby ustawić zmienne parametry transmisji podczas uruchamian
 
 ```json title="opencode.json" {5-7}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "lsp": {
     "rust": {
       "env": {
@@ -113,7 +113,7 @@ właściwości `initialization`, aby mieć możliwość inicjalizacji na serwerz
 
 ```json title="opencode.json" {5-9}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "lsp": {
     "typescript": {
       "initialization": {
@@ -138,7 +138,7 @@ Aby wyłączyć **wszystkie** serwery LSP globalnie, ustaw `lsp` na `false`:
 
 ```json title="opencode.json" {3}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "lsp": false
 }
 ```
@@ -147,7 +147,7 @@ Aby wyłączyć **określony** serwer LSP, ustawa `disabled` na `true`:
 
 ```json title="opencode.json" {5}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "lsp": {
     "typescript": {
       "disabled": true
@@ -164,7 +164,7 @@ Serwer udostępniający serwery LSP, mechanizmy sterujące i udostępniane pliki
 
 ```json title="opencode.json" {4-7}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "lsp": {
     "custom-lsp": {
       "command": ["custom-lsp-server", "--stdio"],

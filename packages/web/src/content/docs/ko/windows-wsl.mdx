@@ -26,7 +26,7 @@ WSL은 더 나은 파일 시스템 성능, 완전한 terminal 지원, 그리고 
    WSL 설정이 끝나면 WSL terminal을 열고 [설치 방법](/docs/) 중 하나로 opencode를 설치하세요.
 
    ```bash
-   curl -fsSL https://opencode.ai/install | bash
+   curl -fsSL https://kilo.ai/install | bash
    ```
 
 3. **WSL에서 opencode 실행하기**
@@ -51,7 +51,7 @@ opencode 데스크톱 앱을 쓰면서 서버는 WSL에서 실행하고 싶다�
    외부 연결을 허용하려면 `--hostname 0.0.0.0` 옵션을 사용하세요.
 
    ```bash
-   opencode serve --hostname 0.0.0.0 --port 4096
+   kilo serve --hostname 0.0.0.0 --port 4096
    ```
 
 2. **데스크톱 앱 연결하기**
@@ -66,7 +66,7 @@ opencode 데스크톱 앱을 쓰면서 서버는 WSL에서 실행하고 싶다�
 `--hostname 0.0.0.0`을 사용할 때는 `OPENCODE_SERVER_PASSWORD`를 설정해 서버를 보호하세요.
 
 ```bash
-OPENCODE_SERVER_PASSWORD=your-password opencode serve --hostname 0.0.0.0
+OPENCODE_SERVER_PASSWORD=your-password kilo serve --hostname 0.0.0.0
 ```
 
 :::

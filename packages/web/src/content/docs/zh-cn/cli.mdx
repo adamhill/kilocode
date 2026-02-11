@@ -112,17 +112,17 @@ opencode agent list
 用于管理提供商的憑據和登錄的命令。
 
 ```bash
-opencode auth [command]
+kilo auth [command]
 ```
 
 ---
 
 #### 登录
 
-opencode 由 [Models.dev](https://models.dev) 上的模型列表提供支持，因此您可以使用 `opencode auth login` 来为您想要使用的任何模型配置 API 按键。它存储在 `~/.local/share/opencode/auth.json` 中。
+opencode 由 [Models.dev](https://models.dev) 上的模型列表提供支持，因此您可以使用 `kilo auth login` 来为您想要使用的任何模型配置 API 按键。它存储在 `~/.local/share/opencode/auth.json` 中。
 
 ```bash
-opencode auth login
+kilo auth login
 ```
 
 当opencode启动时，它会从auth 文件加载提供商。如果您的环境中定义了任何按键或项目中的`.env`文件。
@@ -134,13 +134,13 @@ opencode auth login
 列出憑證文件中存儲的所有經过身份验证的提供商。
 
 ```bash
-opencode auth list
+kilo auth list
 ```
 
 或者簡短的版本。
 
 ```bash
-opencode auth ls
+kilo auth ls
 ```
 
 ---
@@ -150,7 +150,7 @@ opencode auth ls
 通过從憑據文件中清除提供商，将您從提供商中註銷。
 
 ```bash
-opencode auth logout
+kilo auth logout
 ```
 
 ---
@@ -323,11 +323,11 @@ opencode run [message..]
 opencode run Explain the use of context in Go
 ```
 
-您还可以添加到正在运行的`opencode serve`实例，会员每次运行时MCP服务器冷启动时间：
+您还可以添加到正在运行的`kilo serve`实例，会员每次运行时MCP服务器冷启动时间：
 
 ```bash
 # Start a headless server in one terminal
-opencode serve
+kilo serve
 
 # In another terminal, run commands that attach to it
 opencode run --attach http://localhost:4096 "Explain async/await in JavaScript"
@@ -357,7 +357,7 @@ opencode run --attach http://localhost:4096 "Explain async/await in JavaScript"
 启动无头opencode服务器以进行API访问。查看[服务器文档](/docs/server)以获取完整的HTTP 接口。
 
 ```bash
-opencode serve
+kilo serve
 ```
 
 这将启动一个 HTTP 服务器，该服务器提供对 opencode 功能的 API 访问，并占用 TUI 接口。设置 `OPENCODE_SERVER_PASSWORD` 以启用 HTTP 基本身份验证（用户名默认为 `opencode`）。
@@ -513,19 +513,19 @@ opencode uninstall
 将 opencode 更新到最新版本或特定版本。
 
 ```bash
-opencode upgrade [target]
+kilo upgrade [target]
 ```
 
 升級到最新版本。
 
 ```bash
-opencode upgrade
+kilo upgrade
 ```
 
 升級到特定版本。
 
 ```bash
-opencode upgrade v0.1.48
+kilo upgrade v0.1.48
 ```
 
 #### 旗幟

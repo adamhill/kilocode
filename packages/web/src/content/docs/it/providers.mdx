@@ -1,17 +1,17 @@
 ---
 title: Providers
-description: Usa qualsiasi provider LLM in OpenCode.
+description: Usa qualsiasi provider LLM in Kilo.
 ---
 
 import config from "../../../../config.mjs"
 export const console = config.console
 
-OpenCode usa [AI SDK](https://ai-sdk.dev/) e [Models.dev](https://models.dev) per supportare **oltre 75 provider LLM** e anche modelli locali.
+Kilo usa [AI SDK](https://ai-sdk.dev/) e [Models.dev](https://models.dev) per supportare **oltre 75 provider LLM** e anche modelli locali.
 
 Per aggiungere un provider devi:
 
 1. Aggiungere le API key del provider con il comando `/connect`.
-2. Configurare il provider nella configurazione di OpenCode.
+2. Configurare il provider nella configurazione di Kilo.
 
 ---
 
@@ -25,7 +25,7 @@ in `~/.local/share/opencode/auth.json`.
 ### Configurazione
 
 Puoi personalizzare i provider tramite la sezione `provider` nella
-configurazione di OpenCode.
+configurazione di Kilo.
 
 ---
 
@@ -35,7 +35,7 @@ Puoi personalizzare l'URL base per qualsiasi provider impostando l'opzione `base
 
 ```json title="opencode.json" {6}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "anthropic": {
       "options": {
@@ -50,14 +50,14 @@ Puoi personalizzare l'URL base per qualsiasi provider impostando l'opzione `base
 
 ## OpenCode Zen
 
-OpenCode Zen e una lista di modelli forniti dal team OpenCode, testati e
-verificati per funzionare bene con OpenCode. [Scopri di piu](/docs/zen).
+OpenCode Zen e una lista di modelli forniti dal team Kilo, testati e
+verificati per funzionare bene con Kilo. [Scopri di piu](/docs/zen).
 
 :::tip
 Se sei all'inizio, ti consigliamo di partire da OpenCode Zen.
 :::
 
-1. Esegui `/connect` nella TUI, seleziona opencode e vai su [opencode.ai/auth](https://opencode.ai/auth).
+1. Esegui `/connect` nella TUI, seleziona opencode e vai su [kilo.ai/auth](https://kilo.ai/auth).
 
    ```txt
    /connect
@@ -80,7 +80,7 @@ Se sei all'inizio, ti consigliamo di partire da OpenCode Zen.
    /models
    ```
 
-Funziona come qualsiasi altro provider in OpenCode ed e totalmente opzionale.
+Funziona come qualsiasi altro provider in Kilo ed e totalmente opzionale.
 
 ---
 
@@ -124,7 +124,7 @@ Non vedi un provider qui? Invia una PR.
 
 ### Amazon Bedrock
 
-To use Amazon Bedrock with OpenCode:
+To use Amazon Bedrock with Kilo:
 
 1. Head over to the **Model catalog** in the Amazon Bedrock console and request
    access to the models you want.
@@ -163,7 +163,7 @@ To use Amazon Bedrock with OpenCode:
 
    ```json title="opencode.json"
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://kilo.ai/config.json",
      "provider": {
        "amazon-bedrock": {
          "options": {
@@ -190,7 +190,7 @@ To use Amazon Bedrock with OpenCode:
 
    ```json title="opencode.json"
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://kilo.ai/config.json",
      "provider": {
        "amazon-bedrock": {
          "options": {
@@ -234,7 +234,7 @@ For custom inference profiles, use the model and provider name in the key and se
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "amazon-bedrock": {
       // ...
@@ -279,7 +279,7 @@ For custom inference profiles, use the model and provider name in the key and se
    ```
 
 :::info
-Using your Claude Pro/Max subscription in OpenCode is not officially supported by [Anthropic](https://anthropic.com).
+Using your Claude Pro/Max subscription in Kilo is not officially supported by [Anthropic](https://anthropic.com).
 :::
 
 ##### Using API keys
@@ -486,7 +486,7 @@ Cloudflare AI Gateway lets you access models from OpenAI, Anthropic, Workers AI,
 
    ```json title="opencode.json"
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://kilo.ai/config.json",
      "provider": {
        "cloudflare-ai-gateway": {
          "models": {
@@ -662,7 +662,7 @@ GitLab Duo provides AI-powered agentic chat with native tool calling capabilitie
    #### Using Personal Access Token
    1. Go to [GitLab User Settings > Access Tokens](https://gitlab.com/-/user_settings/personal_access_tokens)
    2. Click **Add new token**
-   3. Name: `OpenCode`, Scopes: `api`
+   3. Name: `Kilo`, Scopes: `api`
    4. Copy the token (starts with `glpat-`)
    5. Enter it in the terminal
 
@@ -679,20 +679,20 @@ GitLab Duo provides AI-powered agentic chat with native tool calling capabilitie
 
 :::note
 You can also specify 'GITLAB_TOKEN' environment variable if you don't want
-to store token in opencode auth storage.
+to store token in kilo auth storage.
 :::
 
 ##### Self-Hosted GitLab
 
 :::note[compliance note]
-OpenCode uses a small model for some AI tasks like generating the session title.
-It is configured to use gpt-5-nano by default, hosted by Zen. To lock OpenCode
+Kilo uses a small model for some AI tasks like generating the session title.
+It is configured to use gpt-5-nano by default, hosted by Zen. To lock Kilo
 to only use your own GitLab-hosted instance, add the following to your
 `opencode.json` file. It is also recommended to disable session sharing.
 
 ```json
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "small_model": "gitlab/duo-chat-haiku-4-5",
   "share": "disabled"
 }
@@ -754,7 +754,7 @@ Customize through `opencode.json`:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "gitlab": {
       "options": {
@@ -775,7 +775,7 @@ To access GitLab tools (merge requests, issues, pipelines, CI/CD, etc.):
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "plugin": ["@gitlab/opencode-gitlab-plugin"]
 }
 ```
@@ -822,7 +822,7 @@ Some models need to be manually enabled in your [GitHub Copilot settings](https:
 
 ### Google Vertex AI
 
-To use Google Vertex AI with OpenCode:
+To use Google Vertex AI with Kilo:
 
 1. Head over to the **Model Garden** in the Google Cloud Console and check the
    models available in your region.
@@ -957,7 +957,7 @@ Here's [Helicone's Model Directory](https://helicone.ai/models), you'll need thi
 
 ```jsonc title="~/.config/opencode/opencode.jsonc"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "helicone": {
       "npm": "@ai-sdk/openai-compatible",
@@ -985,7 +985,7 @@ Helicone supports custom headers for features like caching, user tracking, and s
 
 ```jsonc title="~/.config/opencode/opencode.jsonc"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "helicone": {
       "npm": "@ai-sdk/openai-compatible",
@@ -1004,7 +1004,7 @@ Helicone supports custom headers for features like caching, user tracking, and s
 
 ##### Session tracking
 
-Helicone's [Sessions](https://docs.helicone.ai/features/sessions) feature lets you group related LLM requests together. Use the [opencode-helicone-session](https://github.com/H2Shami/opencode-helicone-session) plugin to automatically log each OpenCode conversation as a session in Helicone.
+Helicone's [Sessions](https://docs.helicone.ai/features/sessions) feature lets you group related LLM requests together. Use the [opencode-helicone-session](https://github.com/H2Shami/opencode-helicone-session) plugin to automatically log each Kilo conversation as a session in Helicone.
 
 ```bash
 npm install -g opencode-helicone-session
@@ -1018,7 +1018,7 @@ Add it to your config.
 }
 ```
 
-The plugin injects `Helicone-Session-Id` and `Helicone-Session-Name` headers into your requests. In Helicone's Sessions page, you'll see each OpenCode conversation listed as a separate session.
+The plugin injects `Helicone-Session-Id` and `Helicone-Session-Name` headers into your requests. In Helicone's Sessions page, you'll see each Kilo conversation listed as a separate session.
 
 ##### Common Helicone headers
 
@@ -1039,7 +1039,7 @@ You can configure opencode to use local models through [llama.cpp's](https://git
 
 ```json title="opencode.json" "llama.cpp" {5, 6, 8, 10-15}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "llama.cpp": {
       "npm": "@ai-sdk/openai-compatible",
@@ -1106,7 +1106,7 @@ You can configure opencode to use local models through LM Studio.
 
 ```json title="opencode.json" "lmstudio" {5, 6, 8, 10-14}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "lmstudio": {
       "npm": "@ai-sdk/openai-compatible",
@@ -1222,12 +1222,12 @@ To use Kimi K2 from Moonshot AI:
 You can configure opencode to use local models through Ollama.
 
 :::tip
-Ollama can automatically configure itself for OpenCode. See the [Ollama integration docs](https://docs.ollama.com/integrations/opencode) for details.
+Ollama can automatically configure itself for Kilo. See the [Ollama integration docs](https://docs.ollama.com/integrations/opencode) for details.
 :::
 
 ```json title="opencode.json" "ollama" {5, 6, 8, 10-14}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "ollama": {
       "npm": "@ai-sdk/openai-compatible",
@@ -1261,13 +1261,13 @@ If tool calls aren't working, try increasing `num_ctx` in Ollama. Start around 1
 
 ### Ollama Cloud
 
-To use Ollama Cloud with OpenCode:
+To use Ollama Cloud with Kilo:
 
 1. Head over to [https://ollama.com/](https://ollama.com/) and sign in or create an account.
 
 2. Navigate to **Settings** > **Keys** and click **Add API Key** to generate a new API key.
 
-3. Copy the API key for use in OpenCode.
+3. Copy the API key for use in Kilo.
 
 4. Run the `/connect` command and search for **Ollama Cloud**.
 
@@ -1284,7 +1284,7 @@ To use Ollama Cloud with OpenCode:
    └ enter
    ```
 
-6. **Important**: Before using cloud models in OpenCode, you must pull the model information locally:
+6. **Important**: Before using cloud models in Kilo, you must pull the model information locally:
 
    ```bash
    ollama pull gpt-oss:20b-cloud
@@ -1333,7 +1333,7 @@ If you already have an API key, you can select **Manually enter API Key** and pa
 
 ### OpenCode Zen
 
-OpenCode Zen is a list of tested and verified models provided by the OpenCode team. [Learn more](/docs/zen).
+OpenCode Zen is a list of tested and verified models provided by the Kilo team. [Learn more](/docs/zen).
 
 1. Sign in to **<a href={console}>OpenCode Zen</a>** and click **Create API Key**.
 
@@ -1343,7 +1343,7 @@ OpenCode Zen is a list of tested and verified models provided by the OpenCode te
    /connect
    ```
 
-3. Enter your OpenCode API key.
+3. Enter your Kilo API key.
 
    ```txt
    ┌ API key
@@ -1389,7 +1389,7 @@ OpenCode Zen is a list of tested and verified models provided by the OpenCode te
 
    ```json title="opencode.json" {6}
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://kilo.ai/config.json",
      "provider": {
        "openrouter": {
          "models": {
@@ -1404,7 +1404,7 @@ OpenCode Zen is a list of tested and verified models provided by the OpenCode te
 
    ```json title="opencode.json"
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://kilo.ai/config.json",
      "provider": {
        "openrouter": {
          "models": {
@@ -1620,7 +1620,7 @@ You can also customize models through your opencode config. Here's an example of
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "vercel": {
       "models": {
@@ -1730,7 +1730,7 @@ Some useful routing options:
 
    ```json title="opencode.json" {6}
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://kilo.ai/config.json",
      "provider": {
        "zenmux": {
          "models": {
@@ -1798,7 +1798,7 @@ You can use any OpenAI-compatible provider with opencode. Most modern AI provide
 
    ```json title="opencode.json" ""myprovider"" {5-15}
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://kilo.ai/config.json",
      "provider": {
        "myprovider": {
          "npm": "@ai-sdk/openai-compatible",
@@ -1836,7 +1836,7 @@ Here's an example setting the `apiKey`, `headers`, and model `limit` options.
 
 ```json title="opencode.json" {9,11,17-20}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "myprovider": {
       "npm": "@ai-sdk/openai-compatible",
@@ -1869,7 +1869,7 @@ Configuration details:
 - **limit.context**: Maximum input tokens the model accepts.
 - **limit.output**: Maximum tokens the model can generate.
 
-The `limit` fields allow OpenCode to understand how much context you have left. Standard providers pull these from models.dev automatically.
+The `limit` fields allow Kilo to understand how much context you have left. Standard providers pull these from models.dev automatically.
 
 ---
 
@@ -1877,7 +1877,7 @@ The `limit` fields allow OpenCode to understand how much context you have left. 
 
 If you are having trouble with configuring a provider, check the following:
 
-1. **Check the auth setup**: Run `opencode auth list` to see if the credentials
+1. **Check the auth setup**: Run `kilo auth list` to see if the credentials
    for the provider are added to your config.
 
    This doesn't apply to providers like Amazon Bedrock, that rely on environment variables for their auth.

@@ -1,17 +1,17 @@
 ---
 title: CLI
-description: Opzioni e comandi della CLI di OpenCode.
+description: Opzioni e comandi della CLI di Kilo.
 ---
 
 import { Tabs, TabItem } from "@astrojs/starlight/components"
 
-La CLI di OpenCode, per impostazione predefinita, avvia la [TUI](/docs/tui) quando viene eseguita senza argomenti.
+La CLI di Kilo, per impostazione predefinita, avvia la [TUI](/docs/tui) quando viene eseguita senza argomenti.
 
 ```bash
 opencode
 ```
 
-Ma accetta anche i comandi documentati in questa pagina. Questo ti permette di interagire con OpenCode in modo programmatico.
+Ma accetta anche i comandi documentati in questa pagina. Questo ti permette di interagire con Kilo in modo programmatico.
 
 ```bash
 opencode run "Explain how closures work in JavaScript"
@@ -21,7 +21,7 @@ opencode run "Explain how closures work in JavaScript"
 
 ### tui
 
-Avvia l'interfaccia testuale di OpenCode (terminal user interface).
+Avvia l'interfaccia testuale di Kilo (terminal user interface).
 
 ```bash
 opencode [project]
@@ -44,13 +44,13 @@ opencode [project]
 
 ## Comandi
 
-La CLI di OpenCode include anche i seguenti comandi.
+La CLI di Kilo include anche i seguenti comandi.
 
 ---
 
 ### agent
 
-Gestisci gli agenti per OpenCode.
+Gestisci gli agenti per Kilo.
 
 ```bash
 opencode agent [command]
@@ -60,13 +60,13 @@ opencode agent [command]
 
 ### attach
 
-Collega un terminal a un backend server di OpenCode gia' in esecuzione avviato tramite i comandi `serve` o `web`.
+Collega un terminal a un backend server di Kilo gia' in esecuzione avviato tramite i comandi `serve` o `web`.
 
 ```bash
 opencode attach [url]
 ```
 
-Questo consente di usare la TUI con un backend OpenCode remoto. Per esempio:
+Questo consente di usare la TUI con un backend Kilo remoto. Per esempio:
 
 ```bash
 # Start the backend server for web/mobile access
@@ -112,20 +112,20 @@ opencode agent list
 Comando per gestire le credenziali e il login dei provider.
 
 ```bash
-opencode auth [command]
+kilo auth [command]
 ```
 
 ---
 
 #### login
 
-OpenCode si basa sull'elenco provider di [Models.dev](https://models.dev), quindi puoi usare `opencode auth login` per configurare le API key per qualunque provider tu voglia usare. Le credenziali vengono salvate in `~/.local/share/opencode/auth.json`.
+Kilo si basa sull'elenco provider di [Models.dev](https://models.dev), quindi puoi usare `kilo auth login` per configurare le API key per qualunque provider tu voglia usare. Le credenziali vengono salvate in `~/.local/share/opencode/auth.json`.
 
 ```bash
-opencode auth login
+kilo auth login
 ```
 
-Quando OpenCode si avvia, carica i provider dal file delle credenziali e, se presenti, anche eventuali key definite nell'ambiente o in un file `.env` nel progetto.
+Quando Kilo si avvia, carica i provider dal file delle credenziali e, se presenti, anche eventuali key definite nell'ambiente o in un file `.env` nel progetto.
 
 ---
 
@@ -134,13 +134,13 @@ Quando OpenCode si avvia, carica i provider dal file delle credenziali e, se pre
 Elenca tutti i provider autenticati come salvati nel file delle credenziali.
 
 ```bash
-opencode auth list
+kilo auth list
 ```
 
 Oppure la versione corta.
 
 ```bash
-opencode auth ls
+kilo auth ls
 ```
 
 ---
@@ -150,7 +150,7 @@ opencode auth ls
 Esegue il logout da un provider rimuovendolo dal file delle credenziali.
 
 ```bash
-opencode auth logout
+kilo auth logout
 ```
 
 ---
@@ -301,7 +301,7 @@ opencode models anthropic
 | `--refresh` | Aggiorna la cache modelli da models.dev             |
 | `--verbose` | Output piu' verboso (include metadati come i costi) |
 
-Usa `--refresh` per aggiornare l'elenco modelli in cache. E' utile quando nuovi modelli vengono aggiunti a un provider e vuoi vederli in OpenCode.
+Usa `--refresh` per aggiornare l'elenco modelli in cache. E' utile quando nuovi modelli vengono aggiunti a un provider e vuoi vederli in Kilo.
 
 ```bash
 opencode models --refresh
@@ -323,11 +323,11 @@ E' utile per scripting, automazione o quando vuoi una risposta rapida senza avvi
 opencode run Explain the use of context in Go
 ```
 
-Puoi anche collegarti a una istanza `opencode serve` gia' in esecuzione per evitare i cold boot dei server MCP ad ogni esecuzione:
+Puoi anche collegarti a una istanza `kilo serve` gia' in esecuzione per evitare i cold boot dei server MCP ad ogni esecuzione:
 
 ```bash
 # Start a headless server in one terminal
-opencode serve
+kilo serve
 
 # In another terminal, run commands that attach to it
 opencode run --attach http://localhost:4096 "Explain async/await in JavaScript"
@@ -354,10 +354,10 @@ opencode run --attach http://localhost:4096 "Explain async/await in JavaScript"
 
 ### serve
 
-Avvia un server OpenCode headless per accesso via API. Vedi le [server docs](/docs/server) per l'interfaccia HTTP completa.
+Avvia un server Kilo headless per accesso via API. Vedi le [server docs](/docs/server) per l'interfaccia HTTP completa.
 
 ```bash
-opencode serve
+kilo serve
 ```
 
 Avvia un server HTTP che espone accesso API alle funzionalita' di opencode senza la TUI. Imposta `OPENCODE_SERVER_PASSWORD` per abilitare HTTP basic auth (username di default `opencode`).
@@ -375,7 +375,7 @@ Avvia un server HTTP che espone accesso API alle funzionalita' di opencode senza
 
 ### session
 
-Gestisci le sessioni OpenCode.
+Gestisci le sessioni Kilo.
 
 ```bash
 opencode session [command]
@@ -385,7 +385,7 @@ opencode session [command]
 
 #### list
 
-Elenca tutte le sessioni OpenCode.
+Elenca tutte le sessioni Kilo.
 
 ```bash
 opencode session list
@@ -402,7 +402,7 @@ opencode session list
 
 ### stats
 
-Mostra statistiche di utilizzo token e costo per le sessioni OpenCode.
+Mostra statistiche di utilizzo token e costo per le sessioni Kilo.
 
 ```bash
 opencode stats
@@ -433,13 +433,13 @@ Se non fornisci un ID sessione, ti verra' chiesto di selezionare tra le sessioni
 
 ### import
 
-Importa i dati di sessione da un file JSON o da un URL di condivisione OpenCode.
+Importa i dati di sessione da un file JSON o da un URL di condivisione Kilo.
 
 ```bash
 opencode import <file>
 ```
 
-Puoi importare da un file locale o da un URL di condivisione OpenCode.
+Puoi importare da un file locale o da un URL di condivisione Kilo.
 
 ```bash
 opencode import session.json
@@ -450,13 +450,13 @@ opencode import https://opncd.ai/s/abc123
 
 ### web
 
-Avvia un server OpenCode headless con interfaccia web.
+Avvia un server Kilo headless con interfaccia web.
 
 ```bash
 opencode web
 ```
 
-Avvia un server HTTP e apre un browser per accedere a OpenCode tramite interfaccia web. Imposta `OPENCODE_SERVER_PASSWORD` per abilitare HTTP basic auth (username di default `opencode`).
+Avvia un server HTTP e apre un browser per accedere a Kilo tramite interfaccia web. Imposta `OPENCODE_SERVER_PASSWORD` per abilitare HTTP basic auth (username di default `opencode`).
 
 #### Flag
 
@@ -491,7 +491,7 @@ Questo comando avvia un server ACP che comunica via stdin/stdout usando nd-JSON.
 
 ### uninstall
 
-Disinstalla OpenCode e rimuove tutti i file correlati.
+Disinstalla Kilo e rimuove tutti i file correlati.
 
 ```bash
 opencode uninstall
@@ -513,19 +513,19 @@ opencode uninstall
 Aggiorna opencode all'ultima versione o a una versione specifica.
 
 ```bash
-opencode upgrade [target]
+kilo upgrade [target]
 ```
 
 Per aggiornare all'ultima versione:
 
 ```bash
-opencode upgrade
+kilo upgrade
 ```
 
 Per aggiornare a una versione specifica:
 
 ```bash
-opencode upgrade v0.1.48
+kilo upgrade v0.1.48
 ```
 
 #### Flag
@@ -551,7 +551,7 @@ La CLI di opencode accetta i seguenti flag globali.
 
 ## Variabili d'ambiente
 
-OpenCode puo' essere configurato tramite variabili d'ambiente.
+Kilo puo' essere configurato tramite variabili d'ambiente.
 
 | Variabile                             | Tipo    | Descrizione                                                 |
 | ------------------------------------- | ------- | ----------------------------------------------------------- |

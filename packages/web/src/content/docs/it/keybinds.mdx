@@ -3,11 +3,11 @@ title: Scorciatoie
 description: Personalizza le scorciatoie da tastiera.
 ---
 
-OpenCode ha una lista di scorciatoie che puoi personalizzare tramite la configurazione di OpenCode.
+Kilo ha una lista di scorciatoie che puoi personalizzare tramite la configurazione di Kilo.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "keybinds": {
     "leader": "ctrl+x",
     "app_exit": "ctrl+c,ctrl+d,<leader>q",
@@ -107,7 +107,7 @@ OpenCode ha una lista di scorciatoie che puoi personalizzare tramite la configur
 
 ## Tasto leader
 
-OpenCode usa un tasto `leader` per la maggior parte delle scorciatoie. Questo evita conflitti nel terminal.
+Kilo usa un tasto `leader` per la maggior parte delle scorciatoie. Questo evita conflitti nel terminal.
 
 Per impostazione predefinita, `ctrl+x` e il tasto leader e la maggior parte delle azioni richiede di premere prima il leader e poi la scorciatoia. Per esempio, per avviare una nuova sessione premi `ctrl+x` e poi `n`.
 
@@ -121,7 +121,7 @@ Puoi disabilitare una scorciatoia aggiungendo la chiave nella configurazione con
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "keybinds": {
     "session_compact": "none"
   }

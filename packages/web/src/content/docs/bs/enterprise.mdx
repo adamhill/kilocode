@@ -1,18 +1,18 @@
 ---
 title: Enterprise
-description: Sigurno korištenje OpenCode u vašoj organizaciji.
+description: Sigurno korištenje Kilo u vašoj organizaciji.
 ---
 
 import config from "../../../../config.mjs"
 export const email = `mailto:${config.email}`
 
-OpenCode Enterprise je za organizacije koje žele osigurati da njihov kod i podaci nikada ne napuštaju njihovu infrastrukturu. To omogućava centralizovana konfiguracija koja se integriše s vašim SSO-om i internim AI gateway-om.
+Kilo Enterprise je za organizacije koje žele osigurati da njihov kod i podaci nikada ne napuštaju njihovu infrastrukturu. To omogućava centralizovana konfiguracija koja se integriše s vašim SSO-om i internim AI gateway-om.
 
 :::note
-OpenCode ne pohranjuje nijedan vaš kod ili kontekstualne podatke.
+Kilo ne pohranjuje nijedan vaš kod ili kontekstualne podatke.
 :::
 
-Da započnete s OpenCode Enterprise:
+Da započnete s Kilo Enterprise:
 
 1. Uradite interni probni period sa svojim timom.
 2. **<a href={email}>Kontaktirajte nas</a>** da razgovaramo o cijenama i opcijama implementacije.
@@ -21,15 +21,15 @@ Da započnete s OpenCode Enterprise:
 
 ## Trial
 
-OpenCode je otvorenog koda i ne pohranjuje vaš kod niti kontekstualne podatke, tako da vaši developeri mogu jednostavno [započeti](/docs/) i provesti probu.
+Kilo je otvorenog koda i ne pohranjuje vaš kod niti kontekstualne podatke, tako da vaši developeri mogu jednostavno [započeti](/docs/) i provesti probu.
 
 ---
 
 ### Rukovanje podacima
 
-**OpenCode ne pohranjuje vaš kod ni kontekstualne podatke.** Sva obrada se odvija lokalno ili putem direktnih API poziva vašem AI provajderu.
+**Kilo ne pohranjuje vaš kod ni kontekstualne podatke.** Sva obrada se odvija lokalno ili putem direktnih API poziva vašem AI provajderu.
 
-To znači da, sve dok koristite provajdera kojem vjerujete ili interni AI gateway, OpenCode možete koristiti sigurno.
+To znači da, sve dok koristite provajdera kojem vjerujete ili interni AI gateway, Kilo možete koristiti sigurno.
 
 Jedina iznimka je opcionalna funkcija `/share`.
 
@@ -37,7 +37,7 @@ Jedina iznimka je opcionalna funkcija `/share`.
 
 #### Dijeljenje razgovora
 
-Ako korisnik uključi funkciju `/share`, razgovor i povezani podaci šalju se servisu koji koristimo za hosting ovih share stranica na opencode.ai.
+Ako korisnik uključi funkciju `/share`, razgovor i povezani podaci šalju se servisu koji koristimo za hosting ovih share stranica na kilo.ai.
 
 Podaci se trenutno serviraju kroz edge mrežu našeg CDN-a i keširaju se blizu korisnika.
 
@@ -45,7 +45,7 @@ Preporučujemo da ovo onemogućite tokom probe.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "share": "disabled"
 }
 ```
@@ -56,25 +56,25 @@ Preporučujemo da ovo onemogućite tokom probe.
 
 ### Vlasništvo koda
 
-**Vi posjedujete sav kod koji OpenCode proizvede.** Nema ograničenja licenciranja niti zahtjeva za vlasništvo.
+**Vi posjedujete sav kod koji Kilo proizvede.** Nema ograničenja licenciranja niti zahtjeva za vlasništvo.
 
 ---
 
 ## Pricing
 
-Koristimo model naplate po sjedištu za OpenCode Enterprise. Ako imate vlastiti LLM gateway, ne naplaćujemo korištene tokene. Za više detalja o cijenama i opcijama implementacije, **<a href={email}>kontaktirajte nas</a>**.
+Koristimo model naplate po sjedištu za Kilo Enterprise. Ako imate vlastiti LLM gateway, ne naplaćujemo korištene tokene. Za više detalja o cijenama i opcijama implementacije, **<a href={email}>kontaktirajte nas</a>**.
 
 ---
 
 ## Deployment
 
-Nakon što završite probni period i spremni ste koristiti OpenCode u svojoj organizaciji, možete **<a href={email}>kontaktirati nas</a>** da razgovaramo o cijenama i opcijama implementacije.
+Nakon što završite probni period i spremni ste koristiti Kilo u svojoj organizaciji, možete **<a href={email}>kontaktirati nas</a>** da razgovaramo o cijenama i opcijama implementacije.
 
 ---
 
 ### Central Config
 
-Možemo postaviti OpenCode da koristi jednu centralnu konfiguraciju za cijelu organizaciju.
+Možemo postaviti Kilo da koristi jednu centralnu konfiguraciju za cijelu organizaciju.
 
 Ta centralizovana konfiguracija može se integrisati s vašim SSO provajderom i osigurava da svi korisnici pristupaju samo vašem internom AI gateway-u.
 
@@ -82,15 +82,15 @@ Ta centralizovana konfiguracija može se integrisati s vašim SSO provajderom i 
 
 ### SSO integracija
 
-Kroz centralnu konfiguraciju, OpenCode se može integrisati sa SSO provajderom vaše organizacije za autentifikaciju.
+Kroz centralnu konfiguraciju, Kilo se može integrisati sa SSO provajderom vaše organizacije za autentifikaciju.
 
-To omogućava OpenCode da dobije vjerodajnice za interni AI gateway kroz vaš postojeći sistem upravljanja identitetom.
+To omogućava Kilo da dobije vjerodajnice za interni AI gateway kroz vaš postojeći sistem upravljanja identitetom.
 
 ---
 
 ### Interni AI gateway
 
-Uz centralnu konfiguraciju, OpenCode se može podesiti da koristi samo vaš interni AI gateway.
+Uz centralnu konfiguraciju, Kilo se može podesiti da koristi samo vaš interni AI gateway.
 
 Također možete onemogućiti sve druge AI provajdere, čime osiguravate da svi zahtjevi prolaze kroz odobrenu infrastrukturu vaše organizacije.
 
@@ -107,16 +107,16 @@ Ovo je trenutno na našoj mapi puta. Ako ste zainteresovani, **<a href={email}>j
 ## FAQ
 
 <details>
-<summary>What is OpenCode Enterprise?</summary>
+<summary>What is Kilo Enterprise?</summary>
 
-OpenCode Enterprise je za organizacije koje žele osigurati da njihov kod i podaci nikada ne napuštaju njihovu infrastrukturu. To omogućava centralizovana konfiguracija koja se integriše s vašim SSO-om i internim AI gateway-om.
+Kilo Enterprise je za organizacije koje žele osigurati da njihov kod i podaci nikada ne napuštaju njihovu infrastrukturu. To omogućava centralizovana konfiguracija koja se integriše s vašim SSO-om i internim AI gateway-om.
 
 </details>
 
 <details>
-<summary>How do I get started with OpenCode Enterprise?</summary>
+<summary>How do I get started with Kilo Enterprise?</summary>
 
-Jednostavno započnite internu probu sa svojim timom. OpenCode po defaultu ne pohranjuje vaš kod ni kontekstualne podatke, što olakšava početak.
+Jednostavno započnite internu probu sa svojim timom. Kilo po defaultu ne pohranjuje vaš kod ni kontekstualne podatke, što olakšava početak.
 
 Zatim **<a href={email}>kontaktirajte nas</a>** da razgovaramo o cijenama i opcijama implementacije.
 
@@ -130,16 +130,16 @@ Nudimo enterprise cijene po sjedištu. Ako imate vlastiti LLM gateway, ne napla�
 </details>
 
 <details>
-<summary>Is my data secure with OpenCode Enterprise?</summary>
+<summary>Is my data secure with Kilo Enterprise?</summary>
 
-Da. OpenCode ne pohranjuje vaš kod niti kontekstualne podatke. Sva obrada se odvija lokalno ili putem direktnih API poziva vašem AI provajderu. Uz centralnu konfiguraciju i SSO integraciju, vaši podaci ostaju sigurni unutar infrastrukture vaše organizacije.
+Da. Kilo ne pohranjuje vaš kod niti kontekstualne podatke. Sva obrada se odvija lokalno ili putem direktnih API poziva vašem AI provajderu. Uz centralnu konfiguraciju i SSO integraciju, vaši podaci ostaju sigurni unutar infrastrukture vaše organizacije.
 
 </details>
 
 <details>
 <summary>Can we use our own private NPM registry?</summary>
 
-OpenCode podržava privatne npm registre kroz Bunovu izvornu podršku za `.npmrc` datoteku. Ako vaša organizacija koristi privatni registar, kao što je JFrog Artifactory, Nexus ili slično, osigurajte da su developeri autentifikovani prije pokretanja OpenCode.
+Kilo podržava privatne npm registre kroz Bunovu izvornu podršku za `.npmrc` datoteku. Ako vaša organizacija koristi privatni registar, kao što je JFrog Artifactory, Nexus ili slično, osigurajte da su developeri autentifikovani prije pokretanja Kilo.
 
 Da postavite autentifikaciju s privatnim registrom:
 
@@ -147,10 +147,10 @@ Da postavite autentifikaciju s privatnim registrom:
 npm login --registry=https://your-company.jfrog.io/api/npm/npm-virtual/
 ```
 
-Ovo kreira `~/.npmrc` s detaljima za autentifikaciju. OpenCode će to automatski prepoznati.
+Ovo kreira `~/.npmrc` s detaljima za autentifikaciju. Kilo će to automatski prepoznati.
 
 :::caution
-Morate biti prijavljeni na privatni registar prije pokretanja OpenCode.
+Morate biti prijavljeni na privatni registar prije pokretanja Kilo.
 :::
 
 Alternativno, možete ručno konfigurisati `.npmrc` datoteku:
@@ -160,6 +160,6 @@ registry=https://your-company.jfrog.io/api/npm/npm-virtual/
 //your-company.jfrog.io/api/npm/npm-virtual/:_authToken=${NPM_AUTH_TOKEN}
 ```
 
-Developeri moraju biti prijavljeni na privatni registar prije pokretanja OpenCode kako bi se paketi mogli instalirati iz vašeg enterprise registra.
+Developeri moraju biti prijavljeni na privatni registar prije pokretanja Kilo kako bi se paketi mogli instalirati iz vašeg enterprise registra.
 
 </details>

@@ -1,17 +1,17 @@
 ---
 title: Leverandører
-description: Bruge en hvilken som helst LLM-leverandør i OpenCode.
+description: Bruge en hvilken som helst LLM-leverandør i Kilo.
 ---
 
 import config from "../../../../config.mjs"
 export const console = config.console
 
-OpenCode bruger [AI SDK](https://ai-sdk.dev/) og [Models.dev](https://models.dev) for at støtte **75+ LLM leverandører** og den støtter kjøring av lokale modeller.
+Kilo bruger [AI SDK](https://ai-sdk.dev/) og [Models.dev](https://models.dev) for at støtte **75+ LLM leverandører** og den støtter kjøring av lokale modeller.
 
 For at tilføje til en leverandør må du:
 
 1. Legg til API-nøklene for leverandøren ved at bruge kommandoen `/connect`.
-2. Konfigurer leverandøren i OpenCode-konfigurasjonen.
+2. Konfigurer leverandøren i Kilo-konfigurasjonen.
 
 ---
 
@@ -24,7 +24,7 @@ i `~/.local/share/opencode/auth.json`.
 
 ### Konfig
 
-Du kan tilpasse leverandørene gjennom `provider`-delen i OpenCode
+Du kan tilpasse leverandørene gjennom `provider`-delen i Kilo
 konfig.
 
 ---
@@ -35,7 +35,7 @@ Du kan tilpasse basen URL for enhver leverandør ved at angi alternativet `baseU
 
 ```json title="opencode.json" {6}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "anthropic": {
       "options": {
@@ -50,14 +50,14 @@ Du kan tilpasse basen URL for enhver leverandør ved at angi alternativet `baseU
 
 ## OpenCode Zen
 
-OpenCode Zen er en liste over modeller levert av OpenCode-teamet som har vært
-testet og verifisert for at fungere godt med OpenCode. [Finn ut mer](/docs/zen).
+OpenCode Zen er en liste over modeller levert av Kilo-teamet som har vært
+testet og verifisert for at fungere godt med Kilo. [Finn ut mer](/docs/zen).
 
 :::tip
 Hvis du er ny, anbefaler vi at starte med OpenCode Zen.
 :::
 
-1. Kjør kommandoen `/connect` i TUI, velg opencode og gå til [opencode.ai/auth](https://opencode.ai/auth).
+1. Kjør kommandoen `/connect` i TUI, velg opencode og gå til [kilo.ai/auth](https://kilo.ai/auth).
 
    ```txt
    /connect
@@ -80,7 +80,7 @@ Hvis du er ny, anbefaler vi at starte med OpenCode Zen.
    /models
    ```
 
-Det fungerer som alle andre leverandører i OpenCode og er helt valgfritt at bruge.
+Det fungerer som alle andre leverandører i Kilo og er helt valgfritt at bruge.
 
 ---
 
@@ -124,7 +124,7 @@ Ser du ikke en leverandør her? Send inn en PR.
 
 ### Amazonas grunnfjell
 
-Slik bruger du Amazon Bedrock med OpenCode:
+Slik bruger du Amazon Bedrock med Kilo:
 
 1. Gå over til **modellkatalogen** i Amazon Bedrock-konsollen og be om
    tilgang til modellene du ønsker.
@@ -163,7 +163,7 @@ Slik bruger du Amazon Bedrock med OpenCode:
 
    ```json title="opencode.json"
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://kilo.ai/config.json",
      "provider": {
        "amazon-bedrock": {
          "options": {
@@ -190,7 +190,7 @@ Slik bruger du Amazon Bedrock med OpenCode:
 
    ```json title="opencode.json"
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://kilo.ai/config.json",
      "provider": {
        "amazon-bedrock": {
          "options": {
@@ -234,7 +234,7 @@ For egendefinerte slutningsprofiler, brug modellen og leverandørnavnet i nøkke
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "amazon-bedrock": {
       // ...
@@ -279,7 +279,7 @@ For egendefinerte slutningsprofiler, brug modellen og leverandørnavnet i nøkke
    ```
 
 :::info
-Å bruge Claude Pro/Max-abonnementet ditt i OpenCode støttes ikke offisielt av [Anthropic](https://anthropic.com).
+Å bruge Claude Pro/Max-abonnementet ditt i Kilo støttes ikke offisielt av [Anthropic](https://anthropic.com).
 :::
 
 ##### Bruge API-tastene
@@ -486,7 +486,7 @@ Cloudflare AI Gateway lar deg få tilgang til modeller fra OpenAI, Anthropic, Wo
 
    ```json title="opencode.json"
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://kilo.ai/config.json",
      "provider": {
        "cloudflare-ai-gateway": {
          "models": {
@@ -662,7 +662,7 @@ GitLab Duo gir AI-drevet agentchat med native verktøyoppringingsfunksjoner gjen
    #### Bruger personlig tilgangstoken
    1. Gå til [GitLab User Settings > Access Tokens](https://gitlab.com/-/user_settings/personal_access_tokens)
    2. Klikk på **Legg til nytt token**
-   3. Navn: `OpenCode`, omfang: `api`
+   3. Navn: `Kilo`, omfang: `api`
    4. Kopier tokenet (starter med `glpat-`)
    5. Skriv den inn i terminalen
 
@@ -679,20 +679,20 @@ GitLab Duo gir AI-drevet agentchat med native verktøyoppringingsfunksjoner gjen
 
 :::note
 Du kan også spesifisere 'GITLAB_TOKEN' miljøvariabel hvis du ikke vil
-for at lagre token i opencode auth-lagring.
+for at lagre token i kilo auth-lagring.
 :::
 
 ##### Selvhostet GitLab
 
 :::note[compliance note]
-OpenCode bruger en liten modell for nogle AI oppgaver som at generere sessiontittelen.
-Den er konfigurert til at bruge gpt-5-nano som standard, hostet av Zen. For at låse OpenCode
+Kilo bruger en liten modell for nogle AI oppgaver som at generere sessiontittelen.
+Den er konfigurert til at bruge gpt-5-nano som standard, hostet av Zen. For at låse Kilo
 for kun at bruge din egen GitLab-hostede forekomst, tilføj til følgende i din
 `opencode.json` fil. Det anbefales også at deaktivere sessiondeling.
 
 ```json
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "small_model": "gitlab/duo-chat-haiku-4-5",
   "share": "disabled"
 }
@@ -754,7 +754,7 @@ Tilpass gjennom `opencode.json`:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "gitlab": {
       "options": {
@@ -775,7 +775,7 @@ For at få tilgang til GitLab-verktøy (sammenslåingsforespørsler, problemer, 
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "plugin": ["@gitlab/opencode-gitlab-plugin"]
 }
 ```
@@ -786,7 +786,7 @@ Denne plugin-en gir omfattende GitLab-repository-administrasjonsfunksjoner, inkl
 
 ### GitHub Copilot
 
-Slik bruger du GitHub Copilot-abonnementet med OpenCode:
+Slik bruger du GitHub Copilot-abonnementet med Kilo:
 
 :::note
 Nogle modeller kan trenge en [Pro+
@@ -823,7 +823,7 @@ Nogle modeller må aktiveres manuelt i [GitHub Copilot-innstillingene](https://d
 
 ### Google Vertex AI
 
-Slik bruger du Google Vertex AI med OpenCode:
+Slik bruger du Google Vertex AI med Kilo:
 
 1. Gå over til **Model Garden** i Google Cloud Console og tjek
    modeller tilgængelig i din region.
@@ -958,7 +958,7 @@ Her er [Helicone's Model Directory](https://helicone.ai/models), du trenger denn
 
 ```jsonc title="~/.config/opencode/opencode.jsonc"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "helicone": {
       "npm": "@ai-sdk/openai-compatible",
@@ -986,7 +986,7 @@ Helicone støtter tilpassede overskrifter for funksjoner som bufring, brugerspor
 
 ```jsonc title="~/.config/opencode/opencode.jsonc"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "helicone": {
       "npm": "@ai-sdk/openai-compatible",
@@ -1005,7 +1005,7 @@ Helicone støtter tilpassede overskrifter for funksjoner som bufring, brugerspor
 
 ##### Sesjonssporing
 
-Helicones [Sessions](https://docs.helicone.ai/features/sessions) funksjon lar deg gruppere relaterte LLM forespørsler sammen. Brug [opencode-helicone-session](https://github.com/H2Shami/opencode-helicone-session) plugin for automatisk at logge hver OpenCode-samtale som en session i Helicone.
+Helicones [Sessions](https://docs.helicone.ai/features/sessions) funksjon lar deg gruppere relaterte LLM forespørsler sammen. Brug [opencode-helicone-session](https://github.com/H2Shami/opencode-helicone-session) plugin for automatisk at logge hver Kilo-samtale som en session i Helicone.
 
 ```bash
 npm install -g opencode-helicone-session
@@ -1019,7 +1019,7 @@ Legg den til i konfigurasjonen din.
 }
 ```
 
-Programtiltilføjet injiserer `Helicone-Session-Id` og `Helicone-Session-Name` overskrifter i forespørslene dine. På Helicones Sessions-side vil du se hver OpenCode-samtale oppført som en separat session.
+Programtiltilføjet injiserer `Helicone-Session-Id` og `Helicone-Session-Name` overskrifter i forespørslene dine. På Helicones Sessions-side vil du se hver Kilo-samtale oppført som en separat session.
 
 ##### Vanlige helikonhoder
 
@@ -1040,7 +1040,7 @@ Du kan konfigurere opencode for at bruge lokale modeller gjennom [llama.cpps](ht
 
 ```json title="opencode.json" "llama.cpp" {5, 6, 8, 10-15}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "llama.cpp": {
       "npm": "@ai-sdk/openai-compatible",
@@ -1107,7 +1107,7 @@ Du kan konfigurere opencode for at bruge lokale modeller gjennom LM Studio.
 
 ```json title="opencode.json" "lmstudio" {5, 6, 8, 10-14}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "lmstudio": {
       "npm": "@ai-sdk/openai-compatible",
@@ -1223,12 +1223,12 @@ Slik bruger du Kimi K2 fra Moonshot AI:
 Du kan konfigurere opencode for at bruge lokale modeller gjennom Ollama.
 
 :::tip
-Ollama kan automatisk konfigurere seg selv for OpenCode. Se [Ollama-integrasjonsdokumentene](https://docs.ollama.com/integrations/opencode) for detaljer.
+Ollama kan automatisk konfigurere seg selv for Kilo. Se [Ollama-integrasjonsdokumentene](https://docs.ollama.com/integrations/opencode) for detaljer.
 :::
 
 ```json title="opencode.json" "ollama" {5, 6, 8, 10-14}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "ollama": {
       "npm": "@ai-sdk/openai-compatible",
@@ -1262,13 +1262,13 @@ Hvis verktøykall ikke fungerer, prøv at øke `num_ctx` i Ollama. Start rundt 1
 
 ### Ollama Cloud
 
-Slik bruger du Ollama Cloud med OpenCode:
+Slik bruger du Ollama Cloud med Kilo:
 
 1. Gå over til [https://ollama.com/](https://ollama.com/) og logg på eller opret en konto.
 
 2. Naviger til **Innstillinger** > **Nøkler** og klikk på **Legg til API-nøgle** for at generere en ny API-nøgle.
 
-3. Kopier API-nøgleen for brug i OpenCode.
+3. Kopier API-nøgleen for brug i Kilo.
 
 4. Kjør kommandoen `/connect` og søk etter **Ollama Cloud**.
 
@@ -1285,7 +1285,7 @@ Slik bruger du Ollama Cloud med OpenCode:
    └ enter
    ```
 
-6. **Viktig**: Før du bruger skymodeller i OpenCode, må du hente modellinformasjonen lokalt:
+6. **Viktig**: Før du bruger skymodeller i Kilo, må du hente modellinformasjonen lokalt:
 
    ```bash
    ollama pull gpt-oss:20b-cloud
@@ -1334,7 +1334,7 @@ Hvis du allerede har en API-nøgle, kan du velge **Angi API-nøgle manuelt** og 
 
 ### OpenCode Zen
 
-OpenCode Zen er en liste over testede og verifiserte modeller levert av OpenCode-teamet. [Finn ut mer](/docs/zen).
+OpenCode Zen er en liste over testede og verifiserte modeller levert av Kilo-teamet. [Finn ut mer](/docs/zen).
 
 1. Logg på **<a href={console}>OpenCode Zen</a>** og klikk på **Create API Key**.
 
@@ -1344,7 +1344,7 @@ OpenCode Zen er en liste over testede og verifiserte modeller levert av OpenCode
    /connect
    ```
 
-3. Skriv inn OpenCode API-nøgleen.
+3. Skriv inn Kilo API-nøgleen.
 
    ```txt
    ┌ API key
@@ -1390,7 +1390,7 @@ OpenCode Zen er en liste over testede og verifiserte modeller levert av OpenCode
 
    ```json title="opencode.json" {6}
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://kilo.ai/config.json",
      "provider": {
        "openrouter": {
          "models": {
@@ -1405,7 +1405,7 @@ OpenCode Zen er en liste over testede og verifiserte modeller levert av OpenCode
 
    ```json title="opencode.json"
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://kilo.ai/config.json",
      "provider": {
        "openrouter": {
          "models": {
@@ -1509,7 +1509,7 @@ SAP AI Core gir tilgang til 40+ modeller fra OpenAI, Anthropic, Google, Amazon, 
 
 ### Scaleway
 
-Slik bruger du [Scaleway Generative APIs](https://www.scaleway.com/en/docs/generative-apis/) med OpenCode:
+Slik bruger du [Scaleway Generative APIs](https://www.scaleway.com/en/docs/generative-apis/) med Kilo:
 
 1. Gå over til [Scaleway Console IAM innstillinger](https://console.scaleway.com/iam/api-keys) for at generere en ny API-nøgle.
 
@@ -1621,7 +1621,7 @@ Du kan også tilpasse modeller gjennom opencode-konfigurasjonen. Her er et eksem
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "vercel": {
       "models": {
@@ -1731,7 +1731,7 @@ Nogle nyttige rutealternativer:
 
    ```json title="opencode.json" {6}
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://kilo.ai/config.json",
      "provider": {
        "zenmux": {
          "models": {
@@ -1799,7 +1799,7 @@ Du kan bruge hvilken som helst OpenAI-kompatibel leverandør med opencode. De fl
 
    ```json title="opencode.json" ""myprovider"" {5-15}
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://kilo.ai/config.json",
      "provider": {
        "myprovider": {
          "npm": "@ai-sdk/openai-compatible",
@@ -1837,7 +1837,7 @@ Her er et eksempel på innstilling av alternativene `apiKey`, `headers` og model
 
 ```json title="opencode.json" {9,11,17-20}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "myprovider": {
       "npm": "@ai-sdk/openai-compatible",
@@ -1870,7 +1870,7 @@ Konfigurasjonsdetaljer:
 - **limit.context**: Maksimalt inndatatoken som modellen godtar.
 - **limit.output**: Maksimalt antall tokens modellen kan generere.
 
-`limit`-feltene lar OpenCode forstå hvor mye kontekst du har igjen. Standardleverandører henter disse automatisk fra models.dev.
+`limit`-feltene lar Kilo forstå hvor mye kontekst du har igjen. Standardleverandører henter disse automatisk fra models.dev.
 
 ---
 
@@ -1878,7 +1878,7 @@ Konfigurasjonsdetaljer:
 
 Hvis du har problemer med at konfigurere en leverandør, tjek følgende:
 
-1. **Tjek autentiseringsoppsettet**: Kjør `opencode auth list` for at se om legitimasjonen
+1. **Tjek autentiseringsoppsettet**: Kjør `kilo auth list` for at se om legitimasjonen
    for leverandøren tilføjes til konfigurasjonen din.
 
    Dette gjelder ikke leverandører som Amazon Bedrock, som er avhengige av miljøvariabler for godkjenning.

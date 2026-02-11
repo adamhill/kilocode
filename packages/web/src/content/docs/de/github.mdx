@@ -1,17 +1,17 @@
 ---
 title: GitHub
-description: Verwenden Sie OpenCode in GitHub-Problemen und Pull-Requests.
+description: Verwenden Sie Kilo in GitHub-Problemen und Pull-Requests.
 ---
 
-OpenCode lässt sich in Ihren GitHub-Workflow integrieren. Erwähnen Sie `/opencode` oder `/oc` in Ihrem Kommentar, und OpenCode führt Aufgaben in Ihrem GitHub Actions-Runner aus.
+Kilo lässt sich in Ihren GitHub-Workflow integrieren. Erwähnen Sie `/opencode` oder `/oc` in Ihrem Kommentar, und Kilo führt Aufgaben in Ihrem GitHub Actions-Runner aus.
 
 ---
 
 ## Features
 
-- **Triage-Probleme**: Bitten Sie OpenCode, ein Problem zu untersuchen und es Ihnen zu erklären.
-- **Reparieren und implementieren**: Bitten Sie OpenCode, ein Problem zu beheben oder eine Funktion zu implementieren. Und es funktioniert in einem neuen Zweig und sendet ein PR mit allen Änderungen.
-- **Sicher**: OpenCode läuft in den Runnern Ihres GitHub.
+- **Triage-Probleme**: Bitten Sie Kilo, ein Problem zu untersuchen und es Ihnen zu erklären.
+- **Reparieren und implementieren**: Bitten Sie Kilo, ein Problem zu beheben oder eine Funktion zu implementieren. Und es funktioniert in einem neuen Zweig und sendet ein PR mit allen Änderungen.
+- **Sicher**: Kilo läuft in den Runnern Ihres GitHub.
 
 ---
 
@@ -63,8 +63,8 @@ Oder Sie können es manuell einrichten.
               fetch-depth: 1
               persist-credentials: false
 
-          - name: Run OpenCode
-           uses: anomalyco/opencode/github@latest
+          - name: Run Kilo
+           uses: Kilo-Org/kilo/github@latest
            env:
              ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
            with:
@@ -81,13 +81,13 @@ Oder Sie können es manuell einrichten.
 
 ## Configuration
 
-- `model`: Das mit OpenCode zu verwendende Modell. Nimmt das Format `provider/model` an. Dies ist **erforderlich**.
+- `model`: Das mit Kilo zu verwendende Modell. Nimmt das Format `provider/model` an. Dies ist **erforderlich**.
 - `agent`: Der zu verwendende Agent. Muss ein Hauptagent sein. Fällt aus der Konfiguration auf `default_agent` oder `"build"` zurück, wenn es nicht gefunden wird.
-- `share`: Ob die OpenCode-Sitzung geteilt werden soll. Der Standardwert ist **true** für öffentliche Repositorys.
-- `prompt`: Optionale benutzerdefinierte Eingabeaufforderung zum Überschreiben des Standardverhaltens. Verwenden Sie dies, um anzupassen, wie OpenCode Anfragen verarbeitet.
-- `token`: Optionales GitHub-Zugriffstoken zum Ausführen von Vorgängen wie dem Erstellen von Kommentaren, dem Festschreiben von Änderungen und dem Öffnen von Pull-Anfragen. Standardmäßig verwendet OpenCode das Installationszugriffstoken der OpenCode GitHub-App, sodass Commits, Kommentare und Pull-Anfragen so aussehen, als würden sie von der App kommen.
+- `share`: Ob die Kilo-Sitzung geteilt werden soll. Der Standardwert ist **true** für öffentliche Repositorys.
+- `prompt`: Optionale benutzerdefinierte Eingabeaufforderung zum Überschreiben des Standardverhaltens. Verwenden Sie dies, um anzupassen, wie Kilo Anfragen verarbeitet.
+- `token`: Optionales GitHub-Zugriffstoken zum Ausführen von Vorgängen wie dem Erstellen von Kommentaren, dem Festschreiben von Änderungen und dem Öffnen von Pull-Anfragen. Standardmäßig verwendet Kilo das Installationszugriffstoken der Kilo GitHub-App, sodass Commits, Kommentare und Pull-Anfragen so aussehen, als würden sie von der App kommen.
 
-  Alternativ können Sie [built-in `GITHUB_TOKEN`](https://docs.github.com/en/actions/tutorials/authenticate-with-github_token) des GitHub Action Runners verwenden, ohne die OpenCode GitHub App zu installieren. Stellen Sie einfach sicher, dass Sie in Ihrem Workflow die erforderlichen Berechtigungen erteilen:
+  Alternativ können Sie [built-in `GITHUB_TOKEN`](https://docs.github.com/en/actions/tutorials/authenticate-with-github_token) des GitHub Action Runners verwenden, ohne die Kilo GitHub App zu installieren. Stellen Sie einfach sicher, dass Sie in Ihrem Workflow die erforderlichen Berechtigungen erteilen:
 
   ```yaml
   permissions:
@@ -103,23 +103,23 @@ Oder Sie können es manuell einrichten.
 
 ## Unterstützte Veranstaltungen
 
-OpenCode kann durch die folgenden GitHub-Ereignisse ausgelöst werden:
+Kilo kann durch die folgenden GitHub-Ereignisse ausgelöst werden:
 
 | Ereignistyp                   | Ausgelöst durch                                   | Einzelheiten                                                                                                                                        |
 | ----------------------------- | ------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `issue_comment`               | Kommentieren Sie ein Problem oder PR              | Erwähnen Sie `/opencode` oder `/oc` in Ihrem Kommentar. OpenCode liest den Kontext und kann Verzweigungen erstellen, PRs öffnen oder antworten.     |
-| `pull_request_review_comment` | Kommentieren Sie bestimmte Codezeilen in einem PR | Erwähnen Sie `/opencode` oder `/oc` beim Überprüfen des Codes. OpenCode empfängt Dateipfad, Zeilennummern und Diff-Kontext.                         |
-| `issues`                      | Problem geöffnet oder bearbeitet                  | Lösen Sie OpenCode automatisch aus, wenn Probleme erstellt oder geändert werden. Erfordert `prompt`-Eingabe.                                        |
-| `pull_request`                | PR geöffnet oder aktualisiert                     | Lösen Sie OpenCode automatisch aus, wenn PRs geöffnet, synchronisiert oder erneut geöffnet werden. Nützlich für automatisierte Bewertungen.         |
-| `schedule`                    | Cron-basierter Zeitplan                           | Führen Sie OpenCode nach einem Zeitplan aus. Erfordert `prompt`-Eingabe. Die Ausgabe geht an Protokolle und PRs (kein Kommentar zu diesem Problem). |
-| `workflow_dispatch`           | Manueller Trigger von GitHub UI                   | Lösen Sie OpenCode bei Bedarf über die Registerkarte „Aktionen“ aus. Erfordert `prompt`-Eingabe. Die Ausgabe erfolgt an Protokolle und PRs.         |
+| `issue_comment`               | Kommentieren Sie ein Problem oder PR              | Erwähnen Sie `/opencode` oder `/oc` in Ihrem Kommentar. Kilo liest den Kontext und kann Verzweigungen erstellen, PRs öffnen oder antworten.     |
+| `pull_request_review_comment` | Kommentieren Sie bestimmte Codezeilen in einem PR | Erwähnen Sie `/opencode` oder `/oc` beim Überprüfen des Codes. Kilo empfängt Dateipfad, Zeilennummern und Diff-Kontext.                         |
+| `issues`                      | Problem geöffnet oder bearbeitet                  | Lösen Sie Kilo automatisch aus, wenn Probleme erstellt oder geändert werden. Erfordert `prompt`-Eingabe.                                        |
+| `pull_request`                | PR geöffnet oder aktualisiert                     | Lösen Sie Kilo automatisch aus, wenn PRs geöffnet, synchronisiert oder erneut geöffnet werden. Nützlich für automatisierte Bewertungen.         |
+| `schedule`                    | Cron-basierter Zeitplan                           | Führen Sie Kilo nach einem Zeitplan aus. Erfordert `prompt`-Eingabe. Die Ausgabe geht an Protokolle und PRs (kein Kommentar zu diesem Problem). |
+| `workflow_dispatch`           | Manueller Trigger von GitHub UI                   | Lösen Sie Kilo bei Bedarf über die Registerkarte „Aktionen“ aus. Erfordert `prompt`-Eingabe. Die Ausgabe erfolgt an Protokolle und PRs.         |
 
 ### Beispiel für einen Zeitplan
 
-Führen Sie OpenCode nach einem Zeitplan aus, um automatisierte Aufgaben auszuführen:
+Führen Sie Kilo nach einem Zeitplan aus, um automatisierte Aufgaben auszuführen:
 
 ```yaml title=".github/workflows/opencode-scheduled.yml"
-name: Scheduled OpenCode Task
+name: Scheduled Kilo Task
 
 on:
   schedule:
@@ -139,8 +139,8 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Run OpenCode
-        uses: anomalyco/opencode/github@latest
+      - name: Run Kilo
+        uses: Kilo-Org/kilo/github@latest
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         with:
@@ -150,7 +150,7 @@ jobs:
             If you find issues worth addressing, open an issue to track them.
 ```
 
-Für geplante Ereignisse ist die Eingabe `prompt` **erforderlich**, da es keinen Kommentar gibt, aus dem Anweisungen extrahiert werden können. Geplante Workflows werden ohne Benutzerkontext zur Berechtigungsprüfung ausgeführt. Daher muss der Workflow `contents: write` und `pull-requests: write` gewähren, wenn Sie erwarten, dass OpenCode Zweige oder PRs erstellt.
+Für geplante Ereignisse ist die Eingabe `prompt` **erforderlich**, da es keinen Kommentar gibt, aus dem Anweisungen extrahiert werden können. Geplante Workflows werden ohne Benutzerkontext zur Berechtigungsprüfung ausgeführt. Daher muss der Workflow `contents: write` und `pull-requests: write` gewähren, wenn Sie erwarten, dass Kilo Zweige oder PRs erstellt.
 
 ---
 
@@ -177,7 +177,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           persist-credentials: false
-      - uses: anomalyco/opencode/github@latest
+      - uses: Kilo-Org/kilo/github@latest
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -191,7 +191,7 @@ jobs:
             - Suggest improvements
 ```
 
-Wenn für `pull_request`-Ereignisse kein `prompt` bereitgestellt wird, überprüft OpenCode standardmäßig die Pull-Anfrage.
+Wenn für `pull_request`-Ereignisse kein `prompt` bereitgestellt wird, überprüft Kilo standardmäßig die Pull-Anfrage.
 
 ---
 
@@ -233,7 +233,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - uses: anomalyco/opencode/github@latest
+      - uses: Kilo-Org/kilo/github@latest
         if: steps.check.outputs.result == 'true'
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
@@ -252,10 +252,10 @@ Für `issues`-Ereignisse ist die Eingabe `prompt` **erforderlich**, da es keinen
 
 ## Benutzerdefinierte Eingabeaufforderungen
 
-Überschreiben Sie die Standardaufforderung, um das Verhalten von OpenCode für Ihren Workflow anzupassen.
+Überschreiben Sie die Standardaufforderung, um das Verhalten von Kilo für Ihren Workflow anzupassen.
 
 ```yaml title=".github/workflows/opencode.yml"
-- uses: anomalyco/opencode/github@latest
+- uses: Kilo-Org/kilo/github@latest
   with:
     model: anthropic/claude-sonnet-4-5
     prompt: |
@@ -271,7 +271,7 @@ Dies ist nützlich, um bestimmte Prüfkriterien, Kodierungsstandards oder Schwer
 
 ## Examples
 
-Hier sind einige Beispiele, wie Sie OpenCode in GitHub verwenden können.
+Hier sind einige Beispiele, wie Sie Kilo in GitHub verwenden können.
 
 - **Erklären Sie ein Problem**
 
@@ -281,7 +281,7 @@ Hier sind einige Beispiele, wie Sie OpenCode in GitHub verwenden können.
   /opencode explain this issue
   ```
 
-  OpenCode liest den gesamten Thread, einschließlich aller Kommentare, und antwortet mit einer klaren Erklärung.
+  Kilo liest den gesamten Thread, einschließlich aller Kommentare, und antwortet mit einer klaren Erklärung.
 
 - **Ein Problem beheben**
 
@@ -291,7 +291,7 @@ Hier sind einige Beispiele, wie Sie OpenCode in GitHub verwenden können.
   /opencode fix this
   ```
 
-  Und OpenCode erstellt einen neuen Zweig, implementiert die Änderungen und öffnet ein PR mit den Änderungen.
+  Und Kilo erstellt einen neuen Zweig, implementiert die Änderungen und öffnet ein PR mit den Änderungen.
 
 - **PRs überprüfen und Änderungen vornehmen**
 
@@ -301,18 +301,18 @@ Hier sind einige Beispiele, wie Sie OpenCode in GitHub verwenden können.
   Delete the attachment from S3 when the note is removed /oc
   ```
 
-  OpenCode implementiert die angeforderte Änderung und schreibt sie an denselben PR fest.
+  Kilo implementiert die angeforderte Änderung und schreibt sie an denselben PR fest.
 
 - **Überprüfen Sie bestimmte Codezeilen**
 
-  Hinterlassen Sie einen Kommentar direkt zu den Codezeilen auf der Registerkarte „Dateien“ von PR. OpenCode erkennt automatisch die Datei, Zeilennummern und den Diff-Kontext, um präzise Antworten bereitzustellen.
+  Hinterlassen Sie einen Kommentar direkt zu den Codezeilen auf der Registerkarte „Dateien“ von PR. Kilo erkennt automatisch die Datei, Zeilennummern und den Diff-Kontext, um präzise Antworten bereitzustellen.
 
   ```
   [Comment on specific lines in Files tab]
   /oc add error handling here
   ```
 
-  Beim Kommentieren bestimmter Zeilen erhält OpenCode:
+  Beim Kommentieren bestimmter Zeilen erhält Kilo:
   - Die genaue Datei, die überprüft wird
   - Die spezifischen Codezeilen
   - Der umgebende Diff-Kontext

@@ -3,11 +3,11 @@ title: キーバインド
 description: キーバインドをカスタマイズします。
 ---
 
-OpenCode には、OpenCode 設定を通じてカスタマイズできるキーバインドのリストがあります。
+Kilo には、Kilo 設定を通じてカスタマイズできるキーバインドのリストがあります。
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "keybinds": {
     "leader": "ctrl+x",
     "app_exit": "ctrl+c,ctrl+d,<leader>q",
@@ -107,7 +107,7 @@ OpenCode には、OpenCode 設定を通じてカスタマイズできるキー�
 
 ## リーダーキー
 
-OpenCode は、ほとんどのキーバインドに `leader` キーを使用します。これにより、terminal での競合が回避されます。
+Kilo は、ほとんどのキーバインドに `leader` キーを使用します。これにより、terminal での競合が回避されます。
 
 デフォルトでは、`ctrl+x` がリーダー キーであり、ほとんどの操作では、最初にリーダー キーを押してからショートカットを押す必要があります。たとえば、新しいセッションを開始するには、まず `ctrl+x` を押してから、`n` を押します。
 
@@ -121,7 +121,7 @@ OpenCode は、ほとんどのキーバインドに `leader` キーを使用し�
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "keybinds": {
     "session_compact": "none"
   }

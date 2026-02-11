@@ -26,7 +26,7 @@ WSL дает более высокую производительность фа
    После настройки WSL откройте WSL terminal и установите opencode одним из [способов установки](/docs/).
 
    ```bash
-   curl -fsSL https://opencode.ai/install | bash
+   curl -fsSL https://kilo.ai/install | bash
    ```
 
 3. **Запускайте opencode из WSL**
@@ -49,7 +49,7 @@ WSL дает более высокую производительность фа
 1. **Запустите сервер в WSL** с параметром `--hostname 0.0.0.0`, чтобы разрешить внешние подключения:
 
    ```bash
-   opencode serve --hostname 0.0.0.0 --port 4096
+   kilo serve --hostname 0.0.0.0 --port 4096
    ```
 
 2. **Подключите десктопное приложение** к `http://localhost:4096`
@@ -62,7 +62,7 @@ WSL дает более высокую производительность фа
 При использовании `--hostname 0.0.0.0` задайте `OPENCODE_SERVER_PASSWORD`, чтобы защитить сервер.
 
 ```bash
-OPENCODE_SERVER_PASSWORD=your-password opencode serve --hostname 0.0.0.0
+OPENCODE_SERVER_PASSWORD=your-password kilo serve --hostname 0.0.0.0
 ```
 
 :::

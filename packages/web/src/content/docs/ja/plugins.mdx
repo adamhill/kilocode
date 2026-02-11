@@ -1,9 +1,9 @@
 ---
 title: プラグイン
-description: OpenCode を拡張する独自のプラグインを作成します。
+description: Kilo を拡張する独自のプラグインを作成します。
 ---
 
-プラグインを使用すると、さまざまなイベントにフックして動作をカスタマイズすることで OpenCode を拡張できます。プラグインを作成して、新しい機能を追加したり、外部サービスと統合したり、OpenCode のデフォルトの動作を変更したりできます。
+プラグインを使用すると、さまざまなイベントにフックして動作をカスタマイズすることで Kilo を拡張できます。プラグインを作成して、新しい機能を追加したり、外部サービスと統合したり、Kilo のデフォルトの動作を変更したりできます。
 
 たとえば、コミュニティによって作成された [plugins](/docs/ecosystem#plugins) をチェックしてください。
 
@@ -32,7 +32,7 @@ JavaScript または TypeScript ファイルをプラグイン ディレクト�
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "plugin": ["opencode-helicone-session", "opencode-wakatime", "@my-org/custom-plugin"]
 }
 ```
@@ -83,7 +83,7 @@ JavaScript または TypeScript ファイルをプラグイン ディレクト�
 }
 ```
 
-OpenCode は起動時に `bun install` を実行してこれらをインストールします。プラグインとツールはそれらをインポートできるようになります。
+Kilo は起動時に `bun install` を実行してこれらをインストールします。プラグインとツールはそれらをインポートできるようになります。
 
 ```ts title=".opencode/plugins/my-plugin.ts"
 import { escape } from "shescape"
@@ -235,7 +235,7 @@ export const NotificationPlugin = async ({ project, client, $, directory, worktr
 macOS 上で AppleScript を実行するために `osascript` を使用しています。ここでは通知を送信するために使用しています。
 
 :::note
-OpenCode デスクトップ アプリを使用している場合は、応答の準備ができたとき、またはセッション エラーが発生したときにシステム通知を自動的に送信できます。
+Kilo デスクトップ アプリを使用している場合は、応答の準備ができたとき、またはセッション エラーが発生したときにシステム通知を自動的に送信できます。
 :::
 
 ---
@@ -327,7 +327,7 @@ export const MyPlugin = async ({ client }) => {
 }
 ```
 
-レベル: `debug`、`info`、`warn`、`error`。詳細については、[SDK ドキュメント](https://opencode.ai/docs/sdk) を参照してください。
+レベル: `debug`、`info`、`warn`、`error`。詳細については、[SDK ドキュメント](https://kilo.ai/docs/sdk) を参照してください。
 
 ---
 

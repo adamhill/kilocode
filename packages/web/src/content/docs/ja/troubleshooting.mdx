@@ -3,7 +3,7 @@ title: トラブルシューティング
 description: よくある問題とその解決方法。
 ---
 
-OpenCode の問題をデバッグするには、まず、ディスク上に保存されているログとローカル データを確認します。
+Kilo の問題をデバッグするには、まず、ディスク上に保存されているログとローカル データを確認します。
 
 ---
 
@@ -39,13 +39,13 @@ opencode は、セッション データとその他のアプリケーション 
 
 ## デスクトップアプリ
 
-OpenCode Desktop は、ローカル OpenCode サーバー (`opencode-cli` サイドカー) をバックグラウンドで実行します。ほとんどの問題は、誤動作するプラグイン、破損したキャッシュ、または不正なサーバー設定によって発生します。
+Kilo Desktop は、ローカル Kilo サーバー (`opencode-cli` サイドカー) をバックグラウンドで実行します。ほとんどの問題は、誤動作するプラグイン、破損したキャッシュ、または不正なサーバー設定によって発生します。
 
 ### クイックチェック
 
 - アプリを完全に終了して再起動します。
 - アプリにエラー画面が表示された場合は、**再起動** をクリックしてエラーの詳細をコピーします。
-- macOS のみ: `OpenCode` メニュー -> **Webview を再ロード** (UI が空白またはフリーズしている場合に役立ちます)。
+- macOS のみ: `Kilo` メニュー -> **Webview を再ロード** (UI が空白またはフリーズしている場合に役立ちます)。
 
 ---
 
@@ -65,14 +65,14 @@ OpenCode Desktop は、ローカル OpenCode サーバー (`opencode-cli` サイ
 
 ```jsonc
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "plugin": [],
 }
 ```
 
 #### プラグインのディレクトリを確認する
 
-OpenCode はディスクからローカル プラグインをロードすることもできます。これらを一時的に邪魔にならない場所に移動し (またはフォルダーの名前を変更し)、デスクトップ アプリを再起動します。
+Kilo はディスクからローカル プラグインをロードすることもできます。これらを一時的に邪魔にならない場所に移動し (またはフォルダーの名前を変更し)、デスクトップ アプリを再起動します。
 
 - **グローバル プラグイン**
   - **macOS/Linux**: `~/.config/opencode/plugins/`
@@ -86,22 +86,22 @@ OpenCode はディスクからローカル プラグインをロードするこ�
 
 ### キャッシュをクリアする
 
-プラグインを無効にしても解決しない場合 (またはプラグインのインストールが停止した場合)、OpenCode がキャッシュを再構築できるようにキャッシュをクリアします。
+プラグインを無効にしても解決しない場合 (またはプラグインのインストールが停止した場合)、Kilo がキャッシュを再構築できるようにキャッシュをクリアします。
 
-1. OpenCode Desktop を完全に終了します。
+1. Kilo Desktop を完全に終了します。
 2. キャッシュ ディレクトリを削除します。
 
 - **macOS**: Finder -> `Cmd+Shift+G` -> `~/.cache/opencode` を貼り付け
 - **Linux**: `~/.cache/opencode` を削除します (または `rm -rf ~/.cache/opencode` を実行します)。
 - **Windows**: `WIN+R` を押して `%USERPROFILE%\.cache\opencode` を貼り付けます
 
-3. OpenCode デスクトップを再起動します。
+3. Kilo デスクトップを再起動します。
 
 ---
 
 ### サーバー接続の問題を修正する
 
-OpenCode Desktop は、独自のローカル サーバー (デフォルト) を起動することも、構成したサーバー URL に接続することもできます。
+Kilo Desktop は、独自のローカル サーバー (デフォルト) を起動することも、構成したサーバー URL に接続することもできます。
 
 **「接続に失敗しました」** ダイアログが表示された場合 (またはアプリがスプラッシュ画面を通過できない場合)、カスタム サーバー URL を確認してください。
 
@@ -132,21 +132,21 @@ Linux では、一部の Wayland セットアップにより、空白のウィ�
 
 ### Windows: WebView2 ランタイム
 
-Windows では、OpenCode Desktop には Microsoft Edge **WebView2 ランタイム**が必要です。アプリが空白のウィンドウで開くか、起動しない場合は、WebView2 をインストールまたは更新して、もう一度試してください。
+Windows では、Kilo Desktop には Microsoft Edge **WebView2 ランタイム**が必要です。アプリが空白のウィンドウで開くか、起動しない場合は、WebView2 をインストールまたは更新して、もう一度試してください。
 
 ---
 
 ### Windows: 一般的なパフォーマンスの問題
 
-Windows でパフォーマンスの低下、ファイル アクセスの問題、またはterminal の問題が発生している場合は、[WSL (Windows Subsystem for Linux)](/docs/windows-wsl) を使用してみてください。 WSL は、OpenCode の機能とよりシームレスに連携する Linux 環境を提供します。
+Windows でパフォーマンスの低下、ファイル アクセスの問題、またはterminal の問題が発生している場合は、[WSL (Windows Subsystem for Linux)](/docs/windows-wsl) を使用してみてください。 WSL は、Kilo の機能とよりシームレスに連携する Linux 環境を提供します。
 
 ---
 
 ### 通知が表示されない
 
-OpenCode Desktop では、次の場合にのみシステム通知が表示されます。
+Kilo Desktop では、次の場合にのみシステム通知が表示されます。
 
-- OS 設定で OpenCode の通知が有効になっており、
+- OS 設定で Kilo の通知が有効になっており、
 - アプリウィンドウにフォーカスがありません。
 
 ---
@@ -155,8 +155,8 @@ OpenCode Desktop では、次の場合にのみシステム通知が表示され
 
 アプリが起動せず、UI 内から設定をクリアできない場合は、デスクトップ アプリの保存された状態をリセットします。
 
-1. OpenCode デスクトップを終了します。
-2. これらのファイルを見つけて削除します (これらのファイルは OpenCode デスクトップ アプリのデータ ディレクトリにあります)。
+1. Kilo デスクトップを終了します。
+2. これらのファイルを見つけて削除します (これらのファイルは Kilo デスクトップ アプリのデータ ディレクトリにあります)。
 
 - `opencode.settings.dat` (デスクトップのデフォルトサーバー URL)
 - `opencode.global.dat` および `opencode.workspace.*.dat` (最近のサーバー/プロジェクトなどの UI 状態)
@@ -171,13 +171,13 @@ OpenCode Desktop では、次の場合にのみシステム通知が表示され
 
 ## 助けを求める
 
-OpenCode で問題が発生している場合:
+Kilo で問題が発生している場合:
 
 1. **GitHub で問題を報告してください**
 
 バグを報告したり、機能をリクエストしたりする最良の方法は、GitHub リポジトリを使用することです。
 
-[**github.com/anomalyco/opencode/issues**](https://github.com/anomalyco/opencode/issues)
+[**github.com/Kilo-Org/kilo/issues**](https://github.com/Kilo-Org/kilo/issues)
 
 新しい問題を作成する前に、既存の問題を検索して、問題がすでに報告されているかどうかを確認してください。
 
@@ -185,7 +185,7 @@ OpenCode で問題が発生している場合:
 
 リアルタイムのヘルプやコミュニティのディスカッションについては、Discord サーバーに参加してください。
 
-[**opencode.ai/discord**](https://opencode.ai/discord)
+[**kilo.ai/discord**](https://kilo.ai/discord)
 
 ---
 
@@ -195,11 +195,11 @@ OpenCode で問題が発生している場合:
 
 ---
 
-### OpenCodeが起動しない
+### Kiloが起動しない
 
 1. ログでエラー メッセージを確認する
 2. `--print-logs` で実行して、terminal に出力を確認してください。
-3. `opencode upgrade` を含む最新バージョンを使用していることを確認してください
+3. `kilo upgrade` を含む最新バージョンを使用していることを確認してください
 
 ---
 

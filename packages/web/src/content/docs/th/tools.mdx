@@ -3,7 +3,7 @@ title: เครื่องมือ
 description: จัดการเครื่องมือที่ LLM สามารถใช้ได้
 ---
 
-เครื่องมืออนุญาตให้ LLM ดำเนินการในโค้ดเบสของคุณ OpenCode มาพร้อมกับชุดเครื่องมือในตัว แต่คุณสามารถขยายได้ด้วย [เครื่องมือที่กำหนดเอง](/docs/custom-tools) หรือ [MCP เซิร์ฟเวอร์](/docs/mcp-servers)
+เครื่องมืออนุญาตให้ LLM ดำเนินการในโค้ดเบสของคุณ Kilo มาพร้อมกับชุดเครื่องมือในตัว แต่คุณสามารถขยายได้ด้วย [เครื่องมือที่กำหนดเอง](/docs/custom-tools) หรือ [MCP เซิร์ฟเวอร์](/docs/mcp-servers)
 
 ตามค่าเริ่มต้น เครื่องมือทั้งหมด **เปิดใช้งาน** และไม่จำเป็นต้องมีสิทธิ์ในการทำงาน คุณสามารถควบคุมการทำงานของเครื่องมือผ่าน [สิทธิ์](/docs/permissions)
 
@@ -15,7 +15,7 @@ description: จัดการเครื่องมือที่ LLM ส�
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "permission": {
     "edit": "deny",
     "bash": "ask",
@@ -28,7 +28,7 @@ description: จัดการเครื่องมือที่ LLM ส�
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "permission": {
     "mymcp_*": "ask"
   }
@@ -41,7 +41,7 @@ description: จัดการเครื่องมือที่ LLM ส�
 
 ## บิวท์อิน
 
-นี่คือเครื่องมือในตัวทั้งหมดที่มีอยู่ใน OpenCode
+นี่คือเครื่องมือในตัวทั้งหมดที่มีอยู่ใน Kilo
 
 ---
 
@@ -51,7 +51,7 @@ description: จัดการเครื่องมือที่ LLM ส�
 
 ```json title="opencode.json" {4}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "permission": {
     "bash": "allow"
   }
@@ -68,7 +68,7 @@ description: จัดการเครื่องมือที่ LLM ส�
 
 ```json title="opencode.json" {4}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "permission": {
     "edit": "allow"
   }
@@ -85,7 +85,7 @@ description: จัดการเครื่องมือที่ LLM ส�
 
 ```json title="opencode.json" {4}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "permission": {
     "edit": "allow"
   }
@@ -106,7 +106,7 @@ description: จัดการเครื่องมือที่ LLM ส�
 
 ```json title="opencode.json" {4}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "permission": {
     "read": "allow"
   }
@@ -123,7 +123,7 @@ description: จัดการเครื่องมือที่ LLM ส�
 
 ```json title="opencode.json" {4}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "permission": {
     "grep": "allow"
   }
@@ -140,7 +140,7 @@ description: จัดการเครื่องมือที่ LLM ส�
 
 ```json title="opencode.json" {4}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "permission": {
     "glob": "allow"
   }
@@ -157,7 +157,7 @@ description: จัดการเครื่องมือที่ LLM ส�
 
 ```json title="opencode.json" {4}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "permission": {
     "list": "allow"
   }
@@ -178,7 +178,7 @@ description: จัดการเครื่องมือที่ LLM ส�
 
 ```json title="opencode.json" {4}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "permission": {
     "lsp": "allow"
   }
@@ -197,7 +197,7 @@ description: จัดการเครื่องมือที่ LLM ส�
 
 ```json title="opencode.json" {4}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "permission": {
     "edit": "allow"
   }
@@ -218,7 +218,7 @@ description: จัดการเครื่องมือที่ LLM ส�
 
 ```json title="opencode.json" {4}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "permission": {
     "skill": "allow"
   }
@@ -233,7 +233,7 @@ description: จัดการเครื่องมือที่ LLM ส�
 
 ```json title="opencode.json" {4}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "permission": {
     "todowrite": "allow"
   }
@@ -254,7 +254,7 @@ description: จัดการเครื่องมือที่ LLM ส�
 
 ```json title="opencode.json" {4}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "permission": {
     "todoread": "allow"
   }
@@ -275,7 +275,7 @@ description: จัดการเครื่องมือที่ LLM ส�
 
 ```json title="opencode.json" {4}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "permission": {
     "webfetch": "allow"
   }
@@ -291,9 +291,9 @@ description: จัดการเครื่องมือที่ LLM ส�
 ค้นหาข้อมูลในเว็บ
 
 :::note
-เครื่องมือนี้ใช้ได้เฉพาะเมื่อใช้ผู้ให้บริการ OpenCode หรือเมื่อตัวแปรสภาพแวดล้อม `OPENCODE_ENABLE_EXA` ถูกตั้งค่าเป็นค่าความจริง (เช่น `true` หรือ `1`)
+เครื่องมือนี้ใช้ได้เฉพาะเมื่อใช้ผู้ให้บริการ Kilo หรือเมื่อตัวแปรสภาพแวดล้อม `OPENCODE_ENABLE_EXA` ถูกตั้งค่าเป็นค่าความจริง (เช่น `true` หรือ `1`)
 
-หากต้องการเปิดใช้งานเมื่อเปิดตัว OpenCode:
+หากต้องการเปิดใช้งานเมื่อเปิดตัว Kilo:
 
 ```bash
 OPENCODE_ENABLE_EXA=1 opencode
@@ -303,7 +303,7 @@ OPENCODE_ENABLE_EXA=1 opencode
 
 ```json title="opencode.json" {4}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "permission": {
     "websearch": "allow"
   }
@@ -326,7 +326,7 @@ OPENCODE_ENABLE_EXA=1 opencode
 
 ```json title="opencode.json" {4}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "permission": {
     "question": "allow"
   }

@@ -1,15 +1,15 @@
 ---
 title: LSPサーバー
-description: OpenCode は LSP サーバーと統合します。
+description: Kilo は LSP サーバーと統合します。
 ---
 
-OpenCode は言語サーバー プロトコル (LSP) と統合して、LLM がコードベースと対話できるようにします。診断を使用して LLM にフィードバックを提供します。
+Kilo は言語サーバー プロトコル (LSP) と統合して、LLM がコードベースと対話できるようにします。診断を使用して LLM にフィードバックを提供します。
 
 ---
 
 ## 内蔵
 
-OpenCode には、一般的な言語用のいくつかの組み込み LSP サーバーが付属しています。
+Kilo には、一般的な言語用のいくつかの組み込み LSP サーバーが付属しています。
 
 | LSP Server         | Extensions                                                          | Requirements                                                 |
 | ------------------ | ------------------------------------------------------------------- | ------------------------------------------------------------ |
@@ -69,7 +69,7 @@ Opencode 構成の `lsp` セクションを通じて LSP サーバーをカス�
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "lsp": {}
 }
 ```
@@ -94,7 +94,7 @@ LSP サーバーの起動時に `env` プロパティを使用して環境変数
 
 ```json title="opencode.json" {5-7}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "lsp": {
     "rust": {
       "env": {
@@ -113,7 +113,7 @@ LSP サーバーの起動時に `env` プロパティを使用して環境変数
 
 ```json title="opencode.json" {5-9}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "lsp": {
     "typescript": {
       "initialization": {
@@ -138,7 +138,7 @@ LSP サーバーの起動時に `env` プロパティを使用して環境変数
 
 ```json title="opencode.json" {3}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "lsp": false
 }
 ```
@@ -147,7 +147,7 @@ LSP サーバーの起動時に `env` プロパティを使用して環境変数
 
 ```json title="opencode.json" {5}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "lsp": {
     "typescript": {
       "disabled": true
@@ -164,7 +164,7 @@ LSP サーバーの起動時に `env` プロパティを使用して環境変数
 
 ```json title="opencode.json" {4-7}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "lsp": {
     "custom-lsp": {
       "command": ["custom-lsp-server", "--stdio"],

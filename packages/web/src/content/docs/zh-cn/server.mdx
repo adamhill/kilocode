@@ -6,14 +6,14 @@ description: 通过 HTTP 与 opencode 服务器交互。
 import config from "../../../../config.mjs"
 export const typesUrl = `${config.github}/blob/dev/packages/sdk/js/src/gen/types.gen.ts`
 
-The `opencode serve` command runs a headless HTTP server that exposes an OpenAPI endpoint that an opencode client can use.
+The `kilo serve` command runs a headless HTTP server that exposes an OpenAPI endpoint that an opencode client can use.
 
 ---
 
 ### 用法
 
 ```bash
-opencode serve [--port <number>] [--hostname <string>] [--cors <origin>]
+kilo serve [--port <number>] [--hostname <string>] [--cors <origin>]
 ```
 
 #### 選項
@@ -29,17 +29,17 @@ opencode serve [--port <number>] [--hostname <string>] [--cors <origin>]
 `--cors` 可以多次交付：
 
 ```bash
-opencode serve --cors http://localhost:5173 --cors https://app.example.com
+kilo serve --cors http://localhost:5173 --cors https://app.example.com
 ```
 
 ---
 
 ### 驗證
 
-Set `OPENCODE_SERVER_PASSWORD` to protect the server with HTTP basic auth. The username defaults to `opencode`, or set `OPENCODE_SERVER_USERNAME` to override it. This applies to both `opencode serve` and `opencode web`.
+Set `OPENCODE_SERVER_PASSWORD` to protect the server with HTTP basic auth. The username defaults to `opencode`, or set `OPENCODE_SERVER_USERNAME` to override it. This applies to both `kilo serve` and `opencode web`.
 
 ```bash
-OPENCODE_SERVER_PASSWORD=your-password opencode serve
+OPENCODE_SERVER_PASSWORD=your-password kilo serve
 ```
 
 ---
@@ -56,8 +56,8 @@ When you run `opencode` it starts a TUI and a server. Where the TUI is the
 
 该架构让 opencode 支持客户端，并允许您以多种设计方式与 opencode 交互。
 
-You can run `opencode serve` to start a standalone server. If you have the
-opencode TUI running, `opencode serve` will start a new server.
+You can run `kilo serve` to start a standalone server. If you have the
+opencode TUI running, `kilo serve` will start a new server.
 
 ---
 

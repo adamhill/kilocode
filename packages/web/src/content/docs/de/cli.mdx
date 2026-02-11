@@ -1,17 +1,17 @@
 ---
 title: CLI
-description: OpenCode CLI Optionen und Befehle.
+description: Kilo CLI Optionen und Befehle.
 ---
 
 import { Tabs, TabItem } from "@astrojs/starlight/components"
 
-Der OpenCode CLI startet standardmäßig den [TUI](/docs/tui), wenn er ohne Argumente ausgeführt wird.
+Der Kilo CLI startet standardmäßig den [TUI](/docs/tui), wenn er ohne Argumente ausgeführt wird.
 
 ```bash
 opencode
 ```
 
-Es akzeptiert aber auch Befehle, wie auf dieser Seite dokumentiert. Dadurch können Sie programmgesteuert mit OpenCode interagieren.
+Es akzeptiert aber auch Befehle, wie auf dieser Seite dokumentiert. Dadurch können Sie programmgesteuert mit Kilo interagieren.
 
 ```bash
 opencode run "Explain how closures work in JavaScript"
@@ -21,7 +21,7 @@ opencode run "Explain how closures work in JavaScript"
 
 ### tui
 
-Starten Sie die Terminalbenutzeroberfläche OpenCode.
+Starten Sie die Terminalbenutzeroberfläche Kilo.
 
 ```bash
 opencode [project]
@@ -44,13 +44,13 @@ opencode [project]
 
 ## Befehle
 
-Der OpenCode CLI verfügt außerdem über die folgenden Befehle.
+Der Kilo CLI verfügt außerdem über die folgenden Befehle.
 
 ---
 
 ### agent
 
-Agenten für OpenCode verwalten.
+Agenten für Kilo verwalten.
 
 ```bash
 opencode agent [command]
@@ -60,13 +60,13 @@ opencode agent [command]
 
 ### attach
 
-Schließen Sie ein Terminal an einen bereits laufenden OpenCode-Backend-Server an, der über die Befehle `serve` oder `web` gestartet wurde.
+Schließen Sie ein Terminal an einen bereits laufenden Kilo-Backend-Server an, der über die Befehle `serve` oder `web` gestartet wurde.
 
 ```bash
 opencode attach [url]
 ```
 
-Dies ermöglicht die Verwendung von TUI mit einem Remote-Backend OpenCode. Zum Beispiel:
+Dies ermöglicht die Verwendung von TUI mit einem Remote-Backend Kilo. Zum Beispiel:
 
 ```bash
 # Start the backend server for web/mobile access
@@ -112,20 +112,20 @@ opencode agent list
 Befehl zum Verwalten von Anmeldeinformationen und Anmelden für Anbieter.
 
 ```bash
-opencode auth [command]
+kilo auth [command]
 ```
 
 ---
 
 #### login
 
-OpenCode wird von der Anbieterliste bei [Models.dev](https://models.dev) unterstützt, sodass Sie `opencode auth login` verwenden können, um API-Schlüssel für jeden Anbieter zu konfigurieren, den Sie verwenden möchten. Dies wird in `~/.local/share/opencode/auth.json` gespeichert.
+Kilo wird von der Anbieterliste bei [Models.dev](https://models.dev) unterstützt, sodass Sie `kilo auth login` verwenden können, um API-Schlüssel für jeden Anbieter zu konfigurieren, den Sie verwenden möchten. Dies wird in `~/.local/share/opencode/auth.json` gespeichert.
 
 ```bash
-opencode auth login
+kilo auth login
 ```
 
-Wenn OpenCode startet, lädt es den Anbieter aus der Anmeldeinformationsdatei. Und ob in Ihren Umgebungen Schlüssel sind oder in Ihrem Projekt eine `.env`-Datei vorhanden ist.
+Wenn Kilo startet, lädt es den Anbieter aus der Anmeldeinformationsdatei. Und ob in Ihren Umgebungen Schlüssel sind oder in Ihrem Projekt eine `.env`-Datei vorhanden ist.
 
 ---
 
@@ -134,13 +134,13 @@ Wenn OpenCode startet, lädt es den Anbieter aus der Anmeldeinformationsdatei. U
 Listet alle authentifizierten Anbieter auf, wie in der Anmeldeinformationsdatei gespeichert.
 
 ```bash
-opencode auth list
+kilo auth list
 ```
 
 Oder die Kurzversion.
 
 ```bash
-opencode auth ls
+kilo auth ls
 ```
 
 ---
@@ -150,7 +150,7 @@ opencode auth ls
 Melden Sie sich von einem Anbieter ab, ohne dass es aus der Anmeldeinformationsdatei gelöscht wird.
 
 ```bash
-opencode auth logout
+kilo auth logout
 ```
 
 ---
@@ -301,7 +301,7 @@ opencode models anthropic
 | `--refresh` | Aktualisieren Sie den Modellcache von models.dev                                      |
 | `--verbose` | Verwenden Sie eine ausführlichere Modellausgabe (einschließlich Metadaten wie Kosten) |
 
-Verwenden Sie das Flag `--refresh`, um die zwischengespeicherte Modellliste zu aktualisieren. Dies ist nützlich, wenn einem Anbieter neue Modelle hinzugefügt wurden und Sie diese in OpenCode sehen möchten.
+Verwenden Sie das Flag `--refresh`, um die zwischengespeicherte Modellliste zu aktualisieren. Dies ist nützlich, wenn einem Anbieter neue Modelle hinzugefügt wurden und Sie diese in Kilo sehen möchten.
 
 ```bash
 opencode models --refresh
@@ -311,7 +311,7 @@ opencode models --refresh
 
 ### laufen
 
-Führen Sie OpenCode im nicht interaktiven Modus aus, indem Sie direkt eine Eingabeaufforderung übergeben.
+Führen Sie Kilo im nicht interaktiven Modus aus, indem Sie direkt eine Eingabeaufforderung übergeben.
 
 ```bash
 opencode run [message..]
@@ -323,11 +323,11 @@ Dies ist nützlich für die Skripterstellung, die Automatisierung oder wenn Sie 
 opencode run Explain the use of context in Go
 ```
 
-Sie können auch eine Verbindung zu einer laufenden `opencode serve`-Instanz herstellen, um bei jedem Lauf Kaltstartzeiten für den MCP-Server zu vermeiden:
+Sie können auch eine Verbindung zu einer laufenden `kilo serve`-Instanz herstellen, um bei jedem Lauf Kaltstartzeiten für den MCP-Server zu vermeiden:
 
 ```bash
 # Start a headless server in one terminal
-opencode serve
+kilo serve
 
 # In another terminal, run commands that attach to it
 opencode run --attach http://localhost:4096 "Explain async/await in JavaScript"
@@ -347,20 +347,20 @@ opencode run --attach http://localhost:4096 "Explain async/await in JavaScript"
 | `--file`     | `-f` | Datei(en) zum Anhängen an die Nachricht                                                             |
 | `--format`   |      | Format: Standard (formatiert) oder JSON (rohe JSON-Ereignisse)                                      |
 | `--title`    |      | Titel für die Sitzung (verwendet eine verkürzte Eingabeaufforderung, wenn kein Wert angegeben wird) |
-| `--attach`   |      | An einen laufenden OpenCode-Server anschließen (e.g., http://localhost:4096)                        |
+| `--attach`   |      | An einen laufenden Kilo-Server anschließen (e.g., http://localhost:4096)                        |
 | `--port`     |      | Port für den lokalen Server (standardmäßig zufälliger Port)                                         |
 
 ---
 
 ### serve
 
-Starten Sie einen Headless-OpenCode-Server für den API-Zugriff. Sehen Sie sich [server docs](/docs/server) für die vollständige HTTP-Schnittstelle an.
+Starten Sie einen Headless-Kilo-Server für den API-Zugriff. Sehen Sie sich [server docs](/docs/server) für die vollständige HTTP-Schnittstelle an.
 
 ```bash
-opencode serve
+kilo serve
 ```
 
-Dadurch wird ein HTTP-Server gestartet, der API-Zugriff auf OpenCode-Funktionalität ohne die TUI-Schnittstelle bietet. Legen Sie `OPENCODE_SERVER_PASSWORD` fest, um die HTTP-Basisauthentifizierung zu aktivieren (Benutzername ist standardmäßig `opencode`).
+Dadurch wird ein HTTP-Server gestartet, der API-Zugriff auf Kilo-Funktionalität ohne die TUI-Schnittstelle bietet. Legen Sie `OPENCODE_SERVER_PASSWORD` fest, um die HTTP-Basisauthentifizierung zu aktivieren (Benutzername ist standardmäßig `opencode`).
 
 #### Flaggen
 
@@ -375,7 +375,7 @@ Dadurch wird ein HTTP-Server gestartet, der API-Zugriff auf OpenCode-Funktionali
 
 ### Sitzung
 
-Verwalten Sie OpenCode-Sitzungen.
+Verwalten Sie Kilo-Sitzungen.
 
 ```bash
 opencode session [command]
@@ -385,7 +385,7 @@ opencode session [command]
 
 #### list
 
-Hören Sie sich alle OpenCode-Sitzungen an.
+Hören Sie sich alle Kilo-Sitzungen an.
 
 ```bash
 opencode session list
@@ -402,7 +402,7 @@ opencode session list
 
 ### stats
 
-Zeigen Sie Token-Nutzungs- und Kostenstatistiken für Ihre OpenCode-Sitzungen an.
+Zeigen Sie Token-Nutzungs- und Kostenstatistiken für Ihre Kilo-Sitzungen an.
 
 ```bash
 opencode stats
@@ -433,13 +433,13 @@ Wenn Sie keine Sitzung ID angeben, werden Sie berechtigt, eine der verfügbaren 
 
 ### import
 
-Importieren Sie Sitzungsdaten aus einer JSON-Datei oder einer OpenCode-Freigabe URL.
+Importieren Sie Sitzungsdaten aus einer JSON-Datei oder einer Kilo-Freigabe URL.
 
 ```bash
 opencode import <file>
 ```
 
-Sie können aus einer lokalen Datei oder einer OpenCode-Freigabe URL importieren.
+Sie können aus einer lokalen Datei oder einer Kilo-Freigabe URL importieren.
 
 ```bash
 opencode import session.json
@@ -450,13 +450,13 @@ opencode import https://opncd.ai/s/abc123
 
 ### web
 
-Starten Sie einen Headless-OpenCode-Server mit einer Weboberfläche.
+Starten Sie einen Headless-Kilo-Server mit einer Weboberfläche.
 
 ```bash
 opencode web
 ```
 
-Dadurch wird ein HTTP-Server gestartet und ein Webbrowser geöffnet, um über eine Webschnittstelle auf OpenCode zuzugreifen. Legen Sie `OPENCODE_SERVER_PASSWORD` fest, um die HTTP-Basisauthentifizierung zu aktivieren (Benutzername ist standardmäßig `opencode`).
+Dadurch wird ein HTTP-Server gestartet und ein Webbrowser geöffnet, um über eine Webschnittstelle auf Kilo zuzugreifen. Legen Sie `OPENCODE_SERVER_PASSWORD` fest, um die HTTP-Basisauthentifizierung zu aktivieren (Benutzername ist standardmäßig `opencode`).
 
 #### Flaggen
 
@@ -491,7 +491,7 @@ Dieser Befehl startet einen ACP-Server, der über stdin/stdout mit nd-JSON kommu
 
 ### uninstall
 
-Deinstallieren Sie OpenCode und entfernen Sie alle zugehörigen Dateien.
+Deinstallieren Sie Kilo und entfernen Sie alle zugehörigen Dateien.
 
 ```bash
 opencode uninstall
@@ -510,22 +510,22 @@ opencode uninstall
 
 ### upgrade
 
-Aktualisiert OpenCode auf die neueste Version oder eine bestimmte Version.
+Aktualisiert Kilo auf die neueste Version oder eine bestimmte Version.
 
 ```bash
-opencode upgrade [target]
+kilo upgrade [target]
 ```
 
 Um auf die neueste Version zu aktualisieren.
 
 ```bash
-opencode upgrade
+kilo upgrade
 ```
 
 Um auf eine bestimmte Version zu aktualisieren.
 
 ```bash
-opencode upgrade v0.1.48
+kilo upgrade v0.1.48
 ```
 
 #### Flaggen
@@ -538,7 +538,7 @@ opencode upgrade v0.1.48
 
 ## Globale Flaggen
 
-Der OpenCode CLI akzeptiert die folgenden globalen Flags.
+Der Kilo CLI akzeptiert die folgenden globalen Flags.
 
 | Flagge         | Kurz | Beschreibung                              |
 | -------------- | ---- | ----------------------------------------- |
@@ -551,7 +551,7 @@ Der OpenCode CLI akzeptiert die folgenden globalen Flags.
 
 ## Umgebungsvariablen
 
-OpenCode kann mithilfe von Umgebungsvariablen konfiguriert werden.
+Kilo kann mithilfe von Umgebungsvariablen konfiguriert werden.
 
 | Variable                              | Geben Sie       | eine Beschreibung                                                                |
 | ------------------------------------- | --------------- | -------------------------------------------------------------------------------- |

@@ -26,7 +26,7 @@ O WSL oferece melhor desempenho de sistema de arquivos, suporte completo a termi
    Depois de configurar o WSL, abra o terminal do WSL e instale o opencode usando um dos [metodos de instalacao](/docs/).
 
    ```bash
-   curl -fsSL https://opencode.ai/install | bash
+   curl -fsSL https://kilo.ai/install | bash
    ```
 
 3. **Use o opencode pelo WSL**
@@ -49,7 +49,7 @@ Se voce prefere usar o app desktop do opencode, mas quer rodar o servidor no WSL
 1. **Inicie o servidor no WSL** com `--hostname 0.0.0.0` para permitir conexoes externas:
 
    ```bash
-   opencode serve --hostname 0.0.0.0 --port 4096
+   kilo serve --hostname 0.0.0.0 --port 4096
    ```
 
 2. **Conecte o app desktop** em `http://localhost:4096`
@@ -62,7 +62,7 @@ Se `localhost` nao funcionar no seu ambiente, conecte usando o IP do WSL (no WSL
 Ao usar `--hostname 0.0.0.0`, defina `OPENCODE_SERVER_PASSWORD` para proteger o servidor.
 
 ```bash
-OPENCODE_SERVER_PASSWORD=your-password opencode serve --hostname 0.0.0.0
+OPENCODE_SERVER_PASSWORD=your-password kilo serve --hostname 0.0.0.0
 ```
 
 :::

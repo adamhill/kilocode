@@ -1,15 +1,15 @@
 ---
 title: LSP เซิร์ฟเวอร์
-description: OpenCode ทำงานร่วมกับเซิร์ฟเวอร์ LSP ของคุณ
+description: Kilo ทำงานร่วมกับเซิร์ฟเวอร์ LSP ของคุณ
 ---
 
-OpenCode ทำงานร่วมกับ Language Server Protocol (LSP) เพื่อช่วยให้ LLM โต้ตอบกับโค้ดเบสของคุณ ใช้การวินิจฉัยเพื่อให้ข้อเสนอแนะไปยัง LLM
+Kilo ทำงานร่วมกับ Language Server Protocol (LSP) เพื่อช่วยให้ LLM โต้ตอบกับโค้ดเบสของคุณ ใช้การวินิจฉัยเพื่อให้ข้อเสนอแนะไปยัง LLM
 
 ---
 
 ## บิวท์อิน
 
-OpenCode มาพร้อมกับเซิร์ฟเวอร์ LSP ในตัวหลายตัวสำหรับภาษายอดนิยม:
+Kilo มาพร้อมกับเซิร์ฟเวอร์ LSP ในตัวหลายตัวสำหรับภาษายอดนิยม:
 
 | LSP เซิร์ฟเวอร์      | ส่วนขยาย                                                            | ความต้องการ                                             |
 | -------------------- | ------------------------------------------------------------------- | ------------------------------------------------------- |
@@ -69,7 +69,7 @@ You can customize LSP servers through the `lsp` section in your opencode config.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "lsp": {}
 }
 ```
@@ -94,7 +94,7 @@ You can customize LSP servers through the `lsp` section in your opencode config.
 
 ```json title="opencode.json" {5-7}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "lsp": {
     "rust": {
       "env": {
@@ -113,7 +113,7 @@ You can customize LSP servers through the `lsp` section in your opencode config.
 
 ```json title="opencode.json" {5-9}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "lsp": {
     "typescript": {
       "initialization": {
@@ -138,7 +138,7 @@ You can customize LSP servers through the `lsp` section in your opencode config.
 
 ```json title="opencode.json" {3}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "lsp": false
 }
 ```
@@ -147,7 +147,7 @@ You can customize LSP servers through the `lsp` section in your opencode config.
 
 ```json title="opencode.json" {5}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "lsp": {
     "typescript": {
       "disabled": true
@@ -164,7 +164,7 @@ You can customize LSP servers through the `lsp` section in your opencode config.
 
 ```json title="opencode.json" {4-7}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "lsp": {
     "custom-lsp": {
       "command": ["custom-lsp-server", "--stdio"],

@@ -1,17 +1,17 @@
 ---
 title: CLI
-description: OpenCode CLI รับสัญญาณและคำสั่ง
+description: Kilo CLI รับสัญญาณและคำสั่ง
 ---
 
 import { Tabs, TabItem } from "@astrojs/starlight/components"
 
-OpenCode CLI โดยเฉพาะอย่างยิ่งจะเริ่มต้น [TUI](/docs/tui) ไม่ต้องทำงานโดยไม่มีข้อใดใดๆ
+Kilo CLI โดยเฉพาะอย่างยิ่งจะเริ่มต้น [TUI](/docs/tui) ไม่ต้องทำงานโดยไม่มีข้อใดใดๆ
 
 ```bash
 opencode
 ```
 
-การยอมรับคำสั่งตามเอกสารในนั้นด้วยเหตุนี้ทำให้คุณสามารถพบกับ OpenCode โดยทางโปรแกรมได้
+การยอมรับคำสั่งตามเอกสารในนั้นด้วยเหตุนี้ทำให้คุณสามารถพบกับ Kilo โดยทางโปรแกรมได้
 
 ```bash
 opencode run "Explain how closures work in JavaScript"
@@ -21,7 +21,7 @@ opencode run "Explain how closures work in JavaScript"
 
 ### tui
 
-เริ่มเปิดให้ผู้ใช้เริ่มใช้ OpenCode
+เริ่มเปิดให้ผู้ใช้เริ่มใช้ Kilo
 
 ```bash
 opencode [project]
@@ -44,13 +44,13 @@ opencode [project]
 
 ## คำสั่ง
 
-OpenCode CLI ยังมีคำสั่งอีกมากมาย
+Kilo CLI ยังมีคำสั่งอีกมากมาย
 
 ---
 
 ### agent
 
-จัดการตัวแทนสำหรับ OpenCode
+จัดการตัวแทนสำหรับ Kilo
 
 ```bash
 opencode agent [command]
@@ -60,13 +60,13 @@ opencode agent [command]
 
 ### attach
 
-สาเหตุว่าทำไมเซิร์ฟเวอร์แบ็กเอนด์ OpenCode ที่รันจริงๆ ซึ่งเริ่มต้นผ่านคำสั่ง `serve` หรือ `web`
+สาเหตุว่าทำไมเซิร์ฟเวอร์แบ็กเอนด์ Kilo ที่รันจริงๆ ซึ่งเริ่มต้นผ่านคำสั่ง `serve` หรือ `web`
 
 ```bash
 opencode attach [url]
 ```
 
-วิธีการใช้ TUI กับแบ็กเอนด์ OpenCode ตัวอย่าง:
+วิธีการใช้ TUI กับแบ็กเอนด์ Kilo ตัวอย่าง:
 
 ```bash
 # Start the backend server for web/mobile access
@@ -112,20 +112,20 @@ opencode agent list
 ขอแจ้งให้ทราบข้อมูลและข้อมูลเข้าสู่ระบบสำหรับ...
 
 ```bash
-opencode auth [command]
+kilo auth [command]
 ```
 
 ---
 
 #### login
 
-OpenCode มีประสิทธิภาพสูงโดยรายชื่อทั่วไปที่ [Models.dev](https://models.dev) ดังนั้นเหตุผลที่เป็นไปได้ API สำหรับความต้องการใดๆ จำเป็นต้องใช้ข้อมูลนี้ถูกที่ `~/.local/share/opencode/auth.json`
+Kilo มีประสิทธิภาพสูงโดยรายชื่อทั่วไปที่ [Models.dev](https://models.dev) ดังนั้นเหตุผลที่เป็นไปได้ API สำหรับความต้องการใดๆ จำเป็นต้องใช้ข้อมูลนี้ถูกที่ `~/.local/share/opencode/auth.json`
 
 ```bash
-opencode auth login
+kilo auth login
 ```
 
-เมื่อ OpenCode เริ่มต้นระบบจะโหลดจากไฟล์ข้อมูลรับรองและไม่จำเป็นต้องคำนึงถึงสิ่งใด ๆ ที่จะพบไฟล์ของคุณหรือ `.env` ในโปรเจ็กต์ของคุณ
+เมื่อ Kilo เริ่มต้นระบบจะโหลดจากไฟล์ข้อมูลรับรองและไม่จำเป็นต้องคำนึงถึงสิ่งใด ๆ ที่จะพบไฟล์ของคุณหรือ `.env` ในโปรเจ็กต์ของคุณ
 
 ---
 
@@ -134,13 +134,13 @@ opencode auth login
 การแจ้งเตือนที่พิสูจน์ความถูกต้องทั้งหมดซึ่งจัดเป็นไฟล์ข้อมูลสามารถตรวจสอบได้
 
 ```bash
-opencode auth list
+kilo auth list
 ```
 
 หรือฮิลตันสั้น
 
 ```bash
-opencode auth ls
+kilo auth ls
 ```
 
 ---
@@ -150,7 +150,7 @@ opencode auth ls
 นำคุณออกจากระบบของมักจะพบข้อมูลจากไฟล์รับรองข้อมูล
 
 ```bash
-opencode auth logout
+kilo auth logout
 ```
 
 ---
@@ -301,7 +301,7 @@ opencode models anthropic
 | `--refresh` | โครงสร้างแคชโมเดลจาก models.dev                   |
 | `--verbose` | ใช้โมเดลนี้เพื่อตรวจสอบ (รวมข้อมูลเมตาเช่นต้นทุน) |
 
-ใช้แฟล็ก `--refresh` ในที่นี้รายการโมเดลที่แคชไว้ตรงนั้นมีประโยชน์เพิ่มโมเดลใหม่ให้กับระบบและขอดูโมเดลของข้อมูลใน OpenCode
+ใช้แฟล็ก `--refresh` ในที่นี้รายการโมเดลที่แคชไว้ตรงนั้นมีประโยชน์เพิ่มโมเดลใหม่ให้กับระบบและขอดูโมเดลของข้อมูลใน Kilo
 
 ```bash
 opencode models --refresh
@@ -323,11 +323,11 @@ opencode run [message..]
 opencode run Explain the use of context in Go
 ```
 
-ขอแนบไปกับฟีเจอร์นี้ `opencode serve` ทำงานอยู่อีกครั้งเวลาของแขก MCP การทำงานหลายอย่าง:
+ขอแนบไปกับฟีเจอร์นี้ `kilo serve` ทำงานอยู่อีกครั้งเวลาของแขก MCP การทำงานหลายอย่าง:
 
 ```bash
 # Start a headless server in one terminal
-opencode serve
+kilo serve
 
 # In another terminal, run commands that attach to it
 opencode run --attach http://localhost:4096 "Explain async/await in JavaScript"
@@ -354,10 +354,10 @@ opencode run --attach http://localhost:4096 "Explain async/await in JavaScript"
 
 ### serve
 
-เริ่มต้นเลานจ์ OpenCode ไม่เพียงแต่สำหรับนักท่องเที่ยวเท่านั้น API ภาพถ่าย [เอกสารรับรอง](/docs/server) เพื่อดู HTTP เต็มรูปแบบ
+เริ่มต้นเลานจ์ Kilo ไม่เพียงแต่สำหรับนักท่องเที่ยวเท่านั้น API ภาพถ่าย [เอกสารรับรอง](/docs/server) เพื่อดู HTTP เต็มรูปแบบ
 
 ```bash
-opencode serve
+kilo serve
 ```
 
 ตัวควบคุมจะเริ่มต้นเซิร์ฟเวอร์ HTTP ให้ API เข้าถึงฟังก์ชันการทำงานของ opencode ได้อย่างมีประสิทธิภาพ TUI จัดเตรียม `OPENCODE_SERVER_PASSWORD` ประสิทธิภาพของฮาร์ดแวร์ฮาร์ดแวร์ความถูกต้องพื้นฐาน HTTP (ตัวควบคุมของฮาร์ดแวร์คือ `opencode`)
@@ -375,7 +375,7 @@ opencode serve
 
 ### session
 
-การจัดการ OpenCode
+การจัดการ Kilo
 
 ```bash
 opencode session [command]
@@ -385,7 +385,7 @@ opencode session [command]
 
 #### list
 
-การแจ้งเตือน OpenCode ทั้งหมด
+การแจ้งเตือน Kilo ทั้งหมด
 
 ```bash
 opencode session list
@@ -402,7 +402,7 @@ opencode session list
 
 ### stats
 
-แสดงสถิติการเริ่มต้นและค่าใช้จ่ายสำหรับ OpenCode ของคุณ
+แสดงสถิติการเริ่มต้นและค่าใช้จ่ายสำหรับ Kilo ของคุณ
 
 ```bash
 opencode stats
@@ -433,13 +433,13 @@ opencode export [sessionID]
 
 ### import
 
-นำเข้าข้อมูลที่ดีจากไฟล์ JSON หรือแชร์ OpenCode URL
+นำเข้าข้อมูลที่ดีจากไฟล์ JSON หรือแชร์ Kilo URL
 
 ```bash
 opencode import <file>
 ```
 
-ไม่เคยนำเข้าไฟล์ในเครื่องหรือแชร์ OpenCode URL
+ไม่เคยนำเข้าไฟล์ในเครื่องหรือแชร์ Kilo URL
 
 ```bash
 opencode import session.json
@@ -450,13 +450,13 @@ opencode import https://opncd.ai/s/abc123
 
 ### web
 
-เชิญแขก OpenCode อย่างเป็นทางการด้วยเว็บอินเตอร์เฟส
+เชิญแขก Kilo อย่างเป็นทางการด้วยเว็บอินเตอร์เฟส
 
 ```bash
 opencode web
 ```
 
-ตัวควบคุมจะเริ่มต้นเซิร์ฟเวอร์ HTTP และเปิดเว็บเองเพื่อเข้าถึง OpenCode ผ่านทางเว็บอินเตอร์เฟส จัดเตรียม `OPENCODE_SERVER_PASSWORD` สำหรับคำอธิบายคุณสมบัติความถูกต้องพื้นฐาน HTTP (ตัวยึดของฮาร์ดแวร์คือ `opencode`)
+ตัวควบคุมจะเริ่มต้นเซิร์ฟเวอร์ HTTP และเปิดเว็บเองเพื่อเข้าถึง Kilo ผ่านทางเว็บอินเตอร์เฟส จัดเตรียม `OPENCODE_SERVER_PASSWORD` สำหรับคำอธิบายคุณสมบัติความถูกต้องพื้นฐาน HTTP (ตัวยึดของฮาร์ดแวร์คือ `opencode`)
 
 #### ยอด
 
@@ -491,7 +491,7 @@ opencode acp
 
 ### uninstall
 
-ไม่ว่า OpenCode และลบไฟล์ทั้งหมดทั้งหมด
+ไม่ว่า Kilo และลบไฟล์ทั้งหมดทั้งหมด
 
 ```bash
 opencode uninstall
@@ -513,19 +513,19 @@ opencode uninstall
 อัปเดต opencode เป็นครั้งสุดท้ายหรือเฉพาะเจาะจง
 
 ```bash
-opencode upgrade [target]
+kilo upgrade [target]
 ```
 
 เราปรับปรุงเป็นระดับล่าสุด
 
 ```bash
-opencode upgrade
+kilo upgrade
 ```
 
 เพื่อพัฒนาเป็นฮอนด้าโดยเฉพาะ
 
 ```bash
-opencode upgrade v0.1.48
+kilo upgrade v0.1.48
 ```
 
 #### ยอด
@@ -551,7 +551,7 @@ opencode CLI รับค่าสถานะสากลต่อไป
 
 ## อีกครั้งหนึ่ง
 
-OpenCode สามารถทำได้ตามที่กล่าวมาข้างต้น
+Kilo สามารถทำได้ตามที่กล่าวมาข้างต้น
 
 | ส่วนนั้น                              | พิมพ์ | คำอธิบาย                                                    |
 | ------------------------------------- | ----- | ----------------------------------------------------------- |

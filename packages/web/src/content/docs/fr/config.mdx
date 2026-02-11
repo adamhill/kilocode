@@ -1,19 +1,19 @@
 ---
 title: Configuration
-description: En utilisant la configuration OpenCode JSON.
+description: En utilisant la configuration Kilo JSON.
 ---
 
-Vous pouvez configurer OpenCode à l'aide d'un fichier de configuration JSON.
+Vous pouvez configurer Kilo à l'aide d'un fichier de configuration JSON.
 
 ---
 
 ## Format
 
-OpenCode prend en charge les formats **JSON** et **JSONC** (JSON avec commentaires).
+Kilo prend en charge les formats **JSON** et **JSONC** (JSON avec commentaires).
 
 ```jsonc title="opencode.jsonc"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   // Theme configuration
   "theme": "opencode",
   "model": "anthropic/claude-sonnet-4-5",
@@ -109,7 +109,7 @@ Ajoutez `opencode.json` à la racine de votre projet. La configuration du projet
 Placez la configuration spécifique au projet à la racine de votre projet.
 :::
 
-Lorsque OpenCode démarre, il recherche un fichier de configuration dans le répertoire actuel ou remonte jusqu'au répertoire Git le plus proche.
+Lorsque Kilo démarre, il recherche un fichier de configuration dans le répertoire actuel ou remonte jusqu'au répertoire Git le plus proche.
 
 Il peut également être archivé en toute sécurité dans Git et utilise le même schéma que le schéma global.
 
@@ -146,7 +146,7 @@ Le répertoire personnalisé est chargé après les répertoires de configuratio
 
 ## Schéma
 
-Le fichier de configuration a un schéma défini dans [**`opencode.ai/config.json`**](https://opencode.ai/config.json).
+Le fichier de configuration a un schéma défini dans [**`kilo.ai/config.json`**](https://kilo.ai/config.json).
 
 Votre éditeur doit être capable de valider et de compléter automatiquement en fonction du schéma.
 
@@ -158,7 +158,7 @@ Vous pouvez configurer les paramètres spécifiques à TUI via l'option `tui`.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "tui": {
     "scroll_speed": 3,
     "scroll_acceleration": {
@@ -181,11 +181,11 @@ Options disponibles :
 
 ### Serveur
 
-Vous pouvez configurer les paramètres du serveur pour les commandes `opencode serve` et `opencode web` via l'option `server`.
+Vous pouvez configurer les paramètres du serveur pour les commandes `kilo serve` et `opencode web` via l'option `server`.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "server": {
     "port": 4096,
     "hostname": "0.0.0.0",
@@ -200,7 +200,7 @@ Options disponibles :
 
 - `port` - Port sur lequel écouter.
 - `hostname` - Nom d'hôte sur lequel écouter. Lorsque `mdns` est activé et qu'aucun nom d'hôte n'est défini, la valeur par défaut est `0.0.0.0`.
-- `mdns` - Activer la découverte du service mDNS. Cela permet à d'autres appareils du réseau de découvrir votre serveur OpenCode.
+- `mdns` - Activer la découverte du service mDNS. Cela permet à d'autres appareils du réseau de découvrir votre serveur Kilo.
 - `mdnsDomain` - Nom de domaine personnalisé pour le service mDNS. La valeur par défaut est `opencode.local`. Utile pour exécuter plusieurs instances sur le même réseau.
 - `cors` - Origines supplémentaires pour autoriser CORS lors de l'utilisation du serveur HTTP à partir d'un client basé sur un navigateur. Les valeurs doivent être des origines complètes (schéma + hôte + port facultatif), par exemple `https://app.example.com`.
 
@@ -214,7 +214,7 @@ Vous pouvez gérer les outils qu'un LLM peut utiliser via l'option `tools`.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "tools": {
     "write": false,
     "bash": false
@@ -228,24 +228,24 @@ Vous pouvez gérer les outils qu'un LLM peut utiliser via l'option `tools`.
 
 ### Modèles
 
-Vous pouvez configurer les fournisseurs et les modèles que vous souhaitez utiliser dans votre configuration OpenCode via les options `provider`, `model` et `small_model`.
+Vous pouvez configurer les fournisseurs et les modèles que vous souhaitez utiliser dans votre configuration Kilo via les options `provider`, `model` et `small_model`.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {},
   "model": "anthropic/claude-sonnet-4-5",
   "small_model": "anthropic/claude-haiku-4-5"
 }
 ```
 
-L'option `small_model` configure un modèle distinct pour les tâches légères comme la génération de titres. Par défaut, OpenCode essaie d'utiliser un modèle moins cher s'il est disponible auprès de votre fournisseur, sinon il revient à votre modèle principal.
+L'option `small_model` configure un modèle distinct pour les tâches légères comme la génération de titres. Par défaut, Kilo essaie d'utiliser un modèle moins cher s'il est disponible auprès de votre fournisseur, sinon il revient à votre modèle principal.
 
 Les options du fournisseur peuvent inclure `timeout` et `setCacheKey` :
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "anthropic": {
       "options": {
@@ -274,7 +274,7 @@ Amazon Bedrock prend en charge la configuration spécifique à AWS :
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "amazon-bedrock": {
       "options": {
@@ -301,11 +301,11 @@ Les jetons du porteur (`AWS_BEARER_TOKEN_BEDROCK` ou `/connect`) ont priorité s
 
 ### Thèmes
 
-Vous pouvez configurer le thème que vous souhaitez utiliser dans votre configuration OpenCode via l'option `theme`.
+Vous pouvez configurer le thème que vous souhaitez utiliser dans votre configuration Kilo via l'option `theme`.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "theme": ""
 }
 ```
@@ -320,7 +320,7 @@ Vous pouvez configurer des agents spécialisés pour des tâches spécifiques vi
 
 ```jsonc title="opencode.jsonc"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "agent": {
     "code-reviewer": {
       "description": "Reviews code for best practices and potential issues",
@@ -346,12 +346,12 @@ Vous pouvez définir l'agent par défaut à l'aide de l'option `default_agent`. 
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "default_agent": "plan"
 }
 ```
 
-L'agent par défaut doit être un agent principal (et non un sous-agent). Il peut s'agir d'un agent intégré tel que `"build"` ou `"plan"`, ou d'un [agent personnalisé](/docs/agents) que vous avez défini. Si l'agent spécifié n'existe pas ou est un sous-agent, OpenCode reviendra à `"build"` avec un avertissement.
+L'agent par défaut doit être un agent principal (et non un sous-agent). Il peut s'agir d'un agent intégré tel que `"build"` ou `"plan"`, ou d'un [agent personnalisé](/docs/agents) que vous avez défini. Si l'agent spécifié n'existe pas ou est un sous-agent, Kilo reviendra à `"build"` avec un avertissement.
 
 Ce paramètre s'applique à toutes les interfaces : TUI, CLI (`opencode run`), application de bureau et GitHub Action.
 
@@ -363,7 +363,7 @@ Vous pouvez configurer la fonctionnalité [share](/docs/share) via l'option `sha
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "share": "manual"
 }
 ```
@@ -384,7 +384,7 @@ Vous pouvez configurer des commandes personnalisées pour les tâches répétiti
 
 ```jsonc title="opencode.jsonc"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "command": {
     "test": {
       "template": "Run the full test suite with coverage report and show any failures.\nFocus on the failing tests and suggest fixes.",
@@ -410,7 +410,7 @@ Vous pouvez personnaliser vos raccourcis clavier via l'option `keybinds`.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "keybinds": {}
 }
 ```
@@ -421,11 +421,11 @@ Vous pouvez personnaliser vos raccourcis clavier via l'option `keybinds`.
 
 ### Mise à jour automatique
 
-OpenCode téléchargera automatiquement toutes les nouvelles mises à jour au démarrage. Vous pouvez désactiver cela avec l'option `autoupdate`.
+Kilo téléchargera automatiquement toutes les nouvelles mises à jour au démarrage. Vous pouvez désactiver cela avec l'option `autoupdate`.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "autoupdate": false
 }
 ```
@@ -441,7 +441,7 @@ Vous pouvez configurer les formateurs de code via l'option `formatter`.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "formatter": {
     "prettier": {
       "disabled": true
@@ -469,7 +469,7 @@ Par exemple, pour garantir que les outils `edit` et `bash` nécessitent l'approb
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "permission": {
     "edit": "ask",
     "bash": "ask"
@@ -487,7 +487,7 @@ Vous pouvez contrôler le comportement de compactage du contexte via l'option `c
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "compaction": {
     "auto": true,
     "prune": true
@@ -506,7 +506,7 @@ Vous pouvez configurer les modèles d'ignorance de l'observateur de fichiers via
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "watcher": {
     "ignore": ["node_modules/**", "dist/**", ".git/**"]
   }
@@ -523,7 +523,7 @@ Vous pouvez configurer les serveurs MCP que vous souhaitez utiliser via l'option
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "mcp": {}
 }
 ```
@@ -534,13 +534,13 @@ Vous pouvez configurer les serveurs MCP que vous souhaitez utiliser via l'option
 
 ### Plugins
 
-[Plugins](/docs/plugins) étendent OpenCode avec des outils, des hooks et des intégrations personnalisés.
+[Plugins](/docs/plugins) étendent Kilo avec des outils, des hooks et des intégrations personnalisés.
 
 Placez les fichiers du plugin dans `.opencode/plugins/` ou `~/.config/opencode/plugins/`. Vous pouvez également charger des plugins depuis npm via l'option `plugin`.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "plugin": ["opencode-helicone-session", "@my-org/custom-plugin"]
 }
 ```
@@ -555,7 +555,7 @@ Vous pouvez configurer les instructions pour le modèle que vous utilisez via l'
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "instructions": ["CONTRIBUTING.md", "docs/guidelines.md", ".cursor/rules/*.md"]
 }
 ```
@@ -571,7 +571,7 @@ Vous pouvez désactiver les fournisseurs chargés automatiquement via l'option `
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "disabled_providers": ["openai", "gemini"]
 }
 ```
@@ -594,12 +594,12 @@ Vous pouvez spécifier une liste autorisée de fournisseurs via l'option `enable
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "enabled_providers": ["anthropic", "openai"]
 }
 ```
 
-Ceci est utile lorsque vous souhaitez restreindre OpenCode à l'utilisation de fournisseurs spécifiques plutôt que de les désactiver un par un.
+Ceci est utile lorsque vous souhaitez restreindre Kilo à l'utilisation de fournisseurs spécifiques plutôt que de les désactiver un par un.
 
 :::note
 Le `disabled_providers` est prioritaire sur `enabled_providers`.
@@ -615,7 +615,7 @@ La clé `experimental` contient des options en cours de développement actif.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "experimental": {}
 }
 ```
@@ -638,7 +638,7 @@ Utilisez `{env:VARIABLE_NAME}` pour remplacer les variables d'environnement :
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "model": "{env:OPENCODE_MODEL}",
   "provider": {
     "anthropic": {
@@ -661,7 +661,7 @@ Utilisez `{file:path/to/file}` pour remplacer le contenu d'un fichier :
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "instructions": ["./custom-instructions.md"],
   "provider": {
     "openai": {

@@ -6,14 +6,14 @@ description: Samhandle med opencode-server over HTTP.
 import config from "../../../../config.mjs"
 export const typesUrl = `${config.github}/blob/dev/packages/sdk/js/src/gen/types.gen.ts`
 
-Kommandoen `opencode serve` kjører en hodeløs HTTP-server som avslører et OpenAPI-endepunkt som en opencode-klient kan bruke.
+Kommandoen `kilo serve` kjører en hodeløs HTTP-server som avslører et OpenAPI-endepunkt som en opencode-klient kan bruke.
 
 ---
 
 ### Bruk
 
 ```bash
-opencode serve [--port <number>] [--hostname <string>] [--cors <origin>]
+kilo serve [--port <number>] [--hostname <string>] [--cors <origin>]
 ```
 
 #### Alternativer
@@ -29,17 +29,17 @@ opencode serve [--port <number>] [--hostname <string>] [--cors <origin>]
 `--cors` kan passeres flere ganger:
 
 ```bash
-opencode serve --cors http://localhost:5173 --cors https://app.example.com
+kilo serve --cors http://localhost:5173 --cors https://app.example.com
 ```
 
 ---
 
 ### Autentisering
 
-Sett `OPENCODE_SERVER_PASSWORD` for å beskytte serveren med HTTP grunnleggende autentisering. Brukernavnet er standard til `opencode`, eller sett `OPENCODE_SERVER_USERNAME` for å overstyre det. Dette gjelder både `opencode serve` og `opencode web`.
+Sett `OPENCODE_SERVER_PASSWORD` for å beskytte serveren med HTTP grunnleggende autentisering. Brukernavnet er standard til `opencode`, eller sett `OPENCODE_SERVER_USERNAME` for å overstyre det. Dette gjelder både `kilo serve` og `opencode web`.
 
 ```bash
-OPENCODE_SERVER_PASSWORD=your-password opencode serve
+OPENCODE_SERVER_PASSWORD=your-password kilo serve
 ```
 
 ---
@@ -56,8 +56,8 @@ Bruk opencode-serveren til å samhandle med opencode programmatisk.
 
 Denne arkitekturen lar opencode støtte flere klienter og lar deg samhandle med opencode programmatisk.
 
-Du kan kjøre `opencode serve` for å starte en frittstående server. Hvis du har
-opencode TUI kjører, vil `opencode serve` starte en ny server.
+Du kan kjøre `kilo serve` for å starte en frittstående server. Hvis du har
+opencode TUI kjører, vil `kilo serve` starte en ny server.
 
 ---
 

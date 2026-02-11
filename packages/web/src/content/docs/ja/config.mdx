@@ -1,19 +1,19 @@
 ---
 title: 構成
-description: OpenCode JSON 構成を使用します。
+description: Kilo JSON 構成を使用します。
 ---
 
-JSON 構成ファイルを使用して OpenCode を構成できます。
+JSON 構成ファイルを使用して Kilo を構成できます。
 
 ---
 
 ## 形式
 
-OpenCode は、**JSON** と **JSONC** (コメント付きの JSON) 形式の両方をサポートしています。
+Kilo は、**JSON** と **JSONC** (コメント付きの JSON) 形式の両方をサポートしています。
 
 ```jsonc title="opencode.jsonc"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   // Theme configuration
   "theme": "opencode",
   "model": "anthropic/claude-sonnet-4-5",
@@ -144,7 +144,7 @@ opencode run "Hello world"
 
 ## スキーマ
 
-構成ファイルには、[**`opencode.ai/config.json`**](https://opencode.ai/config.json).
+構成ファイルには、[**`kilo.ai/config.json`**](https://kilo.ai/config.json).
 
 エディターはスキーマに基づいて検証し、オートコンプリートできる必要があります。
 
@@ -156,7 +156,7 @@ opencode run "Hello world"
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "tui": {
     "scroll_speed": 3,
     "scroll_acceleration": {
@@ -179,11 +179,11 @@ opencode run "Hello world"
 
 ### サーバ
 
-`server` オプションを使用して、`opencode serve` および `opencode web` コマンドのサーバー設定を構成できます。
+`server` オプションを使用して、`kilo serve` および `opencode web` コマンドのサーバー設定を構成できます。
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "server": {
     "port": 4096,
     "hostname": "0.0.0.0",
@@ -198,7 +198,7 @@ opencode run "Hello world"
 
 - `port` - リッスンするポート。
 - `hostname` - リッスンするホスト名。 `mdns` が有効でホスト名が設定されていない場合、デフォルトは `0.0.0.0` になります。
-- `mdns` - mDNS サービス検出を有効にします。これにより、ネットワーク上の他のデバイスが OpenCode サーバーを検出できるようになります。
+- `mdns` - mDNS サービス検出を有効にします。これにより、ネットワーク上の他のデバイスが Kilo サーバーを検出できるようになります。
 - `mdnsDomain` - mDNS サービスのカスタム ドメイン名。デフォルトは `opencode.local` です。同じネットワーク上で複数のインスタンスを実行する場合に便利です。
 - `cors` - ブラウザベースのクライアントから HTTP サーバーを使用するときに CORS を許可する追加のオリジン。値は完全なオリジン (スキーム + ホスト + オプションのポート) である必要があります (例: `https://app.example.com`)。
 
@@ -212,7 +212,7 @@ LLM が使用できるツールは、`tools` オプションを通じて管理�
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "tools": {
     "write": false,
     "bash": false
@@ -226,24 +226,24 @@ LLM が使用できるツールは、`tools` オプションを通じて管理�
 
 ### モデル
 
-`provider`、`model`、および `small_model` オプションを使用して、OpenCode 構成で使用するプロバイダーとモデルを構成できます。
+`provider`、`model`、および `small_model` オプションを使用して、Kilo 構成で使用するプロバイダーとモデルを構成できます。
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {},
   "model": "anthropic/claude-sonnet-4-5",
   "small_model": "anthropic/claude-haiku-4-5"
 }
 ```
 
-`small_model` オプションは、タイトル生成などの軽量タスク用に別のモデルを構成します。デフォルトでは、OpenCode は、プロバイダーから安価なモデルが入手可能な場合は、より安価なモデルを使用しようとします。そうでない場合は、メイン モデルにフォールバックします。
+`small_model` オプションは、タイトル生成などの軽量タスク用に別のモデルを構成します。デフォルトでは、Kilo は、プロバイダーから安価なモデルが入手可能な場合は、より安価なモデルを使用しようとします。そうでない場合は、メイン モデルにフォールバックします。
 
 プロバイダー オプションには、`timeout` および `setCacheKey` を含めることができます。
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "anthropic": {
       "options": {
@@ -272,7 +272,7 @@ Amazon Bedrock は、AWS 固有の構成をサポートしています。
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "amazon-bedrock": {
       "options": {
@@ -299,11 +299,11 @@ Amazon Bedrock は、AWS 固有の構成をサポートしています。
 
 ### テーマ
 
-`theme` オプションを使用して、OpenCode 構成で使用するテーマを構成できます。
+`theme` オプションを使用して、Kilo 構成で使用するテーマを構成できます。
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "theme": ""
 }
 ```
@@ -318,7 +318,7 @@ Amazon Bedrock は、AWS 固有の構成をサポートしています。
 
 ```jsonc title="opencode.jsonc"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "agent": {
     "code-reviewer": {
       "description": "Reviews code for best practices and potential issues",
@@ -344,12 +344,12 @@ Amazon Bedrock は、AWS 固有の構成をサポートしています。
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "default_agent": "plan"
 }
 ```
 
-デフォルトのエージェントはプライマリ エージェントである必要があります (サブエージェントではありません)。これは、`"build"` や `"plan"` のような組み込みエージェント、または定義したカスタム Agent](/docs/agents) にすることができます。指定されたエージェントが存在しないか、サブエージェントである場合、OpenCode は警告とともに `"build"` にフォールバックします。
+デフォルトのエージェントはプライマリ エージェントである必要があります (サブエージェントではありません)。これは、`"build"` や `"plan"` のような組み込みエージェント、または定義したカスタム Agent](/docs/agents) にすることができます。指定されたエージェントが存在しないか、サブエージェントである場合、Kilo は警告とともに `"build"` にフォールバックします。
 
 この設定は、TUI、CLI (`opencode run`)、デスクトップ アプリ、および GitHub Action のすべてのインターフェイスに適用されます。
 
@@ -361,7 +361,7 @@ Amazon Bedrock は、AWS 固有の構成をサポートしています。
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "share": "manual"
 }
 ```
@@ -382,7 +382,7 @@ Amazon Bedrock は、AWS 固有の構成をサポートしています。
 
 ```jsonc title="opencode.jsonc"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "command": {
     "test": {
       "template": "Run the full test suite with coverage report and show any failures.\nFocus on the failing tests and suggest fixes.",
@@ -408,7 +408,7 @@ Amazon Bedrock は、AWS 固有の構成をサポートしています。
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "keybinds": {}
 }
 ```
@@ -419,11 +419,11 @@ Amazon Bedrock は、AWS 固有の構成をサポートしています。
 
 ### 自動更新
 
-OpenCode は起動時に新しいアップデートを自動的にダウンロードします。 `autoupdate` オプションを使用してこれを無効にできます。
+Kilo は起動時に新しいアップデートを自動的にダウンロードします。 `autoupdate` オプションを使用してこれを無効にできます。
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "autoupdate": false
 }
 ```
@@ -439,7 +439,7 @@ OpenCode は起動時に新しいアップデートを自動的にダウンロ�
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "formatter": {
     "prettier": {
       "disabled": true
@@ -467,7 +467,7 @@ OpenCode は起動時に新しいアップデートを自動的にダウンロ�
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "permission": {
     "edit": "ask",
     "bash": "ask"
@@ -485,7 +485,7 @@ OpenCode は起動時に新しいアップデートを自動的にダウンロ�
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "compaction": {
     "auto": true,
     "prune": true
@@ -504,7 +504,7 @@ OpenCode は起動時に新しいアップデートを自動的にダウンロ�
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "watcher": {
     "ignore": ["node_modules/**", "dist/**", ".git/**"]
   }
@@ -521,7 +521,7 @@ OpenCode は起動時に新しいアップデートを自動的にダウンロ�
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "mcp": {}
 }
 ```
@@ -532,13 +532,13 @@ OpenCode は起動時に新しいアップデートを自動的にダウンロ�
 
 ### プラグイン
 
-[Plugins](/docs/plugins) は、カスタム ツール、フック、統合を使用して OpenCode を拡張します。
+[Plugins](/docs/plugins) は、カスタム ツール、フック、統合を使用して Kilo を拡張します。
 
 プラグインファイルを`.opencode/plugins/`または`~/.config/opencode/plugins/`に配置します。 `plugin` オプションを使用して npm からプラグインをロードすることもできます。
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "plugin": ["opencode-helicone-session", "@my-org/custom-plugin"]
 }
 ```
@@ -553,7 +553,7 @@ OpenCode は起動時に新しいアップデートを自動的にダウンロ�
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "instructions": ["CONTRIBUTING.md", "docs/guidelines.md", ".cursor/rules/*.md"]
 }
 ```
@@ -569,7 +569,7 @@ OpenCode は起動時に新しいアップデートを自動的にダウンロ�
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "disabled_providers": ["openai", "gemini"]
 }
 ```
@@ -591,12 +591,12 @@ The オプションは、プロバイダー ID の配列を受け入れます。
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "enabled_providers": ["anthropic", "openai"]
 }
 ```
 
-これは、OpenCode を 1 つずつ無効にするのではなく、特定のプロバイダーのみを使用するように制限したい場合に便利です。
+これは、Kilo を 1 つずつ無効にするのではなく、特定のプロバイダーのみを使用するように制限したい場合に便利です。
 
 :::note
 `disabled_providers` は `enabled_providers` よりも優先されます。
@@ -611,7 +611,7 @@ If `enabled_providers` と `disabled_providers` の両方に表示される場�
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "experimental": {}
 }
 ```
@@ -634,7 +634,7 @@ If `enabled_providers` と `disabled_providers` の両方に表示される場�
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "model": "{env:OPENCODE_MODEL}",
   "provider": {
     "anthropic": {
@@ -657,7 +657,7 @@ If `enabled_providers` と `disabled_providers` の両方に表示される場�
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "instructions": ["./custom-instructions.md"],
   "provider": {
     "openai": {

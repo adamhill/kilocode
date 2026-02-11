@@ -3,7 +3,7 @@ title: 「エージェントスキル」
 description: 「SKILL.md定義による再利用可能な動作の定義」
 ---
 
-エージェント スキルにより、OpenCode はリポジトリまたはホーム ディレクトリから再利用可能な命令を検出できます。
+エージェント スキルにより、Kilo はリポジトリまたはホーム ディレクトリから再利用可能な命令を検出できます。
 スキルはネイティブの `skill` ツールを介してオンデマンドでロードされます。エージェントは利用可能なスキルを確認し、必要に応じて完全なコンテンツをロードできます。
 
 ---
@@ -11,7 +11,7 @@ description: 「SKILL.md定義による再利用可能な動作の定義」
 ## ファイルを配置する
 
 スキル名ごとにフォルダーを 1 つ作成し、その中に `SKILL.md` を置きます。
-OpenCode は次の場所を検索します。
+Kilo は次の場所を検索します。
 
 - プロジェクト構成: `.opencode/skills/<name>/SKILL.md`
 - グローバル構成: `~/.config/opencode/skills/<name>/SKILL.md`
@@ -24,7 +24,7 @@ OpenCode は次の場所を検索します。
 
 ## 発見を理解する
 
-プロジェクトのローカル パスの場合、OpenCode は現在の作業ディレクトリから git ワークツリーに到達するまで進みます。
+プロジェクトのローカル パスの場合、Kilo は現在の作業ディレクトリから git ワークツリーに到達するまで進みます。
 途中で、一致する `skills/*/SKILL.md` を `.opencode/` に読み込み、一致する `.claude/skills/*/SKILL.md` または `.agents/skills/*/SKILL.md` を読み込みます。
 
 グローバル定義は、`~/.config/opencode/skills/*/SKILL.md`、`~/.claude/skills/*/SKILL.md`、および `~/.agents/skills/*/SKILL.md` からもロードされます。
@@ -102,7 +102,7 @@ Ask clarifying questions if the target versioning scheme is unclear.
 
 ## ツールの説明を認識する
 
-OpenCode では、`skill` ツールの説明に利用可能なスキルがリストされています。
+Kilo では、`skill` ツールの説明に利用可能なスキルがリストされています。
 各エントリにはスキル名と説明が含まれます。
 
 ```xml

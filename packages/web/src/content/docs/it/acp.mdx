@@ -1,9 +1,9 @@
 ---
 title: Supporto ACP
-description: Usa OpenCode in qualunque editor compatibile con ACP.
+description: Usa Kilo in qualunque editor compatibile con ACP.
 ---
 
-OpenCode supporta [Agent Client Protocol](https://agentclientprotocol.com) (ACP), permettendoti di usarlo direttamente in editor e IDE compatibili.
+Kilo supporta [Agent Client Protocol](https://agentclientprotocol.com) (ACP), permettendoti di usarlo direttamente in editor e IDE compatibili.
 
 :::tip
 Per una lista di editor e tool che supportano ACP, vedi l'[ACP progress report](https://zed.dev/blog/acp-progress-report#available-now).
@@ -15,9 +15,9 @@ ACP e un protocollo aperto che standardizza la comunicazione tra editor di codic
 
 ## Configure
 
-Per usare OpenCode via ACP, configura l'editor in modo che esegua il comando `opencode acp`.
+Per usare Kilo via ACP, configura l'editor in modo che esegua il comando `opencode acp`.
 
-Il comando avvia OpenCode come sottoprocesso compatibile con ACP che comunica con l'editor via JSON-RPC su stdio.
+Il comando avvia Kilo come sottoprocesso compatibile con ACP che comunica con l'editor via JSON-RPC su stdio.
 
 Qui sotto trovi esempi per editor popolari che supportano ACP.
 
@@ -30,7 +30,7 @@ Aggiungi alla configurazione di [Zed](https://zed.dev) (`~/.config/zed/settings.
 ```json title="~/.config/zed/settings.json"
 {
   "agent_servers": {
-    "OpenCode": {
+    "Kilo": {
       "command": "opencode",
       "args": ["acp"]
     }
@@ -51,7 +51,7 @@ Puoi anche assegnare una scorciatoia da tastiera modificando `keymap.json`:
         {
           "agent": {
             "custom": {
-              "name": "OpenCode",
+              "name": "Kilo",
               "command": {
                 "command": "opencode",
                 "args": ["acp"]
@@ -74,7 +74,7 @@ Aggiungi al tuo acp.json per [JetBrains IDE](https://www.jetbrains.com/) secondo
 ```json title="acp.json"
 {
   "agent_servers": {
-    "OpenCode": {
+    "Kilo": {
       "command": "/absolute/path/bin/opencode",
       "args": ["acp"]
     }
@@ -82,7 +82,7 @@ Aggiungi al tuo acp.json per [JetBrains IDE](https://www.jetbrains.com/) secondo
 }
 ```
 
-Per aprirlo, seleziona il nuovo agente 'OpenCode' nel selettore agenti di AI Chat.
+Per aprirlo, seleziona il nuovo agente 'Kilo' nel selettore agenti di AI Chat.
 
 ---
 
@@ -121,7 +121,7 @@ Se devi passare variabili d'ambiente:
 
 ### CodeCompanion.nvim
 
-Per usare OpenCode come agente ACP in [CodeCompanion.nvim](https://github.com/olimorris/codecompanion.nvim), aggiungi quanto segue alla config di Neovim:
+Per usare Kilo come agente ACP in [CodeCompanion.nvim](https://github.com/olimorris/codecompanion.nvim), aggiungi quanto segue alla config di Neovim:
 
 ```lua
 require("codecompanion").setup({
@@ -136,13 +136,13 @@ require("codecompanion").setup({
 })
 ```
 
-Questa config imposta CodeCompanion per usare OpenCode come agente ACP per la chat.
+Questa config imposta CodeCompanion per usare Kilo come agente ACP per la chat.
 
 Se devi passare variabili d'ambiente (come `OPENCODE_API_KEY`), vedi [Configuring Adapters: Environment Variables](https://codecompanion.olimorris.dev/getting-started#setting-an-api-key) nella documentazione di CodeCompanion.nvim.
 
 ## Support
 
-OpenCode funziona via ACP come nel terminal. Tutte le funzionalita sono supportate:
+Kilo funziona via ACP come nel terminal. Tutte le funzionalita sono supportate:
 
 :::note
 Alcuni comandi slash integrati come `/undo` e `/redo` non sono attualmente supportati.
@@ -150,7 +150,7 @@ Alcuni comandi slash integrati come `/undo` e `/redo` non sono attualmente suppo
 
 - Built-in tools (file operations, terminal commands, etc.)
 - Custom tools and slash commands
-- MCP servers configured in your OpenCode config
+- MCP servers configured in your Kilo config
 - Project-specific rules from `AGENTS.md`
 - Custom formatters and linters
 - Agents and permissions system

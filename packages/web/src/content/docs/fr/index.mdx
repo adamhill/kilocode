@@ -1,15 +1,15 @@
 ---
 title: Introduction
-description: Commencez avec OpenCode.
+description: Commencez avec Kilo.
 ---
 
 import { Tabs, TabItem } from "@astrojs/starlight/components"
 import config from "../../../../config.mjs"
 export const console = config.console
 
-[**OpenCode**](/) est un agent de codage d'IA open source. Il est disponible sous forme d'interface basée sur un terminal, d'application de bureau ou d'extension IDE.
+[**Kilo**](/) est un agent de codage d'IA open source. Il est disponible sous forme d'interface basée sur un terminal, d'application de bureau ou d'extension IDE.
 
-![OpenCode TUI avec le thème opencode](../../../assets/lander/screenshot.png)
+![Kilo TUI avec le thème opencode](../../../assets/lander/screenshot.png)
 
 Commençons.
 
@@ -17,7 +17,7 @@ Commençons.
 
 #### Conditions préalables
 
-Pour utiliser OpenCode dans votre terminal, vous aurez besoin de :
+Pour utiliser Kilo dans votre terminal, vous aurez besoin de :
 
 1. Un émulateur de terminal moderne comme :
    - [WezTerm](https://wezterm.org), multiplateforme
@@ -31,10 +31,10 @@ Pour utiliser OpenCode dans votre terminal, vous aurez besoin de :
 
 ## Installer
 
-Le moyen le plus simple d'installer OpenCode consiste à utiliser le script d'installation.
+Le moyen le plus simple d'installer Kilo consiste à utiliser le script d'installation.
 
 ```bash
-curl -fsSL https://opencode.ai/install | bash
+curl -fsSL https://kilo.ai/install | bash
 ```
 
 Vous pouvez également l'installer avec les commandes suivantes :
@@ -79,7 +79,7 @@ Vous pouvez également l'installer avec les commandes suivantes :
   brew install anomalyco/tap/opencode
   ```
 
-  > Nous vous recommandons d'utiliser le tap OpenCode pour les versions les plus récentes. La formule officielle `brew install opencode` est maintenue par l'équipe Homebrew et est mise à jour moins fréquemment.
+  > Nous vous recommandons d'utiliser le tap Kilo pour les versions les plus récentes. La formule officielle `brew install opencode` est maintenue par l'équipe Homebrew et est mise à jour moins fréquemment.
 
 - **Utilisation de Paru sur Arch Linux**
 
@@ -90,7 +90,7 @@ Vous pouvez également l'installer avec les commandes suivantes :
 #### Windows
 
 :::tip[Recommandé : utilisez WSL]
-Pour une expérience optimale sur Windows, nous vous recommandons d'utiliser le sous-système [Windows pour Linux (WSL)](/docs/windows-wsl). Il offre de meilleures performances et une compatibilité totale avec les fonctionnalités de OpenCode.
+Pour une expérience optimale sur Windows, nous vous recommandons d'utiliser le sous-système [Windows pour Linux (WSL)](/docs/windows-wsl). Il offre de meilleures performances et une compatibilité totale avec les fonctionnalités de Kilo.
 :::
 
 - **Utiliser Chocolatey**
@@ -114,30 +114,30 @@ Pour une expérience optimale sur Windows, nous vous recommandons d'utiliser le 
 - **Utiliser Mise**
 
   ```bash
-  mise use -g github:anomalyco/opencode
+  mise use -g github:Kilo-Org/kilo
   ```
 
 - **En utilisant Docker**
 
   ```bash
-  docker run -it --rm ghcr.io/anomalyco/opencode
+  docker run -it --rm ghcr.io/Kilo-Org/kilo
   ```
 
-La prise en charge de l'installation de OpenCode sur Windows à l'aide de Bun est actuellement en cours.
+La prise en charge de l'installation de Kilo sur Windows à l'aide de Bun est actuellement en cours.
 
-Vous pouvez également récupérer le binaire dans le fichier [Releases](https://github.com/anomalyco/opencode/releases).
+Vous pouvez également récupérer le binaire dans le fichier [Releases](https://github.com/Kilo-Org/kilo/releases).
 
 ---
 
 ## Configurer
 
-Avec OpenCode, vous pouvez utiliser n'importe quel fournisseur LLM en configurant ses clés API.
+Avec Kilo, vous pouvez utiliser n'importe quel fournisseur LLM en configurant ses clés API.
 
 Si vous débutez avec les fournisseurs LLM, nous vous recommandons d'utiliser [OpenCode Zen](/docs/zen).
-Il s'agit d'une liste organisée de modèles qui ont été testés et vérifiés par le OpenCode
+Il s'agit d'une liste organisée de modèles qui ont été testés et vérifiés par le Kilo
 équipe.
 
-1. Exécutez la commande `/connect` dans le TUI, sélectionnez opencode et dirigez-vous vers [opencode.ai/auth](https://opencode.ai/auth).
+1. Exécutez la commande `/connect` dans le TUI, sélectionnez opencode et dirigez-vous vers [kilo.ai/auth](https://kilo.ai/auth).
 
    ```txt
    /connect
@@ -167,33 +167,33 @@ vous voulez travailler.
 cd /path/to/project
 ```
 
-Et exécutez OpenCode.
+Et exécutez Kilo.
 
 ```bash
 opencode
 ```
 
-Ensuite, initialisez OpenCode pour le projet en exécutant la commande suivante.
+Ensuite, initialisez Kilo pour le projet en exécutant la commande suivante.
 
 ```bash frame="none"
 /init
 ```
 
-Cela permettra à OpenCode d'analyser votre projet et de créer un fichier `AGENTS.md` dans
+Cela permettra à Kilo d'analyser votre projet et de créer un fichier `AGENTS.md` dans
 la racine du projet.
 
 :::tip
 Vous devez valider le fichier `AGENTS.md` de votre projet dans Git.
 :::
 
-Cela aide OpenCode à comprendre la structure du projet et les modèles de codage
+Cela aide Kilo à comprendre la structure du projet et les modèles de codage
 utilisé.
 
 ---
 
 ## Usage
 
-Vous êtes maintenant prêt à utiliser OpenCode pour travailler sur votre projet. N'hésitez pas à le demander
+Vous êtes maintenant prêt à utiliser Kilo pour travailler sur votre projet. N'hésitez pas à le demander
 rien!
 
 Si vous débutez dans l'utilisation d'un agent de codage IA, voici quelques exemples qui pourraient
@@ -203,7 +203,7 @@ aide.
 
 ### Posez des questions
 
-Vous pouvez demander à OpenCode de vous expliquer la base de code.
+Vous pouvez demander à Kilo de vous expliquer la base de code.
 
 :::tip
 Utilisez la touche `@` pour effectuer une recherche floue de fichiers dans le projet.
@@ -219,11 +219,11 @@ Ceci est utile s'il y a une partie de la base de code sur laquelle vous n'avez p
 
 ### Ajouter des fonctionnalités
 
-Vous pouvez demander à OpenCode d'ajouter de nouvelles fonctionnalités à votre projet. Cependant, nous recommandons d’abord de lui demander de créer un plan.
+Vous pouvez demander à Kilo d'ajouter de nouvelles fonctionnalités à votre projet. Cependant, nous recommandons d’abord de lui demander de créer un plan.
 
 1. **Créer un plan**
 
-OpenCode dispose d'un _Mode Plan_ qui désactive sa capacité à apporter des modifications et
+Kilo dispose d'un _Mode Plan_ qui désactive sa capacité à apporter des modifications et
 suggérez plutôt _comment_ il implémentera la fonctionnalité.
 
 Accédez-y à l'aide de la touche **Tab**. Vous verrez un indicateur à cet effet dans le coin inférieur droit.
@@ -240,11 +240,11 @@ Then create a screen that shows all the recently deleted notes.
 From this screen, the user can undelete a note or permanently delete it.
 ```
 
-Vous souhaitez donner à OpenCode suffisamment de détails pour comprendre ce que vous voulez. Ça aide
+Vous souhaitez donner à Kilo suffisamment de détails pour comprendre ce que vous voulez. Ça aide
 pour lui parler comme si vous parliez à un développeur junior de votre équipe.
 
 :::tip
-Donnez à OpenCode beaucoup de contexte et d'exemples pour l'aider à comprendre ce que vous
+Donnez à Kilo beaucoup de contexte et d'exemples pour l'aider à comprendre ce que vous
 vouloir.
 :::
 
@@ -261,7 +261,7 @@ We'd like to design this new screen using a design I've used before.
 Faites glisser et déposez des images dans le terminal pour les ajouter à l'invite.
 :::
 
-OpenCode peut numériser toutes les images que vous lui donnez et les ajouter à l'invite. Tu peux
+Kilo peut numériser toutes les images que vous lui donnez et les ajouter à l'invite. Tu peux
 faites-le en faisant glisser et en déposant une image dans le terminal.
 
 3. **Créez la fonctionnalité**
@@ -283,7 +283,7 @@ Sounds good! Go ahead and make the changes.
 
 ### Apporter des modifications
 
-Pour des modifications plus simples, vous pouvez demander à OpenCode de le construire directement
+Pour des modifications plus simples, vous pouvez demander à Kilo de le construire directement
 sans avoir à revoir le plan au préalable.
 
 ```txt frame="none" "@packages/functions/src/settings.ts" "@packages/functions/src/notes.ts"
@@ -292,14 +292,14 @@ handled in the /notes route in @packages/functions/src/notes.ts and implement
 the same logic in @packages/functions/src/settings.ts
 ```
 
-Vous voulez vous assurer de fournir une bonne quantité de détails afin que OpenCode fasse le bon choix.
+Vous voulez vous assurer de fournir une bonne quantité de détails afin que Kilo fasse le bon choix.
 changements.
 
 ---
 
 ### Annuler les modifications
 
-Disons que vous demandez à OpenCode d'apporter quelques modifications.
+Disons que vous demandez à Kilo d'apporter quelques modifications.
 
 ```txt frame="none" "@packages/functions/src/api/index.ts"
 Can you refactor the function in @packages/functions/src/api/index.ts?
@@ -312,14 +312,14 @@ Mais vous réalisez que ce n’est pas ce que vous vouliez. Vous **pouvez annule
 /undo
 ```
 
-OpenCode annulera désormais les modifications que vous avez apportées et affichera votre message d'origine
+Kilo annulera désormais les modifications que vous avez apportées et affichera votre message d'origine
 encore.
 
 ```txt frame="none" "@packages/functions/src/api/index.ts"
 Can you refactor the function in @packages/functions/src/api/index.ts?
 ```
 
-À partir de là, vous pouvez modifier l'invite et demander à OpenCode de réessayer.
+À partir de là, vous pouvez modifier l'invite et demander à Kilo de réessayer.
 
 :::tip
 Vous pouvez exécuter `/undo` plusieurs fois pour annuler plusieurs modifications.
@@ -335,7 +335,7 @@ Ou vous **pouvez refaire** les modifications à l'aide de la commande `/redo`.
 
 ## Partager
 
-Les conversations que vous avez avec OpenCode peuvent être [partagées avec votre
+Les conversations que vous avez avec Kilo peuvent être [partagées avec votre
 équipe](/docs/share).
 
 ```bash frame="none"
@@ -348,12 +348,12 @@ Cela créera un lien vers la conversation en cours et le copiera dans votre pres
 Les conversations ne sont pas partagées par défaut.
 :::
 
-Voici un [exemple de conversation](https://opencode.ai/s/4XP1fce5) avec OpenCode.
+Voici un [exemple de conversation](https://kilo.ai/s/4XP1fce5) avec Kilo.
 
 ---
 
 ## Personnaliser
 
-Et c'est tout ! Vous êtes désormais un pro de l'utilisation de OpenCode.
+Et c'est tout ! Vous êtes désormais un pro de l'utilisation de Kilo.
 
-Pour vous l'approprier, nous vous recommandons de [choisir un thème](/docs/themes), [de personnaliser les raccourcis clavier](/docs/keybinds), de [configurer les formateurs de code](/docs/formatters), de [créer des commandes personnalisées](/docs/commands) ou de jouer avec la [OpenCode config](/docs/config).
+Pour vous l'approprier, nous vous recommandons de [choisir un thème](/docs/themes), [de personnaliser les raccourcis clavier](/docs/keybinds), de [configurer les formateurs de code](/docs/formatters), de [créer des commandes personnalisées](/docs/commands) ou de jouer avec la [Kilo config](/docs/config).
