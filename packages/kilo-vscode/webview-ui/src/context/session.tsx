@@ -88,6 +88,8 @@ interface SessionContextValue {
   createSession: () => void
   loadSessions: () => void
   selectSession: (id: string) => void
+  deleteSession: (id: string) => void
+  renameSession: (id: string, title: string) => void
 }
 
 const SessionContext = createContext<SessionContextValue>()
@@ -243,6 +245,10 @@ export const SessionProvider: ParentComponent = (props) => {
         case "sessionUpdated":
           setStore("sessions", message.session.id, message.session)
           break
+
+        case "sessionDeleted":
+          handleSessionDeleted(message.sessionID)
+          break
       }
     })
 
@@ -365,6 +371,39 @@ export const SessionProvider: ParentComponent = (props) => {
     })
   }
 
+  function handleSessionDeleted(sessionID: string) {
+    batch(() => {
+      setStore(
+        "sessions",
+        produce((sessions) => {
+          delete sessions[sessionID]
+        }),
+      )
+      setStore(
+        "messages",
+        produce((messages) => {
+          delete messages[sessionID]
+        }),
+      )
+      setStore(
+        "todos",
+        produce((todos) => {
+          delete todos[sessionID]
+        }),
+      )
+      setStore(
+        "modelSelections",
+        produce((selections) => {
+          delete selections[sessionID]
+        }),
+      )
+      if (currentSessionID() === sessionID) {
+        setCurrentSessionID(undefined)
+        setStatus("idle")
+      }
+    })
+  }
+
   // Actions
   function selectAgent(name: string) {
     setSelectedAgentName(name)
@@ -468,6 +507,22 @@ export const SessionProvider: ParentComponent = (props) => {
     vscode.postMessage({ type: "loadMessages", sessionID: id })
   }
 
+  function deleteSession(id: string) {
+    if (!server.isConnected()) {
+      console.warn("[Kilo New] Cannot delete session: not connected")
+      return
+    }
+    vscode.postMessage({ type: "deleteSession", sessionID: id })
+  }
+
+  function renameSession(id: string, title: string) {
+    if (!server.isConnected()) {
+      console.warn("[Kilo New] Cannot rename session: not connected")
+      return
+    }
+    vscode.postMessage({ type: "renameSession", sessionID: id, title })
+  }
+
   // Computed values
   const currentSession = () => {
     const id = currentSessionID()
@@ -543,6 +598,8 @@ export const SessionProvider: ParentComponent = (props) => {
     createSession,
     loadSessions,
     selectSession,
+    deleteSession,
+    renameSession,
   }
 
   return <SessionContext.Provider value={value}>{props.children}</SessionContext.Provider>
