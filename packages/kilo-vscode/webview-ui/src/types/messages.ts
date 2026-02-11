@@ -157,6 +157,8 @@ export interface ProviderModel {
   contextLength?: number
   releaseDate?: string
   latest?: boolean
+  // Actual shape returned by the server (Provider.Model)
+  limit?: { context: number; input?: number; output: number }
 }
 
 export interface Provider {

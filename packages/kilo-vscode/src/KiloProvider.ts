@@ -523,9 +523,18 @@ export class KiloProvider implements vscode.WebviewViewProvider {
       return
     }
 
+    if (!providerID || !modelID) {
+      console.error("[Kilo New] KiloProvider: No model selected for compact")
+      this.postMessage({
+        type: "error",
+        message: "No model selected. Connect a provider to compact this session.",
+      })
+      return
+    }
+
     try {
       const workspaceDir = this.getWorkspaceDirectory()
-      await this.httpClient.summarize(target, providerID || "kilo", modelID || "kilo/auto", workspaceDir)
+      await this.httpClient.summarize(target, providerID, modelID, workspaceDir)
     } catch (error) {
       console.error("[Kilo New] KiloProvider: Failed to compact session:", error)
       this.postMessage({

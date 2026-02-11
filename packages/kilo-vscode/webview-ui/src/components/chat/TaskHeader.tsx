@@ -14,7 +14,7 @@ export const TaskHeader: Component = () => {
 
   const title = createMemo(() => session.currentSession()?.title)
   const hasMessages = createMemo(() => session.messages().length > 0)
-  const visible = createMemo(() => !!(title() && hasMessages()))
+  const visible = createMemo(() => hasMessages())
   const busy = createMemo(() => session.status() === "busy")
 
   const cost = createMemo(() => {

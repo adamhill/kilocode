@@ -442,7 +442,8 @@ export const SessionProvider: ParentComponent = (props) => {
       if (total === 0) continue
       const sel = selected()
       const model = sel ? provider.findModel(sel) : undefined
-      const percentage = model?.contextLength ? Math.round((total / model.contextLength) * 100) : null
+      const limit = model?.limit?.context ?? model?.contextLength
+      const percentage = limit ? Math.round((total / limit) * 100) : null
       return { tokens: total, percentage }
     }
     return undefined
