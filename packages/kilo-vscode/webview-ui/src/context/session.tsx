@@ -29,6 +29,7 @@ import type {
   PermissionRequest,
   TodoItem,
   ModelSelection,
+  AgentInfo,
   ExtensionMessage,
 } from "../types/messages"
 
@@ -69,6 +70,11 @@ interface SessionContextValue {
   selected: Accessor<ModelSelection | null>
   selectModel: (providerID: string, modelID: string) => void
 
+  // Agent/mode selection
+  agents: Accessor<AgentInfo[]>
+  selectedAgent: Accessor<string>
+  selectAgent: (name: string) => void
+
   // Actions
   sendMessage: (text: string, providerID?: string, modelID?: string) => void
   abort: () => void
@@ -97,6 +103,11 @@ export const SessionProvider: ParentComponent = (props) => {
   // Pending model selection for before a session exists
   const [pendingModelSelection, setPendingModelSelection] = createSignal<ModelSelection | null>(null)
   const [pendingWasUserSet, setPendingWasUserSet] = createSignal(false)
+
+  // Agents (modes) loaded from the CLI backend
+  const [agents, setAgents] = createSignal<AgentInfo[]>([])
+  const [defaultAgent, setDefaultAgent] = createSignal("code")
+  const [selectedAgentName, setSelectedAgentName] = createSignal("code")
 
   // Store for sessions, messages, parts, todos, modelSelections
   const [store, setStore] = createStore<SessionStore>({
@@ -183,6 +194,15 @@ export const SessionProvider: ParentComponent = (props) => {
 
         case "sessionsLoaded":
           handleSessionsLoaded(message.sessions)
+          break
+
+        case "agentsLoaded":
+          setAgents(message.agents)
+          setDefaultAgent(message.defaultAgent)
+          // Only override if the user hasn't explicitly selected an agent
+          if (selectedAgentName() === "code" || !message.agents.some((a) => a.name === selectedAgentName())) {
+            setSelectedAgentName(message.defaultAgent)
+          }
           break
       }
     })
@@ -307,11 +327,17 @@ export const SessionProvider: ParentComponent = (props) => {
   }
 
   // Actions
+  function selectAgent(name: string) {
+    setSelectedAgentName(name)
+  }
+
   function sendMessage(text: string, providerID?: string, modelID?: string) {
     if (!server.isConnected()) {
       console.warn("[Kilo New] Cannot send message: not connected")
       return
     }
+
+    const agent = selectedAgentName() !== defaultAgent() ? selectedAgentName() : undefined
 
     vscode.postMessage({
       type: "sendMessage",
@@ -319,6 +345,7 @@ export const SessionProvider: ParentComponent = (props) => {
       sessionID: currentSessionID(),
       providerID,
       modelID,
+      agent,
     })
   }
 
@@ -417,6 +444,9 @@ export const SessionProvider: ParentComponent = (props) => {
     permissions,
     selected,
     selectModel,
+    agents,
+    selectedAgent: selectedAgentName,
+    selectAgent,
     sendMessage,
     abort,
     respondToPermission,

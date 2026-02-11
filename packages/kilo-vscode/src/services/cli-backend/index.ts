@@ -10,6 +10,7 @@ export type {
   PermissionRequest,
   SSEEvent,
   TodoItem,
+  AgentInfo,
   ServerConfig,
   KilocodeOrganization,
   KilocodeProfile,

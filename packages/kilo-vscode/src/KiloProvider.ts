@@ -11,6 +11,8 @@ export class KiloProvider implements vscode.WebviewViewProvider {
   private isWebviewReady = false
   /** Cached providersLoaded payload so requestProviders can be served before httpClient is ready */
   private cachedProvidersMessage: unknown = null
+  /** Cached agentsLoaded payload so requestAgents can be served before httpClient is ready */
+  private cachedAgentsMessage: unknown = null
 
   private trackedSessionIds: Set<string> = new Set()
   private unsubscribeEvent: (() => void) | null = null
@@ -144,7 +146,13 @@ export class KiloProvider implements vscode.WebviewViewProvider {
           await this.syncWebviewState("webviewReady")
           break
         case "sendMessage":
-          await this.handleSendMessage(message.text, message.sessionID, message.providerID, message.modelID)
+          await this.handleSendMessage(
+            message.text,
+            message.sessionID,
+            message.providerID,
+            message.modelID,
+            message.agent,
+          )
           break
         case "abort":
           await this.handleAbort(message.sessionID)
@@ -181,6 +189,9 @@ export class KiloProvider implements vscode.WebviewViewProvider {
           break
         case "requestProviders":
           await this.fetchAndSendProviders()
+          break
+        case "requestAgents":
+          await this.fetchAndSendAgents()
           break
       }
     })
@@ -254,8 +265,9 @@ export class KiloProvider implements vscode.WebviewViewProvider {
       this.postMessage({ type: "connectionState", state: this.connectionState })
       await this.syncWebviewState("initializeConnection")
 
-      // Fetch providers and send to webview
+      // Fetch providers and agents, then send to webview
       await this.fetchAndSendProviders()
+      await this.fetchAndSendAgents()
 
       console.log("[Kilo New] KiloProvider: ✅ initializeConnection completed successfully")
     } catch (error) {
@@ -434,6 +446,45 @@ export class KiloProvider implements vscode.WebviewViewProvider {
   }
 
   /**
+   * Fetch agents (modes) from the backend and send to webview.
+   */
+  private async fetchAndSendAgents(): Promise<void> {
+    if (!this.httpClient) {
+      if (this.cachedAgentsMessage) {
+        this.postMessage(this.cachedAgentsMessage)
+      }
+      return
+    }
+
+    try {
+      const workspaceDir = this.getWorkspaceDirectory()
+      const agents = await this.httpClient.listAgents(workspaceDir)
+
+      // Filter to only visible primary/all modes (not subagents, not hidden)
+      const visible = agents.filter((a) => a.mode !== "subagent" && !a.hidden)
+
+      // Find default agent: first one in list (CLI sorts default first)
+      const defaultAgent = visible.length > 0 ? visible[0].name : "code"
+
+      const message = {
+        type: "agentsLoaded",
+        agents: visible.map((a) => ({
+          name: a.name,
+          description: a.description,
+          mode: a.mode,
+          native: a.native,
+          color: a.color,
+        })),
+        defaultAgent,
+      }
+      this.cachedAgentsMessage = message
+      this.postMessage(message)
+    } catch (error) {
+      console.error("[Kilo New] KiloProvider: Failed to fetch agents:", error)
+    }
+  }
+
+  /**
    * Handle sending a message from the webview.
    */
   private async handleSendMessage(
@@ -441,6 +492,7 @@ export class KiloProvider implements vscode.WebviewViewProvider {
     sessionID?: string,
     providerID?: string,
     modelID?: string,
+    agent?: string,
   ): Promise<void> {
     if (!this.httpClient) {
       this.postMessage({
@@ -469,10 +521,11 @@ export class KiloProvider implements vscode.WebviewViewProvider {
         throw new Error("No session available")
       }
 
-      // Send message with text part and optional model selection
+      // Send message with text part, optional model selection, and optional agent/mode
       await this.httpClient.sendMessage(targetSessionID, [{ type: "text", text }], workspaceDir, {
         providerID,
         modelID,
+        agent,
       })
     } catch (error) {
       console.error("[Kilo New] KiloProvider: Failed to send message:", error)
