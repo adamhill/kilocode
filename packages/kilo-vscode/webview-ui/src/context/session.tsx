@@ -381,6 +381,10 @@ export const SessionProvider: ParentComponent = (props) => {
 
   function handleSessionDeleted(sessionID: string) {
     batch(() => {
+      // Collect message IDs so we can clean up their parts
+      const msgs = store.messages[sessionID] ?? []
+      const msgIds = msgs.map((m) => m.id)
+
       setStore(
         "sessions",
         produce((sessions) => {
@@ -391,6 +395,14 @@ export const SessionProvider: ParentComponent = (props) => {
         "messages",
         produce((messages) => {
           delete messages[sessionID]
+        }),
+      )
+      setStore(
+        "parts",
+        produce((parts) => {
+          for (const id of msgIds) {
+            delete parts[id]
+          }
         }),
       )
       setStore(
@@ -408,6 +420,7 @@ export const SessionProvider: ParentComponent = (props) => {
       if (currentSessionID() === sessionID) {
         setCurrentSessionID(undefined)
         setStatus("idle")
+        setLoading(false)
       }
     })
   }

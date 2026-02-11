@@ -70,11 +70,13 @@ const SessionList: Component<SessionListProps> = (props) => {
   function saveRename() {
     const id = renamingId()
     const title = renameValue().trim()
-    if (id && title) {
-      const existing = session.sessions().find((s) => s.id === id)
-      if (!existing || title !== (existing.title || "")) {
-        session.renameSession(id, title)
-      }
+    if (!id || !title) {
+      cancelRename()
+      return
+    }
+    const existing = session.sessions().find((s) => s.id === id)
+    if (!existing || title !== (existing.title || "")) {
+      session.renameSession(id, title)
     }
     setRenamingId(null)
     setRenameValue("")
@@ -89,7 +91,7 @@ const SessionList: Component<SessionListProps> = (props) => {
     dialog.show(() => (
       <Dialog title={language.t("session.delete.title")} fit>
         <div style={{ display: "flex", "flex-direction": "column", gap: "16px", padding: "0 16px 12px" }}>
-          <span>{language.t("session.delete.confirm", { name: s.title || "Untitled" })}</span>
+          <span>{language.t("session.delete.confirm", { name: s.title || language.t("session.untitled") })}</span>
           <div style={{ display: "flex", "justify-content": "flex-end", gap: "8px" }}>
             <Button variant="ghost" size="large" onClick={() => dialog.close()}>
               {language.t("common.cancel")}
@@ -143,8 +145,8 @@ const SessionList: Component<SessionListProps> = (props) => {
             props.onSelectSession(s.id)
           }
         }}
-        search={{ placeholder: "Search sessions...", autofocus: false }}
-        emptyMessage="No sessions yet. Click + to start a new conversation."
+        search={{ placeholder: language.t("session.search.placeholder"), autofocus: false }}
+        emptyMessage={language.t("session.empty")}
         groupBy={(s) => dateGroup(s.updatedAt)}
         sortGroupsBy={(a, b) => (GROUP_ORDER[a.category] ?? 99) - (GROUP_ORDER[b.category] ?? 99)}
         itemWrapper={wrapItem}
@@ -154,13 +156,13 @@ const SessionList: Component<SessionListProps> = (props) => {
             when={renamingId() === s.id}
             fallback={
               <>
-                <span data-slot="list-item-title">{s.title || "Untitled"}</span>
+                <span data-slot="list-item-title">{s.title || language.t("session.untitled")}</span>
                 <span data-slot="list-item-description">{formatRelativeDate(s.updatedAt)}</span>
               </>
             }
           >
             <InlineInput
-              ref={(el) => requestAnimationFrame(() => el.focus())}
+              ref={(el) => requestAnimationFrame(() => el?.focus())}
               value={renameValue()}
               onInput={(e) => setRenameValue(e.currentTarget.value)}
               onKeyDown={(e) => {

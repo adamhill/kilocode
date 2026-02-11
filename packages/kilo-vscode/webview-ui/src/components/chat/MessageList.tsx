@@ -7,6 +7,7 @@
 import { Component, For, Show, createSignal, createEffect, createMemo, onCleanup } from "solid-js"
 import { useSession } from "../../context/session"
 import { useServer } from "../../context/server"
+import { useLanguage } from "../../context/language"
 import { formatRelativeDate } from "../../utils/date"
 import { Message } from "./Message"
 
@@ -17,6 +18,7 @@ interface MessageListProps {
 export const MessageList: Component<MessageListProps> = (props) => {
   const session = useSession()
   const server = useServer()
+  const language = useLanguage()
 
   let containerRef: HTMLDivElement | undefined
   const [isAtBottom, setIsAtBottom] = createSignal(true)
@@ -66,8 +68,11 @@ export const MessageList: Component<MessageListProps> = (props) => {
 
   // Load sessions once connected so the recent list is available immediately.
   // Uses createEffect instead of onMount so it retries when connection state changes.
+  // The flag prevents redundant loads (e.g. after deleting all sessions).
+  let loaded = false
   createEffect(() => {
-    if (server.isConnected() && session.sessions().length === 0) {
+    if (!loaded && server.isConnected() && session.sessions().length === 0) {
+      loaded = true
       session.loadSessions()
     }
   })
@@ -75,10 +80,10 @@ export const MessageList: Component<MessageListProps> = (props) => {
   const messages = () => session.messages()
   const isEmpty = () => messages().length === 0 && !session.loading()
 
-  // 3 most recently created sessions (youngest first)
+  // 3 most recently active sessions
   const recent = createMemo(() =>
     [...session.sessions()]
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
       .slice(0, 3),
   )
 
@@ -90,11 +95,11 @@ export const MessageList: Component<MessageListProps> = (props) => {
             <p>Start a conversation by typing a message below.</p>
             <Show when={recent().length > 0 && props.onSelectSession}>
               <div class="recent-sessions">
-                <span class="recent-sessions-label">Recent</span>
+                <span class="recent-sessions-label">{language.t("session.recent")}</span>
                 <For each={recent()}>
                   {(s) => (
                     <button class="recent-session-item" onClick={() => props.onSelectSession?.(s.id)}>
-                      <span class="recent-session-title">{s.title || "Untitled"}</span>
+                      <span class="recent-session-title">{s.title || language.t("session.untitled")}</span>
                       <span class="recent-session-date">{formatRelativeDate(s.updatedAt)}</span>
                     </button>
                   )}

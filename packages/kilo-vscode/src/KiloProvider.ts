@@ -168,6 +168,7 @@ export class KiloProvider implements vscode.WebviewViewProvider {
           break
         case "clearSession":
           this.currentSession = null
+          this.trackedSessionIds.clear()
           break
         case "loadMessages":
           await this.handleLoadMessages(message.sessionID)

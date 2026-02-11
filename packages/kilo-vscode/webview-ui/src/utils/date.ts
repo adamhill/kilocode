@@ -1,7 +1,10 @@
 export function formatRelativeDate(iso: string): string {
   const now = Date.now()
-  const then = new Date(iso).getTime()
+  const parsed = Date.parse(iso)
+  const then = Number.isFinite(parsed) ? parsed : now
   const diff = now - then
+
+  if (diff <= 0) return "just now"
 
   const seconds = Math.floor(diff / 1000)
   if (seconds < 60) return "just now"
