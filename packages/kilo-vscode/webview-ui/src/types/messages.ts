@@ -98,6 +98,16 @@ export interface TodoItem {
   status: "pending" | "in_progress" | "completed"
 }
 
+// Agent/mode info from CLI backend
+export interface AgentInfo {
+  name: string
+  description?: string
+  mode: "subagent" | "primary" | "all"
+  native?: boolean
+  hidden?: boolean
+  color?: string
+}
+
 // Server info
 export interface ServerInfo {
   port: number
@@ -259,6 +269,12 @@ export interface ProvidersLoadedMessage {
   defaultSelection: ModelSelection
 }
 
+export interface AgentsLoadedMessage {
+  type: "agentsLoaded"
+  agents: AgentInfo[]
+  defaultAgent: string
+}
+
 export type ExtensionMessage =
   | ReadyMessage
   | ConnectionStateMessage
@@ -278,6 +294,7 @@ export type ExtensionMessage =
   | DeviceAuthFailedMessage
   | DeviceAuthCancelledMessage
   | ProvidersLoadedMessage
+  | AgentsLoadedMessage
 
 // ============================================
 // Messages FROM webview TO extension
@@ -289,6 +306,7 @@ export interface SendMessageRequest {
   sessionID?: string
   providerID?: string
   modelID?: string
+  agent?: string
 }
 
 export interface AbortRequest {
@@ -345,6 +363,10 @@ export interface RequestProvidersMessage {
   type: "requestProviders"
 }
 
+export interface RequestAgentsMessage {
+  type: "requestAgents"
+}
+
 export type WebviewMessage =
   | SendMessageRequest
   | AbortRequest
@@ -359,6 +381,7 @@ export type WebviewMessage =
   | CancelLoginRequest
   | WebviewReadyRequest
   | RequestProvidersMessage
+  | RequestAgentsMessage
 
 // ============================================
 // VS Code API type

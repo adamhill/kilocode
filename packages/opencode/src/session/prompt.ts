@@ -262,14 +262,28 @@ export namespace SessionPrompt {
       })
     }
 
+    // kilocode_change start
+    void Bus.publish(Session.Event.TurnOpen, { sessionID })
+    let closeReason: Session.CloseReason = "completed"
+    let finished = false
     using _ = defer(() => cancel(sessionID))
+    await using _close = defer(async () => {
+      if (!finished) closeReason = abort.aborted ? "interrupted" : "error"
+      await Bus.publish(Session.Event.TurnClose, { sessionID, reason: closeReason })
+    })
+    // kilocode_change end
 
     let step = 0
     const session = await Session.get(sessionID)
     while (true) {
       SessionStatus.set(sessionID, { type: "busy" })
       log.info("loop", { step, sessionID })
-      if (abort.aborted) break
+      // kilocode_change start
+      if (abort.aborted) {
+        closeReason = "interrupted"
+        break
+      }
+      // kilocode_change end
       let msgs = await MessageV2.filterCompacted(MessageV2.stream(sessionID))
 
       let lastUser: MessageV2.User | undefined
@@ -614,7 +628,13 @@ export namespace SessionPrompt {
         tools,
         model,
       })
-      if (result === "stop") break
+      // kilocode_change start
+      if (result === "stop") {
+        if (abort.aborted || processor.message.error?.name === "MessageAbortedError") closeReason = "interrupted"
+        else if (processor.message.error) closeReason = "error"
+        break
+      }
+      // kilocode_change end
       if (result === "compact") {
         await SessionCompaction.create({
           sessionID,
@@ -626,6 +646,9 @@ export namespace SessionPrompt {
       continue
     }
     SessionCompaction.prune({ sessionID })
+    // kilocode_change start
+    finished = true
+    // kilocode_change end
     for await (const item of MessageV2.stream(sessionID)) {
       if (item.info.role === "user") continue
       const queued = state()[sessionID]?.callbacks ?? []

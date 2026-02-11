@@ -392,3 +392,92 @@
   text-transform: uppercase;
   letter-spacing: 0.03em;
 }
+
+/* ============================================
+   Mode Switcher
+   ============================================ */
+
+.mode-switcher {
+  position: relative;
+}
+
+.mode-switcher-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  color: var(--vscode-descriptionForeground);
+  font-size: 11px;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 3px;
+  white-space: nowrap;
+  max-width: 120px;
+}
+
+.mode-switcher-trigger:hover:not(:disabled) {
+  color: var(--vscode-foreground);
+  background: var(--vscode-toolbar-hoverBackground);
+}
+
+.mode-switcher-trigger:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.mode-switcher-trigger-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mode-switcher-trigger-chevron {
+  flex-shrink: 0;
+}
+
+.mode-switcher-dropdown {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  margin-bottom: 4px;
+  min-width: 200px;
+  max-width: 300px;
+  max-height: 280px;
+  overflow-y: auto;
+  background: var(--vscode-dropdown-background);
+  border: 1px solid var(--vscode-dropdown-border);
+  border-radius: 4px;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.mode-switcher-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.mode-switcher-item:hover {
+  background: var(--vscode-list-hoverBackground);
+}
+
+.mode-switcher-item.selected {
+  color: var(--vscode-list-activeSelectionForeground, var(--vscode-foreground));
+  background: var(--vscode-list-activeSelectionBackground, var(--vscode-list-hoverBackground));
+}
+
+.mode-switcher-item-name {
+  font-weight: 500;
+}
+
+.mode-switcher-item-desc {
+  font-size: 11px;
+  color: var(--vscode-descriptionForeground);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
