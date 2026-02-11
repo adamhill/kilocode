@@ -4,8 +4,9 @@
  * Shows recent sessions in the empty state for quick resumption.
  */
 
-import { Component, For, Show, createSignal, createEffect, createMemo, onMount, onCleanup } from "solid-js"
+import { Component, For, Show, createSignal, createEffect, createMemo, onCleanup } from "solid-js"
 import { useSession } from "../../context/session"
+import { useServer } from "../../context/server"
 import { Message } from "./Message"
 
 interface MessageListProps {
@@ -35,6 +36,7 @@ function formatRelativeDate(iso: string): string {
 
 export const MessageList: Component<MessageListProps> = (props) => {
   const session = useSession()
+  const server = useServer()
 
   let containerRef: HTMLDivElement | undefined
   const [isAtBottom, setIsAtBottom] = createSignal(true)
@@ -82,9 +84,12 @@ export const MessageList: Component<MessageListProps> = (props) => {
     })
   })
 
-  // Load sessions for the recent list when the empty state is visible
-  onMount(() => {
-    session.loadSessions()
+  // Load sessions once connected so the recent list is available immediately.
+  // Uses createEffect instead of onMount so it retries when connection state changes.
+  createEffect(() => {
+    if (server.isConnected() && session.sessions().length === 0) {
+      session.loadSessions()
+    }
   })
 
   const messages = () => session.messages()

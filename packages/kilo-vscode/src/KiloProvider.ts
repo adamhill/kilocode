@@ -365,13 +365,17 @@ export class KiloProvider implements vscode.WebviewViewProvider {
 
     try {
       const workspaceDir = this.getWorkspaceDirectory()
+      const messagesData = await this.httpClient.getMessages(sessionID, workspaceDir)
 
       // Update currentSession so fallback logic in handleSendMessage/handleAbort
       // references the correct session after switching to a historical session.
-      const session = await this.httpClient.getSession(sessionID, workspaceDir)
-      this.currentSession = session
-
-      const messagesData = await this.httpClient.getMessages(sessionID, workspaceDir)
+      // Non-blocking: don't let a failure here prevent messages from loading.
+      this.httpClient
+        .getSession(sessionID, workspaceDir)
+        .then((session) => {
+          this.currentSession = session
+        })
+        .catch(() => {})
 
       // Convert to webview format, including cost/tokens for assistant messages
       const messages = messagesData.map((m) => ({
