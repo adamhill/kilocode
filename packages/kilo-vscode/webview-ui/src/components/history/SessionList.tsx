@@ -1,10 +1,13 @@
 /**
  * SessionList component
- * Displays all sessions sorted by most recent, allowing selection
+ * Displays all sessions sorted by most recent, allowing selection.
+ * Uses kilo-ui List component for keyboard navigation and accessibility.
  */
 
-import { Component, For, Show, onMount } from "solid-js"
+import { Component, onMount } from "solid-js"
+import { List } from "@kilocode/kilo-ui/list"
 import { useSession } from "../../context/session"
+import type { SessionInfo } from "../../types/messages"
 
 function formatRelativeDate(iso: string): string {
   const now = Date.now()
@@ -47,29 +50,33 @@ const SessionList: Component<SessionListProps> = (props) => {
     session.loadSessions()
   })
 
+  const currentSession = (): SessionInfo | undefined => {
+    const id = session.currentSessionID()
+    return session.sessions().find((s) => s.id === id)
+  }
+
   return (
     <div class="session-list">
-      <Show
-        when={session.sessions().length > 0}
-        fallback={
-          <div class="session-list-empty">
-            <p>No sessions yet. Click + to start a new conversation.</p>
-          </div>
-        }
+      <List<SessionInfo>
+        items={session.sessions()}
+        key={(s) => s.id}
+        filterKeys={["title"]}
+        current={currentSession()}
+        onSelect={(s) => {
+          if (s) {
+            props.onSelectSession(s.id)
+          }
+        }}
+        search={{ placeholder: "Search sessions...", autofocus: false }}
+        emptyMessage="No sessions yet. Click + to start a new conversation."
       >
-        <For each={session.sessions()}>
-          {(s) => (
-            <div
-              class="session-item"
-              classList={{ "session-item-active": s.id === session.currentSessionID() }}
-              onClick={() => props.onSelectSession(s.id)}
-            >
-              <div class="session-item-title">{s.title || "Untitled"}</div>
-              <div class="session-item-date">{formatRelativeDate(s.updatedAt)}</div>
-            </div>
-          )}
-        </For>
-      </Show>
+        {(s) => (
+          <>
+            <span data-slot="list-item-title">{s.title || "Untitled"}</span>
+            <span data-slot="list-item-description">{formatRelativeDate(s.updatedAt)}</span>
+          </>
+        )}
+      </List>
     </div>
   )
 }
