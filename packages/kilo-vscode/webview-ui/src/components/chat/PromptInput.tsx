@@ -80,13 +80,13 @@ export const PromptInput: Component = () => {
           <Show
             when={isBusy()}
             fallback={
-              <Tooltip value={language.t("chat.send")} placement="top">
+              <Tooltip value={language.t("prompt.action.send")} placement="top">
                 <Button
                   variant="primary"
                   size="small"
                   onClick={handleSend}
                   disabled={!canSend()}
-                  aria-label={language.t("chat.send")}
+                  aria-label={language.t("prompt.action.send")}
                 >
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
                     <path d="M1.5 1.5L14.5 8L1.5 14.5V9L10 8L1.5 7V1.5Z" />
@@ -95,8 +95,8 @@ export const PromptInput: Component = () => {
               </Tooltip>
             }
           >
-            <Tooltip value={language.t("chat.stop")} placement="top">
-              <Button variant="ghost" size="small" onClick={handleAbort} aria-label={language.t("chat.stop")}>
+            <Tooltip value={language.t("prompt.action.stop")} placement="top">
+              <Button variant="ghost" size="small" onClick={handleAbort} aria-label={language.t("prompt.action.stop")}>
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
                   <rect x="3" y="3" width="10" height="10" rx="1" />
                 </svg>

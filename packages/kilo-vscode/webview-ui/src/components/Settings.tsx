@@ -40,7 +40,7 @@ const Settings: Component<SettingsProps> = (props) => {
           gap: "8px",
         }}
       >
-        <Tooltip value={language.t("sidebar.done")} placement="bottom">
+        <Tooltip value={language.t("common.goBack")} placement="bottom">
           <Button variant="ghost" size="small" onClick={() => props.onBack?.()}>
             <Icon name="arrow-left" />
           </Button>
