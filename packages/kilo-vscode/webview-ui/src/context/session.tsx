@@ -253,6 +253,11 @@ export const SessionProvider: ParentComponent = (props) => {
         case "sessionDeleted":
           handleSessionDeleted(message.sessionID)
           break
+
+        // kilocode_change - reset loading on backend errors to avoid stuck state
+        case "error":
+          setLoading(false)
+          break
       }
     })
 

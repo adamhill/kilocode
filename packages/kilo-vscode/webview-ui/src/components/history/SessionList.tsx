@@ -13,36 +13,8 @@ import { InlineInput } from "@kilocode/kilo-ui/inline-input"
 import { useDialog } from "@kilocode/kilo-ui/context/dialog"
 import { useSession } from "../../context/session"
 import { useLanguage } from "../../context/language"
+import { formatRelativeDate } from "../../utils/date"
 import type { SessionInfo } from "../../types/messages"
-
-function formatRelativeDate(iso: string): string {
-  const now = Date.now()
-  const then = new Date(iso).getTime()
-  const diff = now - then
-
-  const seconds = Math.floor(diff / 1000)
-  if (seconds < 60) {
-    return "just now"
-  }
-
-  const minutes = Math.floor(seconds / 60)
-  if (minutes < 60) {
-    return `${minutes} min ago`
-  }
-
-  const hours = Math.floor(minutes / 60)
-  if (hours < 24) {
-    return `${hours}h ago`
-  }
-
-  const days = Math.floor(hours / 24)
-  if (days < 30) {
-    return `${days}d ago`
-  }
-
-  const months = Math.floor(days / 30)
-  return `${months}mo ago`
-}
 
 function dateGroup(iso: string): string {
   const now = new Date()
@@ -99,7 +71,10 @@ const SessionList: Component<SessionListProps> = (props) => {
     const id = renamingId()
     const title = renameValue().trim()
     if (id && title) {
-      session.renameSession(id, title)
+      const existing = session.sessions().find((s) => s.id === id)
+      if (!existing || title !== (existing.title || "")) {
+        session.renameSession(id, title)
+      }
     }
     setRenamingId(null)
     setRenameValue("")

@@ -378,7 +378,7 @@ export class KiloProvider implements vscode.WebviewViewProvider {
         .then((session) => {
           this.currentSession = session
         })
-        .catch(() => {})
+        .catch((err) => console.error("[Kilo New] KiloProvider: Failed to fetch session for tracking:", err))
 
       // Convert to webview format, including cost/tokens for assistant messages
       const messages = messagesData.map((m) => ({
