@@ -357,6 +357,10 @@ export interface CreateSessionRequest {
   type: "createSession"
 }
 
+export interface ClearSessionRequest {
+  type: "clearSession"
+}
+
 export interface LoadMessagesRequest {
   type: "loadMessages"
   sessionID: string
@@ -427,6 +431,7 @@ export type WebviewMessage =
   | AbortRequest
   | PermissionResponseRequest
   | CreateSessionRequest
+  | ClearSessionRequest
   | LoadMessagesRequest
   | LoadSessionsRequest
   | LoginRequest

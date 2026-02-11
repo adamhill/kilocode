@@ -166,6 +166,9 @@ export class KiloProvider implements vscode.WebviewViewProvider {
         case "createSession":
           await this.handleCreateSession()
           break
+        case "clearSession":
+          this.currentSession = null
+          break
         case "loadMessages":
           await this.handleLoadMessages(message.sessionID)
           break

@@ -93,9 +93,7 @@ const AppContent: Component = () => {
   const handleViewAction = (action: string) => {
     switch (action) {
       case "plusButtonClicked":
-        if (session.messages().length > 0 || !session.currentSessionID()) {
-          session.createSession()
-        }
+        session.clearCurrentSession()
         setCurrentView("newTask")
         break
       case "marketplaceButtonClicked":

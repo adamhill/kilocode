@@ -86,6 +86,7 @@ interface SessionContextValue {
   compact: () => void
   respondToPermission: (permissionId: string, response: "once" | "always" | "reject") => void
   createSession: () => void
+  clearCurrentSession: () => void
   loadSessions: () => void
   selectSession: (id: string) => void
   deleteSession: (id: string) => void
@@ -489,6 +490,15 @@ export const SessionProvider: ParentComponent = (props) => {
     vscode.postMessage({ type: "createSession" })
   }
 
+  function clearCurrentSession() {
+    setCurrentSessionID(undefined)
+    setStatus("idle")
+    setPermissions([])
+    setPendingModelSelection(provider.defaultSelection())
+    setPendingWasUserSet(false)
+    vscode.postMessage({ type: "clearSession" })
+  }
+
   function loadSessions() {
     if (!server.isConnected()) {
       console.warn("[Kilo New] Cannot load sessions: not connected")
@@ -596,6 +606,7 @@ export const SessionProvider: ParentComponent = (props) => {
     compact,
     respondToPermission,
     createSession,
+    clearCurrentSession,
     loadSessions,
     selectSession,
     deleteSession,
