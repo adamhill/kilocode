@@ -567,6 +567,10 @@ export class KiloProvider implements vscode.WebviewViewProvider {
    */
   private async handleCompact(sessionID?: string, providerID?: string, modelID?: string): Promise<void> {
     if (!this.httpClient) {
+      this.postMessage({
+        type: "error",
+        message: "Not connected to CLI backend",
+      })
       return
     }
 

@@ -402,6 +402,11 @@ export const SessionProvider: ParentComponent = (props) => {
   }
 
   function compact() {
+    if (!server.isConnected()) {
+      console.warn("[Kilo New] Cannot compact: not connected")
+      return
+    }
+
     const sessionID = currentSessionID()
     if (!sessionID) {
       console.warn("[Kilo New] Cannot compact: no current session")
@@ -498,7 +503,12 @@ export const SessionProvider: ParentComponent = (props) => {
     for (let i = msgs.length - 1; i >= 0; i--) {
       const m = msgs[i]
       if (m.role !== "assistant" || !m.tokens) continue
-      const total = m.tokens.input + m.tokens.output + m.tokens.reasoning + m.tokens.cache.read + m.tokens.cache.write
+      const total =
+        m.tokens.input +
+        m.tokens.output +
+        (m.tokens.reasoning ?? 0) +
+        (m.tokens.cache?.read ?? 0) +
+        (m.tokens.cache?.write ?? 0)
       if (total === 0) continue
       const sel = selected()
       const model = sel ? provider.findModel(sel) : undefined

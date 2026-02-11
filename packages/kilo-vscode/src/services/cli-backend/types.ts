@@ -22,8 +22,8 @@ export type SessionStatusInfo =
 export interface TokenUsage {
   input: number
   output: number
-  reasoning: number
-  cache: { read: number; write: number }
+  reasoning?: number
+  cache?: { read: number; write: number }
 }
 
 // Message types from MessageV2

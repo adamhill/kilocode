@@ -68,8 +68,8 @@ export interface PartDelta {
 export interface TokenUsage {
   input: number
   output: number
-  reasoning: number
-  cache: { read: number; write: number }
+  reasoning?: number
+  cache?: { read: number; write: number }
 }
 
 // Context usage derived from the last assistant message's tokens
