@@ -4,14 +4,14 @@ description: Ulike moduser for forskjellige brukstilfeller.
 ---
 
 :::caution
-Modi er nå konfigurert gjennom alternativet `agent` i OpenCode-konfigurasjonen. De
+Modi er nå konfigurert gjennom alternativet `agent` i Kilo-konfigurasjonen. De
 Alternativet `mode` er nå utdatert. [Finn ut mer](/docs/agents).
 :::
 
-Moduser i OpenCode lar deg tilpasse oppførselen, verktøyene og ledetekstene for ulike brukstilfeller.
+Moduser i Kilo lar deg tilpasse oppførselen, verktøyene og ledetekstene for ulike brukstilfeller.
 
 Den kommer med to innebygde moduser: **bygg** og **plan**. Du kan tilpasse
-disse eller konfigurer din egen gjennom OpenCode-konfigurasjonen.
+disse eller konfigurer din egen gjennom Kilo-konfigurasjonen.
 
 Du kan bytte mellom moduser under en økt eller konfigurere dem i konfigurasjonsfilen.
 
@@ -19,7 +19,7 @@ Du kan bytte mellom moduser under en økt eller konfigurere dem i konfigurasjons
 
 ## Innebygd
 
-OpenCode kommer med to innebygde moduser.
+Kilo kommer med to innebygde moduser.
 
 ---
 
@@ -60,7 +60,7 @@ Konfigurer moduser i konfigurasjonsfilen `opencode.json`:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "mode": {
     "build": {
       "model": "anthropic/claude-sonnet-4-20250514",
@@ -173,7 +173,7 @@ Temperaturverdier varierer vanligvis fra 0,0 til 1,0:
 }
 ```
 
-Hvis ingen temperatur er spesifisert, bruker OpenCode modellspesifikke standarder (vanligvis 0 for de fleste modeller, 0,55 for Qwen-modeller).
+Hvis ingen temperatur er spesifisert, bruker Kilo modellspesifikke standarder (vanligvis 0 for de fleste modeller, 0,55 for Qwen-modeller).
 
 ---
 
@@ -192,7 +192,7 @@ Spesifiser en tilpasset systemmeldingsfil for denne modusen med `prompt`-konfigu
 ```
 
 Denne banen er i forhold til hvor konfigurasjonsfilen er plassert. Så dette fungerer for
-både den globale OpenCode-konfigurasjonen og den prosjektspesifikke konfigurasjonen.
+både den globale Kilo-konfigurasjonen og den prosjektspesifikke konfigurasjonen.
 
 ---
 
@@ -249,7 +249,7 @@ Du kan lage dine egne tilpassede moduser ved å legge dem til konfigurasjonen. H
 
 ```json title="opencode.json" {4-14}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "mode": {
     "docs": {
       "prompt": "{file:./prompts/documentation.txt}",

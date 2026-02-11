@@ -112,17 +112,17 @@ opencode agent list
 Polecenie do zarządzania danymi uwierzytelniającymi i logowaniem dla dostawców.
 
 ```bash
-opencode auth [command]
+kilo auth [command]
 ```
 
 ---
 
 #### login
 
-opencode jest dostępny przez listę dostawców w [Models.dev](https://models.dev), więc można użyć `opencode auth login` do skonfigurowania klucza API dla dowolnego dostawcy, który może być kontrolowany. Jest to możliwe w `~/.local/share/opencode/auth.json`.
+opencode jest dostępny przez listę dostawców w [Models.dev](https://models.dev), więc można użyć `kilo auth login` do skonfigurowania klucza API dla dowolnego dostawcy, który może być kontrolowany. Jest to możliwe w `~/.local/share/opencode/auth.json`.
 
 ```bash
-opencode auth login
+kilo auth login
 ```
 
 Po uruchomieniu opencode ładuje dostawców z pliku poświadczeń. A jeśli twoje siedliskiem są jakieś klucze lub plik `.env` w twoim projekcie.
@@ -134,13 +134,13 @@ Po uruchomieniu opencode ładuje dostawców z pliku poświadczeń. A jeśli twoj
 Wyświetlanie list wszystkich uwierzytelnionych dostawców przechowywanych w pliku poświadczeń.
 
 ```bash
-opencode auth list
+kilo auth list
 ```
 
 Lub krótka wersja.
 
 ```bash
-opencode auth ls
+kilo auth ls
 ```
 
 ---
@@ -150,7 +150,7 @@ opencode auth ls
 Wylogowuje Cię z dostawcy poprzez usunięcie go z pliku poświadczeń.
 
 ```bash
-opencode auth logout
+kilo auth logout
 ```
 
 ---
@@ -323,11 +323,11 @@ Jest to wymagane w przypadku tworzenia skryptów, automatyzacji lub gdy zostanie
 opencode run Explain the use of context in Go
 ```
 
-Można również zastosować, uruchamiając `opencode serve`, aby wyłączyć zimne uruchamianie serwera MCP przy każdym uruchomieniu:
+Można również zastosować, uruchamiając `kilo serve`, aby wyłączyć zimne uruchamianie serwera MCP przy każdym uruchomieniu:
 
 ```bash
 # Start a headless server in one terminal
-opencode serve
+kilo serve
 
 # In another terminal, run commands that attach to it
 opencode run --attach http://localhost:4096 "Explain async/await in JavaScript"
@@ -357,7 +357,7 @@ opencode run --attach http://localhost:4096 "Explain async/await in JavaScript"
 Uruchom bezgłowy serwer opencode w celu uzyskania dostępu do API. Pełny interfejs HTTP w [dokumentacji serwera](/docs/server).
 
 ```bash
-opencode serve
+kilo serve
 ```
 
 Spowoduje dostęp do serwera HTTP, który zapewnia dostęp do API opencode bez interfejsu TUI. Ustaw `OPENCODE_SERVER_PASSWORD`, aby włączyć podstawowe uwierzytelnianie HTTP (domyślna nazwa użytkownika do `opencode`).
@@ -513,19 +513,19 @@ opencode uninstall
 Aktualizuje opencode do oryginalnej wersji lub oryginalnej wersji.
 
 ```bash
-opencode upgrade [target]
+kilo upgrade [target]
 ```
 
 Aby zachować ostatnią wersję.
 
 ```bash
-opencode upgrade
+kilo upgrade
 ```
 
 Aby zobaczyć wersję pierwotną.
 
 ```bash
-opencode upgrade v0.1.48
+kilo upgrade v0.1.48
 ```
 
 #### Flagi

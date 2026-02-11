@@ -35,7 +35,7 @@ opencode의 `provider` 섹션을 통해 공급자를 사용자 정의 할 수 �
 
 ```json title="opencode.json" {6}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "anthropic": {
       "options": {
@@ -57,7 +57,7 @@ opencode와 잘 작동하도록 테스트 및 검증. [더 알아보기](/docs/z
 새로운 경우, OpenCode Zen로 시작하는 것이 좋습니다.
 :::
 
-1. TUI에서 `/connect` 명령을 실행하고, opencode를 선택하고, [opencode.ai/auth](https://opencode.ai/auth)에 머리를 선택합니다.
+1. TUI에서 `/connect` 명령을 실행하고, opencode를 선택하고, [kilo.ai/auth](https://kilo.ai/auth)에 머리를 선택합니다.
 
    ```txt
    /connect
@@ -163,7 +163,7 @@ opencode를 실행하는 동안 이러한 환경 변수 중 하나를 설정:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "amazon-bedrock": {
       "options": {
@@ -191,7 +191,7 @@ Bedrock의 VPC 엔드포인트를 사용하는 경우:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "amazon-bedrock": {
       "options": {
@@ -238,7 +238,7 @@ custom inference profiles를 위해, 열쇠에 있는 모형 그리고 공급자
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "amazon-bedrock": {
       // ...
@@ -492,7 +492,7 @@ opencode config를 통해 모델을 추가할 수 있습니다.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "cloudflare-ai-gateway": {
       "models": {
@@ -669,7 +669,7 @@ Select**OAuth**와 브라우저는 권한이 없습니다.
 
 1. [GitLab User Settings > Access Tokens](https://gitlab.com/-/user settings/personal access tokens)로 이동
 2. 새 토큰 추가 \*\*
-3. 이름: `OpenCode`의 범위: `api`
+3. 이름: `Kilo`의 범위: `api`
 4. 토큰 복사 (`glpat-`와 함께 시작)
 5. terminal에서 그것을 입력하십시오
 
@@ -683,7 +683,7 @@ Select**OAuth**와 브라우저는 권한이 없습니다.
 
 :::note
 'GITLAB TOKEN' 환경 변수를 지정할 수도 있습니다.
-opencode auth 저장소에 토큰을 저장합니다.
+kilo auth 저장소에 토큰을 저장합니다.
 :::
 
 #### 셀프 호스팅 GitLab
@@ -696,7 +696,7 @@ opencode는 세션 제목을 생성하고 같은 일부 AI 작업을 위해 작�
 
 ```json
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "small_model": "gitlab/duo-chat-haiku-4-5",
   "share": "disabled"
 }
@@ -759,7 +759,7 @@ export GITLAB_OAUTH_CLIENT_ID=your_application_id_here
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "gitlab": {
       "options": {
@@ -780,7 +780,7 @@ GitLab 도구에 액세스하려면 (merge 요청, 문제, 파이프라인, CI/C
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "plugin": ["@gitlab/opencode-gitlab-plugin"]
 }
 ```
@@ -964,7 +964,7 @@ opencode를 실행하면서 설정한다.
 
 ```jsonc title="~/.config/opencode/opencode.jsonc"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "helicone": {
       "npm": "@ai-sdk/openai-compatible",
@@ -992,7 +992,7 @@ Helicone는 캐싱, 사용자 추적 및 세션 관리와 같은 기능을 위�
 
 ```jsonc title="~/.config/opencode/opencode.jsonc"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "helicone": {
       "npm": "@ai-sdk/openai-compatible",
@@ -1046,7 +1046,7 @@ npm install -g opencode-helicone-session
 
 ```json title="opencode.json" "llama.cpp" {5, 6, 8, 10-15}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "llama.cpp": {
       "npm": "@ai-sdk/openai-compatible",
@@ -1113,7 +1113,7 @@ LM Studio를 통해 로컬 모델을 사용할 수 있습니다.
 
 ```json title="opencode.json" "lmstudio" {5, 6, 8, 10-14}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "lmstudio": {
       "npm": "@ai-sdk/openai-compatible",
@@ -1234,7 +1234,7 @@ Ollama는 opencode를 자동으로 구성할 수 있습니다. 자세한 내용�
 
 ```json title="opencode.json" "ollama" {5, 6, 8, 10-14}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "ollama": {
       "npm": "@ai-sdk/openai-compatible",
@@ -1396,7 +1396,7 @@ opencode config를 통해 추가 모델을 추가할 수 있습니다.
 
 ```json title="opencode.json" {6}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "openrouter": {
       "models": {
@@ -1411,7 +1411,7 @@ opencode config를 통해 추가 모델을 추가할 수 있습니다.
 
    ```json title="opencode.json"
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://kilo.ai/config.json",
      "provider": {
        "openrouter": {
          "models": {
@@ -1627,7 +1627,7 @@ opencode config를 통해 모델을 사용자 정의 할 수 있습니다. 공�
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "vercel": {
       "models": {
@@ -1737,7 +1737,7 @@ opencode config를 통해 추가 모델을 추가할 수 있습니다.
 
 ```json title="opencode.json" {6}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "zenmux": {
       "models": {
@@ -1805,7 +1805,7 @@ opencode를 사용하여 OpenAI 호환 공급자를 사용할 수 있습니다. 
 
    ```json title="opencode.json" ""myprovider"" {5-15}
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://kilo.ai/config.json",
      "provider": {
        "myprovider": {
          "npm": "@ai-sdk/openai-compatible",
@@ -1843,7 +1843,7 @@ opencode를 사용하여 OpenAI 호환 공급자를 사용할 수 있습니다. 
 
 ```json title="opencode.json" {9,11,17-20}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "myprovider": {
       "npm": "@ai-sdk/openai-compatible",
@@ -1883,7 +1883,7 @@ opencode를 사용하여 OpenAI 호환 공급자를 사용할 수 있습니다. 
 
 공급자 구성에 문제가 있는 경우 다음을 확인하십시오.
 
-1. **주의 설정 확인 **: `opencode auth list`를 실행하여 자격 증명을 볼 수 있습니다.
+1. **주의 설정 확인 **: `kilo auth list`를 실행하여 자격 증명을 볼 수 있습니다.
    공급자는 config에 추가됩니다.
 
 이것은 Amazon Bedrock과 같은 공급자에 적용되지 않습니다. 환경 변수에 의존합니다.

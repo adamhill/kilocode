@@ -5,13 +5,13 @@ description: opencode CLI 選項和命令。
 
 import { Tabs, TabItem } from "@astrojs/starlight/components"
 
-默認情況下，OpenCode CLI 在不帶任何參數運行時啟動[TUI](/docs/tui)。
+默認情況下，Kilo CLI 在不帶任何參數運行時啟動[TUI](/docs/tui)。
 
 ```bash
 opencode
 ```
 
-但它也接受本頁記錄的命令。這允許您以編程方式與 OpenCode 交互。
+但它也接受本頁記錄的命令。這允許您以編程方式與 Kilo 交互。
 
 ```bash
 opencode run "Explain how closures work in JavaScript"
@@ -21,7 +21,7 @@ opencode run "Explain how closures work in JavaScript"
 
 ### tui
 
-啟動 OpenCode TUI。
+啟動 Kilo TUI。
 
 ```bash
 opencode [project]
@@ -44,13 +44,13 @@ opencode [project]
 
 ## 命令
 
-OpenCode CLI 還具有以下命令。
+Kilo CLI 還具有以下命令。
 
 ---
 
 ### agent
 
-管理 OpenCode 代理。
+管理 Kilo 代理。
 
 ```bash
 opencode agent [command]
@@ -60,13 +60,13 @@ opencode agent [command]
 
 ### attach
 
-將 terminal 連接到通過 `serve` 或 `web` 命令啟動的已運行的 OpenCode 後端服務器。
+將 terminal 連接到通過 `serve` 或 `web` 命令啟動的已運行的 Kilo 後端服務器。
 
 ```bash
 opencode attach [url]
 ```
 
-這允許將 TUI 與遠程 OpenCode 後端一起使用。例如：
+這允許將 TUI 與遠程 Kilo 後端一起使用。例如：
 
 ```bash
 # Start the backend server for web/mobile access
@@ -112,20 +112,20 @@ opencode agent list
 用於管理提供商的憑據和登錄的命令。
 
 ```bash
-opencode auth [command]
+kilo auth [command]
 ```
 
 ---
 
 #### login
 
-OpenCode 由 [Models.dev](https://models.dev) 上的提供商列表提供支持，因此您可以使用 `opencode auth login` 為您想要使用的任何提供商配置 API 密鑰。它存儲在`~/.local/share/opencode/auth.json` 中。
+Kilo 由 [Models.dev](https://models.dev) 上的提供商列表提供支持，因此您可以使用 `kilo auth login` 為您想要使用的任何提供商配置 API 密鑰。它存儲在`~/.local/share/opencode/auth.json` 中。
 
 ```bash
-opencode auth login
+kilo auth login
 ```
 
-當 OpenCode 啟動時，它會從憑據文件加載提供商。如果您的環境中定義了任何鍵或項目中的 `.env` 文件。
+當 Kilo 啟動時，它會從憑據文件加載提供商。如果您的環境中定義了任何鍵或項目中的 `.env` 文件。
 
 ---
 
@@ -134,13 +134,13 @@ opencode auth login
 列出憑證文件中存儲的所有經過身份驗證的提供商。
 
 ```bash
-opencode auth list
+kilo auth list
 ```
 
 或者簡短的版本。
 
 ```bash
-opencode auth ls
+kilo auth ls
 ```
 
 ---
@@ -150,7 +150,7 @@ opencode auth ls
 通過從憑據文件中清除提供商，將您從提供商中註銷。
 
 ```bash
-opencode auth logout
+kilo auth logout
 ```
 
 ---
@@ -301,7 +301,7 @@ opencode models anthropic
 | `--refresh` | 從 models.dev 刷新模型緩存               |
 | `--verbose` | 使用更詳細的模型輸出（包括成本等元數據） |
 
-使用`--refresh`標誌來更新緩存的模型列表。當新模型已添加到提供商並且您希望在 OpenCode 中查看它們時，這非常有用。
+使用`--refresh`標誌來更新緩存的模型列表。當新模型已添加到提供商並且您希望在 Kilo 中查看它們時，這非常有用。
 
 ```bash
 opencode models --refresh
@@ -323,11 +323,11 @@ opencode run [message..]
 opencode run Explain the use of context in Go
 ```
 
-您還可以附加到正在運行的 `opencode serve` 實例，以避免每次運行時 MCP 服務器冷啟動時間：
+您還可以附加到正在運行的 `kilo serve` 實例，以避免每次運行時 MCP 服務器冷啟動時間：
 
 ```bash
 # Start a headless server in one terminal
-opencode serve
+kilo serve
 
 # In another terminal, run commands that attach to it
 opencode run --attach http://localhost:4096 "Explain async/await in JavaScript"
@@ -357,7 +357,7 @@ opencode run --attach http://localhost:4096 "Explain async/await in JavaScript"
 啟動無頭 opencode 服務器以進行 API 訪問。查看[服務器文檔](/docs/server) 以獲取完整的 HTTP 接口。
 
 ```bash
-opencode serve
+kilo serve
 ```
 
 這將啟動一個 HTTP 服務器，該服務器提供對 opencode 功能的 API 訪問，而無需 TUI 接口。設置`OPENCODE_SERVER_PASSWORD`以啟用HTTP基本身份驗證（用戶名默認為`opencode`）。
@@ -513,19 +513,19 @@ opencode uninstall
 將 opencode 更新到最新版本或特定版本。
 
 ```bash
-opencode upgrade [target]
+kilo upgrade [target]
 ```
 
 升級到最新版本。
 
 ```bash
-opencode upgrade
+kilo upgrade
 ```
 
 升級到特定版本。
 
 ```bash
-opencode upgrade v0.1.48
+kilo upgrade v0.1.48
 ```
 
 #### 旗幟

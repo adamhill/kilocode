@@ -3,7 +3,7 @@ title: Troubleshooting
 description: Haeufige Probleme und schnelle Loesungen.
 ---
 
-Wenn OpenCode Probleme macht, starte mit Logs und lokal gespeicherten Daten auf der Festplatte.
+Wenn Kilo Probleme macht, starte mit Logs und lokal gespeicherten Daten auf der Festplatte.
 
 ---
 
@@ -39,14 +39,14 @@ Dieses Verzeichnis enthaelt:
 
 ## Desktop app
 
-OpenCode Desktop startet im Hintergrund einen lokalen OpenCode-Server (`opencode-cli`-Sidecar).
+Kilo Desktop startet im Hintergrund einen lokalen Kilo-Server (`opencode-cli`-Sidecar).
 Viele Probleme kommen von fehlerhaften Plugins, kaputtem Cache oder falschen Server-Einstellungen.
 
 ### Quick checks
 
 - App komplett beenden und neu starten
 - Bei Fehlerbildschirm **Restart** klicken und Details kopieren
-- Nur macOS: `OpenCode`-Menue -> **Reload Webview** (hilft bei leerer/eingefrorener UI)
+- Nur macOS: `Kilo`-Menue -> **Reload Webview** (hilft bei leerer/eingefrorener UI)
 
 ---
 
@@ -66,14 +66,14 @@ If you have plugins configured, temporarily disable them by removing the key or 
 
 ```jsonc
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "plugin": [],
 }
 ```
 
 #### Check plugin directories
 
-OpenCode can also load local plugins from disk. Temporarily move these out of the way (or rename the folder) and restart the desktop app:
+Kilo can also load local plugins from disk. Temporarily move these out of the way (or rename the folder) and restart the desktop app:
 
 - **Global plugins**
   - **macOS/Linux**: `~/.config/opencode/plugins/`
@@ -87,22 +87,22 @@ If the app starts working again, re-enable plugins one at a time to find which o
 
 ### Clear the cache
 
-If disabling plugins doesn't help (or a plugin install is stuck), clear the cache so OpenCode can rebuild it.
+If disabling plugins doesn't help (or a plugin install is stuck), clear the cache so Kilo can rebuild it.
 
-1. Quit OpenCode Desktop completely.
+1. Quit Kilo Desktop completely.
 2. Delete the cache directory:
 
 - **macOS**: Finder -> `Cmd+Shift+G` -> paste `~/.cache/opencode`
 - **Linux**: delete `~/.cache/opencode` (or run `rm -rf ~/.cache/opencode`)
 - **Windows**: Press `WIN+R` and paste `%USERPROFILE%\.cache\opencode`
 
-3. Restart OpenCode Desktop.
+3. Restart Kilo Desktop.
 
 ---
 
 ### Fix server connection issues
 
-OpenCode Desktop can either start its own local server (default) or connect to a server URL you configured.
+Kilo Desktop can either start its own local server (default) or connect to a server URL you configured.
 
 If you see a **"Connection Failed"** dialog (or the app never gets past the splash screen), check for a custom server URL.
 
@@ -133,21 +133,21 @@ On Linux, some Wayland setups can cause blank windows or compositor errors.
 
 ### Windows: WebView2 runtime
 
-On Windows, OpenCode Desktop requires the Microsoft Edge **WebView2 Runtime**. If the app opens to a blank window or won't start, install/update WebView2 and try again.
+On Windows, Kilo Desktop requires the Microsoft Edge **WebView2 Runtime**. If the app opens to a blank window or won't start, install/update WebView2 and try again.
 
 ---
 
 ### Windows: General performance issues
 
-If you're experiencing slow performance, file access issues, or terminal problems on Windows, try using [WSL (Windows Subsystem for Linux)](/docs/windows-wsl). WSL provides a Linux environment that works more seamlessly with OpenCode's features.
+If you're experiencing slow performance, file access issues, or terminal problems on Windows, try using [WSL (Windows Subsystem for Linux)](/docs/windows-wsl). WSL provides a Linux environment that works more seamlessly with Kilo's features.
 
 ---
 
 ### Notifications not showing
 
-OpenCode Desktop only shows system notifications when:
+Kilo Desktop only shows system notifications when:
 
-- notifications are enabled for OpenCode in your OS settings, and
+- notifications are enabled for Kilo in your OS settings, and
 - the app window is not focused.
 
 ---
@@ -156,8 +156,8 @@ OpenCode Desktop only shows system notifications when:
 
 If the app won't start and you can't clear settings from inside the UI, reset the desktop app's saved state.
 
-1. Quit OpenCode Desktop.
-2. Find and delete these files (they live in the OpenCode Desktop app data directory):
+1. Quit Kilo Desktop.
+2. Find and delete these files (they live in the Kilo Desktop app data directory):
 
 - `opencode.settings.dat` (desktop default server URL)
 - `opencode.global.dat` and `opencode.workspace.*.dat` (UI state like recent servers/projects)
@@ -172,13 +172,13 @@ To find the directory quickly:
 
 ## Hilfe bekommen
 
-Wenn du Probleme mit OpenCode hast:
+Wenn du Probleme mit Kilo hast:
 
 1. **Probleme auf GitHub melden**
 
    Bugs und Feature-Wuensche meldest du am besten im GitHub-Repository:
 
-   [**github.com/anomalyco/opencode/issues**](https://github.com/anomalyco/opencode/issues)
+   [**github.com/Kilo-Org/kilo/issues**](https://github.com/Kilo-Org/kilo/issues)
 
    Suche vor dem Erstellen nach bestehenden Issues, damit Duplikate vermieden werden.
 
@@ -186,7 +186,7 @@ Wenn du Probleme mit OpenCode hast:
 
    Fuer schnelle Hilfe und Austausch in der Community:
 
-   [**opencode.ai/discord**](https://opencode.ai/discord)
+   [**kilo.ai/discord**](https://kilo.ai/discord)
 
 ---
 
@@ -196,11 +196,11 @@ Hier sind typische Fehlerbilder und wie du sie loest.
 
 ---
 
-### OpenCode won't start
+### Kilo won't start
 
 1. Check the logs for error messages
 2. Try running with `--print-logs` to see output in the terminal
-3. Ensure you have the latest version with `opencode upgrade`
+3. Ensure you have the latest version with `kilo upgrade`
 
 ---
 

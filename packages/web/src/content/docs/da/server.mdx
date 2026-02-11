@@ -6,14 +6,14 @@ description: Samhandle med opencode-server over HTTP.
 import config from "../../../../config.mjs"
 export const typesUrl = `${config.github}/blob/dev/packages/sdk/js/src/gen/types.gen.ts`
 
-Kommandoen `opencode serve` kjører en hodeløs HTTP-server som avslører et OpenAPI-endepunkt som en opencode-klient kan bruge.
+Kommandoen `kilo serve` kjører en hodeløs HTTP-server som avslører et OpenAPI-endepunkt som en opencode-klient kan bruge.
 
 ---
 
 ### Brug
 
 ```bash
-opencode serve [--port <number>] [--hostname <string>] [--cors <origin>]
+kilo serve [--port <number>] [--hostname <string>] [--cors <origin>]
 ```
 
 #### Alternativer
@@ -29,17 +29,17 @@ opencode serve [--port <number>] [--hostname <string>] [--cors <origin>]
 `--cors` kan passeres flere ganger:
 
 ```bash
-opencode serve --cors http://localhost:5173 --cors https://app.example.com
+kilo serve --cors http://localhost:5173 --cors https://app.example.com
 ```
 
 ---
 
 ### Autentisering
 
-Sett `OPENCODE_SERVER_PASSWORD` for at beskytte serveren med HTTP grunntilføjende autentisering. Brugernavnet er standard til `opencode`, eller sett `OPENCODE_SERVER_USERNAME` for at overstyre det. Dette gjelder både `opencode serve` og `opencode web`.
+Sett `OPENCODE_SERVER_PASSWORD` for at beskytte serveren med HTTP grunntilføjende autentisering. Brugernavnet er standard til `opencode`, eller sett `OPENCODE_SERVER_USERNAME` for at overstyre det. Dette gjelder både `kilo serve` og `opencode web`.
 
 ```bash
-OPENCODE_SERVER_PASSWORD=your-password opencode serve
+OPENCODE_SERVER_PASSWORD=your-password kilo serve
 ```
 
 ---
@@ -56,8 +56,8 @@ Brug opencode-serveren til at samhandle med opencode programmatisk.
 
 Denne arkitekturen lar opencode støtte flere klienter og lar deg samhandle med opencode programmatisk.
 
-Du kan kjøre `opencode serve` for at starte en frittstående server. Hvis du har
-opencode TUI kjører, vil `opencode serve` starte en ny server.
+Du kan kjøre `kilo serve` for at starte en frittstående server. Hvis du har
+opencode TUI kjører, vil `kilo serve` starte en ny server.
 
 ---
 
@@ -65,7 +65,7 @@ opencode TUI kjører, vil `opencode serve` starte en ny server.
 
 Når du starter TUI, tildeler den tilfeldig en port og vertsnavn. Du kan i stedet sende inn `--hostname` og `--port` [flagg](/docs/cli). Brug deretter denne til at koble til serveren.
 
-[`/tui`](#tui) endepunktet kan bruges til at kjøre TUI gjennom serveren. Du kan for eksempel forhåndsutfylle eller kjøre en forespørsel. Dette oppsettet bruges av OpenCode [IDE](/docs/ide) plugins.
+[`/tui`](#tui) endepunktet kan bruges til at kjøre TUI gjennom serveren. Du kan for eksempel forhåndsutfylle eller kjøre en forespørsel. Dette oppsettet bruges av Kilo [IDE](/docs/ide) plugins.
 
 ---
 
@@ -83,7 +83,7 @@ For eksempel `http://localhost:4096/doc`. Brug spesifikasjonen til at generere k
 
 ## APIer
 
-OpenCode-serveren viser følgende APIer.
+Kilo-serveren viser følgende APIer.
 
 ---
 

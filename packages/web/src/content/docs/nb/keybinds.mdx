@@ -3,11 +3,11 @@ title: Keybinds
 description: Tilpass tastebindingene dine.
 ---
 
-OpenCode har en liste over nøkkelbindinger som du kan tilpasse gjennom OpenCode-konfigurasjonen.
+Kilo har en liste over nøkkelbindinger som du kan tilpasse gjennom Kilo-konfigurasjonen.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "keybinds": {
     "leader": "ctrl+x",
     "app_exit": "ctrl+c,ctrl+d,<leader>q",
@@ -107,7 +107,7 @@ OpenCode har en liste over nøkkelbindinger som du kan tilpasse gjennom OpenCode
 
 ## Ledertast
 
-OpenCode bruker en `leader`-nøkkel for de fleste nøkkelbindinger. Dette unngår konflikter i terminalen din.
+Kilo bruker en `leader`-nøkkel for de fleste nøkkelbindinger. Dette unngår konflikter i terminalen din.
 
 Som standard er `ctrl+x` ledertasten, og de fleste handlinger krever at du først trykker på ledertasten og deretter snarveien. For å starte en ny økt, trykker du for eksempel først `ctrl+x` og deretter `n`.
 
@@ -121,7 +121,7 @@ Du kan deaktivere en nøkkelbinding ved å legge til nøkkelen til konfigurasjon
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "keybinds": {
     "session_compact": "none"
   }

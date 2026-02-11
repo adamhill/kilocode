@@ -6,14 +6,14 @@ description: opencode sunucusuyla HTTP uzerinden etkilesin.
 import config from "../../../../config.mjs"
 export const typesUrl = `${config.github}/blob/dev/packages/sdk/js/src/gen/types.gen.ts`
 
-`opencode serve` komutu, opencode istemcisinin kullanabilecegi bir OpenAPI endpoint'i acan headless bir HTTP sunucusu calistirir.
+`kilo serve` komutu, opencode istemcisinin kullanabilecegi bir OpenAPI endpoint'i acan headless bir HTTP sunucusu calistirir.
 
 ---
 
 ### Kullanim
 
 ```bash
-opencode serve [--port <number>] [--hostname <string>] [--cors <origin>]
+kilo serve [--port <number>] [--hostname <string>] [--cors <origin>]
 ```
 
 #### Secenekler
@@ -29,17 +29,17 @@ opencode serve [--port <number>] [--hostname <string>] [--cors <origin>]
 `--cors` birden fazla kez gecilebilir:
 
 ```bash
-opencode serve --cors http://localhost:5173 --cors https://app.example.com
+kilo serve --cors http://localhost:5173 --cors https://app.example.com
 ```
 
 ---
 
 ### Kimlik dogrulama
 
-Sunucuyu HTTP basic auth ile korumak icin `OPENCODE_SERVER_PASSWORD` ayarlayin. Kullanici adi varsayilan olarak `opencode` degeridir; degistirmek isterseniz `OPENCODE_SERVER_USERNAME` ayarlayabilirsiniz. Bu ayar hem `opencode serve` hem de `opencode web` icin gecerlidir.
+Sunucuyu HTTP basic auth ile korumak icin `OPENCODE_SERVER_PASSWORD` ayarlayin. Kullanici adi varsayilan olarak `opencode` degeridir; degistirmek isterseniz `OPENCODE_SERVER_USERNAME` ayarlayabilirsiniz. Bu ayar hem `kilo serve` hem de `opencode web` icin gecerlidir.
 
 ```bash
-OPENCODE_SERVER_PASSWORD=your-password opencode serve
+OPENCODE_SERVER_PASSWORD=your-password kilo serve
 ```
 
 ---
@@ -55,7 +55,7 @@ opencode ile programatik etkilesim icin opencode sunucusunu kullanin.
 
 Bu mimari, opencode'un birden fazla istemciyi desteklemesini ve programatik kullanimlari mumkun kilmasini saglar.
 
-`opencode serve` ile bagimsiz bir sunucu baslatabilirsiniz. opencode TUI aciksa, `opencode serve` yeni bir sunucu baslatir.
+`kilo serve` ile bagimsiz bir sunucu baslatabilirsiniz. opencode TUI aciksa, `kilo serve` yeni bir sunucu baslatir.
 
 ---
 

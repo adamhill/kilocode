@@ -35,7 +35,7 @@ Możesz dostosować podstawowy adres URL dla dowolnego dostawcy, ustawiając opc
 
 ```json title="opencode.json" {6}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "anthropic": {
       "options": {
@@ -57,7 +57,7 @@ przetestowane i zweryfikowane, aby dobrze współpracować z opencode. [Dowiedz 
 Jeśli jesteś nowy, zalecamy rozpoczęcie od OpenCode Zen.
 :::
 
-1. Uruchom polecenie `/connect` w TUI, wybierz opencode i przejdź do [opencode.ai/auth](https://opencode.ai/auth).
+1. Uruchom polecenie `/connect` w TUI, wybierz opencode i przejdź do [kilo.ai/auth](https://kilo.ai/auth).
 
    ```txt
    /connect
@@ -163,7 +163,7 @@ Aby używać Amazon Bedrock z opencode:
 
    ```json title="opencode.json"
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://kilo.ai/config.json",
      "provider": {
        "amazon-bedrock": {
          "options": {
@@ -190,7 +190,7 @@ Aby używać Amazon Bedrock z opencode:
 
    ```json title="opencode.json"
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://kilo.ai/config.json",
      "provider": {
        "amazon-bedrock": {
          "options": {
@@ -234,7 +234,7 @@ W przypadku niestandardowych profili wnioskowania użyj nazwy modelu i dostawcy 
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "amazon-bedrock": {
       // ...
@@ -486,7 +486,7 @@ Cloudflare AI Gateway umożliwia dostęp do modeli z OpenAI, Anthropic, Workers 
 
    ```json title="opencode.json"
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://kilo.ai/config.json",
      "provider": {
        "cloudflare-ai-gateway": {
          "models": {
@@ -662,7 +662,7 @@ GitLab Duo zapewnia czat agentowy oparty na sztucznej inteligencji z natywnymi m
    #### Using Personal Access Token
    1. Przejdź do [Ustawienia użytkownika GitLab > Tokeny dostępu](https://gitlab.com/-/user_settings/personal_access_tokens)
    2. Click **Add new token**
-   3. Name: `OpenCode`, Scopes: `api`
+   3. Name: `Kilo`, Scopes: `api`
    4. Skopiuj token (zaczyna się od `glpat-`)
    5. Wpisz go w terminalu
 
@@ -679,7 +679,7 @@ GitLab Duo zapewnia czat agentowy oparty na sztucznej inteligencji z natywnymi m
 
 :::note
 Jeśli nie chcesz, możesz także określić zmienną środowiskową „GITLAB_TOKEN”.
-to store token in opencode auth storage.
+to store token in kilo auth storage.
 :::
 
 ##### Self-Hosted GitLab
@@ -692,7 +692,7 @@ aby używać tylko własnej instancji hostowanej przez GitLab, dodaj następują
 
 ```json
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "small_model": "gitlab/duo-chat-haiku-4-5",
   "share": "disabled"
 }
@@ -754,7 +754,7 @@ Customize through `opencode.json`:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "gitlab": {
       "options": {
@@ -775,7 +775,7 @@ To access GitLab tools (merge requests, issues, pipelines, CI/CD, etc.):
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "plugin": ["@gitlab/opencode-gitlab-plugin"]
 }
 ```
@@ -957,7 +957,7 @@ Oto [Katalog modeli Helicone](https://helicone.ai/models), będziesz go potrzebo
 
 ```jsonc title="~/.config/opencode/opencode.jsonc"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "helicone": {
       "npm": "@ai-sdk/openai-compatible",
@@ -985,7 +985,7 @@ Helicone obsługuje niestandardowe nagłówki dla funkcji takich jak buforowanie
 
 ```jsonc title="~/.config/opencode/opencode.jsonc"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "helicone": {
       "npm": "@ai-sdk/openai-compatible",
@@ -1039,7 +1039,7 @@ Możesz skonfigurować opencode tak, aby korzystał z modeli lokalnych, za pomoc
 
 ```json title="opencode.json" "llama.cpp" {5, 6, 8, 10-15}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "llama.cpp": {
       "npm": "@ai-sdk/openai-compatible",
@@ -1106,7 +1106,7 @@ Możesz skonfigurować opencode tak, aby korzystał z modeli lokalnych poprzez L
 
 ```json title="opencode.json" "lmstudio" {5, 6, 8, 10-14}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "lmstudio": {
       "npm": "@ai-sdk/openai-compatible",
@@ -1227,7 +1227,7 @@ Ollama może automatycznie skonfigurować się pod kątem opencode. Aby uzyskać
 
 ```json title="opencode.json" "ollama" {5, 6, 8, 10-14}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "ollama": {
       "npm": "@ai-sdk/openai-compatible",
@@ -1389,7 +1389,7 @@ OpenCode Zen to lista przetestowanych i zweryfikowanych modeli udostępniona prz
 
    ```json title="opencode.json" {6}
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://kilo.ai/config.json",
      "provider": {
        "openrouter": {
          "models": {
@@ -1404,7 +1404,7 @@ OpenCode Zen to lista przetestowanych i zweryfikowanych modeli udostępniona prz
 
    ```json title="opencode.json"
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://kilo.ai/config.json",
      "provider": {
        "openrouter": {
          "models": {
@@ -1620,7 +1620,7 @@ Możesz także dostosować modele za pomocą konfiguracji opencode. Oto przykła
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "vercel": {
       "models": {
@@ -1730,7 +1730,7 @@ Przydatne opcje routingu:
 
    ```json title="opencode.json" {6}
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://kilo.ai/config.json",
      "provider": {
        "zenmux": {
          "models": {
@@ -1798,7 +1798,7 @@ Możesz użyć dowolnego dostawcy kompatybilnego z OpenAI z opencode. Większoś
 
    ```json title="opencode.json" ""myprovider"" {5-15}
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://kilo.ai/config.json",
      "provider": {
        "myprovider": {
          "npm": "@ai-sdk/openai-compatible",
@@ -1836,7 +1836,7 @@ Oto przykład ustawienia opcji `apiKey`, `headers` i modelu `limit`.
 
 ```json title="opencode.json" {9,11,17-20}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "myprovider": {
       "npm": "@ai-sdk/openai-compatible",
@@ -1877,7 +1877,7 @@ Pola `limit` pozwalają opencode zrozumieć, ile kontekstu pozostało. Standardo
 
 Jeśli masz problemy z konfiguracją dostawcy, sprawdź następujące elementy:
 
-1. **Sprawdź konfigurację uwierzytelniania**: Uruchom `opencode auth list`, aby sprawdzić, czy poświadczenia
+1. **Sprawdź konfigurację uwierzytelniania**: Uruchom `kilo auth list`, aby sprawdzić, czy poświadczenia
    dla dostawcy są dodawane do Twojej konfiguracji.
 
    Nie dotyczy to dostawców takich jak Amazon Bedrock, którzy w procesie uwierzytelniania opierają się na zmiennych środowiskowych.

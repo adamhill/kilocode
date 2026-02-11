@@ -3,13 +3,13 @@ title: 型號
 description: 配置LLM提供者和模型。
 ---
 
-OpenCode 使用[AI SDK](https://ai-sdk.dev/) 和[Models.dev](https://models.dev) 來支持**75+ LLM 提供商**，並且它支持運行本地模型。
+Kilo 使用[AI SDK](https://ai-sdk.dev/) 和[Models.dev](https://models.dev) 來支持**75+ LLM 提供商**，並且它支持運行本地模型。
 
 ---
 
 ## 供應商
 
-默認情況下會預加載大多數流行的提供商。如果您已通過 `/connect` 命令添加了提供商的憑據，那麼它們將在您啟動 OpenCode 時可用。
+默認情況下會預加載大多數流行的提供商。如果您已通過 `/connect` 命令添加了提供商的憑據，那麼它們將在您啟動 Kilo 時可用。
 
 了解有關[提供者](/docs/providers) 的更多信息。
 
@@ -35,7 +35,7 @@ OpenCode 使用[AI SDK](https://ai-sdk.dev/) 和[Models.dev](https://models.dev)
 
 然而，既擅長生成程式碼又擅長工具調用的只有少數。
 
-以下是與 OpenCode 配合良好的幾個模型，排名不分先後。 （這不是詳盡的列表，也不一定是最新的）：
+以下是與 Kilo 配合良好的幾個模型，排名不分先後。 （這不是詳盡的列表，也不一定是最新的）：
 
 - GPT 5.2
 - GPT 5.1 Codex
@@ -49,11 +49,11 @@ OpenCode 使用[AI SDK](https://ai-sdk.dev/) 和[Models.dev](https://models.dev)
 ## 設置默認值
 
 要將其中之一設置為默認模型，您可以在您的
-OpenCode 配置。
+Kilo 配置。
 
 ```json title="opencode.json" {3}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "model": "lmstudio/google/gemma-3n-e4b"
 }
 ```
@@ -70,7 +70,7 @@ OpenCode 配置。
 
 ```jsonc title="opencode.jsonc" {7-12,19-24}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "openai": {
       "models": {
@@ -109,7 +109,7 @@ OpenCode 配置。
 
 ```jsonc title="opencode.jsonc" {6-21}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "opencode": {
       "models": {
@@ -137,11 +137,11 @@ OpenCode 配置。
 
 ## 變體
 
-許多型號支持具有不同配置的多種變體。OpenCode 附帶了流行提供商的內置默認變體。
+許多型號支持具有不同配置的多種變體。Kilo 附帶了流行提供商的內置默認變體。
 
 ### 內置變體
 
-OpenCode 附帶了許多提供商的默認變體：
+Kilo 附帶了許多提供商的默認變體：
 
 **Anthropic**：
 
@@ -174,7 +174,7 @@ OpenCode 附帶了許多提供商的默認變體：
 
 ```jsonc title="opencode.jsonc" {7-18}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "openai": {
       "models": {
@@ -203,15 +203,15 @@ OpenCode 附帶了許多提供商的默認變體：
 
 ## 加載模型
 
-當 OpenCode 啟動時，它會按以下優先順序檢查模型：
+當 Kilo 啟動時，它會按以下優先順序檢查模型：
 
 1. `--model` 或 `-m` 命令行標誌。格式與配置文件中的相同：`provider_id/model_id`。
 
-2. OpenCode 配置中的模型列表。
+2. Kilo 配置中的模型列表。
 
    ```json title="opencode.json"
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://kilo.ai/config.json",
      "model": "anthropic/claude-sonnet-4-20250514"
    }
    ```

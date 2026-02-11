@@ -39,13 +39,13 @@ opencode程序将会话数据和其他应用程序数据存储在磁碟上：
 
 ## 桌面应用程序
 
-opencode Desktop runs a local opencode server (the `opencode-cli` sidecar) in the background. Most issues are caused by a misbehaving plugin, a corrupted cache, or a bad server setting.
+opencode Desktop runs a local kilo server (the `opencode-cli` sidecar) in the background. Most issues are caused by a misbehaving plugin, a corrupted cache, or a bad server setting.
 
 ### 快速检查
 
 - 完全退出并重新启动应用程序。
 - 如果应用程序显示错误界面，请单击“**重新启动**”并复制错误详细信息。
-- macOS only: `OpenCode` menu -> **Reload Webview** (helps if the UI is blank/frozen).
+- macOS only: `Kilo` menu -> **Reload Webview** (helps if the UI is blank/frozen).
 
 ---
 
@@ -65,7 +65,7 @@ opencode Desktop runs a local opencode server (the `opencode-cli` sidecar) in th
 
 ```jsonc
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "plugin": [],
 }
 ```
@@ -177,7 +177,7 @@ opencode 桌面仅在以下情况下显示系统通知：
 
    报告错误或请求功能的最佳方式是利用我们的 GitHub 存储库：
 
-   [**github.com/anomalyco/opencode/issues**](https://github.com/anomalyco/opencode/issues)
+   [**github.com/Kilo-Org/kilo/issues**](https://github.com/Kilo-Org/kilo/issues)
 
    在建立新問題之前，请搜索現有問題以查看您的問題是否已被報告。
 
@@ -185,7 +185,7 @@ opencode 桌面仅在以下情况下显示系统通知：
 
    获得实时帮助和社群讨论，请加入我们的Discord服务器：
 
-   [**opencode.ai/discord**](https://opencode.ai/discord)
+   [**kilo.ai/discord**](https://kilo.ai/discord)
 
 ---
 
@@ -199,7 +199,7 @@ opencode 桌面仅在以下情况下显示系统通知：
 
 1. 检查日誌中是否有错误消息
 2. 尝试使用 `--print-logs` 执行以查看终端中的输出
-3. Ensure you have the latest version with `opencode upgrade`
+3. Ensure you have the latest version with `kilo upgrade`
 
 ---
 

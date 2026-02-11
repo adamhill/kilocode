@@ -3,11 +3,11 @@ title: Keybinds
 description: Prilagodite svoje veze dugmadi.
 ---
 
-OpenCode ima listu veza ključeva koje možete prilagoditi preko OpenCode konfiguracije.
+Kilo ima listu veza ključeva koje možete prilagoditi preko Kilo konfiguracije.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "keybinds": {
     "leader": "ctrl+x",
     "app_exit": "ctrl+c,ctrl+d,<leader>q",
@@ -107,7 +107,7 @@ OpenCode ima listu veza ključeva koje možete prilagoditi preko OpenCode konfig
 
 ## Leader key
 
-OpenCode koristi `leader` ključ za većinu povezivanja tipki. Ovo izbjegava sukobe u vašem terminalu.
+Kilo koristi `leader` ključ za većinu povezivanja tipki. Ovo izbjegava sukobe u vašem terminalu.
 Prema zadanim postavkama, `ctrl+x` je vodeći taster i većina radnji zahtijeva da prvo pritisnete vodeći taster, a zatim i prečicu. Na primjer, da biste započeli novu sesiju, prvo pritisnite `ctrl+x`, a zatim pritisnite `n`.
 Ne morate koristiti vodeći ključ za svoje veze tipki, ali preporučujemo da to učinite.
 
@@ -119,7 +119,7 @@ Možete onemogućiti spajanje tipki dodavanjem ključa u svoju konfiguraciju s v
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "keybinds": {
     "session_compact": "none"
   }

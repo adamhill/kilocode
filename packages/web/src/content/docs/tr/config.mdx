@@ -13,7 +13,7 @@ opencode hem **JSON** hem de **JSONC** (JSON Yorumlarla birlikte) formatlarını
 
 ```jsonc title="opencode.jsonc"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   // Theme configuration
   "theme": "opencode",
   "model": "anthropic/claude-sonnet-4-5",
@@ -146,7 +146,7 @@ opencode run "Hello world"
 
 ## Schema
 
-Yapılandırma dosyası [**`opencode.ai/config.json`**](https://opencode.ai/config.json)'da tanımlanan bir şemaya sahiptir.
+Yapılandırma dosyası [**`kilo.ai/config.json`**](https://kilo.ai/config.json)'da tanımlanan bir şemaya sahiptir.
 
 Editörünüz şemaya göre doğrulama ve otomatik tamamlama yapabilmelidir.
 
@@ -158,7 +158,7 @@ TUI'ye özgü ayarları `tui` seçeneği aracılığıyla yapılandırabilirsini
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "tui": {
     "scroll_speed": 3,
     "scroll_acceleration": {
@@ -181,11 +181,11 @@ Mevcut seçenekler:
 
 ### Sunucu
 
-`opencode serve` ve `opencode web` komutları için sunucu ayarlarını `server` seçeneği aracılığıyla yapılandırabilirsiniz.
+`kilo serve` ve `opencode web` komutları için sunucu ayarlarını `server` seçeneği aracılığıyla yapılandırabilirsiniz.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "server": {
     "port": 4096,
     "hostname": "0.0.0.0",
@@ -214,7 +214,7 @@ Bir LLM'nin kullanabileceği araçları `tools` seçeneği aracılığıyla yön
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "tools": {
     "write": false,
     "bash": false
@@ -232,7 +232,7 @@ opencode yapılandırmanızda kullanmak istediğiniz sağlayıcıları ve modell
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {},
   "model": "anthropic/claude-sonnet-4-5",
   "small_model": "anthropic/claude-haiku-4-5"
@@ -245,7 +245,7 @@ Sağlayıcı seçenekleri `timeout` ve `setCacheKey` içerebilir:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "anthropic": {
       "options": {
@@ -274,7 +274,7 @@ Amazon Bedrock, AWS'a özgü yapılandırmayı destekler:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "amazon-bedrock": {
       "options": {
@@ -305,7 +305,7 @@ opencode yapılandırmanızda kullanmak istediğiniz temayı `theme` seçeneği 
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "theme": ""
 }
 ```
@@ -320,7 +320,7 @@ opencode yapılandırmanızda kullanmak istediğiniz temayı `theme` seçeneği 
 
 ```jsonc title="opencode.jsonc"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "agent": {
     "code-reviewer": {
       "description": "Reviews code for best practices and potential issues",
@@ -346,7 +346,7 @@ Agent'ları `~/.config/opencode/agents/` veya `.opencode/agents/` içindeki Mark
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "default_agent": "plan"
 }
 ```
@@ -363,7 +363,7 @@ Bu ayar tüm arayüzler için geçerlidir: TUI, CLI (`opencode run`), masaüstü
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "share": "manual"
 }
 ```
@@ -384,7 +384,7 @@ Varsayılan olarak paylaşım, `/share` yoğunluğu kullanılarak konuşmaları 
 
 ```jsonc title="opencode.jsonc"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "command": {
     "test": {
       "template": "Run the full test suite with coverage report and show any failures.\nFocus on the failing tests and suggest fixes.",
@@ -410,7 +410,7 @@ Tuş atamalarınızı `keybinds` seçeneği aracılığıyla özelleştirebilirs
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "keybinds": {}
 }
 ```
@@ -425,7 +425,7 @@ opencode başlatıldığında yeni güncellemeleri otomatik olarak indirecektir.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "autoupdate": false
 }
 ```
@@ -441,7 +441,7 @@ Kod formatlayıcılarını `formatter` seçeneği aracılığıyla yapılandıra
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "formatter": {
     "prettier": {
       "disabled": true
@@ -469,7 +469,7 @@ Varsayılan olarak, opencode açık bir onay gerektirmeden **tüm işlemlere izi
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "permission": {
     "edit": "ask",
     "bash": "ask"
@@ -487,7 +487,7 @@ Bağlam sıkıştırma davranışını `compaction` seçeneği aracılığıyla 
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "compaction": {
     "auto": true,
     "prune": true
@@ -506,7 +506,7 @@ Dosya izleyicinin yok sayma kalıplarını `watcher` seçeneği aracılığıyla
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "watcher": {
     "ignore": ["node_modules/**", "dist/**", ".git/**"]
   }
@@ -523,7 +523,7 @@ Kullanmak istediğiniz MCP sunucularını `mcp` seçeneği aracılığıyla yap�
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "mcp": {}
 }
 ```
@@ -540,7 +540,7 @@ Eklenti dosyalarını `.opencode/plugins/` veya `~/.config/opencode/plugins/` i�
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "plugin": ["opencode-helicone-session", "@my-org/custom-plugin"]
 }
 ```
@@ -555,7 +555,7 @@ Kullandığınız modele ilişkin talimatları `instructions` seçeneği aracıl
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "instructions": ["CONTRIBUTING.md", "docs/guidelines.md", ".cursor/rules/*.md"]
 }
 ```
@@ -571,7 +571,7 @@ kurallar hakkında burada](/docs/rules).
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "disabled_providers": ["openai", "gemini"]
 }
 ```
@@ -594,7 +594,7 @@ kurallar hakkında burada](/docs/rules).
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "enabled_providers": ["anthropic", "openai"]
 }
 ```
@@ -615,7 +615,7 @@ Bir sağlayıcı hem `enabled_providers` hem de `disabled_providers`'de görün�
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "experimental": {}
 }
 ```
@@ -638,7 +638,7 @@ Ortam değişkenlerini değiştirmek için `{env:VARIABLE_NAME}` kullanın:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "model": "{env:OPENCODE_MODEL}",
   "provider": {
     "anthropic": {
@@ -661,7 +661,7 @@ Bir dosyanın biçimini değiştirmek için `{file:path/to/file}` kullanın:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "instructions": ["./custom-instructions.md"],
   "provider": {
     "openai": {

@@ -15,7 +15,7 @@ description: 配置和使用专门的代理。
 
 ## 类型
 
-OpenCode 有两种类型的代理；主代理和子代理。
+Kilo 有两种类型的代理；主代理和子代理。
 
 ---
 
@@ -27,7 +27,7 @@ Primary 代理是与您直接交互的主要助手。您可以使用 **Tab** 键
 您可以在会话期间使用 **Tab** 键在 Primary 代理之间进行切换。
 :::
 
-OpenCode 附带两个内置的 Primary 代理：**Build** 和 **Plan**。
+Kilo 附带两个内置的 Primary 代理：**Build** 和 **Plan**。
 看看下面这些。
 
 ---
@@ -36,13 +36,13 @@ OpenCode 附带两个内置的 Primary 代理：**Build** 和 **Plan**。
 
 Subagents (子代理) 是 Primary 代理可以调用​​来执行特定任务的专业助手。您还可以通过在消息中 **@提及** 它们来手动调用它们。
 
-OpenCode 附带两个内置子代理：**General** 和 **Explore**。我们将在下面看看这个。
+Kilo 附带两个内置子代理：**General** 和 **Explore**。我们将在下面看看这个。
 
 ---
 
 ## 内置
 
-OpenCode 附带两个内置主代理和两个内置子代理。
+Kilo 附带两个内置主代理和两个内置子代理。
 
 ---
 
@@ -140,7 +140,7 @@ _模式_：`primary`
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "agent": {
     "build": {
       "mode": "primary",
@@ -277,7 +277,7 @@ Markdown 文件名成为代理名称。例如，`review.md` 创建 `review` 代�
 }
 ```
 
-如果未指定温度，OpenCode 将使用特定于模型的默认值；大多数模型通常为 0，Qwen 模型为 0.55。
+如果未指定温度，Kilo 将使用特定于模型的默认值；大多数模型通常为 0，Qwen 模型为 0.55。
 
 ---
 
@@ -337,7 +337,7 @@ Markdown 文件名成为代理名称。例如，`review.md` 创建 `review` 代�
 }
 ```
 
-该路径相对于文件所在位置的配置。因此，这适用于全局 OpenCode 配置和项目特定配置。
+该路径相对于文件所在位置的配置。因此，这适用于全局 Kilo 配置和项目特定配置。
 
 ---
 
@@ -359,7 +359,7 @@ Markdown 文件名成为代理名称。例如，`review.md` 创建 `review` 代�
 }
 ```
 
-OpenCode 配置中的模型 ID 使用格式 `provider/model-id`。例如，如果您使用 [OpenCode Zen](/docs/zen)，则您将使用 `opencode/gpt-5.1-codex` 来表示 GPT 5.1 Codex。
+Kilo 配置中的模型 ID 使用格式 `provider/model-id`。例如，如果您使用 [OpenCode Zen](/docs/zen)，则您将使用 `opencode/gpt-5.1-codex` 来表示 GPT 5.1 Codex。
 
 ---
 
@@ -369,7 +369,7 @@ OpenCode 配置中的模型 ID 使用格式 `provider/model-id`。例如，如�
 
 ```json title="opencode.json" {3-6,9-12}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "tools": {
     "write": true,
     "bash": true
@@ -393,7 +393,7 @@ OpenCode 配置中的模型 ID 使用格式 `provider/model-id`。例如，如�
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "agent": {
     "readonly": {
       "tools": {
@@ -420,7 +420,7 @@ OpenCode 配置中的模型 ID 使用格式 `provider/model-id`。例如，如�
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "permission": {
     "edit": "deny"
   }
@@ -431,7 +431,7 @@ OpenCode 配置中的模型 ID 使用格式 `provider/model-id`。例如，如�
 
 ```json title="opencode.json" {3-5,8-10}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "permission": {
     "edit": "deny"
   },
@@ -468,7 +468,7 @@ Only analyze code and suggest changes.
 
 ```json title="opencode.json" {7}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "agent": {
     "build": {
       "permission": {
@@ -486,7 +486,7 @@ Only analyze code and suggest changes.
 
 ```json title="opencode.json" {7}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "agent": {
     "build": {
       "permission": {
@@ -504,7 +504,7 @@ Only analyze code and suggest changes.
 
 ```json title="opencode.json" {8}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "agent": {
     "build": {
       "permission": {
@@ -697,7 +697,7 @@ opencode agent create
 以下是一些您可能会觉得有用的示例代理。
 
 :::tip
-您有想要分享的代理吗？ [提交 PR](https://github.com/anomalyco/opencode)。
+您有想要分享的代理吗？ [提交 PR](https://github.com/Kilo-Org/kilo)。
 :::
 
 ---

@@ -1,9 +1,9 @@
 ---
 title: Plugins
-description: Skriv dine egne plugins for at udvide OpenCode.
+description: Skriv dine egne plugins for at udvide Kilo.
 ---
 
-Plugins giver dig mulighed for at udvide OpenCode ved at tilslutte sig forskellige begivenheder og tilpasse adfærd. Du kan oprette plugins for at tilføje nye funktioner, integrere med eksterne tjenester eller ændre OpenCodes standardadfærd.
+Plugins giver dig mulighed for at udvide Kilo ved at tilslutte sig forskellige begivenheder og tilpasse adfærd. Du kan oprette plugins for at tilføje nye funktioner, integrere med eksterne tjenester eller ændre OpenCodes standardadfærd.
 
 For eksempler, tjek [plugins](/docs/ecosystem#plugins) oprettet af fællesskabet.
 
@@ -32,7 +32,7 @@ Angiv npm-pakker i din konfigurationsfil.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "plugin": ["opencode-helicone-session", "opencode-wakatime", "@my-org/custom-plugin"]
 }
 ```
@@ -83,7 +83,7 @@ Lokale plugins og brugerdefinerede værktøjer kan bruge eksterne npm-pakker. Ti
 }
 ```
 
-OpenCode kører `bun install` ved opstart for at installere disse. Dine plugins og værktøjer kan derefter importere dem.
+Kilo kører `bun install` ved opstart for at installere disse. Dine plugins og værktøjer kan derefter importere dem.
 
 ```ts title=".opencode/plugins/my-plugin.ts"
 import { escape } from "shescape"
@@ -235,7 +235,7 @@ export const NotificationPlugin = async ({ project, client, $, directory, worktr
 Vi bruger `osascript` til at køre AppleScript på macOS. Her bruger vi det til at sende notifikationer.
 
 :::note
-Hvis du bruger OpenCode desktop-appen, kan den sende systemmeddelelser automatisk, når et svar er klar, eller når en session fejler.
+Hvis du bruger Kilo desktop-appen, kan den sende systemmeddelelser automatisk, når et svar er klar, eller når en session fejler.
 :::
 
 ---
@@ -327,7 +327,7 @@ export const MyPlugin = async ({ client }) => {
 }
 ```
 
-Niveauer: `debug`, `info`, `warn`, `error`. Se [SDK documentation](https://opencode.ai/docs/sdk) for detaljer.
+Niveauer: `debug`, `info`, `warn`, `error`. Se [SDK documentation](https://kilo.ai/docs/sdk) for detaljer.
 
 ---
 

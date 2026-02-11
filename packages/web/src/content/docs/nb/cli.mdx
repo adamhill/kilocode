@@ -5,13 +5,13 @@ description: opencode CLI alternativer og kommandoer.
 
 import { Tabs, TabItem } from "@astrojs/starlight/components"
 
-OpenCode CLI starter som standard [TUI](/docs/tui) når den kjøres uten noen argumenter.
+Kilo CLI starter som standard [TUI](/docs/tui) når den kjøres uten noen argumenter.
 
 ```bash
 opencode
 ```
 
-Men den godtar også kommandoer som dokumentert på denne siden. Dette lar deg samhandle med OpenCode programmatisk.
+Men den godtar også kommandoer som dokumentert på denne siden. Dette lar deg samhandle med Kilo programmatisk.
 
 ```bash
 opencode run "Explain how closures work in JavaScript"
@@ -21,7 +21,7 @@ opencode run "Explain how closures work in JavaScript"
 
 ### tui
 
-Start OpenCode-terminalbrukergrensesnittet.
+Start Kilo-terminalbrukergrensesnittet.
 
 ```bash
 opencode [project]
@@ -44,13 +44,13 @@ opencode [project]
 
 ## Kommandoer
 
-OpenCode CLI har også følgende kommandoer.
+Kilo CLI har også følgende kommandoer.
 
 ---
 
 ### agent
 
-Administrer agenter for OpenCode.
+Administrer agenter for Kilo.
 
 ```bash
 opencode agent [command]
@@ -60,13 +60,13 @@ opencode agent [command]
 
 ### attach
 
-Koble en terminal til en allerede kjørende OpenCode-backend-server startet via `serve` eller `web` kommandoer.
+Koble en terminal til en allerede kjørende Kilo-backend-server startet via `serve` eller `web` kommandoer.
 
 ```bash
 opencode attach [url]
 ```
 
-Dette gjør det mulig å bruke TUI med en ekstern OpenCode-backend. For eksempel:
+Dette gjør det mulig å bruke TUI med en ekstern Kilo-backend. For eksempel:
 
 ```bash
 # Start the backend server for web/mobile access
@@ -112,20 +112,20 @@ opencode agent list
 Kommando for å administrere legitimasjon og pålogging for leverandører.
 
 ```bash
-opencode auth [command]
+kilo auth [command]
 ```
 
 ---
 
 #### login
 
-OpenCode drives av leverandørlisten på [Models.dev](https://models.dev), så du kan bruke `opencode auth login` til å konfigurere API-nøkler for enhver leverandør du vil bruke. Dette er lagret i `~/.local/share/opencode/auth.json`.
+Kilo drives av leverandørlisten på [Models.dev](https://models.dev), så du kan bruke `kilo auth login` til å konfigurere API-nøkler for enhver leverandør du vil bruke. Dette er lagret i `~/.local/share/opencode/auth.json`.
 
 ```bash
-opencode auth login
+kilo auth login
 ```
 
-Når OpenCode starter opp, laster den leverandørene fra legitimasjonsfilen. Og hvis det er noen nøkler definert i miljøene dine eller en `.env`-fil i prosjektet ditt.
+Når Kilo starter opp, laster den leverandørene fra legitimasjonsfilen. Og hvis det er noen nøkler definert i miljøene dine eller en `.env`-fil i prosjektet ditt.
 
 ---
 
@@ -134,13 +134,13 @@ Når OpenCode starter opp, laster den leverandørene fra legitimasjonsfilen. Og 
 Viser alle de autentiserte leverandørene som er lagret i legitimasjonsfilen.
 
 ```bash
-opencode auth list
+kilo auth list
 ```
 
 Eller kortversjonen.
 
 ```bash
-opencode auth ls
+kilo auth ls
 ```
 
 ---
@@ -150,7 +150,7 @@ opencode auth ls
 Logger deg ut av en leverandør ved å fjerne den fra legitimasjonsfilen.
 
 ```bash
-opencode auth logout
+kilo auth logout
 ```
 
 ---
@@ -301,7 +301,7 @@ opencode models anthropic
 | `--refresh` | Oppdater modellbufferen fra models.dev                              |
 | `--verbose` | Bruk mer detaljert modellutdata (inkluderer metadata som kostnader) |
 
-Bruk `--refresh`-flagget for å oppdatere den bufrede modelllisten. Dette er nyttig når nye modeller er lagt til en leverandør og du vil se dem i OpenCode.
+Bruk `--refresh`-flagget for å oppdatere den bufrede modelllisten. Dette er nyttig når nye modeller er lagt til en leverandør og du vil se dem i Kilo.
 
 ```bash
 opencode models --refresh
@@ -311,7 +311,7 @@ opencode models --refresh
 
 ### run
 
-Kjør OpenCode i ikke-interaktiv modus ved å sende en melding direkte.
+Kjør Kilo i ikke-interaktiv modus ved å sende en melding direkte.
 
 ```bash
 opencode run [message..]
@@ -323,11 +323,11 @@ Dette er nyttig for skripting, automatisering eller når du vil ha et raskt svar
 opencode run Explain the use of context in Go
 ```
 
-Du kan også koble til en kjørende `opencode serve`-forekomst for å unngå MCP-tjenerkaldoppstartstider ved hver kjøring:
+Du kan også koble til en kjørende `kilo serve`-forekomst for å unngå MCP-tjenerkaldoppstartstider ved hver kjøring:
 
 ```bash
 # Start a headless server in one terminal
-opencode serve
+kilo serve
 
 # In another terminal, run commands that attach to it
 opencode run --attach http://localhost:4096 "Explain async/await in JavaScript"
@@ -347,20 +347,20 @@ opencode run --attach http://localhost:4096 "Explain async/await in JavaScript"
 | `--file`     | `-f` | Fil(er) som skal legges ved melding                                      |
 | `--format`   |      | Format: standard (formatert) eller json (rå JSON hendelser)              |
 | `--title`    |      | Tittel for økten (bruker avkortet ledetekst hvis ingen verdi er oppgitt) |
-| `--attach`   |      | Koble til en kjørende OpenCode-server (f.eks. http://localhost:4096)     |
+| `--attach`   |      | Koble til en kjørende Kilo-server (f.eks. http://localhost:4096)     |
 | `--port`     |      | Port for den lokale serveren (standard til tilfeldig port)               |
 
 ---
 
 ### serve
 
-Start en hodeløs OpenCode-server for API-tilgang. Sjekk ut [server-dokumentene](/docs/server) for hele HTTP-grensesnittet.
+Start en hodeløs Kilo-server for API-tilgang. Sjekk ut [server-dokumentene](/docs/server) for hele HTTP-grensesnittet.
 
 ```bash
-opencode serve
+kilo serve
 ```
 
-Dette starter en HTTP-server som gir API tilgang til OpenCode-funksjonalitet uten TUI-grensesnittet. Sett `OPENCODE_SERVER_PASSWORD` for å aktivere HTTP grunnleggende autentisering (brukernavn er standard til `opencode`).
+Dette starter en HTTP-server som gir API tilgang til Kilo-funksjonalitet uten TUI-grensesnittet. Sett `OPENCODE_SERVER_PASSWORD` for å aktivere HTTP grunnleggende autentisering (brukernavn er standard til `opencode`).
 
 #### Flagg
 
@@ -375,7 +375,7 @@ Dette starter en HTTP-server som gir API tilgang til OpenCode-funksjonalitet ute
 
 ### session
 
-Administrer OpenCode-økter.
+Administrer Kilo-økter.
 
 ```bash
 opencode session [command]
@@ -385,7 +385,7 @@ opencode session [command]
 
 #### list
 
-List opp alle OpenCode-økter.
+List opp alle Kilo-økter.
 
 ```bash
 opencode session list
@@ -402,7 +402,7 @@ opencode session list
 
 ### stats
 
-Vis tokenbruk og kostnadsstatistikk for OpenCode-øktene dine.
+Vis tokenbruk og kostnadsstatistikk for Kilo-øktene dine.
 
 ```bash
 opencode stats
@@ -433,13 +433,13 @@ Hvis du ikke gir en økt ID, blir du bedt om å velge fra tilgjengelige økter.
 
 ### import
 
-Importer øktdata fra en JSON-fil eller en OpenCode share-URL.
+Importer øktdata fra en JSON-fil eller en Kilo share-URL.
 
 ```bash
 opencode import <file>
 ```
 
-Du kan importere fra en lokal fil eller en OpenCode share-URL.
+Du kan importere fra en lokal fil eller en Kilo share-URL.
 
 ```bash
 opencode import session.json
@@ -450,13 +450,13 @@ opencode import https://opncd.ai/s/abc123
 
 ### web
 
-Start en hodeløs OpenCode-server med et webgrensesnitt.
+Start en hodeløs Kilo-server med et webgrensesnitt.
 
 ```bash
 opencode web
 ```
 
-Dette starter en HTTP-server og åpner en nettleser for å få tilgang til OpenCode via et nettgrensesnitt. Sett `OPENCODE_SERVER_PASSWORD` for å aktivere HTTP grunnleggende autentisering (brukernavn er standard til `opencode`).
+Dette starter en HTTP-server og åpner en nettleser for å få tilgang til Kilo via et nettgrensesnitt. Sett `OPENCODE_SERVER_PASSWORD` for å aktivere HTTP grunnleggende autentisering (brukernavn er standard til `opencode`).
 
 #### Flagg
 
@@ -491,7 +491,7 @@ Denne kommandoen starter en ACP-server som kommuniserer via stdin/stdout ved å 
 
 ### uninstall
 
-Avinstaller OpenCode og fjern alle relaterte filer.
+Avinstaller Kilo og fjern alle relaterte filer.
 
 ```bash
 opencode uninstall
@@ -510,22 +510,22 @@ opencode uninstall
 
 ### upgrade
 
-Oppdaterer OpenCode til siste versjon eller en spesifikk versjon.
+Oppdaterer Kilo til siste versjon eller en spesifikk versjon.
 
 ```bash
-opencode upgrade [target]
+kilo upgrade [target]
 ```
 
 For å oppgradere til siste versjon.
 
 ```bash
-opencode upgrade
+kilo upgrade
 ```
 
 For å oppgradere til en bestemt versjon.
 
 ```bash
-opencode upgrade v0.1.48
+kilo upgrade v0.1.48
 ```
 
 #### Flagg
@@ -538,7 +538,7 @@ opencode upgrade v0.1.48
 
 ## Globale flagg
 
-OpenCode CLI bruker følgende globale flagg.
+Kilo CLI bruker følgende globale flagg.
 
 | Flagg          | Kort | Beskrivelse                         |
 | -------------- | ---- | ----------------------------------- |
@@ -551,7 +551,7 @@ OpenCode CLI bruker følgende globale flagg.
 
 ## Miljøvariabler
 
-OpenCode kan konfigureres ved hjelp av miljøvariabler.
+Kilo kan konfigureres ved hjelp av miljøvariabler.
 
 | Variabel                              | Type   | Beskrivelse                                                           |
 | ------------------------------------- | ------ | --------------------------------------------------------------------- |

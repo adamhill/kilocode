@@ -1,17 +1,17 @@
 ---
 title: プロバイダー
-description: OpenCode で LLM プロバイダーを使用する。
+description: Kilo で LLM プロバイダーを使用する。
 ---
 
 import config from "../../../../config.mjs"
 export const console = config.console
 
-OpenCode は [AI SDK](https://ai-sdk.dev/) および [Models.dev](https://models.dev) を使用して **75 以上の LLM プロバイダー** をサポートし、ローカル モデルの実行をサポートします。
+Kilo は [AI SDK](https://ai-sdk.dev/) および [Models.dev](https://models.dev) を使用して **75 以上の LLM プロバイダー** をサポートし、ローカル モデルの実行をサポートします。
 
 プロバイダーを追加するには、次のことを行う必要があります。
 
 1. `/connect` コマンドを使用して、プロバイダーの API キーを追加します。
-2. OpenCode 構成でプロバイダーを構成します。
+2. Kilo 構成でプロバイダーを構成します。
 
 ---
 
@@ -24,7 +24,7 @@ OpenCode は [AI SDK](https://ai-sdk.dev/) および [Models.dev](https://models
 
 ### 構成
 
-OpenCode の `provider` セクションを通じてプロバイダーをカスタマイズできます。
+Kilo の `provider` セクションを通じてプロバイダーをカスタマイズできます。
 config.
 
 ---
@@ -35,7 +35,7 @@ config.
 
 ```json title="opencode.json" {6}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "anthropic": {
       "options": {
@@ -50,14 +50,14 @@ config.
 
 ## OpenCode Zen
 
-OpenCode Zen は、OpenCode チームが提供するモデルのリストです。
-OpenCode で適切に動作することがテストおよび検証されています。 [詳細はこちら](/docs/zen)。
+OpenCode Zen は、Kilo チームが提供するモデルのリストです。
+Kilo で適切に動作することがテストおよび検証されています。 [詳細はこちら](/docs/zen)。
 
 :::tip
 初めての方は、OpenCode Zen から始めることをお勧めします。
 :::
 
-1. TUI で `/connect` コマンドを実行し、opencode を選択して、[opencode.ai/auth](https://opencode.ai/auth).
+1. TUI で `/connect` コマンドを実行し、opencode を選択して、[kilo.ai/auth](https://kilo.ai/auth).
 
    ```txt
    /connect
@@ -80,7 +80,7 @@ OpenCode で適切に動作することがテストおよび検証されてい�
    /models
    ```
 
-これは OpenCode の他のプロバイダーと同様に機能し、使用は完全にオプションです。
+これは Kilo の他のプロバイダーと同様に機能し、使用は完全にオプションです。
 
 ---
 
@@ -124,7 +124,7 @@ OpenCode で適切に動作することがテストおよび検証されてい�
 
 ### Amazon Bedrock
 
-OpenCode で Amazon Bedrock を使用するには:
+Kilo で Amazon Bedrock を使用するには:
 
 1. Amazon Bedrock コンソールの **モデル カタログ** に移動してリクエストします。
    必要なモデルにアクセスします。
@@ -163,7 +163,7 @@ opencode の実行中に次の環境変数のいずれかを設定します。
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "amazon-bedrock": {
       "options": {
@@ -191,7 +191,7 @@ Bedrock の VPC エンドポイントを使用している場合:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "amazon-bedrock": {
       "options": {
@@ -237,7 +237,7 @@ Amazon Bedrock は次の認証優先度を使用します。
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "amazon-bedrock": {
       // ...
@@ -282,7 +282,7 @@ Amazon Bedrock は次の認証優先度を使用します。
    ```
 
 :::info
-OpenCode での Claude Pro/Max サブスクリプションの使用は、[Anthropic](https://anthropic.com).
+Kilo での Claude Pro/Max サブスクリプションの使用は、[Anthropic](https://anthropic.com).
 :::
 
 ##### APIキーの使用
@@ -489,7 +489,7 @@ opencode構成を通じてモデルを追加することもできます。
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "cloudflare-ai-gateway": {
       "models": {
@@ -666,7 +666,7 @@ GitLab Duo は、GitLab の Anthropic プロキシを介したネイティブ �
 
 1.  [GitLab ユーザー設定 > アクセス Tokens](https://gitlab.com/-/user_settings/personal_access_tokens) に移動します。
 2.  **新しいトークンを追加** をクリックします
-3.  名前: `OpenCode`、スコープ: `api`
+3.  名前: `Kilo`、スコープ: `api`
 4.  トークンをコピーします（`glpat-`で始まる）
 5.  terminal に入力してください
 
@@ -692,14 +692,14 @@ GitLab Duo は、GitLab の Anthropic プロキシを介したネイティブ �
 ##### 自己ホスト型 GitLab
 
 :::note[コンプライアンスメモ]
-OpenCode は、セッション タイトルの生成などの一部の AI タスクに小規模なモデルを使用します。
-デフォルトでは、Zen によってホストされる gpt-5-nano を使用するように構成されています。 OpenCodeをロックするには
+Kilo は、セッション タイトルの生成などの一部の AI タスクに小規模なモデルを使用します。
+デフォルトでは、Zen によってホストされる gpt-5-nano を使用するように構成されています。 Kiloをロックするには
 自分の GitLab でホストされているインスタンスのみを使用するには、次の行を
 `opencode.json` ファイル。セッション共有を無効にすることもお勧めします。
 
 ```json
 {
-"$schema": "https://opencode.ai/config.json",
+"$schema": "https://kilo.ai/config.json",
 "small_model": "gitlab/duo-chat-haiku-4-5",
 "share": "disabled"
 }
@@ -761,7 +761,7 @@ export GITLAB_OAUTH_CLIENT_ID=your_application_id_here
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "gitlab": {
       "options": {
@@ -782,7 +782,7 @@ GitLab ツール (マージ リクエスト、問題、パイプライン、CI/C
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "plugin": ["@gitlab/opencode-gitlab-plugin"]
 }
 ```
@@ -830,7 +830,7 @@ subscription](https://github.com/features/copilot/plans) を使用します。
 
 ### Google Vertex AI
 
-OpenCode で Google Vertex AI を使用するには:
+Kilo で Google Vertex AI を使用するには:
 
 1. Google Cloud Console の **Model Garden** に移動し、
    お住まいの地域で利用可能なモデル。
@@ -965,7 +965,7 @@ opencodeを通じて自動的に構成されていない Helicone の機能ま�
 
 ```jsonc title="~/.config/opencode/opencode.jsonc"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "helicone": {
       "npm": "@ai-sdk/openai-compatible",
@@ -993,7 +993,7 @@ Helicone は、キャッシュ、ユーザー追跡、セッション管理な�
 
 ```jsonc title="~/.config/opencode/opencode.jsonc"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "helicone": {
       "npm": "@ai-sdk/openai-compatible",
@@ -1012,7 +1012,7 @@ Helicone は、キャッシュ、ユーザー追跡、セッション管理な�
 
 ##### セッション追跡
 
-Helicone の [Sessions](https://docs.helicone.ai/features/sessions) 機能を使用すると、関連する LLM リクエストをグループ化できます。 [opencode-helicone-session](https://github.com/H2Shami/opencode-helicone-session) プラグインを使用して、各 OpenCode 会話を Helicone のセッションとして自動的に記録します。
+Helicone の [Sessions](https://docs.helicone.ai/features/sessions) 機能を使用すると、関連する LLM リクエストをグループ化できます。 [opencode-helicone-session](https://github.com/H2Shami/opencode-helicone-session) プラグインを使用して、各 Kilo 会話を Helicone のセッションとして自動的に記録します。
 
 ```bash
 npm install -g opencode-helicone-session
@@ -1026,7 +1026,7 @@ npm install -g opencode-helicone-session
 }
 ```
 
-プラグインは、リクエストに `Helicone-Session-Id` ヘッダーと `Helicone-Session-Name` ヘッダーを挿入します。 Helicone のセッション ページでは、OpenCode の各会話が個別のセッションとしてリストされています。
+プラグインは、リクエストに `Helicone-Session-Id` ヘッダーと `Helicone-Session-Name` ヘッダーを挿入します。 Helicone のセッション ページでは、Kilo の各会話が個別のセッションとしてリストされています。
 
 ##### 一般的なヘリコーンヘッダー
 
@@ -1047,7 +1047,7 @@ npm install -g opencode-helicone-session
 
 ```json title="opencode.json" "llama.cpp" {5, 6, 8, 10-15}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "llama.cpp": {
       "npm": "@ai-sdk/openai-compatible",
@@ -1114,7 +1114,7 @@ LM Studio を通じてローカル モデルを使用するようにopencodeを�
 
 ```json title="opencode.json" "lmstudio" {5, 6, 8, 10-14}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "lmstudio": {
       "npm": "@ai-sdk/openai-compatible",
@@ -1230,12 +1230,12 @@ Moonshot AI の Kim K2 を使用するには:
 Ollama を通じてローカル モデルを使用するようにopencodeを構成できます。
 
 :::tip
-Ollama は OpenCode 用に自動的に構成できます。詳細については、[Ollama 統合 docs](https://docs.ollama.com/integrations/opencode)」を参照してください。
+Ollama は Kilo 用に自動的に構成できます。詳細については、[Ollama 統合 docs](https://docs.ollama.com/integrations/opencode)」を参照してください。
 :::
 
 ```json title="opencode.json" "ollama" {5, 6, 8, 10-14}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "ollama": {
       "npm": "@ai-sdk/openai-compatible",
@@ -1269,13 +1269,13 @@ Ollama は OpenCode 用に自動的に構成できます。詳細については
 
 ### Ollama Cloud
 
-OpenCode で Ollama Cloud を使用するには:
+Kilo で Ollama Cloud を使用するには:
 
 1. [https://ollama.com/](https://ollama.com/) にアクセスしてサインインするか、アカウントを作成します。
 
 2. [**設定**] > [キー**] に移動し、[**API キーの追加**] をクリックして新しい API キーを生成します。
 
-3. OpenCode で使用するために API キーをコピーします。
+3. Kilo で使用するために API キーをコピーします。
 
 4. `/connect` コマンドを実行し、**Ollama Cloud** を検索します。
 
@@ -1292,7 +1292,7 @@ OpenCode で Ollama Cloud を使用するには:
    └ enter
    ```
 
-6. **重要**: OpenCode でクラウド モデルを使用する前に、モデル情報をローカルに取得する必要があります。
+6. **重要**: Kilo でクラウド モデルを使用する前に、モデル情報をローカルに取得する必要があります。
 
    ```bash
    ollama pull gpt-oss:20b-cloud
@@ -1341,7 +1341,7 @@ OpenCode で Ollama Cloud を使用するには:
 
 ### OpenCode Zen
 
-OpenCode Zen は、OpenCode チームによって提供される、テストおよび検証されたモデルのリストです。 [詳細はこちら](/docs/zen)。
+OpenCode Zen は、Kilo チームによって提供される、テストおよび検証されたモデルのリストです。 [詳細はこちら](/docs/zen)。
 
 1. **<a href={console}>OpenCode Zen</a>** にサインインし、**API キーの作成** をクリックします。
 
@@ -1351,7 +1351,7 @@ OpenCode Zen は、OpenCode チームによって提供される、テストお�
    /connect
    ```
 
-3. OpenCode API キーを入力します。
+3. Kilo API キーを入力します。
 
    ```txt
    ┌ API key
@@ -1397,7 +1397,7 @@ opencode構成を通じて追加のモデルを追加することもできます
 
 ```json title="opencode.json" {6}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "openrouter": {
       "models": {
@@ -1412,7 +1412,7 @@ opencode構成を通じて追加のモデルを追加することもできます
 
    ```json title="opencode.json"
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://kilo.ai/config.json",
      "provider": {
        "openrouter": {
          "models": {
@@ -1628,7 +1628,7 @@ opencode構成を通じてモデルをカスタマイズすることもできま
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "vercel": {
       "models": {
@@ -1738,7 +1738,7 @@ opencode構成を通じて追加のモデルを追加することもできます
 
 ```json title="opencode.json" {6}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "zenmux": {
       "models": {
@@ -1806,7 +1806,7 @@ OpenAI と互換性のある任意のプロバイダーをopencodeで使用で�
 
    ```json title="opencode.json" ""myprovider"" {5-15}
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://kilo.ai/config.json",
      "provider": {
        "myprovider": {
          "npm": "@ai-sdk/openai-compatible",
@@ -1845,7 +1845,7 @@ OpenAI と互換性のある任意のプロバイダーをopencodeで使用で�
 
 ```json title="opencode.json" {9,11,17-20}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "myprovider": {
       "npm": "@ai-sdk/openai-compatible",
@@ -1878,7 +1878,7 @@ OpenAI と互換性のある任意のプロバイダーをopencodeで使用で�
 - **limit.context**: モデルが受け入れる最大入力トークン。
 - **limit.output**: モデルが生成できる最大トークン。
 
-`limit` フィールドを使用すると、OpenCode はコンテキストがどのくらい残っているかを理解できます。標準プロバイダーは、これらを models.dev から自動的に取得します。
+`limit` フィールドを使用すると、Kilo はコンテキストがどのくらい残っているかを理解できます。標準プロバイダーは、これらを models.dev から自動的に取得します。
 
 ---
 
@@ -1886,7 +1886,7 @@ OpenAI と互換性のある任意のプロバイダーをopencodeで使用で�
 
 プロバイダーの構成で問題が発生した場合は、次の点を確認してください。
 
-1. **認証設定を確認します**: `opencode auth list` を実行して、資格情報が正しいかどうかを確認します。
+1. **認証設定を確認します**: `kilo auth list` を実行して、資格情報が正しいかどうかを確認します。
    プロバイダー用のものが構成に追加されます。
 
 これは、認証に環境変数に依存する Amazon Bedrock のようなプロバイダーには当てはまりません。

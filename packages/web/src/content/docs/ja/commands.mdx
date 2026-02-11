@@ -42,17 +42,17 @@ Focus on the failing tests and suggest fixes.
 
 ## 設定する
 
-カスタム コマンドは、OpenCode 構成を通じて、または `commands/` ディレクトリにMarkdown ファイルを作成することによって追加できます。
+カスタム コマンドは、Kilo 構成を通じて、または `commands/` ディレクトリにMarkdown ファイルを作成することによって追加できます。
 
 ---
 
 ### JSON
 
-OpenCode で `command` オプションを使用します [config](/docs/config):
+Kilo で `command` オプションを使用します [config](/docs/config):
 
 ```json title="opencode.jsonc" {4-12}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "command": {
     // This becomes the name of the command
     "test": {

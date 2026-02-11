@@ -3,7 +3,7 @@ title: MCPサーバー
 description: ローカルおよびリモートの MCP ツールを追加します。
 ---
 
-_Model Context Protocol_ (MCP) を使用して、OpenCode に外部ツールを追加できます。 OpenCode は、ローカル サーバーとリモート サーバーの両方をサポートします。
+_Model Context Protocol_ (MCP) を使用して、Kilo に外部ツールを追加できます。 Kilo は、ローカル サーバーとリモート サーバーの両方をサポートします。
 
 MCP ツールを追加すると、組み込みツールとともに LLM で自動的に使用できるようになります。
 
@@ -22,11 +22,11 @@ Certain MCP サーバーなどの特定の MCP サーバーは、大量のトー
 
 ## 有効にする
 
-MCP サーバーは、`mcp` の下の [OpenCode Config](https://opencode.ai/docs/config/) で定義できます。各 MCP を一意の名前で追加します。 LLM にプロンプ​​トを表示するときに、その MCP を名前で参照できます。
+MCP サーバーは、`mcp` の下の [Kilo Config](https://kilo.ai/docs/config/) で定義できます。各 MCP を一意の名前で追加します。 LLM にプロンプ​​トを表示するときに、その MCP を名前で参照できます。
 
 ```jsonc title="opencode.jsonc" {6}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "mcp": {
     "name-of-mcp-server": {
       // ...
@@ -51,7 +51,7 @@ MCP サーバーは、`mcp` の下の [OpenCode Config](https://opencode.ai/docs
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "mcp": {
     "jira": {
       "type": "remote",
@@ -72,7 +72,7 @@ MCP オブジェクト内の `type` から `"local"` を使用してローカル
 
 ```jsonc title="opencode.jsonc" {15}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "mcp": {
     "my-local-mcp-server": {
       "type": "local",
@@ -93,7 +93,7 @@ MCP オブジェクト内の `type` から `"local"` を使用してローカル
 
 ```jsonc title="opencode.jsonc"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "mcp": {
     "mcp_everything": {
       "type": "local",
@@ -131,7 +131,7 @@ use the mcp_everything tool to add the number 3 and 4
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "mcp": {
     "my-remote-mcp": {
       "type": "remote",
@@ -164,7 +164,7 @@ use the mcp_everything tool to add the number 3 and 4
 
 ## OAuth
 
-OpenCode は、リモート MCP サーバーの OAuth 認証を自動的に処理します。サーバーが認証を必要とする場合、OpenCode は次のことを行います。
+Kilo は、リモート MCP サーバーの OAuth 認証を自動的に処理します。サーバーが認証を必要とする場合、Kilo は次のことを行います。
 
 1. 401 応答を検出し、OAuth フローを開始します。
 2. サーバーでサポートされている場合は **動的クライアント登録 (RFC 7591)** を使用します
@@ -178,7 +178,7 @@ OpenCode は、リモート MCP サーバーの OAuth 認証を自動的に処�
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "mcp": {
     "my-oauth-server": {
       "type": "remote",
@@ -188,7 +188,7 @@ OpenCode は、リモート MCP サーバーの OAuth 認証を自動的に処�
 }
 ```
 
-サーバーが認証を必要とする場合、OpenCode を初めて使用しようとすると、認証を求めるプロンプトが表示されます。そうでない場合は、`opencode mcp auth <server-name>` を使用して flow](#authenticating) を手動でトリガーできます。
+サーバーが認証を必要とする場合、Kilo を初めて使用しようとすると、認証を求めるプロンプトが表示されます。そうでない場合は、`opencode mcp auth <server-name>` を使用して flow](#authenticating) を手動でトリガーできます。
 
 ---
 
@@ -198,7 +198,7 @@ MCP サーバープロバイダーからクライアント認証情報を取得�
 
 ```json title="opencode.json" {7-11}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "mcp": {
     "my-oauth-server": {
       "type": "remote",
@@ -237,7 +237,7 @@ opencode mcp list
 opencode mcp logout my-oauth-server
 ```
 
-`mcp auth` コマンドは、認証のためにブラウザを開きます。承認後、OpenCode はトークンを `~/.local/share/opencode/mcp-auth.json` に安全に保存します。
+`mcp auth` コマンドは、認証のためにブラウザを開きます。承認後、Kilo はトークンを `~/.local/share/opencode/mcp-auth.json` に安全に保存します。
 
 ---
 
@@ -247,7 +247,7 @@ opencode mcp logout my-oauth-server
 
 ```json title="opencode.json" {7}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "mcp": {
     "my-api-key-server": {
       "type": "remote",
@@ -290,7 +290,7 @@ opencode mcp debug my-oauth-server
 
 ## 管理
 
-MCP は、組み込みツールと並んで、OpenCode のツールとして利用できます。したがって、他のツールと同様に、OpenCode config を通じてそれらを管理できます。
+MCP は、組み込みツールと並んで、Kilo のツールとして利用できます。したがって、他のツールと同様に、Kilo config を通じてそれらを管理できます。
 
 ---
 
@@ -300,7 +300,7 @@ MCP は、組み込みツールと並んで、OpenCode のツールとして利�
 
 ```json title="opencode.json" {14}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "mcp": {
     "my-mcp-foo": {
       "type": "local",
@@ -321,7 +321,7 @@ MCP は、組み込みツールと並んで、OpenCode のツールとして利�
 
 ```json title="opencode.json" {14}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "mcp": {
     "my-mcp-foo": {
       "type": "local",
@@ -351,7 +351,7 @@ MCP は、組み込みツールと並んで、OpenCode のツールとして利�
 
 ```json title="opencode.json" {11, 14-18}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "mcp": {
     "my-mcp": {
       "type": "local",
@@ -403,7 +403,7 @@ MCP サーバー ツールはサーバー名をプレフィックスとして登
 
 ```json title="opencode.json" {4-8}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "mcp": {
     "sentry": {
       "type": "remote",
@@ -420,7 +420,7 @@ MCP サーバー ツールはサーバー名をプレフィックスとして登
 opencode mcp auth sentry
 ```
 
-これにより、ブラウザ ウィンドウが開き、OAuth フローが完了し、OpenCode が Sentry アカウントに接続されます。
+これにより、ブラウザ ウィンドウが開き、OAuth フローが完了し、Kilo が Sentry アカウントに接続されます。
 
 認証が完了すると、プロンプトで Sentry ツールを使用して、問題、プロジェクト、エラー データをクエリできるようになります。
 
@@ -436,7 +436,7 @@ Show me the latest unresolved issues in my project. use sentry
 
 ```json title="opencode.json" {4-7}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "mcp": {
     "context7": {
       "type": "remote",
@@ -450,7 +450,7 @@ Show me the latest unresolved issues in my project. use sentry
 
 ```json title="opencode.json" {7-9}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "mcp": {
     "context7": {
       "type": "remote",
@@ -485,7 +485,7 @@ GitHub 上のコード スニペットを検索するには、[Grep by Vercel](h
 
 ```json title="opencode.json" {4-7}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "mcp": {
     "gh_grep": {
       "type": "remote",

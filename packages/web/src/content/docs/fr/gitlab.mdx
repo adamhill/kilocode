@@ -1,33 +1,33 @@
 ---
 title: GitLab
-description: Utilisez OpenCode dans les problèmes GitLab et les demandes de fusion.
+description: Utilisez Kilo dans les problèmes GitLab et les demandes de fusion.
 ---
 
-OpenCode s'intègre à votre flux de travail GitLab via votre pipeline CI/CD GitLab ou avec GitLab Duo.
+Kilo s'intègre à votre flux de travail GitLab via votre pipeline CI/CD GitLab ou avec GitLab Duo.
 
-Dans les deux cas, OpenCode fonctionnera sur vos coureurs GitLab.
+Dans les deux cas, Kilo fonctionnera sur vos coureurs GitLab.
 
 ---
 
 ## GitLab CI
 
-OpenCode fonctionne dans un pipeline GitLab régulier. Vous pouvez l'intégrer dans un pipeline en tant que [composant CI](https://docs.gitlab.com/ee/ci/components/)
+Kilo fonctionne dans un pipeline GitLab régulier. Vous pouvez l'intégrer dans un pipeline en tant que [composant CI](https://docs.gitlab.com/ee/ci/components/)
 
-Ici, nous utilisons un composant CI/CD créé par la communauté pour OpenCode — [nagyv/gitlab-opencode](https://gitlab.com/nagyv/gitlab-opencode).
+Ici, nous utilisons un composant CI/CD créé par la communauté pour Kilo — [nagyv/gitlab-opencode](https://gitlab.com/nagyv/gitlab-opencode).
 
 ---
 
 ### Caractéristiques
 
-- **Utiliser une configuration personnalisée par tâche** : configurez OpenCode avec un répertoire de configuration personnalisé, par exemple `./config/#custom-directory` pour activer ou désactiver la fonctionnalité par appel OpenCode.
-- **Configuration minimale** : le composant CI configure OpenCode en arrière-plan, il vous suffit de créer la configuration OpenCode et l'invite initiale.
+- **Utiliser une configuration personnalisée par tâche** : configurez Kilo avec un répertoire de configuration personnalisé, par exemple `./config/#custom-directory` pour activer ou désactiver la fonctionnalité par appel Kilo.
+- **Configuration minimale** : le composant CI configure Kilo en arrière-plan, il vous suffit de créer la configuration Kilo et l'invite initiale.
 - **Flexible** : le composant CI prend en charge plusieurs entrées pour personnaliser son comportement
 
 ---
 
 ### Installation
 
-1. Stockez votre authentification OpenCode JSON en tant que variables d'environnement CI de type fichier sous **Paramètres** > **CI/CD** > **Variables**. Assurez-vous de les marquer comme « Masqués et cachés ».
+1. Stockez votre authentification Kilo JSON en tant que variables d'environnement CI de type fichier sous **Paramètres** > **CI/CD** > **Variables**. Assurez-vous de les marquer comme « Masqués et cachés ».
 2. Ajoutez ce qui suit à votre fichier `.gitlab-ci.yml`.
 
    ```yaml title=".gitlab-ci.yml"
@@ -35,7 +35,7 @@ Ici, nous utilisons un composant CI/CD créé par la communauté pour OpenCode �
      - component: $CI_SERVER_FQDN/nagyv/gitlab-opencode/opencode@2
        inputs:
          config_dir: ${CI_PROJECT_DIR}/opencode-config
-         auth_json: $OPENCODE_AUTH_JSON # The variable name for your OpenCode authentication JSON
+         auth_json: $OPENCODE_AUTH_JSON # The variable name for your Kilo authentication JSON
          command: optional-custom-command
          message: "Your prompt here"
    ```
@@ -46,23 +46,23 @@ Pour plus d'entrées et de cas d'utilisation [consultez la docs](https://gitlab.
 
 ## GitLab Duo
 
-OpenCode s'intègre à votre flux de travail GitLab.
-Mentionnez `@opencode` dans un commentaire et OpenCode exécutera les tâches au sein de votre pipeline CI GitLab.
+Kilo s'intègre à votre flux de travail GitLab.
+Mentionnez `@opencode` dans un commentaire et Kilo exécutera les tâches au sein de votre pipeline CI GitLab.
 
 ---
 
 ### Caractéristiques
 
-- **Problèmes de triage** : demandez à OpenCode d'examiner un problème et de vous l'expliquer.
-- **Réparer et implémenter** : demandez à OpenCode de résoudre un problème ou d'implémenter une fonctionnalité.
+- **Problèmes de triage** : demandez à Kilo d'examiner un problème et de vous l'expliquer.
+- **Réparer et implémenter** : demandez à Kilo de résoudre un problème ou d'implémenter une fonctionnalité.
   Cela créera une nouvelle branche et déclenchera une demande de fusion avec les modifications.
-- **Sécurisé** : OpenCode fonctionne sur vos coureurs GitLab.
+- **Sécurisé** : Kilo fonctionne sur vos coureurs GitLab.
 
 ---
 
 ### Installation
 
-OpenCode s'exécute dans votre pipeline CI/CD GitLab. Voici ce dont vous aurez besoin pour le configurer :
+Kilo s'exécute dans votre pipeline CI/CD GitLab. Voici ce dont vous aurez besoin pour le configurer :
 
 :::tip
 Consultez les [**GitLab docs**](https://docs.gitlab.com/user/duo_agent_platform/agent_assistant/) pour obtenir des instructions à jour.
@@ -91,7 +91,7 @@ Consultez les [**GitLab docs**](https://docs.gitlab.com/user/duo_agent_platform/
       - apt-get install --yes glab
       - echo "Configuring glab"
       - echo $GITLAB_HOST
-      - echo "Creating OpenCode auth configuration"
+      - echo "Creating Kilo auth configuration"
       - mkdir --parents ~/.local/share/opencode
       - |
         cat > ~/.local/share/opencode/auth.json << EOF
@@ -104,10 +104,10 @@ Consultez les [**GitLab docs**](https://docs.gitlab.com/user/duo_agent_platform/
         EOF
       - echo "Configuring git"
       - git config --global user.email "opencode@gitlab.com"
-      - git config --global user.name "OpenCode"
+      - git config --global user.name "Kilo"
       - echo "Testing glab"
       - glab issue list
-      - echo "Running OpenCode"
+      - echo "Running Kilo"
       - |
         opencode run "
         You are an AI assistant helping with GitLab operations.
@@ -158,7 +158,7 @@ Vous pouvez vous référer aux [GitLab CLI agents docs](https://docs.gitlab.com/
 
 ### Exemples
 
-Voici quelques exemples de la façon dont vous pouvez utiliser OpenCode dans GitLab.
+Voici quelques exemples de la façon dont vous pouvez utiliser Kilo dans GitLab.
 
 :::tip
 Vous pouvez configurer pour utiliser une phrase de déclenchement différente de `@opencode`.
@@ -172,7 +172,7 @@ Ajoutez ce commentaire dans un numéro GitLab.
   @opencode explain this issue
 ```
 
-OpenCode lira le problème et répondra avec une explication claire.
+Kilo lira le problème et répondra avec une explication claire.
 
 - **Résoudre un problème**
 
@@ -182,7 +182,7 @@ Dans un numéro GitLab, dites :
   @opencode fix this
 ```
 
-OpenCode créera une nouvelle branche, mettra en œuvre les modifications et ouvrira une demande de fusion avec les modifications.
+Kilo créera une nouvelle branche, mettra en œuvre les modifications et ouvrira une demande de fusion avec les modifications.
 
 - **Examiner les demandes de fusion**
 
@@ -192,4 +192,4 @@ Laissez le commentaire suivant sur une demande de fusion GitLab.
   @opencode review this merge request
 ```
 
-OpenCode examinera la demande de fusion et fournira des commentaires.
+Kilo examinera la demande de fusion et fournira des commentaires.

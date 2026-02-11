@@ -1,15 +1,15 @@
 ---
 title: Formateurs
-description: OpenCode utilise des formateurs spécifiques à la langue.
+description: Kilo utilise des formateurs spécifiques à la langue.
 ---
 
-OpenCode formate automatiquement les fichiers après leur écriture ou leur modification à l'aide de formateurs spécifiques à la langue. Cela garantit que le code généré suit les styles de code de votre projet.
+Kilo formate automatiquement les fichiers après leur écriture ou leur modification à l'aide de formateurs spécifiques à la langue. Cela garantit que le code généré suit les styles de code de votre projet.
 
 ---
 
 ## Intégré
 
-OpenCode est livré avec plusieurs formateurs intégrés pour les langages et frameworks populaires. Vous trouverez ci-dessous une liste des formateurs, des extensions de fichiers prises en charge et des commandes ou options de configuration dont il a besoin.
+Kilo est livré avec plusieurs formateurs intégrés pour les langages et frameworks populaires. Vous trouverez ci-dessous une liste des formateurs, des extensions de fichiers prises en charge et des commandes ou options de configuration dont il a besoin.
 
 | Formateur            | Rallonges                                                                                              | Exigences                                                                                                             |
 | -------------------- | ------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------- |
@@ -38,13 +38,13 @@ OpenCode est livré avec plusieurs formateurs intégrés pour les langages et fr
 | oxfmt (expérimental) | .js, .jsx, .ts, .tsx                                                                                   | Dépendance `oxfmt` dans `package.json` et un [flag de variable d'environnement expérimental](/docs/cli/#experimental) |
 | ormolu               | .hs                                                                                                    | Commande `ormolu` disponible                                                                                          |
 
-Ainsi, si votre projet a `prettier` dans votre `package.json`, OpenCode l'utilisera automatiquement.
+Ainsi, si votre projet a `prettier` dans votre `package.json`, Kilo l'utilisera automatiquement.
 
 ---
 
 ## Comment ça marche
 
-Lorsque OpenCode écrit ou modifie un fichier, il :
+Lorsque Kilo écrit ou modifie un fichier, il :
 
 1. Vérifie l'extension du fichier par rapport à tous les formateurs activés.
 2. Exécute la commande de formatage appropriée sur le fichier.
@@ -56,11 +56,11 @@ Ce processus se déroule en arrière-plan, garantissant que vos styles de code s
 
 ## Configurer
 
-Vous pouvez personnaliser les formateurs via la section `formatter` de votre configuration OpenCode.
+Vous pouvez personnaliser les formateurs via la section `formatter` de votre configuration Kilo.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "formatter": {}
 }
 ```
@@ -84,7 +84,7 @@ Pour désactiver **tous** les formateurs globalement, définissez `formatter` su
 
 ```json title="opencode.json" {3}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "formatter": false
 }
 ```
@@ -93,7 +93,7 @@ Pour désactiver un formateur **spécifique**, définissez `disabled` sur `true`
 
 ```json title="opencode.json" {5}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "formatter": {
     "prettier": {
       "disabled": true
@@ -110,7 +110,7 @@ Vous pouvez remplacer les formateurs intégrés ou en ajouter de nouveaux en sp�
 
 ```json title="opencode.json" {4-14}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "formatter": {
     "prettier": {
       "command": ["npx", "prettier", "--write", "$FILE"],

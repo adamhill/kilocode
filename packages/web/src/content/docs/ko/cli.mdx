@@ -112,17 +112,17 @@ opencode agent list
 credentials 및 로그인을 관리하는 명령.
 
 ```bash
-opencode auth [command]
+kilo auth [command]
 ```
 
 ---
 
 #### 로그인
 
-opencode는 [Models.dev](https://models.dev)의 공급자 목록에 의해 구동되므로 `opencode auth login`를 사용하여 사용하려는 모든 공급자의 API 키를 구성할 수 있습니다. 이것은 `~/.local/share/opencode/auth.json`에서 저장됩니다.
+opencode는 [Models.dev](https://models.dev)의 공급자 목록에 의해 구동되므로 `kilo auth login`를 사용하여 사용하려는 모든 공급자의 API 키를 구성할 수 있습니다. 이것은 `~/.local/share/opencode/auth.json`에서 저장됩니다.
 
 ```bash
-opencode auth login
+kilo auth login
 ```
 
 opencode가 시작하면 credentials 파일에서 공급자를로드합니다. 그리고 프로젝트에 있는 환경 또는 `.env` 파일에서 정의된 키가 있다면.
@@ -134,13 +134,13 @@ opencode가 시작하면 credentials 파일에서 공급자를로드합니다. �
 credentials 파일에 저장 한 모든 인증 된 제공 업체를 나열합니다.
 
 ```bash
-opencode auth list
+kilo auth list
 ```
 
 또는 짧은 버전.
 
 ```bash
-opencode auth ls
+kilo auth ls
 ```
 
 ---
@@ -150,7 +150,7 @@ opencode auth ls
 credentials 파일에서 삭제하여 공급자에서 로그.
 
 ```bash
-opencode auth logout
+kilo auth logout
 ```
 
 ---
@@ -323,11 +323,11 @@ opencode run [message..]
 opencode run Explain the use of context in Go
 ```
 
-`opencode serve` 인스턴스를 실행하여 MCP 서버 콜드 부팅 시간을 각 실행할 수 있습니다.
+`kilo serve` 인스턴스를 실행하여 MCP 서버 콜드 부팅 시간을 각 실행할 수 있습니다.
 
 ```bash
 # Start a headless server in one terminal
-opencode serve
+kilo serve
 
 # In another terminal, run commands that attach to it
 opencode run --attach http://localhost:4096 "Explain async/await in JavaScript"
@@ -356,7 +356,7 @@ opencode run --attach http://localhost:4096 "Explain async/await in JavaScript"
 API 액세스를 위한 headless opencode 서버를 시작합니다. 완전한 HTTP 인터페이스를 위해 [server docs](/docs/server)를 체크하십시오.
 
 ```bash
-opencode serve
+kilo serve
 ```
 
 TUI 인터페이스없이 API 액세스를 제공하는 HTTP 서버를 시작합니다. `OPENCODE_SERVER_PASSWORD`를 설정하여 HTTP 기본 auth (`opencode`에 기본적으로 이름을 지정합니다).
@@ -512,19 +512,19 @@ opencode uninstall
 업데이트 opencode 최신 버전 또는 특정 버전.
 
 ```bash
-opencode upgrade [target]
+kilo upgrade [target]
 ```
 
 최신 버전으로 업그레이드하십시오.
 
 ```bash
-opencode upgrade
+kilo upgrade
 ```
 
 특정 버전으로 업그레이드하십시오.
 
 ```bash
-opencode upgrade v0.1.48
+kilo upgrade v0.1.48
 ```
 
 #### 플래그

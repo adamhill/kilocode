@@ -1,17 +1,17 @@
 ---
 title: CLI
-description: OpenCode CLI opciones y comandos.
+description: Kilo CLI opciones y comandos.
 ---
 
 import { Tabs, TabItem } from "@astrojs/starlight/components"
 
-El OpenCode CLI de forma predeterminada inicia el [TUI](/docs/tui) cuando se ejecuta sin ningún argumento.
+El Kilo CLI de forma predeterminada inicia el [TUI](/docs/tui) cuando se ejecuta sin ningún argumento.
 
 ```bash
 opencode
 ```
 
-Pero también acepta comandos como se documenta en esta página. Esto le permite interactuar con OpenCode mediante programación.
+Pero también acepta comandos como se documenta en esta página. Esto le permite interactuar con Kilo mediante programación.
 
 ```bash
 opencode run "Explain how closures work in JavaScript"
@@ -21,7 +21,7 @@ opencode run "Explain how closures work in JavaScript"
 
 ### tui
 
-Inicie la interfaz de usuario del terminal OpenCode.
+Inicie la interfaz de usuario del terminal Kilo.
 
 ```bash
 opencode [project]
@@ -44,13 +44,13 @@ opencode [project]
 
 ## Comandos
 
-El OpenCode CLI también tiene los siguientes comandos.
+El Kilo CLI también tiene los siguientes comandos.
 
 ---
 
 ### agent
 
-Administrar agentes para OpenCode.
+Administrar agentes para Kilo.
 
 ```bash
 opencode agent [command]
@@ -60,13 +60,13 @@ opencode agent [command]
 
 ### attach
 
-Conecte una terminal a un servidor backend OpenCode que ya se esté ejecutando y iniciado mediante los comandos `serve` o `web`.
+Conecte una terminal a un servidor backend Kilo que ya se esté ejecutando y iniciado mediante los comandos `serve` o `web`.
 
 ```bash
 opencode attach [url]
 ```
 
-Esto permite usar TUI con un backend remoto OpenCode. Por ejemplo:
+Esto permite usar TUI con un backend remoto Kilo. Por ejemplo:
 
 ```bash
 # Start the backend server for web/mobile access
@@ -112,20 +112,20 @@ opencode agent list
 Comando para administrar credenciales e iniciar sesión para proveedores.
 
 ```bash
-opencode auth [command]
+kilo auth [command]
 ```
 
 ---
 
 #### login
 
-OpenCode funciona con la lista de proveedores en [Models.dev](https://models.dev), por lo que puede usar `opencode auth login` para configurar las claves API para cualquier proveedor que desee utilizar. Esto se almacena en `~/.local/share/opencode/auth.json`.
+Kilo funciona con la lista de proveedores en [Models.dev](https://models.dev), por lo que puede usar `kilo auth login` para configurar las claves API para cualquier proveedor que desee utilizar. Esto se almacena en `~/.local/share/opencode/auth.json`.
 
 ```bash
-opencode auth login
+kilo auth login
 ```
 
-Cuando se inicia OpenCode, carga los proveedores desde el archivo de credenciales. Y si hay claves definidas en sus entornos o un archivo `.env` en su proyecto.
+Cuando se inicia Kilo, carga los proveedores desde el archivo de credenciales. Y si hay claves definidas en sus entornos o un archivo `.env` en su proyecto.
 
 ---
 
@@ -134,13 +134,13 @@ Cuando se inicia OpenCode, carga los proveedores desde el archivo de credenciale
 Enumera todos los proveedores autenticados tal como están almacenados en el archivo de credenciales.
 
 ```bash
-opencode auth list
+kilo auth list
 ```
 
 O la versión corta.
 
 ```bash
-opencode auth ls
+kilo auth ls
 ```
 
 ---
@@ -150,7 +150,7 @@ opencode auth ls
 Cierra tu sesión de un proveedor eliminándolo del archivo de credenciales.
 
 ```bash
-opencode auth logout
+kilo auth logout
 ```
 
 ---
@@ -301,7 +301,7 @@ opencode models anthropic
 | `--refresh` | Actualizar la caché de modelos desde models.dev                             |
 | `--verbose` | Utilice una salida del modelo más detallada (incluye metadatos como costos) |
 
-Utilice el indicador `--refresh` para actualizar la lista de modelos almacenados en caché. Esto es útil cuando se han agregado nuevos modelos a un proveedor y desea verlos en OpenCode.
+Utilice el indicador `--refresh` para actualizar la lista de modelos almacenados en caché. Esto es útil cuando se han agregado nuevos modelos a un proveedor y desea verlos en Kilo.
 
 ```bash
 opencode models --refresh
@@ -323,11 +323,11 @@ Esto es útil para secuencias de comandos, automatización o cuando desea una re
 opencode run Explain the use of context in Go
 ```
 
-También puede conectarse a una instancia `opencode serve` en ejecución para evitar tiempos de arranque en frío del servidor MCP en cada ejecución:
+También puede conectarse a una instancia `kilo serve` en ejecución para evitar tiempos de arranque en frío del servidor MCP en cada ejecución:
 
 ```bash
 # Start a headless server in one terminal
-opencode serve
+kilo serve
 
 # In another terminal, run commands that attach to it
 opencode run --attach http://localhost:4096 "Explain async/await in JavaScript"
@@ -354,10 +354,10 @@ opencode run --attach http://localhost:4096 "Explain async/await in JavaScript"
 
 ### serve
 
-Inicie un servidor OpenCode sin cabeza para acceso API. Consulte los [documentos del servidor](/docs/server) para conocer la interfaz HTTP completa.
+Inicie un servidor Kilo sin cabeza para acceso API. Consulte los [documentos del servidor](/docs/server) para conocer la interfaz HTTP completa.
 
 ```bash
-opencode serve
+kilo serve
 ```
 
 Esto inicia un servidor HTTP que proporciona acceso API a la funcionalidad opencode sin la interfaz TUI. Configure `OPENCODE_SERVER_PASSWORD` para habilitar la autenticación básica HTTP (el nombre de usuario predeterminado es `opencode`).
@@ -375,7 +375,7 @@ Esto inicia un servidor HTTP que proporciona acceso API a la funcionalidad openc
 
 ### session
 
-Administrar OpenCode sesiones.
+Administrar Kilo sesiones.
 
 ```bash
 opencode session [command]
@@ -385,7 +385,7 @@ opencode session [command]
 
 #### list
 
-Enumere todas las sesiones OpenCode.
+Enumere todas las sesiones Kilo.
 
 ```bash
 opencode session list
@@ -402,7 +402,7 @@ opencode session list
 
 ### stats
 
-Muestre el uso de tokens y las estadísticas de costos para sus sesiones OpenCode.
+Muestre el uso de tokens y las estadísticas de costos para sus sesiones Kilo.
 
 ```bash
 opencode stats
@@ -433,13 +433,13 @@ Si no proporciona una ID de sesión, se le pedirá que seleccione entre las sesi
 
 ### import
 
-Importe datos de sesión desde un archivo JSON o una URL compartida OpenCode.
+Importe datos de sesión desde un archivo JSON o una URL compartida Kilo.
 
 ```bash
 opencode import <file>
 ```
 
-Puede importar desde un archivo local o una URL compartida OpenCode.
+Puede importar desde un archivo local o una URL compartida Kilo.
 
 ```bash
 opencode import session.json
@@ -450,13 +450,13 @@ opencode import https://opncd.ai/s/abc123
 
 ### web
 
-Inicie un servidor OpenCode sin cabeza con una interfaz web.
+Inicie un servidor Kilo sin cabeza con una interfaz web.
 
 ```bash
 opencode web
 ```
 
-Esto inicia un servidor HTTP y abre un navegador web para acceder a OpenCode a través de una interfaz web. Configure `OPENCODE_SERVER_PASSWORD` para habilitar la autenticación básica HTTP (el nombre de usuario predeterminado es `opencode`).
+Esto inicia un servidor HTTP y abre un navegador web para acceder a Kilo a través de una interfaz web. Configure `OPENCODE_SERVER_PASSWORD` para habilitar la autenticación básica HTTP (el nombre de usuario predeterminado es `opencode`).
 
 #### Banderas
 
@@ -491,7 +491,7 @@ Este comando inicia un servidor ACP que se comunica a través de stdin/stdout us
 
 ### uninstall
 
-Desinstale OpenCode y elimine todos los archivos relacionados.
+Desinstale Kilo y elimine todos los archivos relacionados.
 
 ```bash
 opencode uninstall
@@ -513,19 +513,19 @@ opencode uninstall
 Actualiza opencode a la última versión o a una versión específica.
 
 ```bash
-opencode upgrade [target]
+kilo upgrade [target]
 ```
 
 Para actualizar a la última versión.
 
 ```bash
-opencode upgrade
+kilo upgrade
 ```
 
 Para actualizar a una versión específica.
 
 ```bash
-opencode upgrade v0.1.48
+kilo upgrade v0.1.48
 ```
 
 #### Banderas
@@ -551,7 +551,7 @@ El opencode CLI toma las siguientes banderas globales.
 
 ## Variables de entorno
 
-OpenCode se puede configurar mediante variables de entorno.
+Kilo se puede configurar mediante variables de entorno.
 
 | Variable                              | Type     | Description                                                                     |
 | ------------------------------------- | -------- | ------------------------------------------------------------------------------- |

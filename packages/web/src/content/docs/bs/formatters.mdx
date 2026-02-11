@@ -1,15 +1,15 @@
 ---
 title: Trenerke
-description: OpenCode koristi formatere specifične za jezik.
+description: Kilo koristi formatere specifične za jezik.
 ---
 
-OpenCode automatski formatira datoteke nakon što su napisane ili uređene pomoću formatera specifičnih za jezik. Ovo osigurava da kod koji se generira prati stilove koda vašeg projekta.
+Kilo automatski formatira datoteke nakon što su napisane ili uređene pomoću formatera specifičnih za jezik. Ovo osigurava da kod koji se generira prati stilove koda vašeg projekta.
 
 ---
 
 ## Ugrađeno
 
-OpenCode dolazi sa nekoliko ugrađenih formatera za popularne jezike i okvire. Ispod je lista formatera, podržanih ekstenzija datoteka i naredbi ili opcija konfiguracije koje su mu potrebne.
+Kilo dolazi sa nekoliko ugrađenih formatera za popularne jezike i okvire. Ispod je lista formatera, podržanih ekstenzija datoteka i naredbi ili opcija konfiguracije koje su mu potrebne.
 | Formatter | Ekstenzije | Zahtjevi
 |-------------------- | -------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
 | gofmt | .go | `gofmt` komanda dostupna |
@@ -34,13 +34,13 @@ OpenCode dolazi sa nekoliko ugrađenih formatera za popularne jezike i okvire. I
 | shfmt | .sh, .bash | `shfmt` komanda dostupna |
 | pint | .php | `laravel/pint` zavisnost u `composer.json` || oxfmt (Eksperimentalno) | .js, .jsx, .ts, .tsx | `oxfmt` zavisnost u `package.json` i [eksperimentalna env varijabla flag](/docs/cli/#experimental) |
 | ormolu | .hs | `ormolu` komanda dostupna |
-Dakle, ako vaš projekat ima `prettier` u vašem `package.json`, OpenCode će ga automatski koristiti.
+Dakle, ako vaš projekat ima `prettier` u vašem `package.json`, Kilo će ga automatski koristiti.
 
 ---
 
 ## Kako radi
 
-Kada OpenCode piše ili uređuje datoteku, on:
+Kada Kilo piše ili uređuje datoteku, on:
 
 1. Provjerava ekstenziju datoteke prema svim omogućenim formaterima.
 2. Pokreće odgovarajuću naredbu za formatiranje na datoteci.
@@ -51,11 +51,11 @@ Kada OpenCode piše ili uređuje datoteku, on:
 
 ## Konfiguriši
 
-Možete prilagoditi formatere kroz `formatter` odjeljak u vašoj OpenCode konfiguraciji.
+Možete prilagoditi formatere kroz `formatter` odjeljak u vašoj Kilo konfiguraciji.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "formatter": {}
 }
 ```
@@ -77,7 +77,7 @@ Da onemogućite **sve** formatere globalno, postavite `formatter` na `false`:
 
 ```json title="opencode.json" {3}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "formatter": false
 }
 ```
@@ -86,7 +86,7 @@ Da onemogućite **specifični** formater, postavite `disabled` na `true`:
 
 ```json title="opencode.json" {5}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "formatter": {
     "prettier": {
       "disabled": true
@@ -103,7 +103,7 @@ Možete nadjačati ugrađene formatere ili dodati nove navođenjem naredbe, vari
 
 ```json title="opencode.json" {4-14}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "formatter": {
     "prettier": {
       "command": ["npx", "prettier", "--write", "$FILE"],

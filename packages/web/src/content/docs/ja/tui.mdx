@@ -1,13 +1,13 @@
 ---
 title: トゥイ
-description: OpenCode terminal ユーザー インターフェイスの使用。
+description: Kilo terminal ユーザー インターフェイスの使用。
 ---
 
 import { Tabs, TabItem } from "@astrojs/starlight/components"
 
-OpenCode は、LLM を使用してプロジェクトを作業するための対話型terminal インターフェイスまたは TUI を提供します。
+Kilo は、LLM を使用してプロジェクトを作業するための対話型terminal インターフェイスまたは TUI を提供します。
 
-OpenCode を実行すると、現在のディレクトリの TUI が開始されます。
+Kilo を実行すると、現在のディレクトリの TUI が開始されます。
 
 ```bash
 opencode
@@ -57,7 +57,7 @@ How is auth handled in @packages/functions/src/api/index.ts?
 
 ## コマンド
 
-OpenCode TUI を使用する場合、「`/`」に続いてコマンド名を入力すると、アクションをすばやく実行できます。例えば：
+Kilo TUI を使用する場合、「`/`」に続いてコマンド名を入力すると、アクションをすばやく実行できます。例えば：
 
 ```bash frame="none"
 /help
@@ -71,7 +71,7 @@ OpenCode TUI を使用する場合、「`/`」に続いてコマンド名を入�
 
 ### 接続する
 
-OpenCode にプロバイダーを追加します。利用可能なプロバイダーから選択し、その API キーを追加できます。
+Kilo にプロバイダーを追加します。利用可能なプロバイダーから選択し、その API キーを追加できます。
 
 ```bash frame="none"
 /connect
@@ -117,7 +117,7 @@ OpenCode にプロバイダーを追加します。利用可能なプロバイ�
 
 ### 出口
 
-OpenCodeを終了します。 _エイリアス_: `/quit`、`/q`
+Kiloを終了します。 _エイリアス_: `/quit`、`/q`
 
 ```bash frame="none"
 /exit
@@ -352,11 +352,11 @@ VS Code などの一部のエディターは、`--wait` フラグを使用して
 
 ## 設定する
 
-OpenCode 構成ファイルを通じて TUI の動作をカスタマイズできます。
+Kilo 構成ファイルを通じて TUI の動作をカスタマイズできます。
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "tui": {
     "scroll_speed": 3,
     "scroll_acceleration": {

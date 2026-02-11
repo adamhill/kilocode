@@ -1,15 +1,15 @@
 ---
 title: Intro
-description: Kom godt i gang med OpenCode.
+description: Kom godt i gang med Kilo.
 ---
 
 import { Tabs, TabItem } from "@astrojs/starlight/components"
 import config from "../../../../config.mjs"
 export const console = config.console
 
-[**OpenCode**](/) er en open source AI-kodningsagent. Den er tilgængelig som en terminalbaseret grænseflade, desktop-app eller IDE-udvidelse.
+[**Kilo**](/) er en open source AI-kodningsagent. Den er tilgængelig som en terminalbaseret grænseflade, desktop-app eller IDE-udvidelse.
 
-![OpenCode TUI with the opencode theme](../../../assets/lander/screenshot.png)
+![Kilo TUI with the opencode theme](../../../assets/lander/screenshot.png)
 
 Lad os komme i gang.
 
@@ -17,7 +17,7 @@ Lad os komme i gang.
 
 #### Forudsætninger
 
-For at bruge OpenCode i din terminal skal du bruge:
+For at bruge Kilo i din terminal skal du bruge:
 
 1. En moderne terminalemulator som:
    - [WezTerm](https://wezterm.org), på tværs af platforme
@@ -31,10 +31,10 @@ For at bruge OpenCode i din terminal skal du bruge:
 
 ## Installationsprogram
 
-Den nemmeste måde at installere OpenCode på er gennem installationsscriptet.
+Den nemmeste måde at installere Kilo på er gennem installationsscriptet.
 
 ```bash
-curl -fsSL https://opencode.ai/install | bash
+curl -fsSL https://kilo.ai/install | bash
 ```
 
 Du kan også installere det med følgende kommandoer:
@@ -79,7 +79,7 @@ Du kan også installere det med følgende kommandoer:
   brew install anomalyco/tap/opencode
   ```
 
-  > Vi anbefaler at bruge OpenCode-tap for at få de mest opdaterede udgivelser. Den officielle `brew install opencode`-formel vedligeholdes af Homebrew-teamet og opdateret sjældnere.
+  > Vi anbefaler at bruge Kilo-tap for at få de mest opdaterede udgivelser. Den officielle `brew install opencode`-formel vedligeholdes af Homebrew-teamet og opdateret sjældnere.
 
 - **Brug af Paru på Arch Linux**
 
@@ -114,30 +114,30 @@ For at få den bedste oplevelse på Windows anbefaler vi at bruge [Windows Subsy
 - **Brug af Mise**
 
   ```bash
-  mise use -g github:anomalyco/opencode
+  mise use -g github:Kilo-Org/kilo
   ```
 
 - **Brug af Docker**
 
   ```bash
-  docker run -it --rm ghcr.io/anomalyco/opencode
+  docker run -it --rm ghcr.io/Kilo-Org/kilo
   ```
 
-Support til installation af OpenCode på Windows ved hjælp af Bun er i gang.
+Support til installation af Kilo på Windows ved hjælp af Bun er i gang.
 
-Du kan også få fat i binæren fra [Releases](https://github.com/anomalyco/opencode/releases).
+Du kan også få fat i binæren fra [Releases](https://github.com/Kilo-Org/kilo/releases).
 
 ---
 
 ## Konfigurer
 
-Med OpenCode kan du bruge enhver LLM udbyder ved at konfigurere deres API-nøgler.
+Med Kilo kan du bruge enhver LLM udbyder ved at konfigurere deres API-nøgler.
 
 Hvis du er ny til at bruge LLM-udbydere, anbefaler vi at bruge [OpenCode Zen](/docs/zen).
-Det er en udvalgt liste over modeller, der er blevet testet og verificeret af OpenCode
+Det er en udvalgt liste over modeller, der er blevet testet og verificeret af Kilo
 holde.
 
-1. Kør kommandoen `/connect` i TUI, vælg opencode, og gå til [opencode.ai/auth](https://opencode.ai/auth).
+1. Kør kommandoen `/connect` i TUI, vælg opencode, og gå til [kilo.ai/auth](https://kilo.ai/auth).
 
    ```txt
    /connect
@@ -167,33 +167,33 @@ du vil arbejde på.
 cd /path/to/project
 ```
 
-Og kør OpenCode.
+Og kør Kilo.
 
 ```bash
 opencode
 ```
 
-Derefter initialiseres OpenCode for projektet ved at køre følgende kommando.
+Derefter initialiseres Kilo for projektet ved at køre følgende kommando.
 
 ```bash frame="none"
 /init
 ```
 
-Dette får OpenCode til at analysere dit projekt og oprette en `AGENTS.md` fil i
+Dette får Kilo til at analysere dit projekt og oprette en `AGENTS.md` fil i
 projektets rod.
 
 :::tip
 Du bør overgive dit projekter `AGENTS.md` fil til Git.
 :::
 
-Dette hjælper OpenCode med at forstå projektstrukturen og kodningsmønstrene
+Dette hjælper Kilo med at forstå projektstrukturen og kodningsmønstrene
 brugt.
 
 ---
 
 ## Brug
 
-Du er nu klar til at bruge OpenCode til at arbejde på dit projekt. Spørg det gerne
+Du er nu klar til at bruge Kilo til at arbejde på dit projekt. Spørg det gerne
 noget!
 
 Hvis du er ny til at bruge en AI-kodningsagent, er her nogle eksempler, der evt
@@ -203,7 +203,7 @@ hjælp.
 
 ### Stil spørgsmål
 
-Du kan bede OpenCode om at forklare kodebasen for dig.
+Du kan bede Kilo om at forklare kodebasen for dig.
 
 :::tip
 Brug `@`-tasten til at søge efter filer i projektet.
@@ -219,11 +219,11 @@ Dette er nyttigt, hvis der er en del af kodebasen, som du ikke har arbejdet på.
 
 ### Tilføj funktioner
 
-Du kan bede OpenCode om at tilføje nye funktioner til dit projekt. Selvom vi først anbefaler, at du beder den om at lave en plan.
+Du kan bede Kilo om at tilføje nye funktioner til dit projekt. Selvom vi først anbefaler, at du beder den om at lave en plan.
 
 1. **Opret en plan**
 
-   OpenCode har en _Plan mode_, der deaktiverer dens evne til at foretage ændringer og
+   Kilo har en _Plan mode_, der deaktiverer dens evne til at foretage ændringer og
    foreslå i stedet _hvordan_ det vil implementere funktionen.
 
    Skift til det ved hjælp af **Tab**-tasten. Du vil se en indikator for dette i nederste højre hjørne.
@@ -240,11 +240,11 @@ Du kan bede OpenCode om at tilføje nye funktioner til dit projekt. Selvom vi f�
    From this screen, the user can undelete a note or permanently delete it.
    ```
 
-   Du vil give OpenCode nok detaljer til at forstå, hvad du ønsker. Det hjælper
+   Du vil give Kilo nok detaljer til at forstå, hvad du ønsker. Det hjælper
    at tale med det, som om du taler med en juniorudvikler på dit team.
 
 :::tip
-Giv OpenCode masser af kontekst og eksempler for at hjælpe den med at forstå, hvad du
+Giv Kilo masser af kontekst og eksempler for at hjælpe den med at forstå, hvad du
 ønsker.
 :::
 
@@ -261,7 +261,7 @@ Giv OpenCode masser af kontekst og eksempler for at hjælpe den med at forstå, 
 Træk og slip billeder i terminalen for at tilføje dem til prompten.
 :::
 
-OpenCode kan scanne alle billeder, du giver dem og tilføje dem til prompten. Det kan du
+Kilo kan scanne alle billeder, du giver dem og tilføje dem til prompten. Det kan du
 gør dette ved at trække og slippe et billede ind i terminalen.
 
 3. **Byg funktionen**
@@ -283,7 +283,7 @@ gør dette ved at trække og slippe et billede ind i terminalen.
 
 ### Foretag ændringer
 
-For mere ligetil ændringer kan du bede OpenCode om at bygge den direkte
+For mere ligetil ændringer kan du bede Kilo om at bygge den direkte
 uden at skulle gennemgå planen først.
 
 ```txt frame="none" "@packages/functions/src/settings.ts" "@packages/functions/src/notes.ts"
@@ -292,14 +292,14 @@ handled in the /notes route in @packages/functions/src/notes.ts and implement
 the same logic in @packages/functions/src/settings.ts
 ```
 
-Du vil sikre dig, at du giver en god mængde detaljer, så OpenCode gør det rigtige
+Du vil sikre dig, at du giver en god mængde detaljer, så Kilo gør det rigtige
 ændringer.
 
 ---
 
 ### Fortryd ændringer
 
-Lad os sige, at du beder OpenCode om at foretage nogle ændringer.
+Lad os sige, at du beder Kilo om at foretage nogle ændringer.
 
 ```txt frame="none" "@packages/functions/src/api/index.ts"
 Can you refactor the function in @packages/functions/src/api/index.ts?
@@ -312,14 +312,14 @@ ved hjælp af kommandoen `/undo`.
 /undo
 ```
 
-OpenCode vil nu vende tilbage til ændringerne, du har foretaget, og vise din oprindelige besked
+Kilo vil nu vende tilbage til ændringerne, du har foretaget, og vise din oprindelige besked
 igen.
 
 ```txt frame="none" "@packages/functions/src/api/index.ts"
 Can you refactor the function in @packages/functions/src/api/index.ts?
 ```
 
-Herfra kan du justere prompten og bede OpenCode om at prøve igen.
+Herfra kan du justere prompten og bede Kilo om at prøve igen.
 
 :::tip
 Du kan køre `/undo` flere gange for at fortryde flere ændringer.
@@ -335,7 +335,7 @@ Eller du **kan gentage** ændringerne ved hjælp af kommandoen `/redo`.
 
 ## Del
 
-De samtaler, du har med OpenCode, kan [deles med din
+De samtaler, du har med Kilo, kan [deles med din
 team](/docs/share).
 
 ```bash frame="none"
@@ -348,12 +348,12 @@ Dette vil oprette et link til den aktuelle samtale og kopiere det til denne udkl
 Samtaler dele ikke som standard.
 :::
 
-Her er en [eksempelsamtale](https://opencode.ai/s/4XP1fce5) med OpenCode.
+Her er en [eksempelsamtale](https://kilo.ai/s/4XP1fce5) med Kilo.
 
 ---
 
 ## Tilpas
 
-Og det er det! Du er nu en professionel i at bruge OpenCode.
+Og det er det! Du er nu en professionel i at bruge Kilo.
 
-For at gøre det til dit eget, anbefaler vi [picking a theme](/docs/themes), [customizing the keybinds](/docs/keybinds), [configuring code formatters](/docs/formatters), [creating custom commands](/docs/commands) eller at lege med [OpenCode config](/docs/config).
+For at gøre det til dit eget, anbefaler vi [picking a theme](/docs/themes), [customizing the keybinds](/docs/keybinds), [configuring code formatters](/docs/formatters), [creating custom commands](/docs/commands) eller at lege med [Kilo config](/docs/config).

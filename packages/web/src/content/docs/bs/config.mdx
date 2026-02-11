@@ -1,19 +1,19 @@
 ---
 title: Config
-description: Korištenje OpenCode JSON konfiguracije.
+description: Korištenje Kilo JSON konfiguracije.
 ---
 
-Možete konfigurirati OpenCode koristeći JSON konfiguracijski fajl.
+Možete konfigurirati Kilo koristeći JSON konfiguracijski fajl.
 
 ---
 
 ## Format
 
-OpenCode podržava i **JSON** i **JSONC** (JSON sa komentarima) formate.
+Kilo podržava i **JSON** i **JSONC** (JSON sa komentarima) formate.
 
 ```jsonc title="opencode.jsonc"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   // Theme configuration
   "theme": "opencode",
   "model": "anthropic/claude-sonnet-4-5",
@@ -99,7 +99,7 @@ Dodajte `opencode.json` u korijen projekta. Konfiguracija projekta ima najveći 
 :::tip
 Postavite specifičnu konfiguraciju projekta u korijen vašeg projekta.
 :::
-Kada se OpenCode pokrene, traži konfiguracijsku datoteku u trenutnom direktoriju ili prelazi do najbližeg Git direktorija.
+Kada se Kilo pokrene, traži konfiguracijsku datoteku u trenutnom direktoriju ili prelazi do najbližeg Git direktorija.
 Ovo je također sigurno provjeriti u Git i koristi istu shemu kao globalna.
 
 ---
@@ -135,7 +135,7 @@ Prilagođeni direktorij se učitava nakon direktorija globalne konfiguracije i `
 
 ## Shema
 
-Konfiguracijski fajl ima šemu koja je definirana u [**`opencode.ai/config.json`**](https://opencode.ai/config.json).
+Konfiguracijski fajl ima šemu koja je definirana u [**`kilo.ai/config.json`**](https://kilo.ai/config.json).
 Vaš uređivač bi trebao biti u mogućnosti da potvrdi i autodovršava na osnovu šeme.
 
 ---
@@ -146,7 +146,7 @@ Možete konfigurirati postavke specifične za TUI putem opcije `tui`.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "tui": {
     "scroll_speed": 3,
     "scroll_acceleration": {
@@ -168,11 +168,11 @@ Dostupne opcije:
 
 ### Server
 
-Možete konfigurirati postavke servera za komande `opencode serve` i `opencode web` putem opcije `server`.
+Možete konfigurirati postavke servera za komande `kilo serve` i `opencode web` putem opcije `server`.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "server": {
     "port": 4096,
     "hostname": "0.0.0.0",
@@ -187,7 +187,7 @@ Dostupne opcije:
 
 - `port` - Port za slušanje.
 - `hostname` - Ime hosta za slušanje. Kada je `mdns` omogućen i nije postavljeno ime hosta, podrazumevano je `0.0.0.0`.
-- `mdns` - Omogući otkrivanje mDNS usluge. Ovo omogućava drugim uređajima na mreži da otkriju vaš OpenCode server.
+- `mdns` - Omogući otkrivanje mDNS usluge. Ovo omogućava drugim uređajima na mreži da otkriju vaš Kilo server.
 - `mdnsDomain` - Prilagođeno ime domene za mDNS uslugu. Zadano je `opencode.local`. Korisno za pokretanje više instanci na istoj mreži.
 - `cors` - Dodatni izvori koji omogućavaju CORS kada koristite HTTP server iz klijenta baziranog na pretraživaču. Vrijednosti moraju biti punog porijekla (šema + host + opcijski port), npr. `https://app.example.com`.
   [Saznajte više o serveru](/docs/server) ovdje.
@@ -200,7 +200,7 @@ Možete upravljati alatima koje LLM može koristiti putem opcije `tools`.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "tools": {
     "write": false,
     "bash": false
@@ -214,23 +214,23 @@ Možete upravljati alatima koje LLM može koristiti putem opcije `tools`.
 
 ### Model
 
-Možete konfigurirati dobavljače i modele koje želite koristiti u svojoj OpenCode konfiguraciji kroz opcije `provider`, `model` i `small_model`.
+Možete konfigurirati dobavljače i modele koje želite koristiti u svojoj Kilo konfiguraciji kroz opcije `provider`, `model` i `small_model`.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {},
   "model": "anthropic/claude-sonnet-4-5",
   "small_model": "anthropic/claude-haiku-4-5"
 }
 ```
 
-Opcija `small_model` konfigurira poseban model za lagane zadatke poput generiranja naslova. Podrazumevano, OpenCode pokušava da koristi jeftiniji model ako je dostupan od vašeg provajdera, inače se vraća na vaš glavni model.
+Opcija `small_model` konfigurira poseban model za lagane zadatke poput generiranja naslova. Podrazumevano, Kilo pokušava da koristi jeftiniji model ako je dostupan od vašeg provajdera, inače se vraća na vaš glavni model.
 Opcije provajdera mogu uključivati ​​`timeout` i `setCacheKey`:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "anthropic": {
       "options": {
@@ -258,7 +258,7 @@ Amazon Bedrock podržava konfiguraciju specifičnu za AWS:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "amazon-bedrock": {
       "options": {
@@ -283,11 +283,11 @@ Amazon Bedrock podržava konfiguraciju specifičnu za AWS:
 
 ### Domaći
 
-Možete konfigurirati temu koju želite koristiti u svojoj OpenCode konfiguraciji putem opcije `theme`.
+Možete konfigurirati temu koju želite koristiti u svojoj Kilo konfiguraciji putem opcije `theme`.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "theme": ""
 }
 ```
@@ -302,7 +302,7 @@ Možete konfigurirati specijalizirane agente za određene zadatke putem opcije `
 
 ```jsonc title="opencode.jsonc"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "agent": {
     "code-reviewer": {
       "description": "Reviews code for best practices and potential issues",
@@ -328,12 +328,12 @@ Možete postaviti zadanog agenta koristeći opciju `default_agent`. Ovo određuj
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "default_agent": "plan"
 }
 ```
 
-Zadani agent mora biti primarni agent (ne podagent). Ovo može biti ugrađeni agent kao što je `"build"` ili `"plan"`, ili [prilagođeni agent](/docs/agents) koji ste definirali. Ako navedeni agent ne postoji ili je subagent, OpenCode će se vratiti na `"build"` s upozorenjem.
+Zadani agent mora biti primarni agent (ne podagent). Ovo može biti ugrađeni agent kao što je `"build"` ili `"plan"`, ili [prilagođeni agent](/docs/agents) koji ste definirali. Ako navedeni agent ne postoji ili je subagent, Kilo će se vratiti na `"build"` s upozorenjem.
 Ova postavka se primjenjuje na sva sučelja: TUI, CLI (`opencode run`), desktop aplikaciju i GitHub Action.
 
 ---
@@ -344,7 +344,7 @@ Možete konfigurirati funkciju [share](/docs/share) putem opcije `share`.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "share": "manual"
 }
 ```
@@ -364,7 +364,7 @@ Možete konfigurirati prilagođene komande za ponavljanje zadataka putem opcije 
 
 ```jsonc title="opencode.jsonc"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "command": {
     "test": {
       "template": "Run the full test suite with coverage report and show any failures.\nFocus on the failing tests and suggest fixes.",
@@ -390,7 +390,7 @@ Možete prilagoditi svoje veze ključeva putem opcije `keybinds`.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "keybinds": {}
 }
 ```
@@ -401,11 +401,11 @@ Možete prilagoditi svoje veze ključeva putem opcije `keybinds`.
 
 ### Automatsko ažuriranje
 
-OpenCode će automatski preuzeti sva nova ažuriranja kada se pokrene. Ovo možete onemogućiti opcijom `autoupdate`.
+Kilo će automatski preuzeti sva nova ažuriranja kada se pokrene. Ovo možete onemogućiti opcijom `autoupdate`.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "autoupdate": false
 }
 ```
@@ -421,7 +421,7 @@ Možete konfigurirati formatere koda putem opcije `formatter`.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "formatter": {
     "prettier": {
       "disabled": true
@@ -448,7 +448,7 @@ Na primjer, da osigurate da alati `edit` i `bash` zahtijevaju odobrenje korisnik
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "permission": {
     "edit": "ask",
     "bash": "ask"
@@ -466,7 +466,7 @@ Možete kontrolirati ponašanje sažimanja konteksta putem opcije `compaction`.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "compaction": {
     "auto": true,
     "prune": true
@@ -485,7 +485,7 @@ Možete konfigurirati obrasce ignoriranja promatrača datoteka putem opcije `wat
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "watcher": {
     "ignore": ["node_modules/**", "dist/**", ".git/**"]
   }
@@ -502,7 +502,7 @@ Možete konfigurirati MCP servere koje želite koristiti putem opcije `mcp`.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "mcp": {}
 }
 ```
@@ -513,12 +513,12 @@ Možete konfigurirati MCP servere koje želite koristiti putem opcije `mcp`.
 
 ### Extras
 
-[Plugins](/docs/plugins) proširuju OpenCode sa prilagođenim alatima, kukicama i integracijama.
+[Plugins](/docs/plugins) proširuju Kilo sa prilagođenim alatima, kukicama i integracijama.
 Postavite datoteke dodataka u `.opencode/plugins/` ili `~/.config/opencode/plugins/`. Također možete učitati dodatke iz npm-a preko opcije `plugin`.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "plugin": ["opencode-helicone-session", "@my-org/custom-plugin"]
 }
 ```
@@ -533,7 +533,7 @@ Možete konfigurirati upute za model koji koristite putem opcije `instructions`.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "instructions": ["CONTRIBUTING.md", "docs/guidelines.md", ".cursor/rules/*.md"]
 }
 ```
@@ -549,7 +549,7 @@ Možete onemogućiti dobavljače koji se automatski učitavaju preko opcije `dis
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "disabled_providers": ["openai", "gemini"]
 }
 ```
@@ -571,12 +571,12 @@ Možete odrediti listu dozvoljenih dobavljača putem opcije `enabled_providers`.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "enabled_providers": ["anthropic", "openai"]
 }
 ```
 
-Ovo je korisno kada želite da ograničite OpenCode da koristi samo određene provajdere umesto da ih onemogućavate jednog po jednog.
+Ovo je korisno kada želite da ograničite Kilo da koristi samo određene provajdere umesto da ih onemogućavate jednog po jednog.
 :::note
 `disabled_providers` ima prioritet nad `enabled_providers`.
 :::
@@ -590,7 +590,7 @@ Ključ `experimental` sadrži opcije koje su u aktivnom razvoju.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "experimental": {}
 }
 ```
@@ -613,7 +613,7 @@ Koristite `{env:VARIABLE_NAME}` za zamjenu varijabli okruženja:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "model": "{env:OPENCODE_MODEL}",
   "provider": {
     "anthropic": {
@@ -636,7 +636,7 @@ Koristite `{file:path/to/file}` da zamijenite sadržaj fajla:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "instructions": ["./custom-instructions.md"],
   "provider": {
     "openai": {

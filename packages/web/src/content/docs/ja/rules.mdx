@@ -67,7 +67,7 @@ opencode は、複数の場所からの `AGENTS.md` ファイルの読み取り�
 
 ### Claude Code Compatibility
 
-Claude Code から移行するユーザーのために、OpenCode はフォールバックとして Claude Code のファイル規則をサポートしています。
+Claude Code から移行するユーザーのために、Kilo はフォールバックとして Claude Code のファイル規則をサポートしています。
 
 - **プロジェクト ルール**: プロジェクト ディレクトリ内の `CLAUDE.md` (`AGENTS.md` が存在しない場合に使用されます)
 - **グローバル ルール**: `~/.claude/CLAUDE.md` (`~/.config/opencode/AGENTS.md` が存在しない場合に使用)
@@ -103,7 +103,7 @@ opencode が開始されると、次の順序でルール ファイルが検索�
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "instructions": ["CONTRIBUTING.md", "docs/guidelines.md", ".cursor/rules/*.md"]
 }
 ```
@@ -112,7 +112,7 @@ opencode が開始されると、次の順序でルール ファイルが検索�
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "instructions": ["https://raw.githubusercontent.com/my-org/shared-rules/main/style.md"]
 }
 ```
@@ -133,7 +133,7 @@ opencode は `AGENTS.md` のファイル参照を自動的に解析しません�
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "instructions": ["docs/development-standards.md", "test/testing-guidelines.md", "packages/*/AGENTS.md"]
 }
 ```

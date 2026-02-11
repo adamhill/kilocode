@@ -26,7 +26,7 @@ WSL, daha iyi dosya sistemi performansi, tam terminal destegi ve opencode'un day
    WSL hazir olduktan sonra WSL terminalini acin ve opencode'u [kurulum yontemlerinden](/docs/) biriyle yukleyin.
 
    ```bash
-   curl -fsSL https://opencode.ai/install | bash
+   curl -fsSL https://kilo.ai/install | bash
    ```
 
 3. **opencode'u WSL icinden kullanin**
@@ -49,7 +49,7 @@ opencode Desktop kullanmak isteyip sunucuyu WSL'de calistirmak istiyorsaniz:
 1. **Sunucuyu WSL'de baslatin** ve dis baglantilara izin vermek icin `--hostname 0.0.0.0` kullanin:
 
    ```bash
-   opencode serve --hostname 0.0.0.0 --port 4096
+   kilo serve --hostname 0.0.0.0 --port 4096
    ```
 
 2. **Desktop uygulamasini** `http://localhost:4096` adresine baglayin
@@ -62,7 +62,7 @@ Kurulumunuzda `localhost` calismiyorsa bunun yerine WSL IP adresini kullanin (WS
 `--hostname 0.0.0.0` kullaniyorsaniz sunucuyu guvene almak icin `OPENCODE_SERVER_PASSWORD` ayarlayin.
 
 ```bash
-OPENCODE_SERVER_PASSWORD=your-password opencode serve --hostname 0.0.0.0
+OPENCODE_SERVER_PASSWORD=your-password kilo serve --hostname 0.0.0.0
 ```
 
 :::

@@ -35,7 +35,7 @@ opencode 在常规 GitLab 管道中工作。您可以将其构建为管道 [CI �
      - component: $CI_SERVER_FQDN/nagyv/gitlab-opencode/opencode@2
        inputs:
          config_dir: ${CI_PROJECT_DIR}/opencode-config
-         auth_json: $OPENCODE_AUTH_JSON # The variable name for your OpenCode authentication JSON
+         auth_json: $OPENCODE_AUTH_JSON # The variable name for your Kilo authentication JSON
          command: optional-custom-command
          message: "Your prompt here"
    ```
@@ -91,7 +91,7 @@ opencode 在您的 GitLab CI/CD 管道中运行，您需要进行以下设置：
       - apt-get install --yes glab
       - echo "Configuring glab"
       - echo $GITLAB_HOST
-      - echo "Creating OpenCode auth configuration"
+      - echo "Creating Kilo auth configuration"
       - mkdir --parents ~/.local/share/opencode
       - |
         cat > ~/.local/share/opencode/auth.json << EOF
@@ -104,10 +104,10 @@ opencode 在您的 GitLab CI/CD 管道中运行，您需要进行以下设置：
         EOF
       - echo "Configuring git"
       - git config --global user.email "opencode@gitlab.com"
-      - git config --global user.name "OpenCode"
+      - git config --global user.name "Kilo"
       - echo "Testing glab"
       - glab issue list
-      - echo "Running OpenCode"
+      - echo "Running Kilo"
       - |
         opencode run "
         You are an AI assistant helping with GitLab operations.

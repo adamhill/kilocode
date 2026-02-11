@@ -6,14 +6,14 @@ description: HTTP 経由でopencode サーバーと通信します。
 import config from "../../../../config.mjs"
 export const typesUrl = `${config.github}/blob/dev/packages/sdk/js/src/gen/types.gen.ts`
 
-`opencode serve` コマンドは、opencode クライアントが使用できる OpenAPI エンドポイントを公開するヘッドレス HTTP サーバーを実行します。
+`kilo serve` コマンドは、opencode クライアントが使用できる OpenAPI エンドポイントを公開するヘッドレス HTTP サーバーを実行します。
 
 ---
 
 ### 使用法
 
 ```bash
-opencode serve [--port <number>] [--hostname <string>] [--cors <origin>]
+kilo serve [--port <number>] [--hostname <string>] [--cors <origin>]
 ```
 
 #### オプション
@@ -29,17 +29,17 @@ opencode serve [--port <number>] [--hostname <string>] [--cors <origin>]
 `--cors` は複数回渡すことができます。
 
 ```bash
-opencode serve --cors http://localhost:5173 --cors https://app.example.com
+kilo serve --cors http://localhost:5173 --cors https://app.example.com
 ```
 
 ---
 
 ### 認証
 
-HTTP 基本認証でサーバーを保護するには、`OPENCODE_SERVER_PASSWORD` を設定します。ユーザー名はデフォルトで `opencode` になるか、`OPENCODE_SERVER_USERNAME` を設定してオーバーライドします。これは、`opencode serve` と `opencode web` の両方に当てはまります。
+HTTP 基本認証でサーバーを保護するには、`OPENCODE_SERVER_PASSWORD` を設定します。ユーザー名はデフォルトで `opencode` になるか、`OPENCODE_SERVER_USERNAME` を設定してオーバーライドします。これは、`kilo serve` と `opencode web` の両方に当てはまります。
 
 ```bash
-OPENCODE_SERVER_PASSWORD=your-password opencode serve
+OPENCODE_SERVER_PASSWORD=your-password kilo serve
 ```
 
 ---
@@ -55,8 +55,8 @@ opencode サーバーを使用して、プログラムで opencode と対話し�
 :::
 This
 
-`opencode serve` を実行してスタンドアロン サーバーを起動できます。持っている場合は、
-opencode TUI を実行すると、`opencode serve` が新しいサーバーを起動します。
+`kilo serve` を実行してスタンドアロン サーバーを起動できます。持っている場合は、
+opencode TUI を実行すると、`kilo serve` が新しいサーバーを起動します。
 
 ---
 
@@ -64,7 +64,7 @@ opencode TUI を実行すると、`opencode serve` が新しいサーバーを�
 
 TUI を起動すると、ポートとホスト名がランダムに割り当てられます。代わりに、`--hostname` と `--port` [flags](/docs/cli).次に、これを使用してサーバーに接続します。
 
-[`/tui`](#tui) エンドポイントは、サーバー経由で TUI を駆動するために使用できます。たとえば、プロンプトを事前入力したり、実行したりできます。この設定は、OpenCode [IDE](/docs/ide) プラグイン] によって使用されます。
+[`/tui`](#tui) エンドポイントは、サーバー経由で TUI を駆動するために使用できます。たとえば、プロンプトを事前入力したり、実行したりできます。この設定は、Kilo [IDE](/docs/ide) プラグイン] によって使用されます。
 
 ---
 

@@ -15,7 +15,7 @@ description: Configure and use specialized agents.
 
 ## 유형
 
-OpenCode의 두 가지 유형이 있습니다; 기본 에이전트와 subagents.
+Kilo의 두 가지 유형이 있습니다; 기본 에이전트와 subagents.
 
 ---
 
@@ -27,7 +27,7 @@ OpenCode의 두 가지 유형이 있습니다; 기본 에이전트와 subagents.
 세션 중에 기본 에이전트를 전환하는 **Tab** 키를 사용할 수 있습니다.
 :::
 
-OpenCode는 두 개의 내장 기본 에이전트, **Build** 및 **Plan**와 함께 제공됩니다. 우리는
+Kilo는 두 개의 내장 기본 에이전트, **Build** 및 **Plan**와 함께 제공됩니다. 우리는
 아래에서 보기.
 
 ---
@@ -36,13 +36,13 @@ OpenCode는 두 개의 내장 기본 에이전트, **Build** 및 **Plan**와 함
 
 Subagents는 기본 에이전트가 특정 작업을 위해 호출 할 수있는 전문 보조입니다. 또한 수동으로 그들을 호출 할 수 있습니다 ** @ 언급 ** 메시지에서 그들.
 
-OpenCode는 두 개의 내장 subagents, **General** 및 **Explore**. 아래에서 볼 수 있습니다.
+Kilo는 두 개의 내장 subagents, **General** 및 **Explore**. 아래에서 볼 수 있습니다.
 
 ---
 
 ## 내장
 
-OpenCode는 기본 에이전트와 두 개의 내장 subagents로 제공됩니다.
+Kilo는 기본 에이전트와 두 개의 내장 subagents로 제공됩니다.
 
 ---
 
@@ -140,7 +140,7 @@ _모드_: `primary`
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "agent": {
     "build": {
       "mode": "primary",
@@ -368,7 +368,7 @@ opencode config의 모델 ID는 `provider/model-id` 형식을 사용합니다. �
 
 ```json title="opencode.json" {3-6,9-12}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "tools": {
     "write": true,
     "bash": true
@@ -392,7 +392,7 @@ opencode config의 모델 ID는 `provider/model-id` 형식을 사용합니다. �
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "agent": {
     "readonly": {
       "tools": {
@@ -419,7 +419,7 @@ opencode config의 모델 ID는 `provider/model-id` 형식을 사용합니다. �
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "permission": {
     "edit": "deny"
   }
@@ -430,7 +430,7 @@ opencode config의 모델 ID는 `provider/model-id` 형식을 사용합니다. �
 
 ```json title="opencode.json" {3-5,8-10}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "permission": {
     "edit": "deny"
   },
@@ -467,7 +467,7 @@ Only analyze code and suggest changes.
 
 ```json title="opencode.json" {7}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "agent": {
     "build": {
       "permission": {
@@ -485,7 +485,7 @@ Only analyze code and suggest changes.
 
 ```json title="opencode.json" {7}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "agent": {
     "build": {
       "permission": {
@@ -503,7 +503,7 @@ Only analyze code and suggest changes.
 
 ```json title="opencode.json" {8}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "agent": {
     "build": {
       "permission": {
@@ -696,7 +696,7 @@ opencode agent create
 여기에 유용 할 수있는 몇 가지 예 에이전트가 있습니다.
 
 :::tip
-당신은 공유하고 싶은 에이전트이 있습니까? [PR](https://github.com/anomalyco/opencode).
+당신은 공유하고 싶은 에이전트이 있습니까? [PR](https://github.com/Kilo-Org/kilo).
 :::
 
 ---

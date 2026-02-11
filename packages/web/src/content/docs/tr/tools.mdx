@@ -15,7 +15,7 @@ Arac davranisini kontrol etmek icin `permission` alanini kullanin. Her arac icin
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "permission": {
     "edit": "deny",
     "bash": "ask",
@@ -28,7 +28,7 @@ Birden fazla araci ayni anda kontrol etmek icin wildcard da kullanabilirsiniz. O
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "permission": {
     "mymcp_*": "ask"
   }
@@ -51,7 +51,7 @@ Proje ortaminizda kabuk komutlari calistirir.
 
 ```json title="opencode.json" {4}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "permission": {
     "bash": "allow"
   }
@@ -68,7 +68,7 @@ Birebir metin degistirme ile mevcut dosyalari duzenler.
 
 ```json title="opencode.json" {4}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "permission": {
     "edit": "allow"
   }
@@ -85,7 +85,7 @@ Yeni dosyalar olusturur veya mevcut dosyalari uzerine yazar.
 
 ```json title="opencode.json" {4}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "permission": {
     "edit": "allow"
   }
@@ -106,7 +106,7 @@ Kod tabaninizdan dosya icerigi okur.
 
 ```json title="opencode.json" {4}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "permission": {
     "read": "allow"
   }
@@ -123,7 +123,7 @@ Duzensiz ifadelerle dosya iceriginde arama yapar.
 
 ```json title="opencode.json" {4}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "permission": {
     "grep": "allow"
   }
@@ -140,7 +140,7 @@ Desen eslestirme ile dosya bulur.
 
 ```json title="opencode.json" {4}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "permission": {
     "glob": "allow"
   }
@@ -157,7 +157,7 @@ Verilen yoldaki dosya ve dizinleri listeler.
 
 ```json title="opencode.json" {4}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "permission": {
     "list": "allow"
   }
@@ -178,7 +178,7 @@ Bu arac yalnizca `OPENCODE_EXPERIMENTAL_LSP_TOOL=true` (veya `OPENCODE_EXPERIMEN
 
 ```json title="opencode.json" {4}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "permission": {
     "lsp": "allow"
   }
@@ -197,7 +197,7 @@ Dosyalara patch uygular.
 
 ```json title="opencode.json" {4}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "permission": {
     "edit": "allow"
   }
@@ -218,7 +218,7 @@ Bir [skill](/docs/skills) (`SKILL.md` dosyasi) yukler ve icerigini konusmaya don
 
 ```json title="opencode.json" {4}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "permission": {
     "skill": "allow"
   }
@@ -233,7 +233,7 @@ Kodlama oturumlarinda yapilacaklar listesini yonetir.
 
 ```json title="opencode.json" {4}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "permission": {
     "todowrite": "allow"
   }
@@ -254,7 +254,7 @@ Mevcut yapilacaklar listesini okur.
 
 ```json title="opencode.json" {4}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "permission": {
     "todoread": "allow"
   }
@@ -275,7 +275,7 @@ Web icerigi getirir.
 
 ```json title="opencode.json" {4}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "permission": {
     "webfetch": "allow"
   }
@@ -303,7 +303,7 @@ OPENCODE_ENABLE_EXA=1 opencode
 
 ```json title="opencode.json" {4}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "permission": {
     "websearch": "allow"
   }
@@ -326,7 +326,7 @@ Calisma sirasinda kullaniciya soru sorar.
 
 ```json title="opencode.json" {4}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "permission": {
     "question": "allow"
   }

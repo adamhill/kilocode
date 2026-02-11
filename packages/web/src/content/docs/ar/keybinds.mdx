@@ -3,11 +3,11 @@ title: اختصارات لوحة المفاتيح
 description: خصّص اختصارات لوحة المفاتيح.
 ---
 
-يوفّر OpenCode قائمة باختصارات لوحة المفاتيح يمكنك تخصيصها عبر إعدادات OpenCode.
+يوفّر Kilo قائمة باختصارات لوحة المفاتيح يمكنك تخصيصها عبر إعدادات Kilo.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "keybinds": {
     "leader": "ctrl+x",
     "app_exit": "ctrl+c,ctrl+d,<leader>q",
@@ -107,7 +107,7 @@ description: خصّص اختصارات لوحة المفاتيح.
 
 ## مفتاح القائد
 
-يستخدم OpenCode مفتاح `leader` لمعظم اختصارات لوحة المفاتيح. يساعد ذلك على تجنّب التعارضات في terminal لديك.
+يستخدم Kilo مفتاح `leader` لمعظم اختصارات لوحة المفاتيح. يساعد ذلك على تجنّب التعارضات في terminal لديك.
 
 افتراضيا، يكون `ctrl+x` هو مفتاح القائد، وتتطلّب معظم الإجراءات أن تضغط أولا مفتاح القائد ثم الاختصار. على سبيل المثال، لبدء جلسة جديدة اضغط `ctrl+x` أولا ثم اضغط `n`.
 
@@ -121,7 +121,7 @@ description: خصّص اختصارات لوحة المفاتيح.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "keybinds": {
     "session_compact": "none"
   }

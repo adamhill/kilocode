@@ -6,14 +6,14 @@ description: 通過 HTTP 與 opencode 服務器交互。
 import config from "../../../../config.mjs"
 export const typesUrl = `${config.github}/blob/dev/packages/sdk/js/src/gen/types.gen.ts`
 
-`opencode serve` 命令運行一個無頭 HTTP 服務器，該服務器公開opencode客戶端可以使用的 OpenAPI 端點。
+`kilo serve` 命令運行一個無頭 HTTP 服務器，該服務器公開opencode客戶端可以使用的 OpenAPI 端點。
 
 ---
 
 ### 用法
 
 ```bash
-opencode serve [--port <number>] [--hostname <string>] [--cors <origin>]
+kilo serve [--port <number>] [--hostname <string>] [--cors <origin>]
 ```
 
 #### 選項
@@ -29,17 +29,17 @@ opencode serve [--port <number>] [--hostname <string>] [--cors <origin>]
 `--cors` 可以多次傳遞：
 
 ```bash
-opencode serve --cors http://localhost:5173 --cors https://app.example.com
+kilo serve --cors http://localhost:5173 --cors https://app.example.com
 ```
 
 ---
 
 ### 驗證
 
-設置`OPENCODE_SERVER_PASSWORD`以使用HTTP基本身份驗證保護服務器。用戶名默認為`opencode`，或設置`OPENCODE_SERVER_USERNAME`來覆蓋它。這適用於`opencode serve` 和`opencode web`。
+設置`OPENCODE_SERVER_PASSWORD`以使用HTTP基本身份驗證保護服務器。用戶名默認為`opencode`，或設置`OPENCODE_SERVER_USERNAME`來覆蓋它。這適用於`kilo serve` 和`opencode web`。
 
 ```bash
-OPENCODE_SERVER_PASSWORD=your-password opencode serve
+OPENCODE_SERVER_PASSWORD=your-password kilo serve
 ```
 
 ---
@@ -56,8 +56,8 @@ OPENCODE_SERVER_PASSWORD=your-password opencode serve
 
 此架構讓 opencode 支持多個客戶端，並允許您以編程方式與 opencode 進行交互。
 
-您可以運行 `opencode serve` 來啟動獨立服務器。如果您有
-opencode TUI 運行，`opencode serve` 將啟動一個新服務器。
+您可以運行 `kilo serve` 來啟動獨立服務器。如果您有
+opencode TUI 運行，`kilo serve` 將啟動一個新服務器。
 
 ---
 

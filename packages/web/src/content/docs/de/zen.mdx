@@ -1,19 +1,19 @@
 ---
 title: Zen
-description: Kuratierte Modellliste direkt von OpenCode.
+description: Kuratierte Modellliste direkt von Kilo.
 ---
 
 import config from "../../../../config.mjs"
 export const console = config.console
 export const email = `mailto:${config.email}`
 
-OpenCode Zen ist eine vom OpenCode-Team getestete und verifizierte Modellliste.
+OpenCode Zen ist eine vom Kilo-Team getestete und verifizierte Modellliste.
 
 :::note
 OpenCode Zen befindet sich aktuell in der Beta.
 :::
 
-Zen funktioniert wie jeder andere Provider in OpenCode.
+Zen funktioniert wie jeder andere Provider in Kilo.
 Du meldest dich bei OpenCode Zen an, holst dir deinen API-Key und nutzt ihn optional.
 
 ---
@@ -24,7 +24,7 @@ Es gibt sehr viele Modelle, aber nur ein Teil davon eignet sich wirklich gut als
 Ausserdem konfigurieren Provider Modelle sehr unterschiedlich, was die Qualitaet stark beeinflusst.
 
 :::tip
-Wir haben eine Auswahl aus Modellen und Providern getestet, die gut mit OpenCode funktionieren.
+Wir haben eine Auswahl aus Modellen und Providern getestet, die gut mit Kilo funktionieren.
 :::
 
 Wenn du Modelle ueber Gateways wie OpenRouter nutzt, ist oft unklar, ob du die beste Ausfuehrung eines Modells bekommst.
@@ -41,7 +41,7 @@ OpenCode Zen ist ein AI-Gateway, das dir Zugriff auf genau diese Modelle gibt.
 
 ## How it works
 
-OpenCode Zen funktioniert wie jeder andere Provider in OpenCode.
+OpenCode Zen funktioniert wie jeder andere Provider in Kilo.
 
 1. Melde dich bei **<a href={console}>OpenCode Zen</a>** an, hinterlege Zahlungsdaten und kopiere deinen API-Key.
 2. Fuehre in der TUI `/connect` aus, waehle OpenCode Zen und fuege den API-Key ein.
@@ -87,7 +87,7 @@ Du kannst unsere Modelle auch ueber die folgenden API-Endpunkte aufrufen.
 | Qwen3 Coder 480B   | qwen3-coder        | `https://opencode.ai/zen/v1/chat/completions`      | `@ai-sdk/openai-compatible` |
 | Big Pickle         | big-pickle         | `https://opencode.ai/zen/v1/chat/completions`      | `@ai-sdk/openai-compatible` |
 
-Die [Model-ID](/docs/config/#models) in deiner OpenCode-Konfiguration hat das Format `opencode/<model-id>`.
+Die [Model-ID](/docs/config/#models) in deiner Kilo-Konfiguration hat das Format `opencode/<model-id>`.
 Fuer GPT 5.2 Codex verwendest du zum Beispiel `opencode/gpt-5.2-codex`.
 
 ---
@@ -244,4 +244,4 @@ Wir haben OpenCode Zen entwickelt, um:
 1. Die besten Modell/Provider-Kombinationen fuer Coding-Agenten zu **benchmarken**
 2. Stets **hohe Qualitaet** ohne Downgrades oder versteckte Umleitungen auf billigere Provider zu liefern
 3. **Preissenkungen** zum Selbstkostenpreis weiterzugeben, mit Aufschlag nur fuer Zahlungsgebuehren
-4. **Kein Lock-in** zu erzwingen, damit du Zen mit anderen Coding-Agents und OpenCode weiter mit anderen Providern nutzen kannst
+4. **Kein Lock-in** zu erzwingen, damit du Zen mit anderen Coding-Agents und Kilo weiter mit anderen Providern nutzen kannst

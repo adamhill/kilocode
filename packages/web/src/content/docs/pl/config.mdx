@@ -13,7 +13,7 @@ opencode obsługa formaty **JSON** i **JSONC** (JSON z komentarzami).
 
 ```jsonc title="opencode.jsonc"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   // Theme configuration
   "theme": "opencode",
   "model": "anthropic/claude-sonnet-4-5",
@@ -146,7 +146,7 @@ Katalog niestandardowy jest ładowany po katalogach global config i `.opencode`,
 
 ## Schemat
 
-Plik konfiguracyjny ma schemat końcowy w [**`opencode.ai/config.json`**](https://opencode.ai/config.json).
+Plik konfiguracyjny ma schemat końcowy w [**`kilo.ai/config.json`**](https://kilo.ai/config.json).
 
 Twój edytor powinien mieć możliwość sprawdzania poprawności i autouzupełniania na podstawie schematu.
 
@@ -158,7 +158,7 @@ Możliwość podłączenia urządzenia dla TUI za pomocą opcji `tui`.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "tui": {
     "scroll_speed": 3,
     "scroll_acceleration": {
@@ -181,11 +181,11 @@ Dostępna opcja:
 
 ### Serwer
 
-Możliwość ustawienia serwera dla źródeł `opencode serve` i `opencode web` za pomocą opcji `server`.
+Możliwość ustawienia serwera dla źródeł `kilo serve` i `opencode web` za pomocą opcji `server`.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "server": {
     "port": 4096,
     "hostname": "0.0.0.0",
@@ -214,7 +214,7 @@ Dostępne narzędzia, z których można korzystać LLM, dostęp do opcji `tools`
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "tools": {
     "write": false,
     "bash": false
@@ -232,7 +232,7 @@ Możesz mieć dostawców i modele, które chcesz mieć w konfiguracji opencode, 
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {},
   "model": "anthropic/claude-sonnet-4-5",
   "small_model": "anthropic/claude-haiku-4-5"
@@ -245,7 +245,7 @@ Opcje dostawcy mogą być zainstalowane `timeout` i `setCacheKey`:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "anthropic": {
       "options": {
@@ -274,7 +274,7 @@ Amazon Bedrock umożliwia podłączenie wyłącznika dla AWS:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "provider": {
     "amazon-bedrock": {
       "options": {
@@ -305,7 +305,7 @@ Urządzenie zachęcające do korzystania z urządzeń opencode, za pomocą sieci
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "theme": ""
 }
 ```
@@ -320,7 +320,7 @@ Możliwość dostępności agentów do gniazd za pomocą opcji `agent`.
 
 ```jsonc title="opencode.jsonc"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "agent": {
     "code-reviewer": {
       "description": "Reviews code for best practices and potential issues",
@@ -346,7 +346,7 @@ Domyślnego agenta można ustawić za pomocą opcji `default_agent`. Wykrywacz, 
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "default_agent": "plan"
 }
 ```
@@ -363,7 +363,7 @@ Możesz udostępnić [udostępnij](/docs/share) za pomocą opcji `share`.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "share": "manual"
 }
 ```
@@ -384,7 +384,7 @@ Możesz korzystać z usług polecanych dla powtarzalnych zadań za pomocą opcji
 
 ```jsonc title="opencode.jsonc"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "command": {
     "test": {
       "template": "Run the full test suite with coverage report and show any failures.\nFocus on the failing tests and suggest fixes.",
@@ -410,7 +410,7 @@ Możliwość zmiany skrótu klawiszowego za pomocą opcji `keybinds`.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "keybinds": {}
 }
 ```
@@ -425,7 +425,7 @@ opencode automatycznie pobierze każde nowe uruchomienie. Można skorzystać z o
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "autoupdate": false
 }
 ```
@@ -441,7 +441,7 @@ Można podać kod formacyjny za pomocą opcji `formatter`.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "formatter": {
     "prettier": {
       "disabled": true
@@ -469,7 +469,7 @@ Na przykład, aby można było wykryć, że narzędzie `edit` i `bash` wymaga zg
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "permission": {
     "edit": "ask",
     "bash": "ask"
@@ -487,7 +487,7 @@ Możesz kontrolować zachowanie zagęszczania kontekstu za pomocą opcji `compac
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "compaction": {
     "auto": true,
     "prune": true
@@ -506,7 +506,7 @@ Rejestracja wzorca plików za pomocą `watcher`.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "watcher": {
     "ignore": ["node_modules/**", "dist/**", ".git/**"]
   }
@@ -523,7 +523,7 @@ Dostęp do serwerów MCP, których chcesz używać, za pośrednictwem sieci `mcp
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "mcp": {}
 }
 ```
@@ -540,7 +540,7 @@ Pliki plików wtyczek w `.opencode/plugins/` lub `~/.config/opencode/plugins/`. 
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "plugin": ["opencode-helicone-session", "@my-org/custom-plugin"]
 }
 ```
@@ -555,7 +555,7 @@ Instrukcja dla modelu, w której można zastosować opcję `instructions`.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "instructions": ["CONTRIBUTING.md", "docs/guidelines.md", ".cursor/rules/*.md"]
 }
 ```
@@ -571,7 +571,7 @@ Zasilacz ładowany automatycznie za pomocą zasilacza `disabled_providers`. Jest
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "disabled_providers": ["openai", "gemini"]
 }
 ```
@@ -594,7 +594,7 @@ Można znaleźć dostawców za pomoc `enabled_providers`. Po ustawieniu włącze
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "enabled_providers": ["anthropic", "openai"]
 }
 ```
@@ -615,7 +615,7 @@ Klucz `experimental` zawiera opcje, które są początkiem rozwoju.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "experimental": {}
 }
 ```
@@ -638,7 +638,7 @@ zastosowanie `{env:VARIABLE_NAME}`, aby zakończyć zmiennego przebiegu:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "model": "{env:OPENCODE_MODEL}",
   "provider": {
     "anthropic": {
@@ -661,7 +661,7 @@ Jeżeli zmienna kontrolna nie jest skonfigurowana, należy zastosować do niej p
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://kilo.ai/config.json",
   "instructions": ["./custom-instructions.md"],
   "provider": {
     "openai": {

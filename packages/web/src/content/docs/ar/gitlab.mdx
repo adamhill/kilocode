@@ -1,33 +1,33 @@
 ---
 title: GitLab
-description: استخدم OpenCode في مشكلات GitLab وطلبات الدمج.
+description: استخدم Kilo في مشكلات GitLab وطلبات الدمج.
 ---
 
-يتكامل OpenCode مع سير عمل GitLab لديك عبر خط أنابيب GitLab CI/CD أو عبر GitLab Duo.
+يتكامل Kilo مع سير عمل GitLab لديك عبر خط أنابيب GitLab CI/CD أو عبر GitLab Duo.
 
-في كلتا الحالتين، سيعمل OpenCode على مشغّلات GitLab لديك.
+في كلتا الحالتين، سيعمل Kilo على مشغّلات GitLab لديك.
 
 ---
 
 ## GitLab CI
 
-يعمل OpenCode ضمن خط أنابيب GitLab عادي. يمكنك دمجه في الخط كمكوّن [CI](https://docs.gitlab.com/ee/ci/components/).
+يعمل Kilo ضمن خط أنابيب GitLab عادي. يمكنك دمجه في الخط كمكوّن [CI](https://docs.gitlab.com/ee/ci/components/).
 
-هنا نستخدم مكوّن CI/CD أنشأه المجتمع لـ OpenCode — [nagyv/gitlab-opencode](https://gitlab.com/nagyv/gitlab-opencode).
+هنا نستخدم مكوّن CI/CD أنشأه المجتمع لـ Kilo — [nagyv/gitlab-opencode](https://gitlab.com/nagyv/gitlab-opencode).
 
 ---
 
 ### الميزات
 
-- **استخدام إعدادات مخصّصة لكل مهمة**: يمكنك إعداد OpenCode باستخدام دليل إعدادات مخصّص، مثل `./config/#custom-directory`، لتفعيل الوظائف أو تعطيلها في كل تشغيل لـ OpenCode.
-- **إعداد بسيط**: يقوم مكوّن CI بإعداد OpenCode في الخلفية؛ كل ما عليك هو إنشاء إعدادات OpenCode والمطالبة (prompt) الأولية.
+- **استخدام إعدادات مخصّصة لكل مهمة**: يمكنك إعداد Kilo باستخدام دليل إعدادات مخصّص، مثل `./config/#custom-directory`، لتفعيل الوظائف أو تعطيلها في كل تشغيل لـ Kilo.
+- **إعداد بسيط**: يقوم مكوّن CI بإعداد Kilo في الخلفية؛ كل ما عليك هو إنشاء إعدادات Kilo والمطالبة (prompt) الأولية.
 - **مرن**: يدعم مكوّن CI عدة مُدخلات لتخصيص سلوكه.
 
 ---
 
 ### الإعداد
 
-1. احفظ JSON مصادقة OpenCode كمتغيرات بيئة CI من نوع File ضمن **Settings** > **CI/CD** > **Variables**. تأكد من تعيينها على "Masked and hidden".
+1. احفظ JSON مصادقة Kilo كمتغيرات بيئة CI من نوع File ضمن **Settings** > **CI/CD** > **Variables**. تأكد من تعيينها على "Masked and hidden".
 2. أضف ما يلي إلى ملف `.gitlab-ci.yml`.
 
    ```yaml title=".gitlab-ci.yml"
@@ -35,7 +35,7 @@ description: استخدم OpenCode في مشكلات GitLab وطلبات الد�
      - component: $CI_SERVER_FQDN/nagyv/gitlab-opencode/opencode@2
        inputs:
          config_dir: ${CI_PROJECT_DIR}/opencode-config
-         auth_json: $OPENCODE_AUTH_JSON # The variable name for your OpenCode authentication JSON
+         auth_json: $OPENCODE_AUTH_JSON # The variable name for your Kilo authentication JSON
          command: optional-custom-command
          message: "Your prompt here"
    ```
@@ -46,23 +46,23 @@ description: استخدم OpenCode في مشكلات GitLab وطلبات الد�
 
 ## GitLab Duo
 
-يتكامل OpenCode مع سير عمل GitLab لديك.
-اذكر `@opencode` في تعليق، وسينفّذ OpenCode المهام ضمن خط أنابيب GitLab CI لديك.
+يتكامل Kilo مع سير عمل GitLab لديك.
+اذكر `@opencode` في تعليق، وسينفّذ Kilo المهام ضمن خط أنابيب GitLab CI لديك.
 
 ---
 
 ### الميزات
 
-- **فرز المشكلات**: اطلب من OpenCode النظر في مشكلة وشرحها لك.
-- **الإصلاح والتنفيذ**: اطلب من OpenCode إصلاح مشكلة أو تنفيذ ميزة.
+- **فرز المشكلات**: اطلب من Kilo النظر في مشكلة وشرحها لك.
+- **الإصلاح والتنفيذ**: اطلب من Kilo إصلاح مشكلة أو تنفيذ ميزة.
   سيُنشئ فرعًا جديدًا ويرفع طلب دمج بالتغييرات.
-- **آمن**: يعمل OpenCode على مشغّلات GitLab لديك.
+- **آمن**: يعمل Kilo على مشغّلات GitLab لديك.
 
 ---
 
 ### الإعداد
 
-يعمل OpenCode ضمن خط أنابيب GitLab CI/CD لديك، وإليك ما ستحتاجه لإعداده:
+يعمل Kilo ضمن خط أنابيب GitLab CI/CD لديك، وإليك ما ستحتاجه لإعداده:
 
 :::tip
 اطّلع على [**وثائق GitLab**](https://docs.gitlab.com/user/duo_agent_platform/agent_assistant/) للحصول على تعليمات محدّثة.
@@ -91,7 +91,7 @@ description: استخدم OpenCode في مشكلات GitLab وطلبات الد�
       - apt-get install --yes glab
       - echo "Configuring glab"
       - echo $GITLAB_HOST
-      - echo "Creating OpenCode auth configuration"
+      - echo "Creating Kilo auth configuration"
       - mkdir --parents ~/.local/share/opencode
       - |
         cat > ~/.local/share/opencode/auth.json << EOF
@@ -104,10 +104,10 @@ description: استخدم OpenCode في مشكلات GitLab وطلبات الد�
         EOF
       - echo "Configuring git"
       - git config --global user.email "opencode@gitlab.com"
-      - git config --global user.name "OpenCode"
+      - git config --global user.name "Kilo"
       - echo "Testing glab"
       - glab issue list
-      - echo "Running OpenCode"
+      - echo "Running Kilo"
       - |
         opencode run "
         You are an AI assistant helping with GitLab operations.
@@ -158,7 +158,7 @@ description: استخدم OpenCode في مشكلات GitLab وطلبات الد�
 
 ### أمثلة
 
-فيما يلي بعض الأمثلة على كيفية استخدام OpenCode في GitLab.
+فيما يلي بعض الأمثلة على كيفية استخدام Kilo في GitLab.
 
 :::tip
 يمكنك ضبطه لاستخدام عبارة تشغيل مختلفة عن `@opencode`.
@@ -172,7 +172,7 @@ description: استخدم OpenCode في مشكلات GitLab وطلبات الد�
   @opencode explain this issue
   ```
 
-  سيقرأ OpenCode المشكلة ويرد بشرح واضح.
+  سيقرأ Kilo المشكلة ويرد بشرح واضح.
 
 - **إصلاح مشكلة**
 
@@ -182,7 +182,7 @@ description: استخدم OpenCode في مشكلات GitLab وطلبات الد�
   @opencode fix this
   ```
 
-  سيُنشئ OpenCode فرعًا جديدًا، وينفّذ التغييرات، ويفتح طلب دمج بالتغييرات.
+  سيُنشئ Kilo فرعًا جديدًا، وينفّذ التغييرات، ويفتح طلب دمج بالتغييرات.
 
 - **مراجعة طلبات الدمج**
 
@@ -192,4 +192,4 @@ description: استخدم OpenCode في مشكلات GitLab وطلبات الد�
   @opencode review this merge request
   ```
 
-  سيُراجع OpenCode طلب الدمج ويقدّم ملاحظات.
+  سيُراجع Kilo طلب الدمج ويقدّم ملاحظات.
