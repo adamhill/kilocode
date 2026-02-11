@@ -100,45 +100,59 @@ const Settings: Component<SettingsProps> = (props) => {
         </Tabs.List>
 
         <Tabs.Content value="providers">
+          <h3 data-slot="settings-content-title">Providers</h3>
           <ProvidersTab />
         </Tabs.Content>
         <Tabs.Content value="agentBehaviour">
+          <h3 data-slot="settings-content-title">Agent Behaviour</h3>
           <AgentBehaviourTab />
         </Tabs.Content>
         <Tabs.Content value="autoApprove">
+          <h3 data-slot="settings-content-title">Auto-Approve</h3>
           <AutoApproveTab />
         </Tabs.Content>
         <Tabs.Content value="browser">
+          <h3 data-slot="settings-content-title">Browser</h3>
           <BrowserTab />
         </Tabs.Content>
         <Tabs.Content value="checkpoints">
+          <h3 data-slot="settings-content-title">Checkpoints</h3>
           <CheckpointsTab />
         </Tabs.Content>
         <Tabs.Content value="display">
+          <h3 data-slot="settings-content-title">Display</h3>
           <DisplayTab />
         </Tabs.Content>
         <Tabs.Content value="autocomplete">
+          <h3 data-slot="settings-content-title">Autocomplete</h3>
           <AutocompleteTab />
         </Tabs.Content>
         <Tabs.Content value="notifications">
+          <h3 data-slot="settings-content-title">Notifications</h3>
           <NotificationsTab />
         </Tabs.Content>
         <Tabs.Content value="context">
+          <h3 data-slot="settings-content-title">Context</h3>
           <ContextTab />
         </Tabs.Content>
         <Tabs.Content value="terminal">
+          <h3 data-slot="settings-content-title">Terminal</h3>
           <TerminalTab />
         </Tabs.Content>
         <Tabs.Content value="prompts">
+          <h3 data-slot="settings-content-title">Prompts</h3>
           <PromptsTab />
         </Tabs.Content>
         <Tabs.Content value="experimental">
+          <h3 data-slot="settings-content-title">Experimental</h3>
           <ExperimentalTab />
         </Tabs.Content>
         <Tabs.Content value="language">
+          <h3 data-slot="settings-content-title">Language</h3>
           <LanguageTab />
         </Tabs.Content>
         <Tabs.Content value="aboutKiloCode">
+          <h3 data-slot="settings-content-title">About Kilo Code</h3>
           <AboutKiloCodeTab port={server.serverInfo()?.port ?? null} connectionState={server.connectionState()} />
         </Tabs.Content>
       </Tabs>

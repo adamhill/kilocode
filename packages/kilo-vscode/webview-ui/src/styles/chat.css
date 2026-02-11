@@ -407,6 +407,13 @@
   overflow: hidden;
 }
 
+[data-slot="settings-content-title"] {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 16px 0;
+  padding: 16px 16px 0;
+}
+
 /* ============================================
    Permission Dialog
    ============================================ */
