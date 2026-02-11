@@ -240,6 +240,11 @@ export interface SessionUpdatedMessage {
   session: SessionInfo
 }
 
+export interface SessionDeletedMessage {
+  type: "sessionDeleted"
+  sessionID: string
+}
+
 export interface MessagesLoadedMessage {
   type: "messagesLoaded"
   sessionID: string
@@ -310,6 +315,7 @@ export type ExtensionMessage =
   | TodoUpdatedMessage
   | SessionCreatedMessage
   | SessionUpdatedMessage
+  | SessionDeletedMessage
   | MessagesLoadedMessage
   | MessageCreatedMessage
   | SessionsLoadedMessage
@@ -405,6 +411,17 @@ export interface SetLanguageRequest {
   locale: string
 }
 
+export interface DeleteSessionRequest {
+  type: "deleteSession"
+  sessionID: string
+}
+
+export interface RenameSessionRequest {
+  type: "renameSession"
+  sessionID: string
+  title: string
+}
+
 export type WebviewMessage =
   | SendMessageRequest
   | AbortRequest
@@ -422,6 +439,8 @@ export type WebviewMessage =
   | CompactRequest
   | RequestAgentsMessage
   | SetLanguageRequest
+  | DeleteSessionRequest
+  | RenameSessionRequest
 
 // ============================================
 // VS Code API type
