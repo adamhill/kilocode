@@ -338,6 +338,7 @@
       "name": "kilo-code",
       "version": "0.0.1",
       "dependencies": {
+        "@kilocode/kilo-i18n": "workspace:*",
         "@kilocode/kilo-ui": "workspace:*",
         "@kilocode/sdk": "workspace:*",
         "eventsource": "^2.0.2",

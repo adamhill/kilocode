@@ -64,9 +64,12 @@ export class KiloProvider implements vscode.WebviewViewProvider {
 
     // Re-send ready so the webview can recover after refresh.
     if (serverInfo) {
+      const langConfig = vscode.workspace.getConfiguration("kilo-code.new")
       this.postMessage({
         type: "ready",
         serverInfo,
+        vscodeLanguage: vscode.env.language,
+        languageOverride: langConfig.get<string>("language"),
       })
     }
 
@@ -193,6 +196,11 @@ export class KiloProvider implements vscode.WebviewViewProvider {
         case "requestAgents":
           await this.fetchAndSendAgents()
           break
+        case "setLanguage":
+          await vscode.workspace
+            .getConfiguration("kilo-code.new")
+            .update("language", message.locale || undefined, vscode.ConfigurationTarget.Global)
+          break
       }
     })
   }
@@ -259,7 +267,13 @@ export class KiloProvider implements vscode.WebviewViewProvider {
       this.connectionState = this.connectionService.getConnectionState()
 
       if (serverInfo) {
-        this.postMessage({ type: "ready", serverInfo })
+        const langConfig = vscode.workspace.getConfiguration("kilo-code.new")
+        this.postMessage({
+          type: "ready",
+          serverInfo,
+          vscodeLanguage: vscode.env.language,
+          languageOverride: langConfig.get<string>("language"),
+        })
       }
 
       this.postMessage({ type: "connectionState", state: this.connectionState })

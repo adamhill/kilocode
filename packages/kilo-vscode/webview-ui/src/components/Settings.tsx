@@ -2,6 +2,7 @@ import { Component } from "solid-js"
 import { Button } from "@kilocode/kilo-ui/button"
 import { Icon } from "@kilocode/kilo-ui/icon"
 import { Tabs } from "@kilocode/kilo-ui/tabs"
+import { useLanguage } from "../context/language"
 import ProvidersTab from "./settings/ProvidersTab"
 import AgentBehaviourTab from "./settings/AgentBehaviourTab"
 import AutoApproveTab from "./settings/AutoApproveTab"
@@ -24,6 +25,7 @@ export interface SettingsProps {
 
 const Settings: Component<SettingsProps> = (props) => {
   const server = useServer()
+  const language = useLanguage()
 
   return (
     <div style={{ display: "flex", "flex-direction": "column", height: "100%" }}>
@@ -40,7 +42,7 @@ const Settings: Component<SettingsProps> = (props) => {
         <Button variant="ghost" size="small" onClick={() => props.onBack?.()} title="Done">
           <Icon name="arrow-left" />
         </Button>
-        <h2 style={{ "font-size": "16px", "font-weight": "600", margin: 0 }}>Settings</h2>
+        <h2 style={{ "font-size": "16px", "font-weight": "600", margin: 0 }}>{language.t("sidebar.settings")}</h2>
       </div>
 
       {/* Settings tabs */}
