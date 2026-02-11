@@ -112,7 +112,11 @@ export const MessageList: Component<MessageListProps> = (props) => {
       </div>
 
       <Show when={showScrollButton()}>
-        <button class="scroll-to-bottom-button" onClick={scrollToBottom} aria-label="Scroll to bottom">
+        <button
+          class="scroll-to-bottom-button"
+          onClick={scrollToBottom}
+          aria-label={language.t("session.messages.scrollToBottom")}
+        >
           ↓
         </button>
       </Show>
