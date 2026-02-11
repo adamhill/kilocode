@@ -213,7 +213,8 @@
       "name": "@kilocode/cli",
       "version": "1.0.14",
       "bin": {
-        "opencode": "./bin/opencode",
+        "kilo": "./bin/kilo",
+        "kilocode": "./bin/kilocode",
       },
       "dependencies": {
         "@actions/core": "1.11.1",
