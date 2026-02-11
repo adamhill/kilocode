@@ -1,5 +1,3 @@
-// kilocode_change - new file
-
 export function formatRelativeDate(iso: string): string {
   const now = Date.now()
   const then = new Date(iso).getTime()

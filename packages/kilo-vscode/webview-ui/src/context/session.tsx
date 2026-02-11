@@ -106,7 +106,6 @@ export const SessionProvider: ParentComponent = (props) => {
 
   // Session status
   const [status, setStatus] = createSignal<SessionStatus>("idle")
-  // kilocode_change - track whether messages are being loaded to avoid empty-state flash
   const [loading, setLoading] = createSignal(false)
 
   // Pending permissions
@@ -254,7 +253,6 @@ export const SessionProvider: ParentComponent = (props) => {
           handleSessionDeleted(message.sessionID)
           break
 
-        // kilocode_change - reset loading on backend errors to avoid stuck state
         case "error":
           setLoading(false)
           break
@@ -285,7 +283,7 @@ export const SessionProvider: ParentComponent = (props) => {
   }
 
   function handleMessagesLoaded(sessionID: string, messages: Message[]) {
-    setLoading(false) // kilocode_change
+    setLoading(false)
     setStore("messages", sessionID, messages)
 
     // Also extract parts from messages
@@ -524,7 +522,7 @@ export const SessionProvider: ParentComponent = (props) => {
     }
     setCurrentSessionID(id)
     setStatus("idle")
-    setLoading(true) // kilocode_change - suppress empty-state flash while messages load
+    setLoading(true)
     vscode.postMessage({ type: "loadMessages", sessionID: id })
   }
 
