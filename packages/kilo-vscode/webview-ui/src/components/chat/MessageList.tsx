@@ -93,7 +93,7 @@ export const MessageList: Component<MessageListProps> = (props) => {
   })
 
   const messages = () => session.messages()
-  const isEmpty = () => messages().length === 0
+  const isEmpty = () => messages().length === 0 && !session.loading()
 
   // 3 most recently created sessions (youngest first)
   const recent = createMemo(() =>
