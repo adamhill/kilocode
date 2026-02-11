@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
-  "name": "opencode",
+  "name": "@kilocode/kilo",
   "description": "AI-powered development tool",
   "private": true,
   "type": "module",
@@ -80,7 +80,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/anomalyco/opencode"
+    "url": "https://github.com/Kilo-Org/kilo"
   },
   "license": "MIT",
   "prettier": {
