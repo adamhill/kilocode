@@ -36,15 +36,15 @@ export const TaskHeader: Component = () => {
 
   return (
     <Show when={hasMessages()}>
-      <div class="task-header">
-        <div class="task-header-title" title={title()}>
+      <div data-component="task-header">
+        <div data-slot="task-header-title" title={title()}>
           {title()}
         </div>
-        <div class="task-header-stats">
+        <div data-slot="task-header-stats">
           <Show when={cost()}>
             {(c) => (
               <Tooltip value="Session cost" placement="bottom">
-                <span class="task-header-stat">{c()}</span>
+                <span>{c()}</span>
               </Tooltip>
             )}
           </Show>
@@ -54,7 +54,7 @@ export const TaskHeader: Component = () => {
                 value={ctx().pct ? `${ctx().tokens} tokens (${ctx().pct} of context)` : `${ctx().tokens} tokens`}
                 placement="bottom"
               >
-                <span class="task-header-stat">{ctx().pct ?? ctx().tokens}</span>
+                <span>{ctx().pct ?? ctx().tokens}</span>
               </Tooltip>
             )}
           </Show>

@@ -20,44 +20,6 @@
   min-height: 0;
 }
 
-/* ============================================
-   Task Header
-   ============================================ */
-
-.task-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 12px;
-  background: var(--vscode-sideBar-background);
-  border-bottom: 1px solid var(--vscode-panel-border);
-  flex-shrink: 0;
-  min-height: 32px;
-}
-
-.task-header-title {
-  flex: 1;
-  font-size: 12px;
-  font-weight: 600;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  color: var(--vscode-foreground);
-}
-
-.task-header-stats {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-shrink: 0;
-}
-
-.task-header-stat {
-  font-size: 11px;
-  color: var(--vscode-descriptionForeground);
-  white-space: nowrap;
-}
-
 .chat-input {
   flex-shrink: 0;
   border-top: 1px solid var(--vscode-panel-border);
