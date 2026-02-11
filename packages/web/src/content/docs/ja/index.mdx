@@ -87,7 +87,7 @@ curl -fsSL https://kilo.ai/install | bash
   paru -S opencode-bin
   ```
 
-#### 窓
+#### Windows
 
 :::tip[推奨: WSL を使用する]
 Windows で最高のエクスペリエンスを得るには、[Windows Subsystem for Linux (WSL)](/docs/windows-wsl) を使用することをお勧めします。これにより、パフォーマンスが向上し、Kilo の機能との完全な互換性が提供されます。
@@ -99,7 +99,7 @@ Windows で最高のエクスペリエンスを得るには、[Windows Subsystem
   choco install opencode
   ```
 
-- **スクープの使用**
+- **Using Scoop**
 
   ```bash
   scoop install opencode
@@ -111,7 +111,7 @@ Windows で最高のエクスペリエンスを得るには、[Windows Subsystem
   npm install -g opencode-ai
   ```
 
-- **ミセの使い方**
+- **Using Mise**
 
   ```bash
   mise use -g github:Kilo-Org/kilo
@@ -223,21 +223,21 @@ Kilo に新しい機能をプロジェクトに追加するよう依頼できま
 
 1. **計画を作成する**
 
-Kilo には、変更を加える機能を無効にする _Plan モード_ があり、
+Kilo には、変更を加える機能を無効にする _Plan mode_ があり、
 代わりに、その機能を*どのように*実装するかを提案してください。
 
 **Tab** キーを使用してそれに切り替えます。右下隅にこれを示すインジケーターが表示されます。
 
 ```bash frame="none" title="Switch to Plan mode"
-<TAB>
+   <TAB>
 ```
 
 では、何をしたいのかを説明しましょう。
 
 ```txt frame="none"
-When a user deletes a note, we'd like to flag it as deleted in the database.
-Then create a screen that shows all the recently deleted notes.
-From this screen, the user can undelete a note or permanently delete it.
+   When a user deletes a note, we'd like to flag it as deleted in the database.
+   Then create a screen that shows all the recently deleted notes.
+   From this screen, the user can undelete a note or permanently delete it.
 ```
 
 自分が何を望んでいるのかを理解するために、Kilo に十分な詳細を提供したいと考えています。役に立ちます
@@ -253,8 +253,8 @@ want.
 計画が示されたら、フィードバックを送信したり、詳細を追加したりできます。
 
 ```txt frame="none"
-We'd like to design this new screen using a design I've used before.
-[Image #1] Take a look at this image and use it as a reference.
+   We'd like to design this new screen using a design I've used before.
+   [Image #1] Take a look at this image and use it as a reference.
 ```
 
 :::tip
@@ -266,17 +266,17 @@ Kilo は、指定された画像をスキャンしてプロンプトに追加で
 
 3. **機能を構築する**
 
-計画に慣れたら、*Build モード*に戻ります。
+計画に慣れたら、*Build mode*に戻ります。
 **Tab** キーをもう一度押します。
 
 ```bash frame="none"
-<TAB>
+   <TAB>
 ```
 
 そして変更を加えるように依頼します。
 
 ```bash frame="none"
-Sounds good! Go ahead and make the changes.
+   Sounds good! Go ahead and make the changes.
 ```
 
 ---
