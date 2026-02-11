@@ -90,8 +90,12 @@ export const MessageList: Component<MessageListProps> = (props) => {
   const messages = () => session.messages()
   const isEmpty = () => messages().length === 0
 
-  // Most recent 3 sessions (already sorted by updatedAt desc from the context)
-  const recent = createMemo(() => session.sessions().slice(0, 3))
+  // 3 most recently created sessions (youngest first)
+  const recent = createMemo(() =>
+    [...session.sessions()]
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .slice(0, 3),
+  )
 
   return (
     <div class="message-list-container">
