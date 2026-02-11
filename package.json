@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
-  "name": "@kilocode/kilo",
+  "name": "opencode",
   "description": "AI-powered development tool",
   "private": true,
   "type": "module",
@@ -68,9 +68,11 @@
     "husky": "9.1.7",
     "prettier": "3.6.2",
     "semver": "^7.6.0",
+    "sst": "3.17.23",
     "turbo": "2.5.6"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "3.933.0",
     "@kilocode/plugin": "workspace:*",
     "@opencode-ai/script": "workspace:*",
     "@kilocode/sdk": "workspace:*",
@@ -78,7 +80,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Kilo-Org/kilo"
+    "url": "https://github.com/anomalyco/opencode"
   },
   "license": "MIT",
   "prettier": {
