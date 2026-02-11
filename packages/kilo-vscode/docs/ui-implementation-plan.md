@@ -630,7 +630,7 @@ import { List } from "@kilocode/kilo-ui/list"
 import { Popover } from "@kilocode/kilo-ui/popover"
 ```
 
-Use for: model selector, provider info cards.
+Use for: model selector, mode selector, provider info cards.
 
 #### Acceptance criteria
 
