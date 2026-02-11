@@ -3,6 +3,7 @@ import { Button } from "@kilocode/kilo-ui/button"
 import { Card } from "@kilocode/kilo-ui/card"
 import { Tooltip } from "@kilocode/kilo-ui/tooltip"
 import { useVSCode } from "../context/vscode"
+import { useLanguage } from "../context/language"
 import DeviceAuthCard from "./DeviceAuthCard"
 import type { ProfileData, DeviceAuthState } from "../types/messages"
 
@@ -20,6 +21,7 @@ const formatBalance = (amount: number): string => {
 
 const ProfileView: Component<ProfileViewProps> = (props) => {
   const vscode = useVSCode()
+  const language = useLanguage()
 
   const handleLogin = () => {
     props.onLogin()
@@ -52,7 +54,7 @@ const ProfileView: Component<ProfileViewProps> = (props) => {
           color: "var(--vscode-foreground)",
         }}
       >
-        Profile
+        {language.t("profile.title")}
       </h2>
 
       <div
@@ -78,10 +80,10 @@ const ProfileView: Component<ProfileViewProps> = (props) => {
                       margin: "0 0 8px 0",
                     }}
                   >
-                    Not logged in
+                    {language.t("profile.notLoggedIn")}
                   </p>
                   <Button variant="primary" onClick={handleLogin}>
-                    Login with Kilo Code
+                    {language.t("profile.action.login")}
                   </Button>
                 </>
               }
@@ -144,7 +146,7 @@ const ProfileView: Component<ProfileViewProps> = (props) => {
                         margin: "0 0 4px 0",
                       }}
                     >
-                      Balance
+                      {language.t("profile.balance.title")}
                     </p>
                     <p
                       style={{
@@ -157,9 +159,9 @@ const ProfileView: Component<ProfileViewProps> = (props) => {
                       {formatBalance(balance().balance)}
                     </p>
                   </div>
-                  <Tooltip value="Refresh balance" placement="left">
+                  <Tooltip value={language.t("profile.balance.refresh")} placement="left">
                     <Button variant="ghost" size="small" onClick={handleRefresh}>
-                      ↻ Refresh
+                      ↻ {language.t("common.refresh")}
                     </Button>
                   </Tooltip>
                 </Card>
@@ -169,14 +171,14 @@ const ProfileView: Component<ProfileViewProps> = (props) => {
             {/* Action buttons */}
             <div style={{ display: "flex", gap: "8px" }}>
               <Button variant="secondary" onClick={handleDashboard} style={{ flex: "1" }}>
-                Dashboard
+                {language.t("profile.action.dashboard")}
               </Button>
               <Button
                 variant="ghost"
                 onClick={handleLogout}
                 style={{ flex: "1", color: "var(--vscode-errorForeground)" }}
               >
-                Log Out
+                {language.t("profile.action.logout")}
               </Button>
             </div>
           </div>
