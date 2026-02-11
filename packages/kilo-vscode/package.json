@@ -114,6 +114,49 @@
     "configuration": {
       "title": "Kilo Code",
       "properties": {
+        "kilo-code.new.language": {
+          "type": "string",
+          "default": "",
+          "description": "Override the UI language for Kilo Code (e.g. en, de, ja). Empty means use VS Code's display language.",
+          "enum": [
+            "",
+            "en",
+            "zh",
+            "zht",
+            "ko",
+            "de",
+            "es",
+            "fr",
+            "da",
+            "ja",
+            "pl",
+            "ru",
+            "ar",
+            "no",
+            "br",
+            "th",
+            "bs"
+          ],
+          "enumDescriptions": [
+            "Auto (VS Code language)",
+            "English",
+            "简体中文",
+            "繁體中文",
+            "한국어",
+            "Deutsch",
+            "Español",
+            "Français",
+            "Dansk",
+            "日本語",
+            "Polski",
+            "Русский",
+            "العربية",
+            "Norsk",
+            "Português (Brasil)",
+            "ภาษาไทย",
+            "Bosanski"
+          ]
+        },
         "kilo-code.new.model.providerID": {
           "type": "string",
           "default": "kilo",
@@ -162,13 +205,10 @@
     "typescript-eslint": "^8.54.0"
   },
   "dependencies": {
+    "@kilocode/kilo-i18n": "workspace:*",
     "@kilocode/kilo-ui": "workspace:*",
     "@kilocode/sdk": "workspace:*",
-    "@kobalte/core": "catalog:",
-    "@opencode-ai/ui": "workspace:*",
-    "@opencode-ai/util": "workspace:*",
     "eventsource": "^2.0.2",
-    "lucide-solid": "^0.563.0",
     "solid-js": "^1.9.11"
   }
 }

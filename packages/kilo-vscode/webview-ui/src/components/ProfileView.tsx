@@ -1,5 +1,6 @@
 import { Component, Show } from "solid-js"
 import { Button } from "@kilocode/kilo-ui/button"
+import { Card } from "@kilocode/kilo-ui/card"
 import { useVSCode } from "../context/vscode"
 import DeviceAuthCard from "./DeviceAuthCard"
 import type { ProfileData, DeviceAuthState } from "../types/messages"
@@ -100,14 +101,7 @@ const ProfileView: Component<ProfileViewProps> = (props) => {
         {(data) => (
           <div style={{ display: "flex", "flex-direction": "column", gap: "12px" }}>
             {/* User header */}
-            <div
-              style={{
-                background: "var(--vscode-editor-background)",
-                border: "1px solid var(--vscode-panel-border)",
-                "border-radius": "4px",
-                padding: "16px",
-              }}
-            >
+            <Card>
               <p
                 style={{
                   "font-size": "14px",
@@ -127,17 +121,13 @@ const ProfileView: Component<ProfileViewProps> = (props) => {
               >
                 {data().profile.email}
               </p>
-            </div>
+            </Card>
 
             {/* Balance */}
             <Show when={data().balance}>
               {(balance) => (
-                <div
+                <Card
                   style={{
-                    background: "var(--vscode-editor-background)",
-                    border: "1px solid var(--vscode-panel-border)",
-                    "border-radius": "4px",
-                    padding: "12px 16px",
                     display: "flex",
                     "align-items": "center",
                     "justify-content": "space-between",
@@ -169,7 +159,7 @@ const ProfileView: Component<ProfileViewProps> = (props) => {
                   <Button variant="ghost" size="small" onClick={handleRefresh}>
                     ↻ Refresh
                   </Button>
-                </div>
+                </Card>
               )}
             </Show>
 

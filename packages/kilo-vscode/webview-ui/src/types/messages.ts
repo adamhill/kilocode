@@ -64,6 +64,20 @@ export interface PartDelta {
   textDelta?: string
 }
 
+// Token usage for assistant messages
+export interface TokenUsage {
+  input: number
+  output: number
+  reasoning?: number
+  cache?: { read: number; write: number }
+}
+
+// Context usage derived from the last assistant message's tokens
+export interface ContextUsage {
+  tokens: number
+  percentage: number | null
+}
+
 // Message structure (simplified for webview)
 export interface Message {
   id: string
@@ -72,6 +86,8 @@ export interface Message {
   content?: string
   parts?: Part[]
   createdAt: string
+  cost?: number
+  tokens?: TokenUsage
 }
 
 // Session info (simplified for webview)
@@ -96,6 +112,16 @@ export interface TodoItem {
   id: string
   content: string
   status: "pending" | "in_progress" | "completed"
+}
+
+// Agent/mode info from CLI backend
+export interface AgentInfo {
+  name: string
+  description?: string
+  mode: "subagent" | "primary" | "all"
+  native?: boolean
+  hidden?: boolean
+  color?: string
 }
 
 // Server info
@@ -141,6 +167,8 @@ export interface ProviderModel {
   contextLength?: number
   releaseDate?: string
   latest?: boolean
+  // Actual shape returned by the server (Provider.Model)
+  limit?: { context: number; input?: number; output: number }
 }
 
 export interface Provider {
@@ -161,6 +189,8 @@ export interface ModelSelection {
 export interface ReadyMessage {
   type: "ready"
   serverInfo?: ServerInfo
+  vscodeLanguage?: string
+  languageOverride?: string
 }
 
 export interface ConnectionStateMessage {
@@ -202,6 +232,11 @@ export interface TodoUpdatedMessage {
 
 export interface SessionCreatedMessage {
   type: "sessionCreated"
+  session: SessionInfo
+}
+
+export interface SessionUpdatedMessage {
+  type: "sessionUpdated"
   session: SessionInfo
 }
 
@@ -259,6 +294,12 @@ export interface ProvidersLoadedMessage {
   defaultSelection: ModelSelection
 }
 
+export interface AgentsLoadedMessage {
+  type: "agentsLoaded"
+  agents: AgentInfo[]
+  defaultAgent: string
+}
+
 export type ExtensionMessage =
   | ReadyMessage
   | ConnectionStateMessage
@@ -268,6 +309,7 @@ export type ExtensionMessage =
   | PermissionRequestMessage
   | TodoUpdatedMessage
   | SessionCreatedMessage
+  | SessionUpdatedMessage
   | MessagesLoadedMessage
   | MessageCreatedMessage
   | SessionsLoadedMessage
@@ -278,6 +320,7 @@ export type ExtensionMessage =
   | DeviceAuthFailedMessage
   | DeviceAuthCancelledMessage
   | ProvidersLoadedMessage
+  | AgentsLoadedMessage
 
 // ============================================
 // Messages FROM webview TO extension
@@ -289,6 +332,7 @@ export interface SendMessageRequest {
   sessionID?: string
   providerID?: string
   modelID?: string
+  agent?: string
 }
 
 export interface AbortRequest {
@@ -345,6 +389,22 @@ export interface RequestProvidersMessage {
   type: "requestProviders"
 }
 
+export interface CompactRequest {
+  type: "compact"
+  sessionID: string
+  providerID?: string
+  modelID?: string
+}
+
+export interface RequestAgentsMessage {
+  type: "requestAgents"
+}
+
+export interface SetLanguageRequest {
+  type: "setLanguage"
+  locale: string
+}
+
 export type WebviewMessage =
   | SendMessageRequest
   | AbortRequest
@@ -359,6 +419,9 @@ export type WebviewMessage =
   | CancelLoginRequest
   | WebviewReadyRequest
   | RequestProvidersMessage
+  | CompactRequest
+  | RequestAgentsMessage
+  | SetLanguageRequest
 
 // ============================================
 // VS Code API type

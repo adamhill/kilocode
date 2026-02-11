@@ -29,6 +29,8 @@ import type {
   PermissionRequest,
   TodoItem,
   ModelSelection,
+  ContextUsage,
+  AgentInfo,
   ExtensionMessage,
 } from "../types/messages"
 
@@ -69,9 +71,19 @@ interface SessionContextValue {
   selected: Accessor<ModelSelection | null>
   selectModel: (providerID: string, modelID: string) => void
 
+  // Cost and context usage for the current session
+  totalCost: Accessor<number>
+  contextUsage: Accessor<ContextUsage | undefined>
+
+  // Agent/mode selection
+  agents: Accessor<AgentInfo[]>
+  selectedAgent: Accessor<string>
+  selectAgent: (name: string) => void
+
   // Actions
   sendMessage: (text: string, providerID?: string, modelID?: string) => void
   abort: () => void
+  compact: () => void
   respondToPermission: (permissionId: string, response: "once" | "always" | "reject") => void
   createSession: () => void
   loadSessions: () => void
@@ -97,6 +109,11 @@ export const SessionProvider: ParentComponent = (props) => {
   // Pending model selection for before a session exists
   const [pendingModelSelection, setPendingModelSelection] = createSignal<ModelSelection | null>(null)
   const [pendingWasUserSet, setPendingWasUserSet] = createSignal(false)
+
+  // Agents (modes) loaded from the CLI backend
+  const [agents, setAgents] = createSignal<AgentInfo[]>([])
+  const [defaultAgent, setDefaultAgent] = createSignal("code")
+  const [selectedAgentName, setSelectedAgentName] = createSignal("code")
 
   // Store for sessions, messages, parts, todos, modelSelections
   const [store, setStore] = createStore<SessionStore>({
@@ -149,6 +166,44 @@ export const SessionProvider: ParentComponent = (props) => {
     }
   }
 
+  // Handle agentsLoaded immediately (not in onMount) so we never miss
+  // the initial push that arrives before the DOM mounts. This mirrors the
+  // pattern used by ProviderProvider for providersLoaded.
+  const unsubAgents = vscode.onMessage((message: ExtensionMessage) => {
+    if (message.type !== "agentsLoaded") {
+      return
+    }
+    setAgents(message.agents)
+    setDefaultAgent(message.defaultAgent)
+    // Only override if the user hasn't explicitly selected an agent
+    if (selectedAgentName() === "code" || !message.agents.some((a) => a.name === selectedAgentName())) {
+      setSelectedAgentName(message.defaultAgent)
+    }
+  })
+
+  // Request agents in case the initial push was missed.
+  // Retry a few times because the extension's httpClient may
+  // not be ready yet when the first request arrives.
+  let agentRetries = 0
+  const agentMaxRetries = 5
+  const agentRetryMs = 500
+
+  vscode.postMessage({ type: "requestAgents" })
+
+  const agentRetryTimer = setInterval(() => {
+    agentRetries++
+    if (agents().length > 0 || agentRetries >= agentMaxRetries) {
+      clearInterval(agentRetryTimer)
+      return
+    }
+    vscode.postMessage({ type: "requestAgents" })
+  }, agentRetryMs)
+
+  onCleanup(() => {
+    unsubAgents()
+    clearInterval(agentRetryTimer)
+  })
+
   // Handle messages from extension
   onMount(() => {
     const unsubscribe = vscode.onMessage((message: ExtensionMessage) => {
@@ -183,6 +238,10 @@ export const SessionProvider: ParentComponent = (props) => {
 
         case "sessionsLoaded":
           handleSessionsLoaded(message.sessions)
+          break
+
+        case "sessionUpdated":
+          setStore("sessions", message.session.id, message.session)
           break
       }
     })
@@ -307,11 +366,17 @@ export const SessionProvider: ParentComponent = (props) => {
   }
 
   // Actions
+  function selectAgent(name: string) {
+    setSelectedAgentName(name)
+  }
+
   function sendMessage(text: string, providerID?: string, modelID?: string) {
     if (!server.isConnected()) {
       console.warn("[Kilo New] Cannot send message: not connected")
       return
     }
+
+    const agent = selectedAgentName() !== defaultAgent() ? selectedAgentName() : undefined
 
     vscode.postMessage({
       type: "sendMessage",
@@ -319,6 +384,7 @@ export const SessionProvider: ParentComponent = (props) => {
       sessionID: currentSessionID(),
       providerID,
       modelID,
+      agent,
     })
   }
 
@@ -332,6 +398,27 @@ export const SessionProvider: ParentComponent = (props) => {
     vscode.postMessage({
       type: "abort",
       sessionID,
+    })
+  }
+
+  function compact() {
+    if (!server.isConnected()) {
+      console.warn("[Kilo New] Cannot compact: not connected")
+      return
+    }
+
+    const sessionID = currentSessionID()
+    if (!sessionID) {
+      console.warn("[Kilo New] Cannot compact: no current session")
+      return
+    }
+
+    const sel = selected()
+    vscode.postMessage({
+      type: "compact",
+      sessionID,
+      providerID: sel?.providerID,
+      modelID: sel?.modelID,
     })
   }
 
@@ -405,6 +492,33 @@ export const SessionProvider: ParentComponent = (props) => {
     Object.values(store.sessions).sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()),
   )
 
+  // Total cost across all assistant messages in the current session
+  const totalCost = createMemo(() => {
+    return messages().reduce((sum, m) => sum + (m.role === "assistant" ? (m.cost ?? 0) : 0), 0)
+  })
+
+  // Context usage from the last assistant message that has token data
+  const contextUsage = createMemo<ContextUsage | undefined>(() => {
+    const msgs = messages()
+    for (let i = msgs.length - 1; i >= 0; i--) {
+      const m = msgs[i]
+      if (m.role !== "assistant" || !m.tokens) continue
+      const total =
+        m.tokens.input +
+        m.tokens.output +
+        (m.tokens.reasoning ?? 0) +
+        (m.tokens.cache?.read ?? 0) +
+        (m.tokens.cache?.write ?? 0)
+      if (total === 0) continue
+      const sel = selected()
+      const model = sel ? provider.findModel(sel) : undefined
+      const limit = model?.limit?.context ?? model?.contextLength
+      const percentage = limit ? Math.round((total / limit) * 100) : null
+      return { tokens: total, percentage }
+    }
+    return undefined
+  })
+
   const value: SessionContextValue = {
     currentSessionID,
     currentSession,
@@ -417,8 +531,14 @@ export const SessionProvider: ParentComponent = (props) => {
     permissions,
     selected,
     selectModel,
+    totalCost,
+    contextUsage,
+    agents,
+    selectedAgent: selectedAgentName,
+    selectAgent,
     sendMessage,
     abort,
+    compact,
     respondToPermission,
     createSession,
     loadSessions,
