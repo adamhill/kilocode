@@ -8,6 +8,7 @@ import { Button } from "@kilocode/kilo-ui/button"
 import { useSession } from "../../context/session"
 import { useServer } from "../../context/server"
 import { ModelSelector } from "./ModelSelector"
+import { ModeSwitcher } from "./ModeSwitcher"
 
 export const PromptInput: Component = () => {
   const session = useSession()
@@ -98,6 +99,7 @@ export const PromptInput: Component = () => {
         </div>
       </div>
       <div class="prompt-input-hint">
+        <ModeSwitcher />
         <ModelSelector />
         <Show when={!isDisabled()}>
           <span>Press Enter to send, Shift+Enter for new line</span>

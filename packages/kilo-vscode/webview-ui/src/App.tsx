@@ -1,15 +1,18 @@
-import { Component, createSignal, Switch, Match, onMount, onCleanup } from "solid-js"
+import { Component, createSignal, createMemo, Switch, Match, onMount, onCleanup } from "solid-js"
 import { ThemeProvider } from "@kilocode/kilo-ui/theme"
-import { I18nProvider } from "@kilocode/kilo-ui/context"
 import { DialogProvider } from "@kilocode/kilo-ui/context/dialog"
+import { MarkedProvider } from "@kilocode/kilo-ui/context/marked"
+import { DataProvider } from "@kilocode/kilo-ui/context/data"
 import Settings from "./components/Settings"
 import ProfileView from "./components/ProfileView"
 import { VSCodeProvider } from "./context/vscode"
 import { ServerProvider, useServer } from "./context/server"
 import { ProviderProvider } from "./context/provider"
 import { SessionProvider, useSession } from "./context/session"
+import { LanguageProvider } from "./context/language"
 import { ChatView } from "./components/chat"
 import SessionList from "./components/history/SessionList"
+import type { Message as SDKMessage, Part as SDKPart } from "@kilocode/sdk/v2"
 import "./styles/chat.css"
 
 type ViewType = "newTask" | "marketplace" | "history" | "profile" | "settings"
@@ -32,15 +35,60 @@ const DummyView: Component<{ title: string }> = (props) => {
   )
 }
 
+/**
+ * Bridge our session store to the DataProvider's expected Data shape.
+ */
+const DataBridge: Component<{ children: any }> = (props) => {
+  const session = useSession()
+
+  const data = createMemo(() => ({
+    session: session.sessions().map((s) => ({ ...s, id: s.id, role: "user" as const })),
+    session_status: {} as Record<string, any>,
+    session_diff: {} as Record<string, any[]>,
+    message: {
+      [session.currentSessionID() ?? ""]: session.messages() as unknown as SDKMessage[],
+    },
+    part: Object.fromEntries(
+      session
+        .messages()
+        .map((msg) => [msg.id, session.getParts(msg.id) as unknown as SDKPart[]])
+        .filter(([, parts]) => (parts as SDKPart[]).length > 0),
+    ),
+    permission: {
+      [session.currentSessionID() ?? ""]: session.permissions() as unknown as any[],
+    },
+  }))
+
+  const respond = (input: { sessionID: string; permissionID: string; response: "once" | "always" | "reject" }) => {
+    session.respondToPermission(input.permissionID, input.response)
+  }
+
+  return (
+    <DataProvider data={data()} directory="" onPermissionRespond={respond}>
+      {props.children}
+    </DataProvider>
+  )
+}
+
+/**
+ * Wraps children in LanguageProvider, passing server-side language info.
+ * Must be below ServerProvider in the hierarchy.
+ */
+const LanguageBridge: Component<{ children: any }> = (props) => {
+  const server = useServer()
+  return (
+    <LanguageProvider vscodeLanguage={server.vscodeLanguage} languageOverride={server.languageOverride}>
+      {props.children}
+    </LanguageProvider>
+  )
+}
+
 // Inner app component that uses the contexts
 const AppContent: Component = () => {
   const [currentView, setCurrentView] = createSignal<ViewType>("newTask")
   const session = useSession()
   const server = useServer()
 
-  // Handle action messages from extension for view switching
-  // This is handled at the VSCode context level, but we need to expose it here
-  // for the action messages that switch views
   const handleViewAction = (action: string) => {
     switch (action) {
       case "plusButtonClicked":
@@ -64,8 +112,6 @@ const AppContent: Component = () => {
     }
   }
 
-  // Listen for action messages at the window level
-  // (These are separate from the typed messages handled by contexts)
   onMount(() => {
     const handler = (event: MessageEvent) => {
       const message = event.data
@@ -114,19 +160,23 @@ const AppContent: Component = () => {
 const App: Component = () => {
   return (
     <ThemeProvider defaultTheme="kilo-vscode">
-      <I18nProvider value={{ locale: () => "en", t: (key) => key }}>
-        <DialogProvider>
-          <VSCodeProvider>
-            <ServerProvider>
-              <ProviderProvider>
-                <SessionProvider>
-                  <AppContent />
-                </SessionProvider>
-              </ProviderProvider>
-            </ServerProvider>
-          </VSCodeProvider>
-        </DialogProvider>
-      </I18nProvider>
+      <DialogProvider>
+        <VSCodeProvider>
+          <ServerProvider>
+            <LanguageBridge>
+              <MarkedProvider>
+                <ProviderProvider>
+                  <SessionProvider>
+                    <DataBridge>
+                      <AppContent />
+                    </DataBridge>
+                  </SessionProvider>
+                </ProviderProvider>
+              </MarkedProvider>
+            </LanguageBridge>
+          </ServerProvider>
+        </VSCodeProvider>
+      </DialogProvider>
     </ThemeProvider>
   )
 }

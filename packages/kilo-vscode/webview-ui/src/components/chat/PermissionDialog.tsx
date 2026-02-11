@@ -1,64 +1,59 @@
 /**
  * PermissionDialog component
- * Displays permission requests from the assistant and allows user to respond
+ * Displays permission requests from the assistant and allows user to respond.
+ *
+ * Uses the same component pattern as the desktop app (packages/app/src/pages/session.tsx):
+ * BasicTool for the collapsible tool header, and data-component="permission-prompt"
+ * with data-slot="permission-actions" for the button row (styled by kilo-ui CSS).
  */
 
-import { Component, Show, For, createSignal } from "solid-js"
+import { Component, For, Show, createEffect, on } from "solid-js"
+import { Dialog } from "@kilocode/kilo-ui/dialog"
 import { Button } from "@kilocode/kilo-ui/button"
+import { BasicTool } from "@kilocode/kilo-ui/basic-tool"
+import { useDialog } from "@kilocode/kilo-ui/context/dialog"
 import { useSession } from "../../context/session"
 import type { PermissionRequest } from "../../types/messages"
 
-interface PermissionDialogProps {
+interface PermissionItemProps {
   permission: PermissionRequest
 }
 
-const PermissionItem: Component<PermissionDialogProps> = (props) => {
+const PermissionItem: Component<PermissionItemProps> = (props) => {
   const session = useSession()
-  const [expanded, setExpanded] = createSignal(false)
 
   const handleResponse = (response: "once" | "always" | "reject") => {
     session.respondToPermission(props.permission.id, response)
   }
 
   return (
-    <div class="permission-item">
-      <div class="permission-header">
-        <span class="permission-icon">🔐</span>
-        <span class="permission-title">Permission Required</span>
-      </div>
-
-      <div class="permission-content">
-        <p class="permission-message">
-          {props.permission.message || `The assistant wants to use: ${props.permission.toolName}`}
-        </p>
-
-        <Button variant="ghost" size="small" onClick={() => setExpanded(!expanded())}>
-          {expanded() ? "Hide details" : "Show details"}
-        </Button>
-
-        <Show when={expanded()}>
+    <div data-component="tool-part-wrapper" data-permission="true">
+      <BasicTool
+        icon="checklist"
+        locked
+        defaultOpen
+        trigger={{
+          title: props.permission.toolName,
+        }}
+      >
+        <Show when={props.permission.args}>
           <div class="permission-details">
-            <div class="permission-tool">
-              <strong>Tool:</strong> {props.permission.toolName}
-            </div>
-            <div class="permission-args">
-              <strong>Arguments:</strong>
-              <pre>{JSON.stringify(props.permission.args, null, 2)}</pre>
-            </div>
+            <pre>{JSON.stringify(props.permission.args, null, 2)}</pre>
           </div>
         </Show>
-      </div>
-
-      <div class="permission-actions">
-        <Button variant="ghost" size="small" onClick={() => handleResponse("reject")}>
-          Reject
-        </Button>
-        <Button variant="secondary" size="small" onClick={() => handleResponse("once")}>
-          Allow Once
-        </Button>
-        <Button variant="primary" size="small" onClick={() => handleResponse("always")}>
-          Always Allow
-        </Button>
+      </BasicTool>
+      <div data-component="permission-prompt">
+        <div data-slot="permission-actions">
+          <Button variant="ghost" size="small" onClick={() => handleResponse("reject")}>
+            Reject
+          </Button>
+          <Button variant="secondary" size="small" onClick={() => handleResponse("always")}>
+            Always Allow
+          </Button>
+          <Button variant="primary" size="small" onClick={() => handleResponse("once")}>
+            Allow Once
+          </Button>
+        </div>
       </div>
     </div>
   )
@@ -66,17 +61,27 @@ const PermissionItem: Component<PermissionDialogProps> = (props) => {
 
 export const PermissionDialog: Component = () => {
   const session = useSession()
+  const dialog = useDialog()
 
   const permissions = () => session.permissions()
   const hasPermissions = () => permissions().length > 0
 
-  return (
-    <Show when={hasPermissions()}>
-      <div class="permission-overlay">
-        <div class="permission-dialog">
-          <For each={permissions()}>{(permission) => <PermissionItem permission={permission} />}</For>
-        </div>
-      </div>
-    </Show>
+  // Reactively show/hide the dialog based on pending permissions.
+  // useDialog().show() internally wraps the Dialog in a Kobalte root + portal
+  // from the same package copy, avoiding the dual-package context mismatch.
+  createEffect(
+    on(hasPermissions, (has) => {
+      if (has) {
+        dialog.show(() => (
+          <Dialog title="Permission Required" fit action={<span />}>
+            <For each={permissions()}>{(permission) => <PermissionItem permission={permission} />}</For>
+          </Dialog>
+        ))
+      } else {
+        dialog.close()
+      }
+    }),
   )
+
+  return null
 }

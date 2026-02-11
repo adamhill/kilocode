@@ -81,208 +81,6 @@
 }
 
 /* ============================================
-   Message
-   ============================================ */
-
-.message {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  max-width: 100%;
-}
-
-.message-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.message-role {
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  color: var(--vscode-descriptionForeground);
-}
-
-.message-content {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.message-user .message-content {
-  background: var(--vscode-input-background);
-  border: 1px solid var(--vscode-input-border);
-  border-radius: 8px;
-  padding: 8px 12px;
-}
-
-.message-assistant .message-content {
-  background: var(--vscode-editor-background);
-  border: 1px solid var(--vscode-panel-border);
-  border-radius: 8px;
-  padding: 8px 12px;
-}
-
-.message-text {
-  white-space: pre-wrap;
-  word-break: break-word;
-  line-height: 1.5;
-}
-
-/* ============================================
-   Tool Parts
-   ============================================ */
-
-.message-tool {
-  border: 1px solid var(--vscode-panel-border);
-  border-radius: 4px;
-  overflow: hidden;
-}
-
-.tool-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  width: 100%;
-  padding: 6px 10px;
-  background: var(--vscode-sideBar-background);
-  border: none;
-  cursor: pointer;
-  text-align: left;
-  color: var(--vscode-foreground);
-  font-size: 12px;
-}
-
-.tool-header:hover {
-  background: var(--vscode-list-hoverBackground);
-}
-
-.tool-icon {
-  font-size: 12px;
-}
-
-.tool-name {
-  flex: 1;
-  font-family: var(--vscode-editor-font-family);
-}
-
-.tool-toggle {
-  font-size: 10px;
-  color: var(--vscode-descriptionForeground);
-}
-
-.tool-details {
-  padding: 8px 10px;
-  background: var(--vscode-editor-background);
-  font-size: 11px;
-}
-
-.tool-input,
-.tool-output,
-.tool-error {
-  margin-bottom: 8px;
-}
-
-.tool-input:last-child,
-.tool-output:last-child,
-.tool-error:last-child {
-  margin-bottom: 0;
-}
-
-.tool-details pre {
-  margin: 4px 0 0 0;
-  font-family: var(--vscode-editor-font-family);
-  font-size: 11px;
-  white-space: pre-wrap;
-  word-break: break-word;
-  overflow-x: auto;
-}
-
-/* Tool status styles */
-.tool-status-pending .tool-icon {
-  color: var(--vscode-charts-yellow);
-}
-
-.tool-status-running .tool-icon {
-  color: var(--vscode-charts-blue);
-  animation: spin 1s linear infinite;
-}
-
-.tool-status-completed .tool-icon {
-  color: var(--vscode-charts-green);
-}
-
-.tool-status-error .tool-icon {
-  color: var(--vscode-errorForeground);
-}
-
-.tool-error {
-  color: var(--vscode-errorForeground);
-}
-
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/* ============================================
-   Reasoning Parts
-   ============================================ */
-
-.message-reasoning {
-  border: 1px solid var(--vscode-panel-border);
-  border-radius: 4px;
-  overflow: hidden;
-  opacity: 0.8;
-}
-
-.reasoning-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  width: 100%;
-  padding: 6px 10px;
-  background: var(--vscode-sideBar-background);
-  border: none;
-  cursor: pointer;
-  text-align: left;
-  color: var(--vscode-descriptionForeground);
-  font-size: 12px;
-  font-style: italic;
-}
-
-.reasoning-header:hover {
-  background: var(--vscode-list-hoverBackground);
-}
-
-.reasoning-icon {
-  font-size: 12px;
-}
-
-.reasoning-label {
-  flex: 1;
-}
-
-.reasoning-toggle {
-  font-size: 10px;
-}
-
-.reasoning-content {
-  padding: 8px 10px;
-  background: var(--vscode-editor-background);
-  font-size: 12px;
-  font-style: italic;
-  color: var(--vscode-descriptionForeground);
-  white-space: pre-wrap;
-  word-break: break-word;
-}
-
-/* ============================================
    Prompt Input
    ============================================ */
 
@@ -376,124 +174,17 @@
    Permission Dialog
    ============================================ */
 
-.permission-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  z-index: 100;
-}
-
-.permission-dialog {
-  background: var(--vscode-editor-background);
-  border: 1px solid var(--vscode-panel-border);
-  border-radius: 8px;
-  max-width: 400px;
-  width: 100%;
-  max-height: 80%;
-  overflow-y: auto;
-}
-
-.permission-item {
-  padding: 16px;
-}
-
-.permission-item + .permission-item {
-  border-top: 1px solid var(--vscode-panel-border);
-}
-
-.permission-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 12px;
-}
-
-.permission-icon {
-  font-size: 20px;
-}
-
-.permission-title {
-  font-weight: 600;
-  font-size: 14px;
-}
-
-.permission-content {
-  margin-bottom: 16px;
-}
-
-.permission-message {
-  margin: 0 0 8px 0;
-  line-height: 1.5;
-}
-
-.permission-details-toggle {
-  background: none;
-  border: none;
-  color: var(--vscode-textLink-foreground);
-  cursor: pointer;
-  padding: 0;
-  font-size: 12px;
-}
-
-.permission-details-toggle:hover {
-  text-decoration: underline;
-}
-
 .permission-details {
-  margin-top: 8px;
   padding: 8px;
-  background: var(--vscode-input-background);
-  border-radius: 4px;
   font-size: 12px;
 }
 
 .permission-details pre {
-  margin: 4px 0 0 0;
+  margin: 0;
   font-family: var(--vscode-editor-font-family);
   font-size: 11px;
   white-space: pre-wrap;
   word-break: break-word;
-}
-
-.permission-actions {
-  display: flex;
-  gap: 8px;
-  justify-content: flex-end;
-}
-
-.permission-button {
-  padding: 6px 12px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 12px;
-  transition: opacity 0.2s;
-}
-
-.permission-button:hover {
-  opacity: 0.9;
-}
-
-.permission-button-reject {
-  background: var(--vscode-button-secondaryBackground);
-  color: var(--vscode-button-secondaryForeground);
-}
-
-.permission-button-once {
-  background: var(--vscode-button-secondaryBackground);
-  color: var(--vscode-button-secondaryForeground);
-}
-
-.permission-button-always {
-  background: var(--vscode-button-background);
-  color: var(--vscode-button-foreground);
 }
 
 /* ============================================
@@ -700,4 +391,93 @@
   color: var(--vscode-badge-foreground);
   text-transform: uppercase;
   letter-spacing: 0.03em;
+}
+
+/* ============================================
+   Mode Switcher
+   ============================================ */
+
+.mode-switcher {
+  position: relative;
+}
+
+.mode-switcher-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  color: var(--vscode-descriptionForeground);
+  font-size: 11px;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 3px;
+  white-space: nowrap;
+  max-width: 120px;
+}
+
+.mode-switcher-trigger:hover:not(:disabled) {
+  color: var(--vscode-foreground);
+  background: var(--vscode-toolbar-hoverBackground);
+}
+
+.mode-switcher-trigger:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.mode-switcher-trigger-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mode-switcher-trigger-chevron {
+  flex-shrink: 0;
+}
+
+.mode-switcher-dropdown {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  margin-bottom: 4px;
+  min-width: 200px;
+  max-width: 300px;
+  max-height: 280px;
+  overflow-y: auto;
+  background: var(--vscode-dropdown-background);
+  border: 1px solid var(--vscode-dropdown-border);
+  border-radius: 4px;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.mode-switcher-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.mode-switcher-item:hover {
+  background: var(--vscode-list-hoverBackground);
+}
+
+.mode-switcher-item.selected {
+  color: var(--vscode-list-activeSelectionForeground, var(--vscode-foreground));
+  background: var(--vscode-list-activeSelectionBackground, var(--vscode-list-hoverBackground));
+}
+
+.mode-switcher-item-name {
+  font-weight: 500;
+}
+
+.mode-switcher-item-desc {
+  font-size: 11px;
+  color: var(--vscode-descriptionForeground);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }

@@ -3,6 +3,7 @@ import type {
   SessionInfo,
   MessageInfo,
   MessagePart,
+  AgentInfo,
   ProfileData,
   ProviderAuthAuthorization,
   ProviderListResponse,
@@ -147,6 +148,17 @@ export class HttpClient {
   }
 
   // ============================================
+  // Agent/Mode Methods
+  // ============================================
+
+  /**
+   * List all available agents (modes) from the CLI backend.
+   */
+  async listAgents(directory: string): Promise<AgentInfo[]> {
+    return this.request<AgentInfo[]>("GET", "/agent", undefined, { directory })
+  }
+
+  // ============================================
   // Messaging Methods
   // ============================================
 
@@ -157,12 +169,15 @@ export class HttpClient {
     sessionId: string,
     parts: Array<{ type: "text"; text: string } | { type: "file"; mime: string; url: string }>,
     directory: string,
-    options?: { providerID?: string; modelID?: string },
+    options?: { providerID?: string; modelID?: string; agent?: string },
   ): Promise<void> {
     const body: Record<string, unknown> = { parts }
     if (options?.providerID && options?.modelID) {
       // Backend expects model selection as a nested object: { model: { providerID, modelID } }
       body.model = { providerID: options.providerID, modelID: options.modelID }
+    }
+    if (options?.agent) {
+      body.agent = options.agent
     }
 
     await this.request<void>("POST", `/session/${sessionId}/message`, body, { directory, allowEmpty: true })

@@ -15,6 +15,8 @@ interface ServerContextValue {
   profileData: Accessor<ProfileData | null>
   deviceAuth: Accessor<DeviceAuthState>
   startLogin: () => void
+  vscodeLanguage: Accessor<string | undefined>
+  languageOverride: Accessor<string | undefined>
 }
 
 const ServerContext = createContext<ServerContextValue>()
@@ -29,6 +31,8 @@ export const ServerProvider: ParentComponent = (props) => {
   const [error, setError] = createSignal<string | undefined>()
   const [profileData, setProfileData] = createSignal<ProfileData | null>(null)
   const [deviceAuth, setDeviceAuth] = createSignal<DeviceAuthState>(initialDeviceAuth)
+  const [vscodeLanguage, setVscodeLanguage] = createSignal<string | undefined>()
+  const [languageOverride, setLanguageOverride] = createSignal<string | undefined>()
 
   onMount(() => {
     const unsubscribe = vscode.onMessage((message: ExtensionMessage) => {
@@ -38,6 +42,12 @@ export const ServerProvider: ParentComponent = (props) => {
           setServerInfo(message.serverInfo)
           setConnectionState("connected")
           setError(undefined)
+          if (message.vscodeLanguage) {
+            setVscodeLanguage(message.vscodeLanguage)
+          }
+          if (message.languageOverride) {
+            setLanguageOverride(message.languageOverride)
+          }
           break
 
         case "connectionState":
@@ -110,6 +120,8 @@ export const ServerProvider: ParentComponent = (props) => {
     profileData,
     deviceAuth,
     startLogin,
+    vscodeLanguage,
+    languageOverride,
   }
 
   return <ServerContext.Provider value={value}>{props.children}</ServerContext.Provider>

@@ -78,7 +78,6 @@ The rebuild has a working foundation:
 | [Localization](non-agent-features/localization-and-locale-alignment.md)                                 | ❌ Not started | No i18n or locale normalization. All UI is English-only.                                                                                                                         | Extension + webview; CLI locale mapping needed                       | P3       |
 | [Marketplace](non-agent-features/marketplace.md)                                                        | 🔨 Partial     | Placeholder view exists but is non-functional. No catalog, install, or update capabilities. [#169](https://github.com/Kilo-Org/kilo/issues/169)                                  | Extension-side                                                       | P2       |
 | [MCP & MCP Hub](non-agent-features/mcp-and-mcp-hub.md)                                                  | ❌ Not started | No MCP configuration UI, server management, tool allowlisting, or connection status. CLI owns MCP runtime.                                                                       | CLI owns MCP lifecycle; extension provides config UI                 | P1       |
-| [Memory Bank](non-agent-features/memory-bank.md)                                                        | ❌ Not started | No `.kilocode` project documentation loading at task start.                                                                                                                      | Extension-side (file convention)                                     | P2       |
 | [Mode Switcher](non-agent-features/mode-switcher.md)                                                    | ❌ Not started | No mode switching UI (Code, Architect, Ask, Debug, etc.). [#162](https://github.com/Kilo-Org/kilo/issues/162)                                                                    | CLI manages modes; extension provides switcher UI                    | P2       |
 | [Model Switcher](non-agent-features/model-switcher.md)                                                  | 🔨 Partial     | No model switching UI. In progress. [#163](https://github.com/Kilo-Org/kilo/issues/163)                                                                                          | CLI provides model list; extension provides switcher UI              | P1       |
 | [Provider Configuration](non-agent-features/provider-configuration.md)                                  | ❌ Not started | No provider add/edit/remove or switching UI. ProvidersTab is a stub. [#175](https://github.com/Kilo-Org/kilo/issues/175)                                                         | CLI manages providers; extension provides config UI                  | P1       |
@@ -104,6 +103,48 @@ These items were identified from the [JetBrains plugin analysis](../LESSONS_LEAR
 | [HTTP Request Timeouts](infrastructure/http-request-timeouts.md)           | ❌ Not started | HTTP client uses bare `fetch()` with no timeouts. Hung requests block indefinitely.                                             | Extension (HttpClient)                    | P1       |
 | [VSCode Error Notifications](infrastructure/vscode-error-notifications.md) | ❌ Not started | Critical errors (CLI missing, server crash) are only shown in the webview. No `vscode.window.showErrorMessage()` notifications. | Extension (KiloProvider)                  | P1       |
 | [Dedicated Output Channel](infrastructure/dedicated-output-channel.md)     | ❌ Not started | All logging goes to console.log mixed with other extensions. No dedicated "Kilo Code" output channel.                           | Extension (new logger utility)            | P2       |
+
+---
+
+## Pre-Production Checklist
+
+Before publishing this extension to the VS Code Marketplace or deploying to users, verify every item below.
+
+### Security
+
+- [ ] **Review and tighten CSP** — The current policy in [`KiloProvider._getHtmlForWebview()`](../src/KiloProvider.ts:829) has several areas to audit:
+  - `style-src 'unsafe-inline'` is broadly permissive — investigate whether nonce-based style loading is feasible now that kilo-ui styles are bundled
+  - `connect-src http://127.0.0.1:* http://localhost:*` allows connections to _any_ localhost port — tighten to the actual CLI server port once known at runtime
+  - `img-src … https:` allows images from any HTTPS origin — scope to `${webview.cspSource} data:` unless external images are explicitly needed
+  - `'wasm-unsafe-eval'` in `script-src` was added for shiki — confirm it is still required and document the reason
+  - `ws://` connections to any localhost port — same concern as `connect-src`
+- [ ] **Validate `openExternal` URLs** — The [`openExternal` handler](../src/KiloProvider.ts:186) passes any URL from the webview directly to `vscode.env.openExternal()` with no allowlist or scheme check. Restrict to `https:` (and possibly `vscode:`) schemes, or allowlist specific hosts
+- [ ] **Audit credential storage** — CLI stores credentials as plaintext JSON with `chmod 0600` ([details](unknowns/7-8-auth-credential-storage.md)). Evaluate whether VS Code's `SecretStorage` API should be used for extension-side secrets, and document the threat model for CLI-managed credentials
+- [ ] **Audit workspace path containment** — CLI's path traversal checks are lexical only; symlinks and Windows cross-drive paths can escape the workspace boundary ([details](unknowns/7-7-workspace-path-safety.md)). Determine if additional hardening (realpath canonicalization) is needed before production
+
+### Reliability
+
+- [ ] **VS Code error notifications** — Critical errors (CLI missing, server crash, connection lost) are only shown inside the webview ([details](infrastructure/vscode-error-notifications.md)). Users get no feedback if the webview is hidden
+- [ ] **Connection state UI** — No loading spinner, error panel, or reconnecting indicator in the webview ([details](chat-ui-features/connection-state-ui.md)). Chat renders even when disconnected
+
+### Testing
+
+- [ ] **Test coverage** — Only one test file exists ([`extension.test.ts`](../src/test/extension.test.ts)). Add integration tests for: server lifecycle, SSE event routing, message send/receive, permission flow, session management
+- [ ] **Multi-theme visual check** — Verify the webview renders correctly in at least one light theme, one dark theme, and one high-contrast theme
+- [ ] **Multi-platform smoke test** — Test on macOS, Windows, and Linux. Particularly: CLI binary provisioning, path handling, `chmod`-based credential protection on Windows
+
+### Packaging & Marketplace
+
+- [ ] **Bundle size audit** — With kilo-ui and its transitive dependencies (shiki, marked, katex, dompurify, etc.) now bundled, measure `dist/webview.js` size and verify the total `.vsix` package size is acceptable
+- [ ] **`.vscodeignore` review** — Ensure only necessary files are included in the package (no `docs/`, `src/`, test artifacts, or development scripts)
+- [ ] **Marketplace metadata** — Verify [`README.md`](../README.md), [`CHANGELOG.md`](../CHANGELOG.md), publisher name, extension icon, and [`package.json`](../package.json) fields (`displayName`, `description`, `categories`, `keywords`, `repository`) are production-ready
+- [ ] **`activationEvents` review** — Confirm the extension only activates when needed (not `*`), to avoid impacting VS Code startup time
+- [ ] **Minimum VS Code version** — Verify `engines.vscode` in [`package.json`](../package.json) matches the minimum API features actually used
+
+### Logging & Observability
+
+- [ ] **Dedicated output channel** — All logging currently goes to `console.log` mixed with other extensions ([details](infrastructure/dedicated-output-channel.md)). Create a dedicated "Kilo Code" output channel before production
+- [ ] **Remove or guard verbose logging** — Many `console.log` calls with emojis and debug detail exist in [`KiloProvider.ts`](../src/KiloProvider.ts). Gate behind a debug flag or move to the output channel at appropriate log levels
 
 ---
 
