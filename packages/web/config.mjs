@@ -8,7 +8,7 @@ export default {
   github: "https://github.com/Kilo-Org/kilo",
   discord: "https://opencode.ai/discord",
   headerLinks: [
-    { name: "Home", url: "/" },
-    { name: "Docs", url: "/docs/" },
+    { name: "app.header.home", url: "/" },
+    { name: "app.header.docs", url: "/docs/" },
   ],
 }
