@@ -25,6 +25,22 @@ import { dict as uiNo } from "@kilocode/kilo-ui/i18n/no"
 import { dict as uiBr } from "@kilocode/kilo-ui/i18n/br"
 import { dict as uiTh } from "@kilocode/kilo-ui/i18n/th"
 import { dict as uiBs } from "@kilocode/kilo-ui/i18n/bs"
+import { dict as appEn } from "../i18n/en"
+import { dict as appZh } from "../i18n/zh"
+import { dict as appZht } from "../i18n/zht"
+import { dict as appKo } from "../i18n/ko"
+import { dict as appDe } from "../i18n/de"
+import { dict as appEs } from "../i18n/es"
+import { dict as appFr } from "../i18n/fr"
+import { dict as appDa } from "../i18n/da"
+import { dict as appJa } from "../i18n/ja"
+import { dict as appPl } from "../i18n/pl"
+import { dict as appRu } from "../i18n/ru"
+import { dict as appAr } from "../i18n/ar"
+import { dict as appNo } from "../i18n/no"
+import { dict as appBr } from "../i18n/br"
+import { dict as appTh } from "../i18n/th"
+import { dict as appBs } from "../i18n/bs"
 import { dict as kiloEn } from "@kilocode/kilo-i18n/en"
 import { dict as kiloZh } from "@kilocode/kilo-i18n/zh"
 import { dict as kiloZht } from "@kilocode/kilo-i18n/zht"
@@ -99,24 +115,25 @@ export const LOCALE_LABELS: Record<Locale, string> = {
   bs: "Bosanski",
 }
 
-// Merge UI + Kilo dicts (kilo overrides last, English base always present)
+// Merge all 3 dict layers: app + ui + kilo (kilo overrides last, English base always present)
+const base = { ...appEn, ...uiEn, ...kiloEn }
 const dicts: Record<Locale, Record<string, string>> = {
-  en: { ...uiEn, ...kiloEn },
-  zh: { ...uiEn, ...kiloEn, ...uiZh, ...kiloZh },
-  zht: { ...uiEn, ...kiloEn, ...uiZht, ...kiloZht },
-  ko: { ...uiEn, ...kiloEn, ...uiKo, ...kiloKo },
-  de: { ...uiEn, ...kiloEn, ...uiDe, ...kiloDe },
-  es: { ...uiEn, ...kiloEn, ...uiEs, ...kiloEs },
-  fr: { ...uiEn, ...kiloEn, ...uiFr, ...kiloFr },
-  da: { ...uiEn, ...kiloEn, ...uiDa, ...kiloDa },
-  ja: { ...uiEn, ...kiloEn, ...uiJa, ...kiloJa },
-  pl: { ...uiEn, ...kiloEn, ...uiPl, ...kiloPl },
-  ru: { ...uiEn, ...kiloEn, ...uiRu, ...kiloRu },
-  ar: { ...uiEn, ...kiloEn, ...uiAr, ...kiloAr },
-  no: { ...uiEn, ...kiloEn, ...uiNo, ...kiloNo },
-  br: { ...uiEn, ...kiloEn, ...uiBr, ...kiloBr },
-  th: { ...uiEn, ...kiloEn, ...uiTh, ...kiloTh },
-  bs: { ...uiEn, ...kiloEn, ...uiBs, ...kiloBs },
+  en: base,
+  zh: { ...base, ...appZh, ...uiZh, ...kiloZh },
+  zht: { ...base, ...appZht, ...uiZht, ...kiloZht },
+  ko: { ...base, ...appKo, ...uiKo, ...kiloKo },
+  de: { ...base, ...appDe, ...uiDe, ...kiloDe },
+  es: { ...base, ...appEs, ...uiEs, ...kiloEs },
+  fr: { ...base, ...appFr, ...uiFr, ...kiloFr },
+  da: { ...base, ...appDa, ...uiDa, ...kiloDa },
+  ja: { ...base, ...appJa, ...uiJa, ...kiloJa },
+  pl: { ...base, ...appPl, ...uiPl, ...kiloPl },
+  ru: { ...base, ...appRu, ...uiRu, ...kiloRu },
+  ar: { ...base, ...appAr, ...uiAr, ...kiloAr },
+  no: { ...base, ...appNo, ...uiNo, ...kiloNo },
+  br: { ...base, ...appBr, ...uiBr, ...kiloBr },
+  th: { ...base, ...appTh, ...uiTh, ...kiloTh },
+  bs: { ...base, ...appBs, ...uiBs, ...kiloBs },
 }
 
 function normalizeLocale(lang: string): Locale {
@@ -195,7 +212,9 @@ export const LanguageProvider: ParentComponent<LanguageProviderProps> = (props) 
   }
 
   return (
-    <LanguageContext.Provider value={{ locale, setLocale, userOverride }}>
+    <LanguageContext.Provider
+      value={{ locale, setLocale, userOverride, t: t as (key: string, params?: UiI18nParams) => string }}
+    >
       <I18nProvider value={{ locale: () => locale(), t }}>{props.children}</I18nProvider>
     </LanguageContext.Provider>
   )
@@ -208,6 +227,7 @@ interface LanguageContextValue {
   locale: Accessor<Locale>
   setLocale: (locale: Locale | "") => void
   userOverride: Accessor<Locale | "">
+  t: (key: string, params?: UiI18nParams) => string
 }
 
 const LanguageContext = createContext<LanguageContextValue>()
