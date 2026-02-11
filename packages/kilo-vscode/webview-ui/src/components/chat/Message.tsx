@@ -25,7 +25,7 @@ interface MessageProps {
 const TextPartView: Component<{ part: TextPart; role: string }> = (props) => {
   return (
     <Show when={props.role === "assistant"} fallback={<div class="message-text">{props.part.text}</div>}>
-      <Markdown content={props.part.text} />
+      <Markdown text={props.part.text} />
     </Show>
   )
 }
@@ -155,7 +155,7 @@ export const Message: Component<MessageProps> = (props) => {
                 when={props.message.role === "assistant"}
                 fallback={<div class="message-text">{props.message.content}</div>}
               >
-                <Markdown content={props.message.content!} />
+                <Markdown text={props.message.content!} />
               </Show>
             </Show>
           }

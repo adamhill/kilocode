@@ -776,7 +776,7 @@ export class KiloProvider implements vscode.WebviewViewProvider {
     const csp = [
       "default-src 'none'",
       `style-src 'unsafe-inline' ${webview.cspSource}`,
-      `script-src 'nonce-${nonce}'`,
+      `script-src 'nonce-${nonce}' 'wasm-unsafe-eval'`,
       `font-src ${webview.cspSource}`,
       "connect-src http://127.0.0.1:* http://localhost:* ws://127.0.0.1:* ws://localhost:*",
       `img-src ${webview.cspSource} data: https:`,
