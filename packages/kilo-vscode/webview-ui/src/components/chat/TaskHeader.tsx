@@ -12,10 +12,10 @@ import { useSession } from "../../context/session"
 export const TaskHeader: Component = () => {
   const session = useSession()
 
-  const title = createMemo(() => session.currentSession()?.title)
+  const title = createMemo(() => session.currentSession()?.title ?? "New session")
   const hasMessages = createMemo(() => session.messages().length > 0)
-  const visible = createMemo(() => hasMessages())
   const busy = createMemo(() => session.status() === "busy")
+  const canCompact = createMemo(() => !busy() && hasMessages() && !!session.selected())
 
   const cost = createMemo(() => {
     const total = session.totalCost()
@@ -35,7 +35,7 @@ export const TaskHeader: Component = () => {
   })
 
   return (
-    <Show when={visible()}>
+    <Show when={hasMessages()}>
       <div class="task-header">
         <div class="task-header-title" title={title()}>
           {title()}
@@ -63,7 +63,7 @@ export const TaskHeader: Component = () => {
               icon="collapse"
               size="small"
               variant="ghost"
-              disabled={busy() || !hasMessages()}
+              disabled={!canCompact()}
               onClick={() => session.compact()}
               aria-label="Compact session"
             />
