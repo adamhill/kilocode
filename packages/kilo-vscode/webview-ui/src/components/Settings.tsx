@@ -26,19 +26,25 @@ const Settings: Component<SettingsProps> = (props) => {
   const server = useServer()
 
   return (
-    <div data-component="settings-page">
+    <div style={{ display: "flex", "flex-direction": "column", height: "100%" }}>
       {/* Header */}
-      <div data-slot="settings-header">
-        <div data-slot="settings-header-left">
-          <Button variant="ghost" size="small" onClick={() => props.onBack?.()} title="Done">
-            <Icon name="arrow-left" />
-          </Button>
-          <h2 data-slot="settings-title">Settings</h2>
-        </div>
+      <div
+        style={{
+          padding: "12px 16px",
+          "border-bottom": "1px solid var(--border-weak-base)",
+          display: "flex",
+          "align-items": "center",
+          gap: "8px",
+        }}
+      >
+        <Button variant="ghost" size="small" onClick={() => props.onBack?.()} title="Done">
+          <Icon name="arrow-left" />
+        </Button>
+        <h2 style={{ "font-size": "16px", "font-weight": "600", margin: 0 }}>Settings</h2>
       </div>
 
       {/* Settings tabs */}
-      <Tabs orientation="vertical" variant="settings" defaultValue="providers" class="settings-tabs">
+      <Tabs orientation="vertical" variant="settings" defaultValue="providers" style={{ flex: 1, overflow: "hidden" }}>
         <Tabs.List>
           <Tabs.SectionTitle>Configuration</Tabs.SectionTitle>
           <Tabs.Trigger value="providers">
@@ -100,59 +106,59 @@ const Settings: Component<SettingsProps> = (props) => {
         </Tabs.List>
 
         <Tabs.Content value="providers">
-          <h3 data-slot="settings-content-title">Providers</h3>
+          <h3>Providers</h3>
           <ProvidersTab />
         </Tabs.Content>
         <Tabs.Content value="agentBehaviour">
-          <h3 data-slot="settings-content-title">Agent Behaviour</h3>
+          <h3>Agent Behaviour</h3>
           <AgentBehaviourTab />
         </Tabs.Content>
         <Tabs.Content value="autoApprove">
-          <h3 data-slot="settings-content-title">Auto-Approve</h3>
+          <h3>Auto-Approve</h3>
           <AutoApproveTab />
         </Tabs.Content>
         <Tabs.Content value="browser">
-          <h3 data-slot="settings-content-title">Browser</h3>
+          <h3>Browser</h3>
           <BrowserTab />
         </Tabs.Content>
         <Tabs.Content value="checkpoints">
-          <h3 data-slot="settings-content-title">Checkpoints</h3>
+          <h3>Checkpoints</h3>
           <CheckpointsTab />
         </Tabs.Content>
         <Tabs.Content value="display">
-          <h3 data-slot="settings-content-title">Display</h3>
+          <h3>Display</h3>
           <DisplayTab />
         </Tabs.Content>
         <Tabs.Content value="autocomplete">
-          <h3 data-slot="settings-content-title">Autocomplete</h3>
+          <h3>Autocomplete</h3>
           <AutocompleteTab />
         </Tabs.Content>
         <Tabs.Content value="notifications">
-          <h3 data-slot="settings-content-title">Notifications</h3>
+          <h3>Notifications</h3>
           <NotificationsTab />
         </Tabs.Content>
         <Tabs.Content value="context">
-          <h3 data-slot="settings-content-title">Context</h3>
+          <h3>Context</h3>
           <ContextTab />
         </Tabs.Content>
         <Tabs.Content value="terminal">
-          <h3 data-slot="settings-content-title">Terminal</h3>
+          <h3>Terminal</h3>
           <TerminalTab />
         </Tabs.Content>
         <Tabs.Content value="prompts">
-          <h3 data-slot="settings-content-title">Prompts</h3>
+          <h3>Prompts</h3>
           <PromptsTab />
         </Tabs.Content>
         <Tabs.Content value="experimental">
-          <h3 data-slot="settings-content-title">Experimental</h3>
+          <h3>Experimental</h3>
           <ExperimentalTab />
         </Tabs.Content>
         <Tabs.Content value="language">
-          <h3 data-slot="settings-content-title">Language</h3>
+          <h3>Language</h3>
           <LanguageTab />
         </Tabs.Content>
         <Tabs.Content value="aboutKiloCode">
-          <h3 data-slot="settings-content-title">About Kilo Code</h3>
+          <h3>About Kilo Code</h3>
           <AboutKiloCodeTab port={server.serverInfo()?.port ?? null} connectionState={server.connectionState()} />
         </Tabs.Content>
       </Tabs>
