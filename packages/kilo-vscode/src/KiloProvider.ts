@@ -820,6 +820,17 @@ export class KiloProvider implements vscode.WebviewViewProvider {
           session: this.sessionToWebview(event.properties.info),
         })
         break
+
+      case "session.updated":
+        // Keep local state in sync (e.g. title generation)
+        if (this.currentSession?.id === event.properties.info.id) {
+          this.currentSession = event.properties.info
+        }
+        this.postMessage({
+          type: "sessionUpdated",
+          session: this.sessionToWebview(event.properties.info),
+        })
+        break
     }
   }
 

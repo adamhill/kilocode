@@ -233,6 +233,11 @@ export interface SessionCreatedMessage {
   session: SessionInfo
 }
 
+export interface SessionUpdatedMessage {
+  type: "sessionUpdated"
+  session: SessionInfo
+}
+
 export interface MessagesLoadedMessage {
   type: "messagesLoaded"
   sessionID: string
@@ -302,6 +307,7 @@ export type ExtensionMessage =
   | PermissionRequestMessage
   | TodoUpdatedMessage
   | SessionCreatedMessage
+  | SessionUpdatedMessage
   | MessagesLoadedMessage
   | MessageCreatedMessage
   | SessionsLoadedMessage

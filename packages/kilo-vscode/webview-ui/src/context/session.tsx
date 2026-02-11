@@ -239,6 +239,10 @@ export const SessionProvider: ParentComponent = (props) => {
         case "sessionsLoaded":
           handleSessionsLoaded(message.sessions)
           break
+
+        case "sessionUpdated":
+          setStore("sessions", message.session.id, message.session)
+          break
       }
     })
 
