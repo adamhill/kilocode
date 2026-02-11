@@ -1,22 +1,6 @@
 import { Component, createSignal, For, JSX } from "solid-js"
 import { Button } from "@kilocode/kilo-ui/button"
-import {
-  Plug,
-  Users2,
-  CheckCheck,
-  SquareMousePointer,
-  GitBranch,
-  Monitor,
-  Bot,
-  Bell,
-  Database,
-  SquareTerminal,
-  MessageSquare,
-  FlaskConical,
-  Globe,
-  Info,
-  ArrowLeft,
-} from "lucide-solid"
+import { Icon } from "@kilocode/kilo-ui/icon"
 import ProvidersTab from "./settings/ProvidersTab"
 import AgentBehaviourTab from "./settings/AgentBehaviourTab"
 import AutoApproveTab from "./settings/AutoApproveTab"
@@ -60,20 +44,20 @@ interface TabConfig {
 }
 
 const tabs: TabConfig[] = [
-  { id: "providers", label: "Providers", icon: () => <Plug size={18} /> },
-  { id: "agentBehaviour", label: "Agent Behaviour", icon: () => <Users2 size={18} /> },
-  { id: "autoApprove", label: "Auto-Approve", icon: () => <CheckCheck size={18} /> },
-  { id: "browser", label: "Browser", icon: () => <SquareMousePointer size={18} /> },
-  { id: "checkpoints", label: "Checkpoints", icon: () => <GitBranch size={18} /> },
-  { id: "display", label: "Display", icon: () => <Monitor size={18} /> },
-  { id: "autocomplete", label: "Autocomplete", icon: () => <Bot size={18} /> },
-  { id: "notifications", label: "Notifications", icon: () => <Bell size={18} /> },
-  { id: "context", label: "Context", icon: () => <Database size={18} /> },
-  { id: "terminal", label: "Terminal", icon: () => <SquareTerminal size={18} /> },
-  { id: "prompts", label: "Prompts", icon: () => <MessageSquare size={18} /> },
-  { id: "experimental", label: "Experimental", icon: () => <FlaskConical size={18} /> },
-  { id: "language", label: "Language", icon: () => <Globe size={18} /> },
-  { id: "aboutKiloCode", label: "About Kilo Code", icon: () => <Info size={18} /> },
+  { id: "providers", label: "Providers", icon: () => <Icon name="providers" /> },
+  { id: "agentBehaviour", label: "Agent Behaviour", icon: () => <Icon name="brain" /> },
+  { id: "autoApprove", label: "Auto-Approve", icon: () => <Icon name="checklist" /> },
+  { id: "browser", label: "Browser", icon: () => <Icon name="window-cursor" /> },
+  { id: "checkpoints", label: "Checkpoints", icon: () => <Icon name="branch" /> },
+  { id: "display", label: "Display", icon: () => <Icon name="eye" /> },
+  { id: "autocomplete", label: "Autocomplete", icon: () => <Icon name="code-lines" /> },
+  { id: "notifications", label: "Notifications", icon: () => <Icon name="circle-check" /> },
+  { id: "context", label: "Context", icon: () => <Icon name="server" /> },
+  { id: "terminal", label: "Terminal", icon: () => <Icon name="console" /> },
+  { id: "prompts", label: "Prompts", icon: () => <Icon name="comment" /> },
+  { id: "experimental", label: "Experimental", icon: () => <Icon name="settings-gear" /> },
+  { id: "language", label: "Language", icon: () => <Icon name="speech-bubble" /> },
+  { id: "aboutKiloCode", label: "About Kilo Code", icon: () => <Icon name="help" /> },
 ]
 
 const Settings: Component<SettingsProps> = (props) => {
@@ -151,7 +135,7 @@ const Settings: Component<SettingsProps> = (props) => {
           }}
         >
           <Button variant="ghost" size="small" onClick={() => props.onBack?.()} title="Done">
-            <ArrowLeft size={18} />
+            <Icon name="arrow-left" />
           </Button>
           <h2
             style={{
