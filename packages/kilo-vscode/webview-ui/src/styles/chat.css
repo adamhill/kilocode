@@ -373,6 +373,41 @@
 }
 
 /* ============================================
+   Settings Page
+   ============================================ */
+
+[data-component="settings-page"] {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+[data-slot="settings-header"] {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--vscode-panel-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+[data-slot="settings-header-left"] {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+[data-slot="settings-title"] {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.settings-tabs {
+  flex: 1;
+  overflow: hidden;
+}
+
+/* ============================================
    Permission Dialog
    ============================================ */
 

@@ -1,6 +1,7 @@
-import { Component, createSignal, For, JSX } from "solid-js"
+import { Component } from "solid-js"
 import { Button } from "@kilocode/kilo-ui/button"
 import { Icon } from "@kilocode/kilo-ui/icon"
+import { Tabs } from "@kilocode/kilo-ui/tabs"
 import ProvidersTab from "./settings/ProvidersTab"
 import AgentBehaviourTab from "./settings/AgentBehaviourTab"
 import AutoApproveTab from "./settings/AutoApproveTab"
@@ -21,244 +22,126 @@ export interface SettingsProps {
   onBack?: () => void
 }
 
-type TabId =
-  | "providers"
-  | "agentBehaviour"
-  | "autoApprove"
-  | "browser"
-  | "checkpoints"
-  | "display"
-  | "autocomplete"
-  | "notifications"
-  | "context"
-  | "terminal"
-  | "prompts"
-  | "experimental"
-  | "language"
-  | "aboutKiloCode"
-
-interface TabConfig {
-  id: TabId
-  label: string
-  icon: () => JSX.Element
-}
-
-const tabs: TabConfig[] = [
-  { id: "providers", label: "Providers", icon: () => <Icon name="providers" /> },
-  { id: "agentBehaviour", label: "Agent Behaviour", icon: () => <Icon name="brain" /> },
-  { id: "autoApprove", label: "Auto-Approve", icon: () => <Icon name="checklist" /> },
-  { id: "browser", label: "Browser", icon: () => <Icon name="window-cursor" /> },
-  { id: "checkpoints", label: "Checkpoints", icon: () => <Icon name="branch" /> },
-  { id: "display", label: "Display", icon: () => <Icon name="eye" /> },
-  { id: "autocomplete", label: "Autocomplete", icon: () => <Icon name="code-lines" /> },
-  { id: "notifications", label: "Notifications", icon: () => <Icon name="circle-check" /> },
-  { id: "context", label: "Context", icon: () => <Icon name="server" /> },
-  { id: "terminal", label: "Terminal", icon: () => <Icon name="console" /> },
-  { id: "prompts", label: "Prompts", icon: () => <Icon name="comment" /> },
-  { id: "experimental", label: "Experimental", icon: () => <Icon name="settings-gear" /> },
-  { id: "language", label: "Language", icon: () => <Icon name="speech-bubble" /> },
-  { id: "aboutKiloCode", label: "About Kilo Code", icon: () => <Icon name="help" /> },
-]
-
 const Settings: Component<SettingsProps> = (props) => {
   const server = useServer()
-  const [activeTab, setActiveTab] = createSignal<TabId>("providers")
-
-  const getTabIcon = (tabId: TabId) => {
-    const tab = tabs.find((t) => t.id === tabId)
-    return tab ? tab.icon() : null
-  }
-
-  const getTabLabel = (tabId: TabId) => {
-    const tab = tabs.find((t) => t.id === tabId)
-    return tab ? tab.label : ""
-  }
-
-  const renderTabContent = () => {
-    switch (activeTab()) {
-      case "providers":
-        return <ProvidersTab />
-      case "agentBehaviour":
-        return <AgentBehaviourTab />
-      case "autoApprove":
-        return <AutoApproveTab />
-      case "browser":
-        return <BrowserTab />
-      case "checkpoints":
-        return <CheckpointsTab />
-      case "display":
-        return <DisplayTab />
-      case "autocomplete":
-        return <AutocompleteTab />
-      case "notifications":
-        return <NotificationsTab />
-      case "context":
-        return <ContextTab />
-      case "terminal":
-        return <TerminalTab />
-      case "prompts":
-        return <PromptsTab />
-      case "experimental":
-        return <ExperimentalTab />
-      case "language":
-        return <LanguageTab />
-      case "aboutKiloCode":
-        return <AboutKiloCodeTab port={server.serverInfo()?.port ?? null} connectionState={server.connectionState()} />
-    }
-  }
 
   return (
-    <div
-      style={{
-        display: "flex",
-        "flex-direction": "column",
-        height: "100%",
-        color: "var(--vscode-foreground)",
-        "font-family": "var(--vscode-font-family)",
-      }}
-    >
+    <div data-component="settings-page">
       {/* Header */}
-      <div
-        style={{
-          padding: "12px 16px",
-          "border-bottom": "1px solid var(--vscode-panel-border)",
-          display: "flex",
-          "align-items": "center",
-          "justify-content": "space-between",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            "align-items": "center",
-            gap: "8px",
-          }}
-        >
+      <div data-slot="settings-header">
+        <div data-slot="settings-header-left">
           <Button variant="ghost" size="small" onClick={() => props.onBack?.()} title="Done">
             <Icon name="arrow-left" />
           </Button>
-          <h2
-            style={{
-              "font-size": "16px",
-              "font-weight": "600",
-              margin: 0,
-              color: "var(--vscode-foreground)",
-            }}
-          >
-            Settings
-          </h2>
-        </div>
-        <Button variant="primary" size="small" disabled>
-          Save
-        </Button>
-      </div>
-
-      {/* Main content area with sidebar and content */}
-      <div
-        style={{
-          display: "flex",
-          flex: 1,
-          overflow: "hidden",
-        }}
-      >
-        {/* Tab sidebar */}
-        <div
-          style={{
-            width: "192px",
-            "flex-shrink": 0,
-            "border-right": "1px solid var(--vscode-panel-border)",
-            "overflow-y": "auto",
-            display: "flex",
-            "flex-direction": "column",
-          }}
-        >
-          <For each={tabs}>
-            {(tab) => (
-              <button
-                onClick={() => setActiveTab(tab.id)}
-                style={{
-                  width: "100%",
-                  height: "48px",
-                  padding: "0 16px",
-                  border: "none",
-                  background: activeTab() === tab.id ? "var(--vscode-list-activeSelectionBackground)" : "transparent",
-                  color:
-                    activeTab() === tab.id
-                      ? "var(--vscode-list-activeSelectionForeground)"
-                      : "var(--vscode-foreground)",
-                  "text-align": "left",
-                  cursor: "pointer",
-                  "font-size": "13px",
-                  "font-family": "var(--vscode-font-family)",
-                  "border-left":
-                    activeTab() === tab.id ? "2px solid var(--vscode-focusBorder)" : "2px solid transparent",
-                  opacity: activeTab() === tab.id ? 1 : 0.7,
-                  display: "flex",
-                  "align-items": "center",
-                  gap: "12px",
-                }}
-                onMouseEnter={(e) => {
-                  if (activeTab() !== tab.id) {
-                    e.currentTarget.style.background = "var(--vscode-list-hoverBackground)"
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (activeTab() !== tab.id) {
-                    e.currentTarget.style.background = "transparent"
-                  }
-                }}
-              >
-                {tab.icon()}
-                <span>{tab.label}</span>
-              </button>
-            )}
-          </For>
-        </div>
-
-        {/* Content area */}
-        <div
-          style={{
-            flex: 1,
-            "overflow-y": "auto",
-            display: "flex",
-            "flex-direction": "column",
-          }}
-        >
-          {/* Section header */}
-          <div
-            style={{
-              padding: "16px",
-              "border-bottom": "1px solid var(--vscode-panel-border)",
-              display: "flex",
-              "align-items": "center",
-              gap: "8px",
-            }}
-          >
-            {getTabIcon(activeTab())}
-            <h3
-              style={{
-                "font-size": "14px",
-                "font-weight": "600",
-                margin: 0,
-                color: "var(--vscode-foreground)",
-              }}
-            >
-              {getTabLabel(activeTab())}
-            </h3>
-          </div>
-
-          {/* Tab content */}
-          <div
-            style={{
-              flex: 1,
-              padding: "16px",
-              "overflow-y": "auto",
-            }}
-          >
-            {renderTabContent()}
-          </div>
+          <h2 data-slot="settings-title">Settings</h2>
         </div>
       </div>
+
+      {/* Settings tabs */}
+      <Tabs orientation="vertical" variant="settings" defaultValue="providers" class="settings-tabs">
+        <Tabs.List>
+          <Tabs.SectionTitle>Configuration</Tabs.SectionTitle>
+          <Tabs.Trigger value="providers">
+            <Icon name="providers" />
+            Providers
+          </Tabs.Trigger>
+          <Tabs.Trigger value="agentBehaviour">
+            <Icon name="brain" />
+            Agent Behaviour
+          </Tabs.Trigger>
+          <Tabs.Trigger value="autoApprove">
+            <Icon name="checklist" />
+            Auto-Approve
+          </Tabs.Trigger>
+          <Tabs.Trigger value="browser">
+            <Icon name="window-cursor" />
+            Browser
+          </Tabs.Trigger>
+          <Tabs.Trigger value="checkpoints">
+            <Icon name="branch" />
+            Checkpoints
+          </Tabs.Trigger>
+          <Tabs.Trigger value="display">
+            <Icon name="eye" />
+            Display
+          </Tabs.Trigger>
+          <Tabs.Trigger value="autocomplete">
+            <Icon name="code-lines" />
+            Autocomplete
+          </Tabs.Trigger>
+          <Tabs.Trigger value="notifications">
+            <Icon name="circle-check" />
+            Notifications
+          </Tabs.Trigger>
+          <Tabs.Trigger value="context">
+            <Icon name="server" />
+            Context
+          </Tabs.Trigger>
+          <Tabs.Trigger value="terminal">
+            <Icon name="console" />
+            Terminal
+          </Tabs.Trigger>
+          <Tabs.Trigger value="prompts">
+            <Icon name="comment" />
+            Prompts
+          </Tabs.Trigger>
+          <Tabs.Trigger value="experimental">
+            <Icon name="settings-gear" />
+            Experimental
+          </Tabs.Trigger>
+          <Tabs.Trigger value="language">
+            <Icon name="speech-bubble" />
+            Language
+          </Tabs.Trigger>
+          <Tabs.Trigger value="aboutKiloCode">
+            <Icon name="help" />
+            About Kilo Code
+          </Tabs.Trigger>
+        </Tabs.List>
+
+        <Tabs.Content value="providers">
+          <ProvidersTab />
+        </Tabs.Content>
+        <Tabs.Content value="agentBehaviour">
+          <AgentBehaviourTab />
+        </Tabs.Content>
+        <Tabs.Content value="autoApprove">
+          <AutoApproveTab />
+        </Tabs.Content>
+        <Tabs.Content value="browser">
+          <BrowserTab />
+        </Tabs.Content>
+        <Tabs.Content value="checkpoints">
+          <CheckpointsTab />
+        </Tabs.Content>
+        <Tabs.Content value="display">
+          <DisplayTab />
+        </Tabs.Content>
+        <Tabs.Content value="autocomplete">
+          <AutocompleteTab />
+        </Tabs.Content>
+        <Tabs.Content value="notifications">
+          <NotificationsTab />
+        </Tabs.Content>
+        <Tabs.Content value="context">
+          <ContextTab />
+        </Tabs.Content>
+        <Tabs.Content value="terminal">
+          <TerminalTab />
+        </Tabs.Content>
+        <Tabs.Content value="prompts">
+          <PromptsTab />
+        </Tabs.Content>
+        <Tabs.Content value="experimental">
+          <ExperimentalTab />
+        </Tabs.Content>
+        <Tabs.Content value="language">
+          <LanguageTab />
+        </Tabs.Content>
+        <Tabs.Content value="aboutKiloCode">
+          <AboutKiloCodeTab port={server.serverInfo()?.port ?? null} connectionState={server.connectionState()} />
+        </Tabs.Content>
+      </Tabs>
     </div>
   )
 }
