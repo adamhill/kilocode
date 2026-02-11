@@ -1,6 +1,6 @@
 import { Component, createSignal, createMemo, Switch, Match, onMount, onCleanup } from "solid-js"
 import { ThemeProvider } from "@kilocode/kilo-ui/theme"
-import { I18nProvider } from "@kilocode/kilo-ui/context"
+import { LanguageProvider } from "./context/language"
 import { DialogProvider } from "@kilocode/kilo-ui/context/dialog"
 import { MarkedProvider } from "@kilocode/kilo-ui/context/marked"
 import { DataProvider } from "@kilocode/kilo-ui/context/data"
@@ -154,7 +154,7 @@ const AppContent: Component = () => {
 const App: Component = () => {
   return (
     <ThemeProvider defaultTheme="kilo-vscode">
-      <I18nProvider value={{ locale: () => "en", t: (key) => key }}>
+      <LanguageProvider>
         <DialogProvider>
           <MarkedProvider>
             <VSCodeProvider>
@@ -170,7 +170,7 @@ const App: Component = () => {
             </VSCodeProvider>
           </MarkedProvider>
         </DialogProvider>
-      </I18nProvider>
+      </LanguageProvider>
     </ThemeProvider>
   )
 }

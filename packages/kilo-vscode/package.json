@@ -162,6 +162,7 @@
     "typescript-eslint": "^8.54.0"
   },
   "dependencies": {
+    "@kilocode/kilo-i18n": "workspace:*",
     "@kilocode/kilo-ui": "workspace:*",
     "@kilocode/sdk": "workspace:*",
     "eventsource": "^2.0.2",
