@@ -1,6 +1,7 @@
 import { Component, Show } from "solid-js"
 import { Button } from "@kilocode/kilo-ui/button"
 import { Card } from "@kilocode/kilo-ui/card"
+import { Tooltip } from "@kilocode/kilo-ui/tooltip"
 import { useVSCode } from "../context/vscode"
 import DeviceAuthCard from "./DeviceAuthCard"
 import type { ProfileData, DeviceAuthState } from "../types/messages"
@@ -156,9 +157,11 @@ const ProfileView: Component<ProfileViewProps> = (props) => {
                       {formatBalance(balance().balance)}
                     </p>
                   </div>
-                  <Button variant="ghost" size="small" onClick={handleRefresh}>
-                    ↻ Refresh
-                  </Button>
+                  <Tooltip value="Refresh balance" placement="left">
+                    <Button variant="ghost" size="small" onClick={handleRefresh}>
+                      ↻ Refresh
+                    </Button>
+                  </Tooltip>
                 </Card>
               )}
             </Show>

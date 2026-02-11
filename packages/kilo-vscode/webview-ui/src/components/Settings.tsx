@@ -2,6 +2,7 @@ import { Component } from "solid-js"
 import { Button } from "@kilocode/kilo-ui/button"
 import { Icon } from "@kilocode/kilo-ui/icon"
 import { Tabs } from "@kilocode/kilo-ui/tabs"
+import { Tooltip } from "@kilocode/kilo-ui/tooltip"
 import { useLanguage } from "../context/language"
 import ProvidersTab from "./settings/ProvidersTab"
 import AgentBehaviourTab from "./settings/AgentBehaviourTab"
@@ -39,9 +40,11 @@ const Settings: Component<SettingsProps> = (props) => {
           gap: "8px",
         }}
       >
-        <Button variant="ghost" size="small" onClick={() => props.onBack?.()} title="Done">
-          <Icon name="arrow-left" />
-        </Button>
+        <Tooltip value={language.t("common.goBack")} placement="bottom">
+          <Button variant="ghost" size="small" onClick={() => props.onBack?.()}>
+            <Icon name="arrow-left" />
+          </Button>
+        </Tooltip>
         <h2 style={{ "font-size": "16px", "font-weight": "600", margin: 0 }}>{language.t("sidebar.settings")}</h2>
       </div>
 

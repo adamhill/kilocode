@@ -2,6 +2,7 @@ import { Component, Show, Switch, Match, createSignal, createEffect, onCleanup }
 import { Button } from "@kilocode/kilo-ui/button"
 import { Card } from "@kilocode/kilo-ui/card"
 import { Spinner } from "@kilocode/kilo-ui/spinner"
+import { showToast } from "@kilocode/kilo-ui/toast"
 import { useVSCode } from "../context/vscode"
 import { generateQRCode } from "../utils/qrcode"
 import type { DeviceAuthStatus } from "../types/messages"
@@ -26,7 +27,6 @@ const DeviceAuthCard: Component<DeviceAuthCardProps> = (props) => {
   const vscode = useVSCode()
   const [timeRemaining, setTimeRemaining] = createSignal(props.expiresIn ?? 900)
   const [qrDataUrl, setQrDataUrl] = createSignal("")
-  const [copied, setCopied] = createSignal(false)
 
   // Countdown timer
   createEffect(() => {
@@ -51,16 +51,14 @@ const DeviceAuthCard: Component<DeviceAuthCardProps> = (props) => {
   const handleCopyUrl = () => {
     if (props.verificationUrl) {
       navigator.clipboard.writeText(props.verificationUrl)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
+      showToast({ variant: "success", title: "URL copied to clipboard" })
     }
   }
 
   const handleCopyCode = () => {
     if (props.code) {
       navigator.clipboard.writeText(props.code)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
+      showToast({ variant: "success", title: "Code copied to clipboard" })
     }
   }
 
@@ -135,7 +133,7 @@ const DeviceAuthCard: Component<DeviceAuthCardProps> = (props) => {
                 {props.verificationUrl}
               </div>
               <Button variant="secondary" size="small" onClick={handleCopyUrl} title="Copy URL">
-                {copied() ? "✓" : "📋"}
+                📋
               </Button>
               <Button variant="secondary" size="small" onClick={handleOpenBrowser}>
                 Open Browser
