@@ -1,12 +1,18 @@
 /**
  * SessionList component
- * Displays all sessions sorted by most recent, allowing selection.
+ * Displays all sessions grouped by date, with context menu for rename/delete.
  * Uses kilo-ui List component for keyboard navigation and accessibility.
  */
 
-import { Component, onMount } from "solid-js"
+import { Component, Show, createSignal, onMount, type JSX } from "solid-js"
 import { List } from "@kilocode/kilo-ui/list"
+import { ContextMenu } from "@kilocode/kilo-ui/context-menu"
+import { Dialog } from "@kilocode/kilo-ui/dialog"
+import { Button } from "@kilocode/kilo-ui/button"
+import { InlineInput } from "@kilocode/kilo-ui/inline-input"
+import { useDialog } from "@kilocode/kilo-ui/context/dialog"
 import { useSession } from "../../context/session"
+import { useLanguage } from "../../context/language"
 import type { SessionInfo } from "../../types/messages"
 
 function formatRelativeDate(iso: string): string {
@@ -38,12 +44,41 @@ function formatRelativeDate(iso: string): string {
   return `${months}mo ago`
 }
 
+function dateGroup(iso: string): string {
+  const now = new Date()
+  const then = new Date(iso)
+
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  const yesterday = new Date(today.getTime() - 86400000)
+  const weekAgo = new Date(today.getTime() - 7 * 86400000)
+  const monthAgo = new Date(today.getTime() - 30 * 86400000)
+
+  if (then >= today) return "Today"
+  if (then >= yesterday) return "Yesterday"
+  if (then >= weekAgo) return "This Week"
+  if (then >= monthAgo) return "This Month"
+  return "Older"
+}
+
+const GROUP_ORDER: Record<string, number> = {
+  Today: 0,
+  Yesterday: 1,
+  "This Week": 2,
+  "This Month": 3,
+  Older: 4,
+}
+
 interface SessionListProps {
   onSelectSession: (id: string) => void
 }
 
 const SessionList: Component<SessionListProps> = (props) => {
   const session = useSession()
+  const language = useLanguage()
+  const dialog = useDialog()
+
+  const [renamingId, setRenamingId] = createSignal<string | null>(null)
+  const [renameValue, setRenameValue] = createSignal("")
 
   onMount(() => {
     console.log("[Kilo New] SessionList mounted, loading sessions")
@@ -55,6 +90,72 @@ const SessionList: Component<SessionListProps> = (props) => {
     return session.sessions().find((s) => s.id === id)
   }
 
+  function startRename(s: SessionInfo) {
+    setRenamingId(s.id)
+    setRenameValue(s.title || "")
+  }
+
+  function saveRename() {
+    const id = renamingId()
+    const title = renameValue().trim()
+    if (id && title) {
+      session.renameSession(id, title)
+    }
+    setRenamingId(null)
+    setRenameValue("")
+  }
+
+  function cancelRename() {
+    setRenamingId(null)
+    setRenameValue("")
+  }
+
+  function confirmDelete(s: SessionInfo) {
+    dialog.show(() => (
+      <Dialog title={language.t("session.delete.title")} fit>
+        <div style={{ display: "flex", "flex-direction": "column", gap: "16px", padding: "0 16px 12px" }}>
+          <span>{language.t("session.delete.confirm", { name: s.title || "Untitled" })}</span>
+          <div style={{ display: "flex", "justify-content": "flex-end", gap: "8px" }}>
+            <Button variant="ghost" size="large" onClick={() => dialog.close()}>
+              {language.t("common.cancel")}
+            </Button>
+            <Button
+              variant="primary"
+              size="large"
+              onClick={() => {
+                session.deleteSession(s.id)
+                dialog.close()
+              }}
+            >
+              {language.t("session.delete.button")}
+            </Button>
+          </div>
+        </div>
+      </Dialog>
+    ))
+  }
+
+  function wrapItem(item: SessionInfo, node: JSX.Element): JSX.Element {
+    return (
+      <ContextMenu>
+        <ContextMenu.Trigger as="div" style={{ display: "contents" }}>
+          {node}
+        </ContextMenu.Trigger>
+        <ContextMenu.Portal>
+          <ContextMenu.Content>
+            <ContextMenu.Item onSelect={() => startRename(item)}>
+              <ContextMenu.ItemLabel>{language.t("common.rename")}</ContextMenu.ItemLabel>
+            </ContextMenu.Item>
+            <ContextMenu.Separator />
+            <ContextMenu.Item onSelect={() => confirmDelete(item)}>
+              <ContextMenu.ItemLabel>{language.t("common.delete")}</ContextMenu.ItemLabel>
+            </ContextMenu.Item>
+          </ContextMenu.Content>
+        </ContextMenu.Portal>
+      </ContextMenu>
+    )
+  }
+
   return (
     <div class="session-list">
       <List<SessionInfo>
@@ -63,18 +164,45 @@ const SessionList: Component<SessionListProps> = (props) => {
         filterKeys={["title"]}
         current={currentSession()}
         onSelect={(s) => {
-          if (s) {
+          if (s && renamingId() !== s.id) {
             props.onSelectSession(s.id)
           }
         }}
         search={{ placeholder: "Search sessions...", autofocus: false }}
         emptyMessage="No sessions yet. Click + to start a new conversation."
+        groupBy={(s) => dateGroup(s.updatedAt)}
+        sortGroupsBy={(a, b) => (GROUP_ORDER[a.category] ?? 99) - (GROUP_ORDER[b.category] ?? 99)}
+        itemWrapper={wrapItem}
       >
         {(s) => (
-          <>
-            <span data-slot="list-item-title">{s.title || "Untitled"}</span>
-            <span data-slot="list-item-description">{formatRelativeDate(s.updatedAt)}</span>
-          </>
+          <Show
+            when={renamingId() === s.id}
+            fallback={
+              <>
+                <span data-slot="list-item-title">{s.title || "Untitled"}</span>
+                <span data-slot="list-item-description">{formatRelativeDate(s.updatedAt)}</span>
+              </>
+            }
+          >
+            <InlineInput
+              ref={(el) => requestAnimationFrame(() => el.focus())}
+              value={renameValue()}
+              onInput={(e) => setRenameValue(e.currentTarget.value)}
+              onKeyDown={(e) => {
+                e.stopPropagation()
+                if (e.key === "Enter") {
+                  e.preventDefault()
+                  saveRename()
+                }
+                if (e.key === "Escape") {
+                  e.preventDefault()
+                  cancelRename()
+                }
+              }}
+              onBlur={() => saveRename()}
+              style={{ width: "100%" }}
+            />
+          </Show>
         )}
       </List>
     </div>
