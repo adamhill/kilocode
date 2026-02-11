@@ -630,7 +630,7 @@ import { List } from "@kilocode/kilo-ui/list"
 import { Popover } from "@kilocode/kilo-ui/popover"
 ```
 
-Use for: model selector, provider info cards.
+Use for: model selector, mode selector, provider info cards.
 
 #### Acceptance criteria
 
@@ -777,7 +777,7 @@ Each phase has specific acceptance criteria (listed above). The general verifica
 | Session history     | List renders, selection works, navigation back to chat           |
 | Login flow          | Device auth card renders, QR code displays, success/error states |
 | Theme switching     | Change VS Code theme → webview updates automatically             |
-| Sidebar ↔ tab      | Both webview hosts render identically                            |
+| Sidebar ↔ tab       | Both webview hosts render identically                            |
 | Markdown content    | Headers, lists, code blocks, links render correctly              |
 | Long conversations  | Auto-scroll works, performance is acceptable                     |
 
@@ -795,7 +795,8 @@ Each phase has specific acceptance criteria (listed above). The general verifica
 | Phase 1.5: Icons             | ✅ Complete   | 2026-02-11 | All 15 lucide-solid icons replaced with kilo-ui `Icon`. `lucide-solid` dep removed. Many icons use approximate matches (see deviation #7).                                                                                                                                           |
 | Phase 2: Settings UI         | ✅ Complete   | 2026-02-11 | Settings shell uses kilo-ui `Tabs` with vertical orientation and `variant="settings"`. ~80 lines of inline styles removed. Tab content (stubs) unchanged. Back button in header kept with minimal CSS.                                                                               |
 | Phase 3: Chat UI             | ✅ Complete   | 2026-02-11 | MarkedProvider added. Assistant text renders as Markdown. Tool calls use BasicTool. Reasoning uses Collapsible. Removed ~150 lines of tool/reasoning CSS. Code/Diff providers deferred (not needed yet).                                                                             |
-| Phase 4: Advanced            | ⬚ Not started | —          |                                                                                                                                                                                                                                                                                      |
+| Phase 4.5: Popover           | ✅ Complete   | 2026-02-11 | ModelSelector and ModeSwitcher replaced with kilo-ui `Popover`. Removed ~85 lines of custom CSS (positioning, click-outside, z-index). Popover handles dismiss, positioning, and animations via Kobalte.                                                                             |
+| Phase 4: Advanced (rest)     | ⬚ Not started | —          | Tooltips, DropdownMenu, ContextMenu, Toast, List still pending.                                                                                                                                                                                                                      |
 
 ### Deviations from plan
 
