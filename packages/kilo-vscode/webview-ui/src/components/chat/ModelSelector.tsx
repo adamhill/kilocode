@@ -159,7 +159,7 @@ export const ModelSelector: Component = () => {
     if (raw?.providerID && raw?.modelID) {
       return raw.providerID === KILO_GATEWAY_ID ? raw.modelID : `${raw.providerID} / ${raw.modelID}`
     }
-    return hasProviders() ? language.t("dialog.model.select.title") : "No providers"
+    return hasProviders() ? language.t("dialog.model.select.title") : language.t("dialog.model.noProviders")
   }
 
   return (

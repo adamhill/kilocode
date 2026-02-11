@@ -69,7 +69,9 @@ export const PromptInput: Component = () => {
         <textarea
           ref={textareaRef}
           class="prompt-input"
-          placeholder={isDisabled() ? "Connecting to server..." : "Type a message..."}
+          placeholder={
+            isDisabled() ? language.t("prompt.placeholder.connecting") : language.t("prompt.placeholder.default")
+          }
           value={text()}
           onInput={handleInput}
           onKeyDown={handleKeyDown}
@@ -109,7 +111,7 @@ export const PromptInput: Component = () => {
         <ModeSwitcher />
         <ModelSelector />
         <Show when={!isDisabled()}>
-          <span>Press Enter to send, Shift+Enter for new line</span>
+          <span>{language.t("prompt.hint.sendShortcut")}</span>
         </Show>
       </div>
     </div>

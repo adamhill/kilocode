@@ -45,7 +45,7 @@ export const TaskHeader: Component = () => {
         <div data-slot="task-header-stats">
           <Show when={cost()}>
             {(c) => (
-              <Tooltip value="Session cost" placement="bottom">
+              <Tooltip value={language.t("context.usage.sessionCost")} placement="bottom">
                 <span>{c()}</span>
               </Tooltip>
             )}
