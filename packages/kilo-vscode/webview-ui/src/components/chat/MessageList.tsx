@@ -1,13 +1,39 @@
 /**
  * MessageList component
- * Scrollable list of messages with auto-scroll behavior
+ * Scrollable list of messages with auto-scroll behavior.
+ * Shows recent sessions in the empty state for quick resumption.
  */
 
-import { Component, For, Show, createSignal, createEffect, onCleanup } from "solid-js"
+import { Component, For, Show, createSignal, createEffect, createMemo, onMount, onCleanup } from "solid-js"
 import { useSession } from "../../context/session"
 import { Message } from "./Message"
 
-export const MessageList: Component = () => {
+interface MessageListProps {
+  onSelectSession?: (id: string) => void
+}
+
+function formatRelativeDate(iso: string): string {
+  const now = Date.now()
+  const then = new Date(iso).getTime()
+  const diff = now - then
+
+  const seconds = Math.floor(diff / 1000)
+  if (seconds < 60) return "just now"
+
+  const minutes = Math.floor(seconds / 60)
+  if (minutes < 60) return `${minutes} min ago`
+
+  const hours = Math.floor(minutes / 60)
+  if (hours < 24) return `${hours}h ago`
+
+  const days = Math.floor(hours / 24)
+  if (days < 30) return `${days}d ago`
+
+  const months = Math.floor(days / 30)
+  return `${months}mo ago`
+}
+
+export const MessageList: Component<MessageListProps> = (props) => {
   const session = useSession()
 
   let containerRef: HTMLDivElement | undefined
@@ -56,8 +82,16 @@ export const MessageList: Component = () => {
     })
   })
 
+  // Load sessions for the recent list when the empty state is visible
+  onMount(() => {
+    session.loadSessions()
+  })
+
   const messages = () => session.messages()
   const isEmpty = () => messages().length === 0
+
+  // Most recent 3 sessions (already sorted by updatedAt desc from the context)
+  const recent = createMemo(() => session.sessions().slice(0, 3))
 
   return (
     <div class="message-list-container">
@@ -65,6 +99,19 @@ export const MessageList: Component = () => {
         <Show when={isEmpty()}>
           <div class="message-list-empty">
             <p>Start a conversation by typing a message below.</p>
+            <Show when={recent().length > 0 && props.onSelectSession}>
+              <div class="recent-sessions">
+                <span class="recent-sessions-label">Recent</span>
+                <For each={recent()}>
+                  {(s) => (
+                    <button class="recent-session-item" onClick={() => props.onSelectSession?.(s.id)}>
+                      <span class="recent-session-title">{s.title || "Untitled"}</span>
+                      <span class="recent-session-date">{formatRelativeDate(s.updatedAt)}</span>
+                    </button>
+                  )}
+                </For>
+              </div>
+            </Show>
           </div>
         </Show>
         <For each={messages()}>{(message) => <Message message={message} />}</For>
