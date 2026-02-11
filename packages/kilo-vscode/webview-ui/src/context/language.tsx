@@ -2,10 +2,11 @@
  * Language context
  * Provides i18n translations for kilo-ui components.
  * Merges UI translations from @opencode-ai/ui and Kilo overrides from @kilocode/kilo-i18n.
- * Follows the same pattern as the desktop app (packages/app/src/context/language.tsx).
+ *
+ * Locale priority: user override → VS Code display language → browser language → "en"
  */
 
-import { createMemo, ParentComponent } from "solid-js"
+import { createSignal, createMemo, createEffect, ParentComponent, Accessor } from "solid-js"
 import { I18nProvider } from "@kilocode/kilo-ui/context"
 import type { UiI18nKey, UiI18nParams } from "@kilocode/kilo-ui/context"
 import { dict as uiEn } from "@kilocode/kilo-ui/i18n/en"
@@ -40,8 +41,9 @@ import { dict as kiloNo } from "@kilocode/kilo-i18n/no"
 import { dict as kiloBr } from "@kilocode/kilo-i18n/br"
 import { dict as kiloTh } from "@kilocode/kilo-i18n/th"
 import { dict as kiloBs } from "@kilocode/kilo-i18n/bs"
+import { useVSCode } from "./vscode"
 
-type Locale =
+export type Locale =
   | "en"
   | "zh"
   | "zht"
@@ -59,7 +61,45 @@ type Locale =
   | "th"
   | "bs"
 
-// Merge UI + Kilo dicts (kilo overrides last)
+export const LOCALES: readonly Locale[] = [
+  "en",
+  "zh",
+  "zht",
+  "ko",
+  "de",
+  "es",
+  "fr",
+  "da",
+  "ja",
+  "pl",
+  "ru",
+  "ar",
+  "no",
+  "br",
+  "th",
+  "bs",
+]
+
+export const LOCALE_LABELS: Record<Locale, string> = {
+  en: "English",
+  zh: "简体中文",
+  zht: "繁體中文",
+  ko: "한국어",
+  de: "Deutsch",
+  es: "Español",
+  fr: "Français",
+  da: "Dansk",
+  ja: "日本語",
+  pl: "Polski",
+  ru: "Русский",
+  ar: "العربية",
+  no: "Norsk",
+  br: "Português (Brasil)",
+  th: "ภาษาไทย",
+  bs: "Bosanski",
+}
+
+// Merge UI + Kilo dicts (kilo overrides last, English base always present)
 const dicts: Record<Locale, Record<string, string>> = {
   en: { ...uiEn, ...kiloEn },
   zh: { ...uiEn, ...kiloEn, ...uiZh, ...kiloZh },
@@ -79,61 +119,23 @@ const dicts: Record<Locale, Record<string, string>> = {
   bs: { ...uiEn, ...kiloEn, ...uiBs, ...kiloBs },
 }
 
-function detectLocale(): Locale {
-  if (typeof navigator !== "object") {
-    return "en"
+function normalizeLocale(lang: string): Locale {
+  const lower = lang.toLowerCase()
+  if (lower.startsWith("zh")) {
+    return lower.includes("hant") ? "zht" : "zh"
   }
-
-  const languages = navigator.languages?.length ? navigator.languages : [navigator.language]
-  for (const language of languages) {
-    if (!language) {
-      continue
-    }
-    const lower = language.toLowerCase()
-    if (lower.startsWith("zh")) {
-      return lower.includes("hant") ? "zht" : "zh"
-    }
-    if (lower.startsWith("ko")) {
-      return "ko"
-    }
-    if (lower.startsWith("de")) {
-      return "de"
-    }
-    if (lower.startsWith("es")) {
-      return "es"
-    }
-    if (lower.startsWith("fr")) {
-      return "fr"
-    }
-    if (lower.startsWith("da")) {
-      return "da"
-    }
-    if (lower.startsWith("ja")) {
-      return "ja"
-    }
-    if (lower.startsWith("pl")) {
-      return "pl"
-    }
-    if (lower.startsWith("ru")) {
-      return "ru"
-    }
-    if (lower.startsWith("ar")) {
-      return "ar"
-    }
-    if (lower.startsWith("no") || lower.startsWith("nb") || lower.startsWith("nn")) {
-      return "no"
-    }
-    if (lower.startsWith("pt")) {
-      return "br"
-    }
-    if (lower.startsWith("th")) {
-      return "th"
-    }
-    if (lower.startsWith("bs")) {
-      return "bs"
+  for (const loc of LOCALES) {
+    if (lower.startsWith(loc)) {
+      return loc
     }
   }
-
+  // Special cases
+  if (lower.startsWith("nb") || lower.startsWith("nn")) {
+    return "no"
+  }
+  if (lower.startsWith("pt")) {
+    return "br"
+  }
   return "en"
 }
 
@@ -147,8 +149,39 @@ function resolveTemplate(text: string, params?: UiI18nParams) {
   })
 }
 
-export const LanguageProvider: ParentComponent = (props) => {
-  const locale = createMemo<Locale>(detectLocale)
+interface LanguageProviderProps {
+  vscodeLanguage?: Accessor<string | undefined>
+  languageOverride?: Accessor<string | undefined>
+}
+
+export const LanguageProvider: ParentComponent<LanguageProviderProps> = (props) => {
+  const vscode = useVSCode()
+  const [userOverride, setUserOverride] = createSignal<Locale | "">("")
+
+  // Initialize from extension-side override
+  createEffect(() => {
+    const override = props.languageOverride?.()
+    if (override) {
+      setUserOverride(normalizeLocale(override))
+    }
+  })
+
+  // Resolved locale: user override → VS Code language → browser language → "en"
+  const locale = createMemo<Locale>(() => {
+    const override = userOverride()
+    if (override) {
+      return override
+    }
+    const vscodeLang = props.vscodeLanguage?.()
+    if (vscodeLang) {
+      return normalizeLocale(vscodeLang)
+    }
+    if (typeof navigator !== "undefined" && navigator.language) {
+      return normalizeLocale(navigator.language)
+    }
+    return "en"
+  })
+
   const dict = createMemo(() => dicts[locale()] ?? dicts.en)
 
   const t = (key: UiI18nKey, params?: UiI18nParams) => {
@@ -156,5 +189,33 @@ export const LanguageProvider: ParentComponent = (props) => {
     return resolveTemplate(text, params)
   }
 
-  return <I18nProvider value={{ locale: () => locale(), t }}>{props.children}</I18nProvider>
+  const setLocale = (next: Locale | "") => {
+    setUserOverride(next)
+    vscode.postMessage({ type: "setLanguage", locale: next })
+  }
+
+  return (
+    <LanguageContext.Provider value={{ locale, setLocale, userOverride }}>
+      <I18nProvider value={{ locale: () => locale(), t }}>{props.children}</I18nProvider>
+    </LanguageContext.Provider>
+  )
+}
+
+// Expose locale + setLocale for the LanguageTab
+import { createContext, useContext } from "solid-js"
+
+interface LanguageContextValue {
+  locale: Accessor<Locale>
+  setLocale: (locale: Locale | "") => void
+  userOverride: Accessor<Locale | "">
+}
+
+const LanguageContext = createContext<LanguageContextValue>()
+
+export function useLanguage() {
+  const ctx = useContext(LanguageContext)
+  if (!ctx) {
+    throw new Error("useLanguage must be used within a LanguageProvider")
+  }
+  return ctx
 }

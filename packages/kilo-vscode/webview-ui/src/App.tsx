@@ -1,6 +1,5 @@
 import { Component, createSignal, createMemo, Switch, Match, onMount, onCleanup } from "solid-js"
 import { ThemeProvider } from "@kilocode/kilo-ui/theme"
-import { LanguageProvider } from "./context/language"
 import { DialogProvider } from "@kilocode/kilo-ui/context/dialog"
 import { MarkedProvider } from "@kilocode/kilo-ui/context/marked"
 import { DataProvider } from "@kilocode/kilo-ui/context/data"
@@ -10,6 +9,7 @@ import { VSCodeProvider } from "./context/vscode"
 import { ServerProvider, useServer } from "./context/server"
 import { ProviderProvider } from "./context/provider"
 import { SessionProvider, useSession } from "./context/session"
+import { LanguageProvider } from "./context/language"
 import { ChatView } from "./components/chat"
 import SessionList from "./components/history/SessionList"
 import type { Message as SDKMessage, Part as SDKPart } from "@kilocode/sdk/v2"
@@ -37,13 +37,6 @@ const DummyView: Component<{ title: string }> = (props) => {
 
 /**
  * Bridge our session store to the DataProvider's expected Data shape.
- * Since the runtime data comes from the CLI backend, it's already in SDK format —
- * we just need to restructure it into the Data layout that DataProvider expects.
- *
- * Note: DiffComponentProvider and CodeComponentProvider are NOT included because
- * @pierre/diffs uses Vite's ?worker&url import syntax which is incompatible
- * with esbuild. Tool renderers that need diffs (edit, write, apply_patch)
- * will fall back to GenericTool display. See ui-implementation-plan.md §7.6.
  */
 const DataBridge: Component<{ children: any }> = (props) => {
   const session = useSession()
@@ -74,6 +67,19 @@ const DataBridge: Component<{ children: any }> = (props) => {
     <DataProvider data={data()} directory="" onPermissionRespond={respond}>
       {props.children}
     </DataProvider>
+  )
+}
+
+/**
+ * Wraps children in LanguageProvider, passing server-side language info.
+ * Must be below ServerProvider in the hierarchy.
+ */
+const LanguageBridge: Component<{ children: any }> = (props) => {
+  const server = useServer()
+  return (
+    <LanguageProvider vscodeLanguage={server.vscodeLanguage} languageOverride={server.languageOverride}>
+      {props.children}
+    </LanguageProvider>
   )
 }
 
@@ -154,11 +160,11 @@ const AppContent: Component = () => {
 const App: Component = () => {
   return (
     <ThemeProvider defaultTheme="kilo-vscode">
-      <LanguageProvider>
-        <DialogProvider>
-          <MarkedProvider>
-            <VSCodeProvider>
-              <ServerProvider>
+      <DialogProvider>
+        <VSCodeProvider>
+          <ServerProvider>
+            <LanguageBridge>
+              <MarkedProvider>
                 <ProviderProvider>
                   <SessionProvider>
                     <DataBridge>
@@ -166,11 +172,11 @@ const App: Component = () => {
                     </DataBridge>
                   </SessionProvider>
                 </ProviderProvider>
-              </ServerProvider>
-            </VSCodeProvider>
-          </MarkedProvider>
-        </DialogProvider>
-      </LanguageProvider>
+              </MarkedProvider>
+            </LanguageBridge>
+          </ServerProvider>
+        </VSCodeProvider>
+      </DialogProvider>
     </ThemeProvider>
   )
 }

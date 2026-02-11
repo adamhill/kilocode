@@ -171,6 +171,8 @@ export interface ModelSelection {
 export interface ReadyMessage {
   type: "ready"
   serverInfo?: ServerInfo
+  vscodeLanguage?: string
+  languageOverride?: string
 }
 
 export interface ConnectionStateMessage {
@@ -367,6 +369,11 @@ export interface RequestAgentsMessage {
   type: "requestAgents"
 }
 
+export interface SetLanguageRequest {
+  type: "setLanguage"
+  locale: string
+}
+
 export type WebviewMessage =
   | SendMessageRequest
   | AbortRequest
@@ -382,6 +389,7 @@ export type WebviewMessage =
   | WebviewReadyRequest
   | RequestProvidersMessage
   | RequestAgentsMessage
+  | SetLanguageRequest
 
 // ============================================
 // VS Code API type
