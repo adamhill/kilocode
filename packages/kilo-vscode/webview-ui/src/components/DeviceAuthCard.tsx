@@ -1,5 +1,6 @@
 import { Component, Show, Switch, Match, createSignal, createEffect, onCleanup } from "solid-js"
 import { Button } from "@kilocode/kilo-ui/button"
+import { Card } from "@kilocode/kilo-ui/card"
 import { Spinner } from "@kilocode/kilo-ui/spinner"
 import { useVSCode } from "../context/vscode"
 import { generateQRCode } from "../utils/qrcode"
@@ -69,28 +70,21 @@ const DeviceAuthCard: Component<DeviceAuthCardProps> = (props) => {
     }
   }
 
-  const cardStyle = {
-    background: "var(--vscode-editor-background)",
-    border: "1px solid var(--vscode-panel-border)",
-    "border-radius": "4px",
-    padding: "20px",
-  }
-
   return (
     <Switch>
       {/* Initiating state */}
       <Match when={props.status === "initiating"}>
-        <div style={cardStyle}>
+        <Card>
           <div style={{ display: "flex", "align-items": "center", gap: "8px" }}>
             <Spinner style={{ width: "14px", height: "14px" }} />
             <span style={{ "font-size": "13px", color: "var(--vscode-descriptionForeground)" }}>Starting login...</span>
           </div>
-        </div>
+        </Card>
       </Match>
 
       {/* Pending state — main card */}
       <Match when={props.status === "pending"}>
-        <div style={cardStyle}>
+        <Card>
           <h3
             style={{
               "font-size": "15px",
@@ -246,12 +240,12 @@ const DeviceAuthCard: Component<DeviceAuthCardProps> = (props) => {
           <Button variant="ghost" onClick={props.onCancel} style={{ width: "100%" }}>
             Cancel
           </Button>
-        </div>
+        </Card>
       </Match>
 
       {/* Success state */}
       <Match when={props.status === "success"}>
-        <div style={cardStyle}>
+        <Card>
           <div style={{ "text-align": "center" }}>
             <span style={{ "font-size": "24px" }}>✅</span>
             <p
@@ -265,12 +259,12 @@ const DeviceAuthCard: Component<DeviceAuthCardProps> = (props) => {
               Login successful!
             </p>
           </div>
-        </div>
+        </Card>
       </Match>
 
       {/* Error state */}
       <Match when={props.status === "error"}>
-        <div style={cardStyle}>
+        <Card>
           <div style={{ "text-align": "center" }}>
             <span style={{ "font-size": "24px" }}>❌</span>
             <p
@@ -286,12 +280,12 @@ const DeviceAuthCard: Component<DeviceAuthCardProps> = (props) => {
               Retry
             </Button>
           </div>
-        </div>
+        </Card>
       </Match>
 
       {/* Cancelled state */}
       <Match when={props.status === "cancelled"}>
-        <div style={cardStyle}>
+        <Card>
           <div style={{ "text-align": "center" }}>
             <p
               style={{
@@ -306,7 +300,7 @@ const DeviceAuthCard: Component<DeviceAuthCardProps> = (props) => {
               Try Again
             </Button>
           </div>
-        </div>
+        </Card>
       </Match>
     </Switch>
   )
