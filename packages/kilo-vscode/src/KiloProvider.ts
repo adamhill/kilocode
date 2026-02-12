@@ -663,7 +663,8 @@ export class KiloProvider implements vscode.WebviewViewProvider {
 
   /**
    * Handle config update request from the webview.
-   * Applies a partial config update, then re-fetches and pushes the full config.
+   * Applies a partial config update via the global config endpoint, then pushes
+   * the full merged config back to the webview.
    */
   private async handleUpdateConfig(partial: Record<string, unknown>): Promise<void> {
     if (!this.httpClient) {
@@ -672,8 +673,7 @@ export class KiloProvider implements vscode.WebviewViewProvider {
     }
 
     try {
-      const workspaceDir = this.getWorkspaceDirectory()
-      const updated = await this.httpClient.updateConfig(partial, workspaceDir)
+      const updated = await this.httpClient.updateConfig(partial)
 
       const message = {
         type: "configUpdated",

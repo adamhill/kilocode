@@ -188,10 +188,12 @@ export class HttpClient {
 
   /**
    * Update backend configuration (partial merge).
-   * The server merges the provided fields into the existing config.
+   * Uses the global config endpoint so changes persist to the user's global
+   * config file (matching the desktop app behaviour). The instance-scoped
+   * PATCH /config writes to a project-local file that is not loaded on restart.
    */
-  async updateConfig(config: Partial<Config>, directory: string): Promise<Config> {
-    return this.request<Config>("PATCH", "/config", config, { directory })
+  async updateConfig(config: Partial<Config>): Promise<Config> {
+    return this.request<Config>("PATCH", "/global/config", config)
   }
 
   // ============================================
