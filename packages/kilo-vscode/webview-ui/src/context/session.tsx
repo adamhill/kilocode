@@ -27,6 +27,7 @@ import type {
   PartDelta,
   SessionStatus,
   PermissionRequest,
+  QuestionRequest,
   TodoItem,
   ModelSelection,
   ContextUsage,
@@ -67,6 +68,9 @@ interface SessionContextValue {
   // Pending permission requests
   permissions: Accessor<PermissionRequest[]>
 
+  // Pending question requests
+  questions: Accessor<QuestionRequest[]>
+
   // Model selection (per-session)
   selected: Accessor<ModelSelection | null>
   selectModel: (providerID: string, modelID: string) => void
@@ -85,6 +89,8 @@ interface SessionContextValue {
   abort: () => void
   compact: () => void
   respondToPermission: (permissionId: string, response: "once" | "always" | "reject") => void
+  replyToQuestion: (requestID: string, answers: string[][]) => void
+  rejectQuestion: (requestID: string) => void
   createSession: () => void
   loadSessions: () => void
   selectSession: (id: string) => void
@@ -105,6 +111,9 @@ export const SessionProvider: ParentComponent = (props) => {
 
   // Pending permissions
   const [permissions, setPermissions] = createSignal<PermissionRequest[]>([])
+
+  // Pending questions
+  const [questions, setQuestions] = createSignal<QuestionRequest[]>([])
 
   // Pending model selection for before a session exists
   const [pendingModelSelection, setPendingModelSelection] = createSignal<ModelSelection | null>(null)
@@ -236,6 +245,14 @@ export const SessionProvider: ParentComponent = (props) => {
           handleTodoUpdated(message.sessionID, message.items)
           break
 
+        case "questionRequest":
+          handleQuestionRequest(message.question)
+          break
+
+        case "questionResolved":
+          handleQuestionResolved(message.requestID)
+          break
+
         case "sessionsLoaded":
           handleSessionsLoaded(message.sessions)
           break
@@ -353,6 +370,14 @@ export const SessionProvider: ParentComponent = (props) => {
     setPermissions((prev) => [...prev, permission])
   }
 
+  function handleQuestionRequest(question: QuestionRequest) {
+    setQuestions((prev) => [...prev, question])
+  }
+
+  function handleQuestionResolved(requestID: string) {
+    setQuestions((prev) => prev.filter((q) => q.id !== requestID))
+  }
+
   function handleTodoUpdated(sessionID: string, items: TodoItem[]) {
     setStore("todos", sessionID, items)
   }
@@ -436,6 +461,27 @@ export const SessionProvider: ParentComponent = (props) => {
 
     // Remove from pending permissions
     setPermissions((prev) => prev.filter((p) => p.id !== permissionId))
+  }
+
+  function replyToQuestion(requestID: string, answers: string[][]) {
+    vscode.postMessage({
+      type: "questionReply",
+      requestID,
+      answers,
+    })
+
+    // Optimistically remove from pending
+    setQuestions((prev) => prev.filter((q) => q.id !== requestID))
+  }
+
+  function rejectQuestion(requestID: string) {
+    vscode.postMessage({
+      type: "questionReject",
+      requestID,
+    })
+
+    // Optimistically remove from pending
+    setQuestions((prev) => prev.filter((q) => q.id !== requestID))
   }
 
   function createSession() {
@@ -529,6 +575,7 @@ export const SessionProvider: ParentComponent = (props) => {
     getParts,
     todos,
     permissions,
+    questions,
     selected,
     selectModel,
     totalCost,
@@ -540,6 +587,8 @@ export const SessionProvider: ParentComponent = (props) => {
     abort,
     compact,
     respondToPermission,
+    replyToQuestion,
+    rejectQuestion,
     createSession,
     loadSessions,
     selectSession,

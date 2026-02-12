@@ -58,14 +58,31 @@ const DataBridge: Component<{ children: any }> = (props) => {
     permission: {
       [session.currentSessionID() ?? ""]: session.permissions() as unknown as any[],
     },
+    question: {
+      [session.currentSessionID() ?? ""]: session.questions() as unknown as any[],
+    },
   }))
 
   const respond = (input: { sessionID: string; permissionID: string; response: "once" | "always" | "reject" }) => {
     session.respondToPermission(input.permissionID, input.response)
   }
 
+  const questionReply = (input: { requestID: string; answers: string[][] }) => {
+    session.replyToQuestion(input.requestID, input.answers)
+  }
+
+  const questionReject = (input: { requestID: string }) => {
+    session.rejectQuestion(input.requestID)
+  }
+
   return (
-    <DataProvider data={data()} directory="" onPermissionRespond={respond}>
+    <DataProvider
+      data={data()}
+      directory=""
+      onPermissionRespond={respond}
+      onQuestionReply={questionReply}
+      onQuestionReject={questionReject}
+    >
       {props.children}
     </DataProvider>
   )

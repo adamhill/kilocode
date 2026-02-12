@@ -199,6 +199,12 @@ export class KiloProvider implements vscode.WebviewViewProvider {
         case "requestAgents":
           await this.fetchAndSendAgents()
           break
+        case "questionReply":
+          await this.handleQuestionReply(message.requestID, message.answers)
+          break
+        case "questionReject":
+          await this.handleQuestionReject(message.requestID)
+          break
         case "setLanguage":
           await vscode.workspace
             .getConfiguration("kilo-code.new")
@@ -642,6 +648,36 @@ export class KiloProvider implements vscode.WebviewViewProvider {
   }
 
   /**
+   * Handle question reply from the webview.
+   */
+  private async handleQuestionReply(requestID: string, answers: string[][]): Promise<void> {
+    if (!this.httpClient) {
+      return
+    }
+
+    try {
+      await this.httpClient.replyToQuestion(requestID, answers)
+    } catch (error) {
+      console.error("[Kilo New] KiloProvider: Failed to reply to question:", error)
+    }
+  }
+
+  /**
+   * Handle question reject (dismiss) from the webview.
+   */
+  private async handleQuestionReject(requestID: string): Promise<void> {
+    if (!this.httpClient) {
+      return
+    }
+
+    try {
+      await this.httpClient.rejectQuestion(requestID)
+    } catch (error) {
+      console.error("[Kilo New] KiloProvider: Failed to reject question:", error)
+    }
+  }
+
+  /**
    * Handle login request from the webview.
    * Uses the provider OAuth flow: authorize → open browser → callback (polls until complete).
    * Sends device auth messages so the webview can display a QR code, verification code, and timer.
@@ -823,6 +859,32 @@ export class KiloProvider implements vscode.WebviewViewProvider {
           type: "todoUpdated",
           sessionID: event.properties.sessionID,
           items: event.properties.items,
+        })
+        break
+
+      case "question.asked":
+        this.postMessage({
+          type: "questionRequest",
+          question: {
+            id: event.properties.id,
+            sessionID: event.properties.sessionID,
+            questions: event.properties.questions,
+            tool: event.properties.tool,
+          },
+        })
+        break
+
+      case "question.replied":
+        this.postMessage({
+          type: "questionResolved",
+          requestID: event.properties.requestID,
+        })
+        break
+
+      case "question.rejected":
+        this.postMessage({
+          type: "questionResolved",
+          requestID: event.properties.requestID,
         })
         break
 

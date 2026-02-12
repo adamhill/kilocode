@@ -114,6 +114,30 @@ export interface TodoItem {
   status: "pending" | "in_progress" | "completed"
 }
 
+// Question types
+export interface QuestionOption {
+  label: string
+  description: string
+}
+
+export interface QuestionInfo {
+  question: string
+  header: string
+  options: QuestionOption[]
+  multiple?: boolean
+  custom?: boolean
+}
+
+export interface QuestionRequest {
+  id: string
+  sessionID: string
+  questions: QuestionInfo[]
+  tool?: {
+    messageID: string
+    callID: string
+  }
+}
+
 // Agent/mode info from CLI backend
 export interface AgentInfo {
   name: string
@@ -300,6 +324,16 @@ export interface AgentsLoadedMessage {
   defaultAgent: string
 }
 
+export interface QuestionRequestMessage {
+  type: "questionRequest"
+  question: QuestionRequest
+}
+
+export interface QuestionResolvedMessage {
+  type: "questionResolved"
+  requestID: string
+}
+
 export type ExtensionMessage =
   | ReadyMessage
   | ConnectionStateMessage
@@ -321,6 +355,8 @@ export type ExtensionMessage =
   | DeviceAuthCancelledMessage
   | ProvidersLoadedMessage
   | AgentsLoadedMessage
+  | QuestionRequestMessage
+  | QuestionResolvedMessage
 
 // ============================================
 // Messages FROM webview TO extension
@@ -405,6 +441,17 @@ export interface SetLanguageRequest {
   locale: string
 }
 
+export interface QuestionReplyRequest {
+  type: "questionReply"
+  requestID: string
+  answers: string[][]
+}
+
+export interface QuestionRejectRequest {
+  type: "questionReject"
+  requestID: string
+}
+
 export type WebviewMessage =
   | SendMessageRequest
   | AbortRequest
@@ -422,6 +469,8 @@ export type WebviewMessage =
   | CompactRequest
   | RequestAgentsMessage
   | SetLanguageRequest
+  | QuestionReplyRequest
+  | QuestionRejectRequest
 
 // ============================================
 // VS Code API type
