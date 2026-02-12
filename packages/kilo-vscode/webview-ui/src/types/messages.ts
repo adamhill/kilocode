@@ -450,9 +450,16 @@ export interface ConfigUpdatedMessage {
   config: Config
 }
 
-export interface LocalSettingsLoadedMessage {
-  type: "localSettingsLoaded"
-  settings: Record<string, unknown>
+export interface NotificationSettingsLoadedMessage {
+  type: "notificationSettingsLoaded"
+  settings: {
+    notifyAgent: boolean
+    notifyPermissions: boolean
+    notifyErrors: boolean
+    soundAgent: string
+    soundPermissions: string
+    soundErrors: string
+  }
 }
 
 export type ExtensionMessage =
@@ -483,7 +490,7 @@ export type ExtensionMessage =
   | BrowserSettingsLoadedMessage
   | ConfigLoadedMessage
   | ConfigUpdatedMessage
-  | LocalSettingsLoadedMessage
+  | NotificationSettingsLoadedMessage
 
 // ============================================
 // Messages FROM webview TO extension
@@ -613,14 +620,8 @@ export interface UpdateConfigMessage {
   config: Partial<Config>
 }
 
-export interface SaveLocalSettingMessage {
-  type: "saveLocalSetting"
-  key: string
-  value: unknown
-}
-
-export interface RequestLocalSettingsMessage {
-  type: "requestLocalSettings"
+export interface RequestNotificationSettingsMessage {
+  type: "requestNotificationSettings"
 }
 
 export type WebviewMessage =
@@ -649,8 +650,7 @@ export type WebviewMessage =
   | RequestBrowserSettingsMessage
   | RequestConfigMessage
   | UpdateConfigMessage
-  | SaveLocalSettingMessage
-  | RequestLocalSettingsMessage
+  | RequestNotificationSettingsMessage
 
 // ============================================
 // VS Code API type

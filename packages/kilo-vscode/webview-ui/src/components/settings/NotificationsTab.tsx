@@ -26,23 +26,23 @@ const NotificationsTab: Component = () => {
   const [errorSound, setErrorSound] = createSignal("default")
 
   const unsubscribe = vscode.onMessage((message: ExtensionMessage) => {
-    if (message.type !== "localSettingsLoaded") {
+    if (message.type !== "notificationSettingsLoaded") {
       return
     }
     const s = message.settings
-    if (s["notifications.agent"] !== undefined) setAgentNotify(s["notifications.agent"] as boolean)
-    if (s["notifications.permissions"] !== undefined) setPermNotify(s["notifications.permissions"] as boolean)
-    if (s["notifications.errors"] !== undefined) setErrorNotify(s["notifications.errors"] as boolean)
-    if (s["sounds.agent"] !== undefined) setAgentSound(s["sounds.agent"] as string)
-    if (s["sounds.permissions"] !== undefined) setPermSound(s["sounds.permissions"] as string)
-    if (s["sounds.errors"] !== undefined) setErrorSound(s["sounds.errors"] as string)
+    setAgentNotify(s.notifyAgent)
+    setPermNotify(s.notifyPermissions)
+    setErrorNotify(s.notifyErrors)
+    setAgentSound(s.soundAgent)
+    setPermSound(s.soundPermissions)
+    setErrorSound(s.soundErrors)
   })
 
   onCleanup(unsubscribe)
-  vscode.postMessage({ type: "requestLocalSettings" })
+  vscode.postMessage({ type: "requestNotificationSettings" })
 
-  const saveSetting = (key: string, value: unknown) => {
-    vscode.postMessage({ type: "saveLocalSetting", key, value })
+  const save = (key: string, value: unknown) => {
+    vscode.postMessage({ type: "updateSetting", key, value })
   }
 
   const SettingsRow: Component<{ label: string; description: string; last?: boolean; children: any }> = (props) => (
@@ -79,7 +79,7 @@ const NotificationsTab: Component = () => {
             checked={agentNotify()}
             onChange={(checked) => {
               setAgentNotify(checked)
-              saveSetting("notifications.agent", checked)
+              save("notifications.agent", checked)
             }}
             hideLabel
           >
@@ -91,7 +91,7 @@ const NotificationsTab: Component = () => {
             checked={permNotify()}
             onChange={(checked) => {
               setPermNotify(checked)
-              saveSetting("notifications.permissions", checked)
+              save("notifications.permissions", checked)
             }}
             hideLabel
           >
@@ -103,7 +103,7 @@ const NotificationsTab: Component = () => {
             checked={errorNotify()}
             onChange={(checked) => {
               setErrorNotify(checked)
-              saveSetting("notifications.errors", checked)
+              save("notifications.errors", checked)
             }}
             hideLabel
           >
@@ -123,7 +123,7 @@ const NotificationsTab: Component = () => {
             onSelect={(o) => {
               if (o) {
                 setAgentSound(o.value)
-                saveSetting("sounds.agent", o.value)
+                save("sounds.agent", o.value)
               }
             }}
             variant="secondary"
@@ -140,7 +140,7 @@ const NotificationsTab: Component = () => {
             onSelect={(o) => {
               if (o) {
                 setPermSound(o.value)
-                saveSetting("sounds.permissions", o.value)
+                save("sounds.permissions", o.value)
               }
             }}
             variant="secondary"
@@ -157,7 +157,7 @@ const NotificationsTab: Component = () => {
             onSelect={(o) => {
               if (o) {
                 setErrorSound(o.value)
-                saveSetting("sounds.errors", o.value)
+                save("sounds.errors", o.value)
               }
             }}
             variant="secondary"
