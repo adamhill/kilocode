@@ -4,7 +4,7 @@
  * Uses kilo-ui's data-component/data-slot CSS pattern for styling.
  */
 
-import { Component, For, Show, createMemo } from "solid-js"
+import { Component, For, Show, createMemo, createEffect } from "solid-js"
 import { createStore } from "solid-js/store"
 import { Button } from "@kilocode/kilo-ui/button"
 import { BasicTool } from "@kilocode/kilo-ui/basic-tool"
@@ -26,6 +26,13 @@ export const QuestionDock: Component<{ request: QuestionRequest }> = (props) => 
     custom: [] as string[],
     editing: false,
     sending: false,
+  })
+
+  // Reset sending state when an error occurs for this question
+  createEffect(() => {
+    if (session.questionErrors().has(props.request.id)) {
+      setStore("sending", false)
+    }
   })
 
   const question = createMemo(() => questions()[store.tab])
@@ -259,6 +266,7 @@ export const QuestionDock: Component<{ request: QuestionRequest }> = (props) => 
 
         <Show when={confirm()}>
           <div data-slot="question-review">
+            <div data-slot="review-title">{language.t("ui.messagePart.review.title")}</div>
             <For each={questions()}>
               {(q, index) => {
                 const value = () => store.answers[index()]?.join(", ") ?? ""

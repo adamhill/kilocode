@@ -71,6 +71,7 @@ interface SessionContextValue {
 
   // Pending question requests
   questions: Accessor<QuestionRequest[]>
+  questionErrors: Accessor<Set<string>>
 
   // Model selection (per-session)
   selected: Accessor<ModelSelection | null>
@@ -119,6 +120,9 @@ export const SessionProvider: ParentComponent = (props) => {
 
   // Pending questions
   const [questions, setQuestions] = createSignal<QuestionRequest[]>([])
+
+  // Tracks question IDs that failed so the UI can reset sending state
+  const [questionErrors, setQuestionErrors] = createSignal<Set<string>>(new Set())
 
   // Pending model selection for before a session exists
   const [pendingModelSelection, setPendingModelSelection] = createSignal<ModelSelection | null>(null)
@@ -258,6 +262,10 @@ export const SessionProvider: ParentComponent = (props) => {
           handleQuestionResolved(message.requestID)
           break
 
+        case "questionError":
+          handleQuestionError(message.requestID)
+          break
+
         case "sessionsLoaded":
           handleSessionsLoaded(message.sessions)
           break
@@ -390,6 +398,15 @@ export const SessionProvider: ParentComponent = (props) => {
 
   function handleQuestionResolved(requestID: string) {
     setQuestions((prev) => prev.filter((q) => q.id !== requestID))
+    setQuestionErrors((prev) => {
+      const next = new Set(prev)
+      next.delete(requestID)
+      return next
+    })
+  }
+
+  function handleQuestionError(requestID: string) {
+    setQuestionErrors((prev) => new Set(prev).add(requestID))
   }
 
   function handleTodoUpdated(sessionID: string, items: TodoItem[]) {
@@ -529,9 +546,7 @@ export const SessionProvider: ParentComponent = (props) => {
       requestID,
       answers,
     })
-
-    // Optimistically remove from pending
-    setQuestions((prev) => prev.filter((q) => q.id !== requestID))
+    // Removal handled by SSE question.replied event via handleQuestionResolved
   }
 
   function rejectQuestion(requestID: string) {
@@ -539,9 +554,7 @@ export const SessionProvider: ParentComponent = (props) => {
       type: "questionReject",
       requestID,
     })
-
-    // Optimistically remove from pending
-    setQuestions((prev) => prev.filter((q) => q.id !== requestID))
+    // Removal handled by SSE question.rejected event via handleQuestionResolved
   }
 
   function createSession() {
@@ -664,6 +677,7 @@ export const SessionProvider: ParentComponent = (props) => {
     todos,
     permissions,
     questions,
+    questionErrors,
     selected,
     selectModel,
     totalCost,

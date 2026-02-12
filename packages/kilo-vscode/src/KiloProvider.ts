@@ -732,6 +732,7 @@ export class KiloProvider implements vscode.WebviewViewProvider {
       await this.httpClient.replyToQuestion(requestID, answers)
     } catch (error) {
       console.error("[Kilo New] KiloProvider: Failed to reply to question:", error)
+      this.postMessage({ type: "questionError", requestID })
     }
   }
 
@@ -747,6 +748,7 @@ export class KiloProvider implements vscode.WebviewViewProvider {
       await this.httpClient.rejectQuestion(requestID)
     } catch (error) {
       console.error("[Kilo New] KiloProvider: Failed to reject question:", error)
+      this.postMessage({ type: "questionError", requestID })
     }
   }
 

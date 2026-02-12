@@ -340,6 +340,11 @@ export interface QuestionResolvedMessage {
   requestID: string
 }
 
+export interface QuestionErrorMessage {
+  type: "questionError"
+  requestID: string
+}
+
 export type ExtensionMessage =
   | ReadyMessage
   | ConnectionStateMessage
@@ -364,6 +369,7 @@ export type ExtensionMessage =
   | AgentsLoadedMessage
   | QuestionRequestMessage
   | QuestionResolvedMessage
+  | QuestionErrorMessage
 
 // ============================================
 // Messages FROM webview TO extension
