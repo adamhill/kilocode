@@ -1,7 +1,7 @@
 // kilocode_change - rewritten to hardcode Kilo Gateway + codestral-2508
 import * as vscode from "vscode"
+import OpenAI from "openai"
 import { ResponseMetaData } from "./types"
-import { streamSse } from "./continuedev/core/fetch/stream"
 
 const KILO_GATEWAY_BASE_URL = "https://openrouter.kilo.ai/api/v1/"
 const DEFAULT_MODEL = "mistralai/codestral-2508"
@@ -21,6 +21,7 @@ export type ApiStreamChunk =
 
 export class AutocompleteModel {
   private apiKey: string | null = null
+  private client: OpenAI | null = null
   public profileName: string | null = null
   public profileType: string | null = null
   public loaded = false
@@ -29,12 +30,14 @@ export class AutocompleteModel {
   constructor(apiKey?: string) {
     if (apiKey) {
       this.apiKey = apiKey
+      this.client = new OpenAI({ apiKey, baseURL: KILO_GATEWAY_BASE_URL })
       this.loaded = true
     }
   }
 
   private cleanup(): void {
     this.apiKey = null
+    this.client = null
     this.profileName = null
     this.profileType = null
     this.loaded = false
@@ -53,6 +56,7 @@ export class AutocompleteModel {
 
     if (key) {
       this.apiKey = key
+      this.client = new OpenAI({ apiKey: key, baseURL: KILO_GATEWAY_BASE_URL })
       this.loaded = true
       console.log(
         `[Kilo New] AutocompleteModel.reload(): API key found, model=${DEFAULT_MODEL}, provider=${PROVIDER_DISPLAY_NAME}`,
@@ -83,46 +87,21 @@ export class AutocompleteModel {
 
   /**
    * Generate response with streaming callback support via Kilo Gateway OpenAI-compatible endpoint.
+   * Uses the openai npm package for reliable streaming in the VS Code Electron environment.
    */
   public async generateResponse(
     systemPrompt: string,
     userPrompt: string,
     onChunk: (chunk: ApiStreamChunk) => void,
   ): Promise<ResponseMetaData> {
-    if (!this.apiKey) {
+    if (!this.apiKey || !this.client) {
       console.error("[Kilo New] API key is not configured")
       throw new Error("API key is not configured. Please set kilo-code.new.autocomplete.apiKey in settings.")
     }
 
     const model = DEFAULT_MODEL
 
-    console.log("[Kilo New] Autocomplete request to", model)
-
-    const body = {
-      model,
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: userPrompt },
-      ],
-      stream: true,
-      max_tokens: 1024,
-      temperature: 0.2,
-    }
-
-    const endpoint = new URL("chat/completions", KILO_GATEWAY_BASE_URL)
-    const response = await fetch(endpoint.toString(), {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${this.apiKey}`,
-      },
-      body: JSON.stringify(body),
-    })
-
-    if (!response.ok) {
-      const errorText = await response.text().catch(() => "unknown error")
-      throw new Error(`Kilo Gateway request failed (${response.status}): ${errorText}`)
-    }
+    console.log("[Kilo New] Autocomplete request to", model, "via openai SDK")
 
     let cost = 0
     let inputTokens = 0
@@ -130,23 +109,44 @@ export class AutocompleteModel {
     let cacheReadTokens = 0
     let cacheWriteTokens = 0
 
-    for await (const value of streamSse(response)) {
-      if (value.choices?.[0]?.delta?.content) {
-        const text = value.choices[0].delta.content as string
-        onChunk({ type: "text", text })
+    const stream = await this.client.chat.completions.create({
+      model,
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPrompt },
+      ],
+      stream: true,
+      stream_options: { include_usage: true },
+      max_tokens: 1024,
+      temperature: 0.2,
+    })
+
+    let chunks = 0
+
+    for await (const chunk of stream) {
+      const content = chunk.choices?.[0]?.delta?.content
+      if (content) {
+        onChunk({ type: "text", text: content })
+        chunks++
       }
 
-      // Track usage from the final chunk if present
-      if (value.usage) {
-        inputTokens = value.usage.prompt_tokens ?? 0
-        outputTokens = value.usage.completion_tokens ?? 0
-        cacheReadTokens = value.usage.prompt_tokens_details?.cached_tokens ?? 0
+      // Track usage from the final chunk (has usage when stream_options.include_usage is true)
+      if (chunk.usage) {
+        inputTokens = chunk.usage.prompt_tokens ?? 0
+        outputTokens = chunk.usage.completion_tokens ?? 0
+        const usage = chunk.usage as unknown as Record<string, unknown>
+        const details = usage.prompt_tokens_details as Record<string, number> | undefined
+        cacheReadTokens = details?.cached_tokens ?? 0
       }
 
-      if (value.x_kilocode) {
-        cost = value.x_kilocode.total_cost ?? 0
+      // Extract cost from kilocode-specific extension
+      const extra = chunk as unknown as Record<string, unknown>
+      if (extra.x_kilocode) {
+        cost = (extra.x_kilocode as Record<string, number>).total_cost ?? 0
       }
     }
+
+    console.log(`[Kilo New] Autocomplete response: ${chunks} text chunks, ${inputTokens} in / ${outputTokens} out`)
 
     const usageChunk: ApiStreamChunk = {
       type: "usage",
