@@ -6,7 +6,7 @@ import type {
   RangeInFile,
   TabAutocompleteOptions as CoreTabAutocompleteOptions,
 } from "./continuedev/core"
-import { RooIgnoreController } from "../../core/ignore/RooIgnoreController"
+import { FileIgnoreController } from "./shims/FileIgnoreController"
 import { ContextRetrievalService } from "./continuedev/core/autocomplete/context/ContextRetrievalService"
 import { VsCodeIde } from "./continuedev/core/vscode-test-harness/src/VSCodeIde"
 import { AutocompleteModel } from "./AutocompleteModel"
@@ -288,5 +288,5 @@ export interface AutocompleteContextProvider {
   contextService: ContextRetrievalService
   ide: VsCodeIde
   model: AutocompleteModel
-  ignoreController?: Promise<RooIgnoreController>
+  ignoreController?: Promise<FileIgnoreController>
 }

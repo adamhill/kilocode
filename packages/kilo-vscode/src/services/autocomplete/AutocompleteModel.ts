@@ -1,219 +1,128 @@
-// kilocode_change new file
-import { modelIdKeysByProvider, ProviderName } from "@roo-code/types"
-import { ApiHandler, buildApiHandler, FimHandler } from "../../api"
-import { ProviderSettingsManager } from "../../core/config/ProviderSettingsManager"
-import { OpenRouterHandler } from "../../api/providers"
-import { CompletionUsage } from "../../api/providers/openrouter"
-import { ApiStreamChunk } from "../../api/transform/stream"
-import { AUTOCOMPLETE_PROVIDER_MODELS, checkKilocodeBalance } from "./utils/kilocode-utils"
-import { KilocodeOpenrouterHandler } from "../../api/providers/kilocode-openrouter"
-import { PROVIDERS } from "../../../webview-ui/src/components/settings/constants"
+// kilocode_change - rewritten to use CLI backend FIM endpoint
 import { ResponseMetaData } from "./types"
+import type { KiloConnectionService } from "../cli-backend"
 
-function getFimHandler(handler: ApiHandler): FimHandler | undefined {
-  if (typeof handler.fimSupport === "function") {
-    return handler.fimSupport()
-  }
-  return undefined
-}
+const DEFAULT_MODEL = "mistralai/codestral-2508"
+const PROVIDER_DISPLAY_NAME = "Kilo Gateway"
 
-// Convert PROVIDERS array to a lookup map for display names
-const PROVIDER_DISPLAY_NAMES = Object.fromEntries(PROVIDERS.map(({ value, label }) => [value, label])) as Record<
-  ProviderName,
-  string
->
+/** Chunk from an LLM streaming response */
+export type ApiStreamChunk =
+  | { type: "text"; text: string }
+  | {
+      type: "usage"
+      totalCost?: number
+      inputTokens?: number
+      outputTokens?: number
+      cacheReadTokens?: number
+      cacheWriteTokens?: number
+    }
 
 export class AutocompleteModel {
-  private apiHandler: ApiHandler | null = null
+  private connectionService: KiloConnectionService | null = null
   public profileName: string | null = null
   public profileType: string | null = null
-  private currentProvider: ProviderName | null = null
   public loaded = false
   public hasKilocodeProfileWithNoBalance = false
 
-  constructor(apiHandler: ApiHandler | null = null) {
-    if (apiHandler) {
-      this.apiHandler = apiHandler
+  constructor(connectionService?: KiloConnectionService) {
+    if (connectionService) {
+      this.connectionService = connectionService
       this.loaded = true
     }
   }
-  private cleanup(): void {
-    this.apiHandler = null
-    this.profileName = null
-    this.profileType = null
-    this.currentProvider = null
-    this.loaded = false
-    this.hasKilocodeProfileWithNoBalance = false
-  }
 
-  public async reload(providerSettingsManager: ProviderSettingsManager): Promise<boolean> {
-    const profiles = await providerSettingsManager.listConfig()
-
-    this.cleanup()
-
-    const selectedProfile = profiles.find((x) => x.profileType === "autocomplete")
-    if (selectedProfile) {
-      const profile = await providerSettingsManager.getProfile({ id: selectedProfile.id })
-      if (profile.apiProvider) {
-        await useProfile(this, profile, profile.apiProvider)
-        return true
-      }
-    }
-
-    for (const [provider, model] of AUTOCOMPLETE_PROVIDER_MODELS) {
-      const selectedProfile = profiles.find((x) => x?.apiProvider === provider && !(x.profileType === "autocomplete"))
-      if (!selectedProfile) continue
-      const profile = await providerSettingsManager.getProfile({ id: selectedProfile.id })
-
-      if (provider === "kilocode") {
-        // For all other providers, assume they are usable
-        if (!profile.kilocodeToken) continue
-        const hasBalance = await checkKilocodeBalance(profile.kilocodeToken, profile.kilocodeOrganizationId)
-        if (!hasBalance) {
-          // Track that we found a kilocode profile but it has no balance
-          this.hasKilocodeProfileWithNoBalance = true
-          continue
-        }
-      }
-      await useProfile(this, { ...profile, [modelIdKeysByProvider[provider]]: model }, provider)
-      return true
-    }
-
-    this.loaded = true // we loaded, and found nothing, but we do not wish to reload
-    return false
-
-    type ProfileWithIdAndName = Awaited<ReturnType<typeof providerSettingsManager.getProfile>>
-    async function useProfile(self: AutocompleteModel, profile: ProfileWithIdAndName, provider: ProviderName) {
-      self.profileName = profile.name || null
-      self.profileType = profile.profileType || null
-      self.currentProvider = provider
-      self.apiHandler = buildApiHandler(profile)
-      if (self.apiHandler instanceof OpenRouterHandler) await self.apiHandler.fetchModel()
-      self.loaded = true
-    }
-  }
-
-  public supportsFim(): boolean {
-    if (!this.apiHandler) {
-      return false
-    }
-
-    return getFimHandler(this.apiHandler) !== undefined
+  /**
+   * Set the connection service (can be called after construction when service becomes available)
+   */
+  public setConnectionService(service: KiloConnectionService): void {
+    this.connectionService = service
   }
 
   /**
-   * Generate FIM completion using the FIM API endpoint.
+   * Load model configuration.
+   * Returns true if the connection service is available.
+   */
+  public async reload(): Promise<boolean> {
+    this.loaded = true
+
+    if (this.connectionService) {
+      const state = this.connectionService.getConnectionState()
+      return state === "connected"
+    }
+
+    return false
+  }
+
+  public supportsFim(): boolean {
+    return true
+  }
+
+  /**
+   * Generate a FIM (Fill-in-the-Middle) completion via the CLI backend.
+   * The CLI backend handles auth using the stored kilo OAuth token.
    */
   public async generateFimResponse(
     prefix: string,
     suffix: string,
     onChunk: (text: string) => void,
-    taskId?: string,
+    _taskId?: string,
   ): Promise<ResponseMetaData> {
-    if (!this.apiHandler) {
-      console.error("API handler is not initialized")
-      throw new Error("API handler is not initialized. Please check your configuration.")
+    if (!this.connectionService) {
+      throw new Error("Connection service is not available")
     }
 
-    const fimHandler = getFimHandler(this.apiHandler)
-    if (!fimHandler) {
-      throw new Error("Current provider/model does not support FIM completions")
+    const state = this.connectionService.getConnectionState()
+    if (state !== "connected") {
+      throw new Error(`CLI backend is not connected (state: ${state})`)
     }
 
-    console.log("USED MODEL (FIM)", fimHandler.getModel())
+    const client = this.connectionService.getHttpClient()
 
-    let usage: CompletionUsage | undefined
-
-    for await (const chunk of fimHandler.streamFim(prefix, suffix, taskId, (u: CompletionUsage) => {
-      usage = u
-    })) {
-      onChunk(chunk)
-    }
-
-    // Calculate cost using the FimHandler's getTotalCost method
-    const cost = usage ? fimHandler.getTotalCost(usage) : 0
-    const inputTokens = usage?.prompt_tokens ?? 0
-    const outputTokens = usage?.completion_tokens ?? 0
-    const cacheReadTokens = usage?.prompt_tokens_details?.cached_tokens ?? 0
+    const result = await client.fimCompletion(prefix, suffix, onChunk, {
+      model: DEFAULT_MODEL,
+      maxTokens: 256,
+      temperature: 0.2,
+    })
 
     return {
-      cost,
-      inputTokens,
-      outputTokens,
-      cacheWriteTokens: 0, // FIM doesn't support cache writes
-      cacheReadTokens,
+      cost: result.cost,
+      inputTokens: result.inputTokens,
+      outputTokens: result.outputTokens,
+      cacheWriteTokens: 0,
+      cacheReadTokens: 0,
     }
   }
 
   /**
-   * Generate response with streaming callback support
+   * Generate response via chat completions (holefiller fallback).
+   * Not used when FIM is supported, but kept for compatibility.
    */
   public async generateResponse(
     systemPrompt: string,
     userPrompt: string,
     onChunk: (chunk: ApiStreamChunk) => void,
   ): Promise<ResponseMetaData> {
-    if (!this.apiHandler) {
-      console.error("API handler is not initialized")
-      throw new Error("API handler is not initialized. Please check your configuration.")
-    }
-
-    console.log("USED MODEL", this.apiHandler.getModel())
-
-    const stream = this.apiHandler.createMessage(systemPrompt, [
-      { role: "user", content: [{ type: "text", text: userPrompt }] },
-    ])
-
-    let cost = 0
-    let inputTokens = 0
-    let outputTokens = 0
-    let cacheReadTokens = 0
-    let cacheWriteTokens = 0
-
-    try {
-      for await (const chunk of stream) {
-        // Call the callback with each chunk
-        onChunk(chunk)
-
-        // Track usage information
-        if (chunk.type === "usage") {
-          cost = chunk.totalCost ?? 0
-          cacheReadTokens = chunk.cacheReadTokens ?? 0
-          cacheWriteTokens = chunk.cacheWriteTokens ?? 0
-          inputTokens = chunk.inputTokens ?? 0
-          outputTokens = chunk.outputTokens ?? 0
-        }
-      }
-    } catch (error) {
-      console.error("Error streaming completion:", error)
-      throw error
-    }
-
-    return {
-      cost,
-      inputTokens,
-      outputTokens,
-      cacheWriteTokens,
-      cacheReadTokens,
-    }
+    // FIM is the primary strategy; this method is a fallback.
+    // For now, throw — callers should use generateFimResponse via supportsFim().
+    throw new Error("Chat-based completions are not supported via CLI backend. Use FIM (supportsFim() returns true).")
   }
 
-  public getModelName(): string | undefined {
-    if (!this.apiHandler) return undefined
-
-    return this.apiHandler.getModel().id ?? undefined
+  public getModelName(): string {
+    return DEFAULT_MODEL
   }
 
-  public getProviderDisplayName(): string | undefined {
-    if (!this.currentProvider) return undefined
-    return PROVIDER_DISPLAY_NAMES[this.currentProvider]
+  public getProviderDisplayName(): string {
+    return PROVIDER_DISPLAY_NAME
   }
 
-  public getRolloutHash_IfLoggedInToKilo(): number | undefined {
-    return this.apiHandler instanceof KilocodeOpenrouterHandler ? this.apiHandler.getRolloutHash() : undefined
-  }
-
+  /**
+   * Check if the model has valid credentials.
+   * With CLI backend, credentials are managed by the backend — we just need a connection.
+   */
   public hasValidCredentials(): boolean {
-    return this.apiHandler !== null && this.loaded
+    if (!this.connectionService) {
+      return false
+    }
+    return this.connectionService.getConnectionState() === "connected"
   }
 }

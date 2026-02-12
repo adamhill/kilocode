@@ -1,7 +1,10 @@
 import { createHash } from "crypto"
 
 import { LRUCache } from "lru-cache"
-import { Node as SyntaxNode, Query, Point } from "web-tree-sitter"
+import type Parser from "web-tree-sitter"
+type SyntaxNode = Parser.SyntaxNode
+type Query = Parser.Query
+type Point = Parser.Point
 
 import { IDE } from "../../.."
 import { getFullLanguageName, getQueryForFile, IGNORE_PATH_PATTERNS, LanguageName } from "../../../util/treeSitter"

@@ -414,6 +414,21 @@ export interface AgentsLoadedMessage {
   defaultAgent: string
 }
 
+export interface AutocompleteSettingsLoadedMessage {
+  type: "autocompleteSettingsLoaded"
+  settings: {
+    enableAutoTrigger: boolean
+    enableSmartInlineTaskKeybinding: boolean
+    enableChatAutocomplete: boolean
+  }
+}
+
+export interface ChatCompletionResultMessage {
+  type: "chatCompletionResult"
+  text: string
+  requestId: string
+}
+
 export interface QuestionRequestMessage {
   type: "questionRequest"
   question: QuestionRequest
@@ -484,6 +499,8 @@ export type ExtensionMessage =
   | DeviceAuthCancelledMessage
   | ProvidersLoadedMessage
   | AgentsLoadedMessage
+  | AutocompleteSettingsLoadedMessage
+  | ChatCompletionResultMessage
   | QuestionRequestMessage
   | QuestionResolvedMessage
   | QuestionErrorMessage
@@ -601,6 +618,26 @@ export interface RenameSessionRequest {
   title: string
 }
 
+export interface RequestAutocompleteSettingsMessage {
+  type: "requestAutocompleteSettings"
+}
+
+export interface UpdateAutocompleteSettingMessage {
+  type: "updateAutocompleteSetting"
+  key: "enableAutoTrigger" | "enableSmartInlineTaskKeybinding" | "enableChatAutocomplete"
+  value: boolean
+}
+
+export interface RequestChatCompletionMessage {
+  type: "requestChatCompletion"
+  text: string
+  requestId: string
+}
+
+export interface ChatCompletionAcceptedMessage {
+  type: "chatCompletionAccepted"
+  suggestionLength?: number
+}
 export interface UpdateSettingRequest {
   type: "updateSetting"
   key: string
@@ -646,6 +683,10 @@ export type WebviewMessage =
   | QuestionRejectRequest
   | DeleteSessionRequest
   | RenameSessionRequest
+  | RequestAutocompleteSettingsMessage
+  | UpdateAutocompleteSettingMessage
+  | RequestChatCompletionMessage
+  | ChatCompletionAcceptedMessage
   | UpdateSettingRequest
   | RequestBrowserSettingsMessage
   | RequestConfigMessage

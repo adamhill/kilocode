@@ -1,5 +1,4 @@
 import { findLlmInfo } from "./model-info"
-import { BaseLlmApi, constructLlmApi } from "./openai-adapters"
 import { ChatCompletionCreateParams } from "openai/resources/index"
 
 import {
@@ -93,7 +92,7 @@ export abstract class BaseLLM implements ILLM {
 
   private _llmOptions: LLMOptions
 
-  protected openaiAdapter?: BaseLlmApi
+  protected openaiAdapter?: any
 
   constructor(_options: LLMOptions) {
     this._llmOptions = _options
@@ -137,24 +136,11 @@ export abstract class BaseLLM implements ILLM {
     }
     this.capabilities = options.capabilities
 
-    this.openaiAdapter = this.createOpenAiAdapter()
-
     this.autocompleteOptions = options.autocompleteOptions
-
-    // openaiAdapter is initialized above
   }
 
   get contextLength() {
     return this._contextLength ?? DEFAULT_CONTEXT_LENGTH
-  }
-
-  protected createOpenAiAdapter() {
-    return constructLlmApi({
-      provider: this.providerName as any,
-      apiKey: this.apiKey ?? "",
-      apiBase: this.apiBase,
-      env: this._llmOptions.env,
-    })
   }
 
   private _templatePromptLikeMessages(prompt: string): string {
@@ -629,7 +615,9 @@ export abstract class BaseLLM implements ILLM {
 
       // Standard OpenAI format
       if (results.data && Array.isArray(results.data)) {
-        return results.data.sort((a, b) => a.index - b.index).map((result) => result.relevance_score)
+        return results.data
+          .sort((a: { index: number }, b: { index: number }) => a.index - b.index)
+          .map((result: { relevance_score: number }) => result.relevance_score)
       }
 
       throw new Error(

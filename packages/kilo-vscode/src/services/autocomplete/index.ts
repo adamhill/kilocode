@@ -1,39 +1,38 @@
 // kilocode_change - new file
 import * as vscode from "vscode"
 import { AutocompleteServiceManager } from "./AutocompleteServiceManager"
-import { ClineProvider } from "../../core/webview/ClineProvider"
-import { registerAutocompleteJetbrainsBridge } from "./AutocompleteJetbrainsBridge"
+import type { KiloConnectionService } from "../cli-backend"
 
-export const registerAutocompleteProvider = (context: vscode.ExtensionContext, cline: ClineProvider) => {
-  const autocompleteManager = new AutocompleteServiceManager(context, cline)
+export const registerAutocompleteProvider = (
+  context: vscode.ExtensionContext,
+  connectionService: KiloConnectionService,
+) => {
+  const autocompleteManager = new AutocompleteServiceManager(context, connectionService)
   context.subscriptions.push(autocompleteManager)
-
-  // Register JetBrains Bridge if applicable
-  registerAutocompleteJetbrainsBridge(context, cline, autocompleteManager)
 
   // Register AutocompleteServiceManager Commands
   context.subscriptions.push(
-    vscode.commands.registerCommand("kilo-code.autocomplete.reload", async () => {
+    vscode.commands.registerCommand("kilo-code.new.autocomplete.reload", async () => {
       await autocompleteManager.load()
     }),
   )
   context.subscriptions.push(
-    vscode.commands.registerCommand("kilo-code.autocomplete.codeActionQuickFix", async () => {
+    vscode.commands.registerCommand("kilo-code.new.autocomplete.codeActionQuickFix", async () => {
       return
     }),
   )
   context.subscriptions.push(
-    vscode.commands.registerCommand("kilo-code.autocomplete.generateSuggestions", async () => {
+    vscode.commands.registerCommand("kilo-code.new.autocomplete.generateSuggestions", async () => {
       autocompleteManager.codeSuggestion()
     }),
   )
   context.subscriptions.push(
-    vscode.commands.registerCommand("kilo-code.autocomplete.showIncompatibilityExtensionPopup", async () => {
+    vscode.commands.registerCommand("kilo-code.new.autocomplete.showIncompatibilityExtensionPopup", async () => {
       await autocompleteManager.showIncompatibilityExtensionPopup()
     }),
   )
   context.subscriptions.push(
-    vscode.commands.registerCommand("kilo-code.autocomplete.disable", async () => {
+    vscode.commands.registerCommand("kilo-code.new.autocomplete.disable", async () => {
       await autocompleteManager.disable()
     }),
   )
@@ -42,6 +41,15 @@ export const registerAutocompleteProvider = (context: vscode.ExtensionContext, c
   context.subscriptions.push(
     vscode.languages.registerCodeActionsProvider("*", autocompleteManager.codeActionProvider, {
       providedCodeActionKinds: Object.values(autocompleteManager.codeActionProvider.providedCodeActionKinds),
+    }),
+  )
+
+  // Re-load when autocomplete settings change (e.g. toggled from webview or VS Code settings UI)
+  context.subscriptions.push(
+    vscode.workspace.onDidChangeConfiguration((e) => {
+      if (e.affectsConfiguration("kilo-code.new.autocomplete")) {
+        void autocompleteManager.load()
+      }
     }),
   )
 }

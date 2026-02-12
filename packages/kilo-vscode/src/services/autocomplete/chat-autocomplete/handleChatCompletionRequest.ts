@@ -1,37 +1,42 @@
-import { ClineProvider } from "../../../core/webview/ClineProvider"
-import { WebviewMessage } from "../../../shared/WebviewMessage"
+import * as vscode from "vscode"
 import { VisibleCodeTracker } from "../context/VisibleCodeTracker"
+import { FileIgnoreController } from "../shims/FileIgnoreController"
 import { ChatTextAreaAutocomplete } from "./ChatTextAreaAutocomplete"
+import type { KiloConnectionService } from "../../cli-backend"
+
+export interface ChatCompletionRequestMessage {
+  type: "requestChatCompletion"
+  text?: string
+  requestId?: string
+}
+
+export interface ChatCompletionResponseSender {
+  postMessage(message: { type: "chatCompletionResult"; text: string; requestId: string }): void
+}
 
 /**
  * Handles a chat completion request from the webview.
- * Captures visible code context and generates a FIM-based autocomplete suggestion.
+ * Captures visible code context and generates an autocomplete suggestion.
  */
 export async function handleChatCompletionRequest(
-  message: WebviewMessage & { type: "requestChatCompletion" },
-  provider: ClineProvider,
-  getCurrentCwd: () => string,
+  message: ChatCompletionRequestMessage,
+  responseSender: ChatCompletionResponseSender,
+  connectionService: KiloConnectionService,
 ): Promise<void> {
-  try {
-    const userText = message.text || ""
-    const requestId = message.requestId || ""
+  const userText = message.text || ""
+  const requestId = message.requestId || ""
 
-    // Pass RooIgnoreController to respect .kilocodeignore patterns
-    const currentTask = provider.getCurrentTask()
-    const tracker = new VisibleCodeTracker(getCurrentCwd(), currentTask?.rooIgnoreController ?? null)
+  const workspacePath = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath ?? ""
+  const ignoreController = new FileIgnoreController()
+  await ignoreController.initialize()
 
-    const visibleContext = await tracker.captureVisibleCode()
+  const tracker = new VisibleCodeTracker(workspacePath, ignoreController)
+  const visibleContext = await tracker.captureVisibleCode()
 
-    const autocomplete = new ChatTextAreaAutocomplete(provider.providerSettingsManager)
-    const { suggestion } = await autocomplete.getCompletion(userText, visibleContext)
+  const autocomplete = new ChatTextAreaAutocomplete(connectionService)
+  const { suggestion } = await autocomplete.getCompletion(userText, visibleContext)
 
-    await provider.postMessageToWebview({ type: "chatCompletionResult", text: suggestion, requestId })
-  } catch (error) {
-    provider.log(`Error getting chat completion: ${JSON.stringify(error, Object.getOwnPropertyNames(error), 2)}`)
-    await provider.postMessageToWebview({
-      type: "chatCompletionResult",
-      text: "",
-      requestId: message.requestId || "",
-    })
-  }
+  responseSender.postMessage({ type: "chatCompletionResult", text: suggestion, requestId })
+
+  ignoreController.dispose()
 }

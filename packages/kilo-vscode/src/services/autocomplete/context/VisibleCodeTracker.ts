@@ -10,9 +10,12 @@
 
 import * as vscode from "vscode"
 
-import { toRelativePath } from "../../../utils/path"
 import { isSecurityConcern } from "../continuedev/core/indexing/ignore"
-import type { RooIgnoreController } from "../../../core/ignore/RooIgnoreController"
+import type { FileIgnoreController } from "../shims/FileIgnoreController"
+
+function toRelativePath(absolutePath: string, workspacePath: string): string {
+  return vscode.workspace.asRelativePath(absolutePath, false) || absolutePath.replace(workspacePath + "/", "")
+}
 
 import { VisibleCodeContext, VisibleEditorInfo, VisibleRange, DiffInfo } from "../types"
 
@@ -24,7 +27,7 @@ export class VisibleCodeTracker {
 
   constructor(
     private workspacePath: string,
-    private rooIgnoreController: RooIgnoreController | null = null,
+    private ignoreController: FileIgnoreController | null = null,
   ) {}
 
   /**
@@ -56,7 +59,7 @@ export class VisibleCodeTracker {
         console.log(`[VisibleCodeTracker] Filtered (security): ${relativePath}`)
         continue
       }
-      if (this.rooIgnoreController && !this.rooIgnoreController.validateAccess(relativePath)) {
+      if (this.ignoreController && !this.ignoreController.validateAccess(relativePath)) {
         console.log(`[VisibleCodeTracker] Filtered (.kilocodeignore): ${relativePath}`)
         continue
       }

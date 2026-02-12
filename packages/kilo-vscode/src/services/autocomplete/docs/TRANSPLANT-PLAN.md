@@ -702,3 +702,60 @@ Use this as the practical step-by-step transplant procedure.
 3. (Optional) Webview:
    - confirm settings update triggers reload
    - confirm chat textarea completion roundtrip works
+
+## 11. Clarifications
+
+These decisions were made before implementation began and override any conflicting guidance in the sections above.
+
+### 11.1 LLM Provider Architecture
+
+**Decision: Option A — Via CLI backend (Kilo Gateway).**
+
+FIM is postponed; only the **holefiller** (chat-completion-based) strategy will be used initially. The LLM provider will route completions through the Kilo Gateway backend. The only supported model for now is `mistralai/codestral-2508`.
+
+### 11.2 Provider & Model Selection
+
+**Decision: Hardcoded to Kilo Gateway + `mistralai/codestral-2508`.**
+
+No profile resolver is needed in phase 1. The provider and model are fixed.
+
+### 11.3 Feature Scope
+
+| Feature                    | Decision                                                                                                                                                                                          |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| JetBrains bridge           | **Exclude permanently** — delete `AutocompleteJetbrainsBridge.ts` and its tests. This will never be implemented this way.                                                                         |
+| Chat textarea autocomplete | **Include**                                                                                                                                                                                       |
+| Code actions               | **Include**                                                                                                                                                                                       |
+| Continuedev LLM adapters   | **Strip to minimum** — remove all adapters not needed for the Kilo Gateway / holefiller path. The module uses `AutocompleteModel`, not the continuedev adapters directly, so most can be removed. |
+
+### 11.4 Settings Storage
+
+**Decision: VS Code settings** via `contributes.configuration` in `package.json`.
+
+### 11.5 Telemetry
+
+**Decision: Console logging only.** The extension has no telemetry system yet. Keep console logs but do not send actual telemetry events. Implement a no-op `ITelemetryClient`.
+
+### 11.6 i18n
+
+**Decision: Wire into `@kilocode/kilo-i18n`.** Use the translations from `src/services/autocomplete/i18n/`. Keys may differ from what `kilo-i18n` uses, so mapping is required. Discard translations for locales not present in `kilo-i18n`.
+
+### 11.7 File Ignore / Access Control
+
+**Decision: Dummy `RooIgnoreController`** that allows everything except `.env` files (and similar sensitive defaults). Include a `TODO` comment for proper implementation later.
+
+### 11.8 Command Prefix
+
+**Decision: Use `kilo-code.new.autocomplete.*`** to be consistent with the existing extension naming convention.
+
+### 11.9 NPM Dependencies
+
+**Decision: Strip unused continuedev code first**, then install only what is actually needed.
+
+### 11.10 Tree-Sitter WASM Bundling
+
+**Decision: Bundle in `dist/`** via esbuild copy plugin.
+
+### 11.11 Singleton vs Dependency Injection
+
+**Decision: Deferred** — will be determined during implementation based on what works best with the existing `KiloConnectionService` / `KiloProvider` architecture.

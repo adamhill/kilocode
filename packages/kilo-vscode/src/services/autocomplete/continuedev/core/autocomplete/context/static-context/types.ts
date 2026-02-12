@@ -1,4 +1,5 @@
-import { Tree } from "web-tree-sitter"
+import type Parser from "web-tree-sitter"
+type Tree = Parser.Tree
 import { Range } from "../../.."
 
 export interface TypeSpanAndSourceFile {

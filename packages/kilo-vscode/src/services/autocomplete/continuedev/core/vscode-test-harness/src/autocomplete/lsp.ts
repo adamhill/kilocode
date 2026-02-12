@@ -7,7 +7,8 @@ import { intersection } from "../../../util/ranges"
 import * as vscode from "vscode"
 
 import type { DocumentSymbol, IDE, Range, RangeInFile, RangeInFileWithContents, SignatureHelp } from "../../../"
-import type { Node as SyntaxNode } from "web-tree-sitter"
+import type Parser from "web-tree-sitter"
+type SyntaxNode = Parser.SyntaxNode
 const FUNCTION_BLOCK_NODE_TYPES = ["block", "statement_block"]
 const FUNCTION_DECLARATION_NODE_TYPEs = [
   "method_definition",

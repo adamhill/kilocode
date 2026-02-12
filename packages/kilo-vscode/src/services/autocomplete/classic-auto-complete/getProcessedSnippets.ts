@@ -8,7 +8,7 @@ import { getDefinitionsFromLsp } from "../continuedev/core/vscode-test-harness/s
 import { DEFAULT_AUTOCOMPLETE_OPTS } from "../continuedev/core/util/parameters"
 import { getSnippets } from "../continuedev/core/autocomplete/templating/filtering"
 import { AutocompleteModel } from "../AutocompleteModel"
-import { RooIgnoreController } from "../../../core/ignore/RooIgnoreController"
+import { FileIgnoreController } from "../shims/FileIgnoreController"
 import { AutocompleteSnippet, AutocompleteSnippetType } from "../continuedev/core/autocomplete/types"
 
 function uriToFsPath(filepath: string): string {
@@ -24,7 +24,7 @@ function hasFilepath(snippet: AutocompleteSnippet): snippet is AutocompleteSnipp
 
 async function filterSnippetsByAccess(
   snippets: AutocompleteSnippet[],
-  ignoreController?: Promise<RooIgnoreController>,
+  ignoreController?: Promise<FileIgnoreController>,
 ): Promise<AutocompleteSnippet[]> {
   if (!ignoreController) {
     return snippets
@@ -70,7 +70,7 @@ export async function getProcessedSnippets(
   contextService: ContextRetrievalService,
   model: AutocompleteModel,
   ide: VsCodeIde,
-  ignoreController?: Promise<RooIgnoreController>,
+  ignoreController?: Promise<FileIgnoreController>,
 ): Promise<{
   filepathUri: string
   helper: any

@@ -1,22 +1,49 @@
 import crypto from "crypto"
 import * as vscode from "vscode"
-import { t } from "../../i18n"
+import { t } from "./shims/i18n"
+import { TelemetryStub } from "./shims/TelemetryStub"
 import { AutocompleteModel } from "./AutocompleteModel"
 import { AutocompleteStatusBar } from "./AutocompleteStatusBar"
 import { AutocompleteCodeActionProvider } from "./AutocompleteCodeActionProvider"
 import { AutocompleteInlineCompletionProvider } from "./classic-auto-complete/AutocompleteInlineCompletionProvider"
-import { AutocompleteServiceSettings, TelemetryEventName } from "@roo-code/types"
-import { ContextProxy } from "../../core/config/ContextProxy"
-import { TelemetryService } from "@roo-code/telemetry"
-import { ClineProvider } from "../../core/webview/ClineProvider"
-import { AutocompleteTelemetry } from "./classic-auto-complete/AutocompleteTelemetry"
+import { AutocompleteTelemetry, TelemetryEventName } from "./classic-auto-complete/AutocompleteTelemetry"
+import type { KiloConnectionService } from "../cli-backend"
+
+const CONFIG_SECTION = "kilo-code.new.autocomplete"
+
+export interface AutocompleteServiceSettings {
+  enableAutoTrigger?: boolean
+  enableSmartInlineTaskKeybinding?: boolean
+  enableChatAutocomplete?: boolean
+  provider?: string
+  model?: string
+  snoozeUntil?: number
+  hasKilocodeProfileWithNoBalance?: boolean
+}
+
+function readSettings(): AutocompleteServiceSettings {
+  const config = vscode.workspace.getConfiguration(CONFIG_SECTION)
+  return {
+    enableAutoTrigger: config.get<boolean>("enableAutoTrigger") ?? true,
+    enableSmartInlineTaskKeybinding: config.get<boolean>("enableSmartInlineTaskKeybinding") ?? true,
+    enableChatAutocomplete: config.get<boolean>("enableChatAutocomplete") ?? true,
+    snoozeUntil: config.get<number>("snoozeUntil"),
+  }
+}
+
+async function writeSettings(patch: Partial<AutocompleteServiceSettings>): Promise<void> {
+  const config = vscode.workspace.getConfiguration(CONFIG_SECTION)
+  for (const [key, value] of Object.entries(patch)) {
+    await config.update(key, value, vscode.ConfigurationTarget.Global)
+  }
+}
 
 export class AutocompleteServiceManager {
   private static _instance: AutocompleteServiceManager | null = null
 
   private readonly model: AutocompleteModel
-  private readonly cline: ClineProvider
   private readonly context: vscode.ExtensionContext
+  private readonly telemetry = new TelemetryStub()
   private settings: AutocompleteServiceSettings | null = null
 
   private taskId: string | null = null
@@ -34,7 +61,7 @@ export class AutocompleteServiceManager {
   public readonly inlineCompletionProvider: AutocompleteInlineCompletionProvider
   private inlineCompletionProviderDisposable: vscode.Disposable | null = null
 
-  constructor(context: vscode.ExtensionContext, cline: ClineProvider) {
+  constructor(context: vscode.ExtensionContext, connectionService: KiloConnectionService) {
     if (AutocompleteServiceManager._instance) {
       throw new Error(
         "AutocompleteServiceManager is a singleton. Use AutocompleteServiceManager.getInstance() instead.",
@@ -42,11 +69,12 @@ export class AutocompleteServiceManager {
     }
 
     this.context = context
-    this.cline = cline
     AutocompleteServiceManager._instance = this
 
     // Register Internal Components
-    this.model = new AutocompleteModel()
+    this.model = new AutocompleteModel(connectionService)
+
+    const workspacePath = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath ?? ""
 
     // Register the providers
     this.codeActionProvider = new AutocompleteCodeActionProvider()
@@ -55,7 +83,7 @@ export class AutocompleteServiceManager {
       this.model,
       this.updateCostTracking.bind(this),
       () => this.settings,
-      this.cline,
+      workspacePath,
       new AutocompleteTelemetry(),
     )
 
@@ -70,34 +98,13 @@ export class AutocompleteServiceManager {
   }
 
   public async load() {
-    await this.cline.providerSettingsManager.initialize() // avoid race condition with settings migrations
-    await this.model.reload(this.cline.providerSettingsManager)
-
-    this.settings = ContextProxy.instance.getGlobalState("ghostServiceSettings") ?? {
-      enableSmartInlineTaskKeybinding: true,
-    }
-    // Auto-enable autocomplete by default
-    if (this.settings.enableAutoTrigger == undefined) {
-      this.settings.enableAutoTrigger = true
-    }
-
-    // Auto-enable chat autocomplete by default
-    if (this.settings.enableChatAutocomplete == undefined) {
-      this.settings.enableChatAutocomplete = true
-    }
+    await this.model.reload()
+    this.settings = readSettings()
 
     await this.updateGlobalContext()
     this.updateStatusBar()
     await this.updateInlineCompletionProviderRegistration()
     this.setupSnoozeTimerIfNeeded()
-    const settingsWithModelInfo = {
-      ...this.settings,
-      provider: this.getCurrentProviderName(),
-      model: this.getCurrentModelName(),
-      hasKilocodeProfileWithNoBalance: this.model.hasKilocodeProfileWithNoBalance,
-    }
-    await ContextProxy.instance.setValues({ ghostServiceSettings: settingsWithModelInfo })
-    await this.cline.postStateToWebview()
   }
 
   private async updateInlineCompletionProviderRegistration() {
@@ -109,7 +116,9 @@ export class AutocompleteServiceManager {
       this.inlineCompletionProviderDisposable = null
     }
 
-    if (!shouldBeRegistered) return
+    if (!shouldBeRegistered) {
+      return
+    }
 
     // Register classic provider
     this.inlineCompletionProviderDisposable = vscode.languages.registerInlineCompletionItemProvider(
@@ -120,16 +129,12 @@ export class AutocompleteServiceManager {
   }
 
   public async disable() {
-    const settings = ContextProxy.instance.getGlobalState("ghostServiceSettings") ?? {}
-    await ContextProxy.instance.setValues({
-      ghostServiceSettings: {
-        ...settings,
-        enableAutoTrigger: false,
-        enableSmartInlineTaskKeybinding: false,
-      },
+    await writeSettings({
+      enableAutoTrigger: false,
+      enableSmartInlineTaskKeybinding: false,
     })
 
-    TelemetryService.instance.captureEvent(TelemetryEventName.GHOST_SERVICE_DISABLED)
+    this.telemetry.captureEvent(TelemetryEventName.GHOST_SERVICE_DISABLED)
 
     await this.load()
   }
@@ -139,7 +144,9 @@ export class AutocompleteServiceManager {
    */
   public isSnoozed(): boolean {
     const snoozeUntil = this.settings?.snoozeUntil
-    if (!snoozeUntil) return false
+    if (!snoozeUntil) {
+      return false
+    }
     return Date.now() < snoozeUntil
   }
 
@@ -148,7 +155,9 @@ export class AutocompleteServiceManager {
    */
   public getSnoozeRemainingSeconds(): number {
     const snoozeUntil = this.settings?.snoozeUntil
-    if (!snoozeUntil) return 0
+    if (!snoozeUntil) {
+      return 0
+    }
     const remaining = Math.max(0, Math.ceil((snoozeUntil - Date.now()) / 1000))
     return remaining
   }
@@ -163,13 +172,7 @@ export class AutocompleteServiceManager {
     }
 
     const snoozeUntil = Date.now() + seconds * 1000
-    const settings = ContextProxy.instance.getGlobalState("ghostServiceSettings") ?? {}
-    await ContextProxy.instance.setValues({
-      ghostServiceSettings: {
-        ...settings,
-        snoozeUntil,
-      },
-    })
+    await writeSettings({ snoozeUntil })
 
     this.snoozeTimer = setTimeout(() => {
       void this.unsnooze()
@@ -187,22 +190,13 @@ export class AutocompleteServiceManager {
       this.snoozeTimer = null
     }
 
-    const settings = ContextProxy.instance.getGlobalState("ghostServiceSettings") ?? {}
-    await ContextProxy.instance.setValues({
-      ghostServiceSettings: {
-        ...settings,
-        snoozeUntil: undefined,
-      },
-    })
+    await writeSettings({ snoozeUntil: undefined })
 
     await this.load()
   }
 
   /**
    * Set up a timer to auto-unsnooze if we're currently in a snoozed state.
-   * This handles the case where the extension restarts while snoozed -
-   * the persisted snoozeUntil timestamp keeps autocomplete disabled,
-   * and this timer ensures we unsnooze at the correct time.
    */
   private setupSnoozeTimerIfNeeded(): void {
     if (this.snoozeTimer) {
@@ -225,7 +219,9 @@ export class AutocompleteServiceManager {
    */
   private getSnoozeRemainingMs(): number {
     const snoozeUntil = this.settings?.snoozeUntil
-    if (!snoozeUntil) return 0
+    if (!snoozeUntil) {
+      return 0
+    }
     return Math.max(0, snoozeUntil - Date.now())
   }
 
@@ -236,7 +232,7 @@ export class AutocompleteServiceManager {
     }
 
     this.taskId = crypto.randomUUID()
-    TelemetryService.instance.captureEvent(TelemetryEventName.INLINE_ASSIST_AUTO_TASK, {
+    this.telemetry.captureEvent(TelemetryEventName.INLINE_ASSIST_AUTO_TASK, {
       taskId: this.taskId,
     })
 
@@ -255,32 +251,27 @@ export class AutocompleteServiceManager {
     }
     const tokenSource = new vscode.CancellationTokenSource()
 
-    try {
-      const completions = await this.inlineCompletionProvider.provideInlineCompletionItems_Internal(
-        document,
-        position,
-        context,
-        tokenSource.token,
-      )
+    const completions = await this.inlineCompletionProvider.provideInlineCompletionItems_Internal(
+      document,
+      position,
+      context,
+      tokenSource.token,
+    )
+    tokenSource.dispose()
 
-      // If we got completions, directly insert the first one
-      if (completions && (Array.isArray(completions) ? completions.length > 0 : completions.items.length > 0)) {
-        const items = Array.isArray(completions) ? completions : completions.items
-        const firstCompletion = items[0]
+    // If we got completions, directly insert the first one
+    if (completions && (Array.isArray(completions) ? completions.length > 0 : completions.items.length > 0)) {
+      const items = Array.isArray(completions) ? completions : completions.items
+      const firstCompletion = items[0]
 
-        if (firstCompletion && firstCompletion.insertText) {
-          const insertText =
-            typeof firstCompletion.insertText === "string"
-              ? firstCompletion.insertText
-              : firstCompletion.insertText.value
+      if (firstCompletion?.insertText) {
+        const insertText =
+          typeof firstCompletion.insertText === "string" ? firstCompletion.insertText : firstCompletion.insertText.value
 
-          await editor.edit((editBuilder) => {
-            editBuilder.insert(position, insertText)
-          })
-        }
+        await editor.edit((editBuilder) => {
+          editBuilder.insert(position, insertText)
+        })
       }
-    } finally {
-      tokenSource.dispose()
     }
   }
 
@@ -318,12 +309,10 @@ export class AutocompleteServiceManager {
   }
 
   private hasNoUsableProvider(): boolean {
-    // We have no usable provider if the model is loaded but has no valid credentials
-    // and it's not because of a kilocode profile with no balance (that's a different error)
     return this.model.loaded && !this.model.hasValidCredentials() && !this.model.hasKilocodeProfileWithNoBalance
   }
 
-  private updateCostTracking(cost: number, inputTokens: number, outputTokens: number): void {
+  private updateCostTracking(cost: number, _inputTokens: number, _outputTokens: number): void {
     this.completionCount++
     this.sessionCost += cost
     this.updateStatusBar()
@@ -355,9 +344,9 @@ export class AutocompleteServiceManager {
     const response = await vscode.window.showErrorMessage(message, disableCopilot, disableInlineAssist)
 
     if (response === disableCopilot) {
-      await vscode.commands.executeCommand<any>("github.copilot.completions.disable")
+      await vscode.commands.executeCommand("github.copilot.completions.disable")
     } else if (response === disableInlineAssist) {
-      await vscode.commands.executeCommand<any>("kilo-code.autocomplete.disable")
+      await vscode.commands.executeCommand("kilo-code.new.autocomplete.disable")
     }
   }
 

@@ -7,8 +7,7 @@ import {
 } from "../types"
 import { getProcessedSnippets } from "./getProcessedSnippets"
 import { formatSnippets } from "../continuedev/core/autocomplete/templating/formatting"
-import { AutocompleteModel } from "../AutocompleteModel"
-import { ApiStreamChunk } from "../../../api/transform/stream"
+import { AutocompleteModel, ApiStreamChunk } from "../AutocompleteModel"
 
 export type { HoleFillerAutocompletePrompt, FillInAtCursorSuggestion, ChatCompletionResult }
 
@@ -189,28 +188,22 @@ Return the COMPLETION tags`
   ): Promise<ChatCompletionResult> {
     const { systemPrompt, userPrompt } = prompt
     let response = ""
+    let chunkCount = 0
 
     const onChunk = (chunk: ApiStreamChunk) => {
       if (chunk.type === "text") {
         response += chunk.text
+        chunkCount++
       }
     }
 
-    console.log("[HoleFiller] userPrompt:", userPrompt)
-
     const usageInfo = await model.generateResponse(systemPrompt, userPrompt, onChunk)
-
-    console.log("response", response)
 
     // Extract just the text from the response - prefix/suffix are handled by the caller
     const completionMatch = response.match(/<COMPLETION>([\s\S]*?)<\/COMPLETION>/i)
     const suggestionText = completionMatch ? (completionMatch[1] || "").replace(/<\/?COMPLETION>/gi, "") : ""
 
     const fillInAtCursorSuggestion = processSuggestion(suggestionText)
-
-    if (fillInAtCursorSuggestion.text) {
-      console.info("Final suggestion:", fillInAtCursorSuggestion)
-    }
 
     return {
       suggestion: fillInAtCursorSuggestion,

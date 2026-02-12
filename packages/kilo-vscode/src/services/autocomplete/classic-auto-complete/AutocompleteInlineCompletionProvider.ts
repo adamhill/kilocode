@@ -20,11 +20,10 @@ import { ContextRetrievalService } from "../continuedev/core/autocomplete/contex
 import { VsCodeIde } from "../continuedev/core/vscode-test-harness/src/VSCodeIde"
 import { RecentlyVisitedRangesService } from "../continuedev/core/vscode-test-harness/src/autocomplete/RecentlyVisitedRangesService"
 import { RecentlyEditedTracker } from "../continuedev/core/vscode-test-harness/src/autocomplete/recentlyEdited"
-import type { AutocompleteServiceSettings } from "@roo-code/types"
+import type { AutocompleteServiceSettings } from "../AutocompleteServiceManager"
 import { postprocessAutocompleteSuggestion } from "./uselessSuggestionFilter"
 import { shouldSkipAutocomplete } from "./contextualSkip"
-import { RooIgnoreController } from "../../../core/ignore/RooIgnoreController"
-import { ClineProvider } from "../../../core/webview/ClineProvider"
+import { FileIgnoreController } from "../shims/FileIgnoreController"
 import { AutocompleteTelemetry } from "./AutocompleteTelemetry"
 
 const MAX_SUGGESTIONS_HISTORY = 20
@@ -251,8 +250,8 @@ export class AutocompleteInlineCompletionProvider implements vscode.InlineComple
   public suggestionsHistory: FillInAtCursorSuggestion[] = []
   /** Tracks all pending/in-flight requests */
   private pendingRequests: PendingRequest[] = []
-  public holeFiller: HoleFiller // publicly exposed for Jetbrains autocomplete code
-  public fimPromptBuilder: FimPromptBuilder // publicly exposed for Jetbrains autocomplete code
+  private holeFiller: HoleFiller
+  private fimPromptBuilder: FimPromptBuilder
   private model: AutocompleteModel
   private costTrackingCallback: CostTrackingCallback
   private getSettings: () => AutocompleteServiceSettings | null
@@ -260,7 +259,7 @@ export class AutocompleteInlineCompletionProvider implements vscode.InlineComple
   private recentlyEditedTracker: RecentlyEditedTracker
   private debounceTimer: NodeJS.Timeout | null = null
   private isFirstCall: boolean = true
-  private ignoreController?: Promise<RooIgnoreController>
+  private ignoreController?: Promise<FileIgnoreController>
   private acceptedCommand: vscode.Disposable | null = null
   private debounceDelayMs: number = INITIAL_DEBOUNCE_DELAY_MS
   private latencyHistory: number[] = []
@@ -273,7 +272,7 @@ export class AutocompleteInlineCompletionProvider implements vscode.InlineComple
     model: AutocompleteModel,
     costTrackingCallback: CostTrackingCallback,
     getSettings: () => AutocompleteServiceSettings | null,
-    cline: ClineProvider,
+    workspacePath: string,
     telemetry: AutocompleteTelemetry | null = null,
   ) {
     this.telemetry = telemetry
@@ -283,7 +282,7 @@ export class AutocompleteInlineCompletionProvider implements vscode.InlineComple
 
     // Create ignore controller internally
     this.ignoreController = (async () => {
-      const ignoreController = new RooIgnoreController(cline.cwd)
+      const ignoreController = new FileIgnoreController()
       await ignoreController.initialize()
       return ignoreController
     })()
@@ -495,8 +494,7 @@ export class AutocompleteInlineCompletionProvider implements vscode.InlineComple
           if (!isAccessible) {
             return []
           }
-        } catch (error) {
-          console.error("[AutocompleteInlineCompletionProvider] Error checking file access:", error)
+        } catch {
           // On error, assume file is ignored
           return []
         }
@@ -545,10 +543,9 @@ export class AutocompleteInlineCompletionProvider implements vscode.InlineComple
       }
 
       return stringToInlineCompletions(cachedResult?.text ?? "", position)
-    } catch (error) {
+    } catch {
       // only big catch at the top of the call-chain, if anything goes wrong at a lower level
       // do not catch, just let the error cascade
-      console.error("[AutocompleteInlineCompletionProvider] Error providing inline completion:", error)
       return []
     }
   }
@@ -706,7 +703,6 @@ export class AutocompleteInlineCompletionProvider implements vscode.InlineComple
         },
         telemetryContext,
       )
-      console.error("Error getting inline completion from LLM:", error)
     }
   }
 }

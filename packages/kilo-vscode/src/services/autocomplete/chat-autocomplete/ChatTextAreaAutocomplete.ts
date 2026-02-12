@@ -1,24 +1,21 @@
-import * as vscode from "vscode"
 import { AutocompleteModel } from "../AutocompleteModel"
-import { ProviderSettingsManager } from "../../../core/config/ProviderSettingsManager"
 import { AutocompleteContext, VisibleCodeContext } from "../types"
 import { removePrefixOverlap } from "../continuedev/core/autocomplete/postprocessing/removePrefixOverlap.js"
 import { AutocompleteTelemetry } from "../classic-auto-complete/AutocompleteTelemetry"
 import { postprocessAutocompleteSuggestion } from "../classic-auto-complete/uselessSuggestionFilter"
+import type { KiloConnectionService } from "../../cli-backend"
 
 export class ChatTextAreaAutocomplete {
   private model: AutocompleteModel
-  private providerSettingsManager: ProviderSettingsManager
   private telemetry: AutocompleteTelemetry
 
-  constructor(providerSettingsManager: ProviderSettingsManager) {
-    this.model = new AutocompleteModel()
-    this.providerSettingsManager = providerSettingsManager
+  constructor(connectionService: KiloConnectionService) {
+    this.model = new AutocompleteModel(connectionService)
     this.telemetry = new AutocompleteTelemetry("chat-textarea")
   }
 
   async initialize(): Promise<boolean> {
-    return this.model.reload(this.providerSettingsManager)
+    return this.model.reload()
   }
 
   async getCompletion(userText: string, visibleCodeContext?: VisibleCodeContext): Promise<{ suggestion: string }> {

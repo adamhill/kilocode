@@ -1,4 +1,3 @@
-import { FimCreateParamsStreaming } from "./openai-adapters/apis/base"
 import {
   ChatCompletion,
   ChatCompletionChunk,
@@ -69,7 +68,7 @@ export function toCompleteBody(prompt: string, options: CompletionOptions): Comp
   }
 }
 
-export function toFimBody(prefix: string, suffix: string, options: CompletionOptions): FimCreateParamsStreaming {
+export function toFimBody(prefix: string, suffix: string, options: CompletionOptions): Record<string, unknown> {
   return {
     model: options.model,
     prompt: prefix,
