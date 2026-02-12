@@ -9,6 +9,7 @@ import ProfileView from "./components/ProfileView"
 import { VSCodeProvider } from "./context/vscode"
 import { ServerProvider, useServer } from "./context/server"
 import { ProviderProvider } from "./context/provider"
+import { ConfigProvider } from "./context/config"
 import { SessionProvider, useSession } from "./context/session"
 import { LanguageProvider } from "./context/language"
 import { ChatView } from "./components/chat"
@@ -165,11 +166,13 @@ const App: Component = () => {
             <LanguageBridge>
               <MarkedProvider>
                 <ProviderProvider>
-                  <SessionProvider>
-                    <DataBridge>
-                      <AppContent />
-                    </DataBridge>
-                  </SessionProvider>
+                  <ConfigProvider>
+                    <SessionProvider>
+                      <DataBridge>
+                        <AppContent />
+                      </DataBridge>
+                    </SessionProvider>
+                  </ConfigProvider>
                 </ProviderProvider>
               </MarkedProvider>
             </LanguageBridge>

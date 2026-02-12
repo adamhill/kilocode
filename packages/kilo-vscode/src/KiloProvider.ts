@@ -15,6 +15,8 @@ export class KiloProvider implements vscode.WebviewViewProvider {
   private cachedProvidersMessage: unknown = null
   /** Cached agentsLoaded payload so requestAgents can be served before httpClient is ready */
   private cachedAgentsMessage: unknown = null
+  /** Cached configLoaded payload so requestConfig can be served before httpClient is ready */
+  private cachedConfigMessage: unknown = null
 
   private trackedSessionIds: Set<string> = new Set()
   private unsubscribeEvent: (() => void) | null = null
@@ -205,6 +207,18 @@ export class KiloProvider implements vscode.WebviewViewProvider {
         case "requestAgents":
           await this.fetchAndSendAgents()
           break
+        case "questionReply":
+          await this.handleQuestionReply(message.requestID, message.answers)
+          break
+        case "questionReject":
+          await this.handleQuestionReject(message.requestID)
+          break
+        case "requestConfig":
+          await this.fetchAndSendConfig()
+          break
+        case "updateConfig":
+          await this.handleUpdateConfig(message.config)
+          break
         case "setLanguage":
           await vscode.workspace
             .getConfiguration("kilo-code.new")
@@ -242,6 +256,15 @@ export class KiloProvider implements vscode.WebviewViewProvider {
           break
         case "renameSession":
           await this.handleRenameSession(message.sessionID, message.title)
+          break
+        case "updateSetting":
+          await this.handleUpdateSetting(message.key, message.value)
+          break
+        case "requestBrowserSettings":
+          this.sendBrowserSettings()
+          break
+        case "requestNotificationSettings":
+          this.sendNotificationSettings()
           break
       }
     })
@@ -324,6 +347,8 @@ export class KiloProvider implements vscode.WebviewViewProvider {
       // Fetch providers and agents, then send to webview
       await this.fetchAndSendProviders()
       await this.fetchAndSendAgents()
+      await this.fetchAndSendConfig()
+      this.sendNotificationSettings()
 
       console.log("[Kilo New] KiloProvider: ✅ initializeConnection completed successfully")
     } catch (error) {
@@ -606,6 +631,80 @@ export class KiloProvider implements vscode.WebviewViewProvider {
   }
 
   /**
+   * Fetch backend config and send to webview.
+   */
+  private async fetchAndSendConfig(): Promise<void> {
+    if (!this.httpClient) {
+      if (this.cachedConfigMessage) {
+        this.postMessage(this.cachedConfigMessage)
+      }
+      return
+    }
+
+    try {
+      const workspaceDir = this.getWorkspaceDirectory()
+      const config = await this.httpClient.getConfig(workspaceDir)
+
+      const message = {
+        type: "configLoaded",
+        config,
+      }
+      this.cachedConfigMessage = message
+      this.postMessage(message)
+    } catch (error) {
+      console.error("[Kilo New] KiloProvider: Failed to fetch config:", error)
+    }
+  }
+
+  /**
+   * Read notification/sound settings from VS Code config and push to webview.
+   */
+  private sendNotificationSettings(): void {
+    const notifications = vscode.workspace.getConfiguration("kilo-code.new.notifications")
+    const sounds = vscode.workspace.getConfiguration("kilo-code.new.sounds")
+    this.postMessage({
+      type: "notificationSettingsLoaded",
+      settings: {
+        notifyAgent: notifications.get<boolean>("agent", true),
+        notifyPermissions: notifications.get<boolean>("permissions", true),
+        notifyErrors: notifications.get<boolean>("errors", true),
+        soundAgent: sounds.get<string>("agent", "default"),
+        soundPermissions: sounds.get<string>("permissions", "default"),
+        soundErrors: sounds.get<string>("errors", "default"),
+      },
+    })
+  }
+
+  /**
+   * Handle config update request from the webview.
+   * Applies a partial config update via the global config endpoint, then pushes
+   * the full merged config back to the webview.
+   */
+  private async handleUpdateConfig(partial: Record<string, unknown>): Promise<void> {
+    if (!this.httpClient) {
+      this.postMessage({ type: "error", message: "Not connected to CLI backend" })
+      return
+    }
+
+    try {
+      const updated = await this.httpClient.updateConfig(partial)
+
+      const message = {
+        type: "configUpdated",
+        config: updated,
+      }
+      this.cachedConfigMessage = { type: "configLoaded", config: updated }
+      this.postMessage(message)
+    } catch (error) {
+      console.error("[Kilo New] KiloProvider: Failed to update config:", error)
+      this.postMessage({
+        type: "error",
+        message: error instanceof Error ? error.message : "Failed to update config",
+      })
+    }
+  }
+
+  /**
    * Handle sending a message from the webview.
    */
   private async handleSendMessage(
@@ -744,6 +843,40 @@ export class KiloProvider implements vscode.WebviewViewProvider {
   }
 
   /**
+   * Handle question reply from the webview.
+   */
+  private async handleQuestionReply(requestID: string, answers: string[][]): Promise<void> {
+    if (!this.httpClient) {
+      this.postMessage({ type: "questionError", requestID })
+      return
+    }
+
+    try {
+      await this.httpClient.replyToQuestion(requestID, answers, this.getWorkspaceDirectory())
+    } catch (error) {
+      console.error("[Kilo New] KiloProvider: Failed to reply to question:", error)
+      this.postMessage({ type: "questionError", requestID })
+    }
+  }
+
+  /**
+   * Handle question reject (dismiss) from the webview.
+   */
+  private async handleQuestionReject(requestID: string): Promise<void> {
+    if (!this.httpClient) {
+      this.postMessage({ type: "questionError", requestID })
+      return
+    }
+
+    try {
+      await this.httpClient.rejectQuestion(requestID, this.getWorkspaceDirectory())
+    } catch (error) {
+      console.error("[Kilo New] KiloProvider: Failed to reject question:", error)
+      this.postMessage({ type: "questionError", requestID })
+    }
+  }
+
+  /**
    * Handle login request from the webview.
    * Uses the provider OAuth flow: authorize → open browser → callback (polls until complete).
    * Sends device auth messages so the webview can display a QR code, verification code, and timer.
@@ -838,6 +971,33 @@ export class KiloProvider implements vscode.WebviewViewProvider {
   }
 
   /**
+   * Handle a generic setting update from the webview.
+   * The key uses dot notation relative to `kilo-code.new` (e.g. "browserAutomation.enabled").
+   */
+  private async handleUpdateSetting(key: string, value: unknown): Promise<void> {
+    const parts = key.split(".")
+    const section = parts.slice(0, -1).join(".")
+    const leaf = parts[parts.length - 1]
+    const config = vscode.workspace.getConfiguration(`kilo-code.new${section ? `.${section}` : ""}`)
+    await config.update(leaf, value, vscode.ConfigurationTarget.Global)
+  }
+
+  /**
+   * Read the current browser automation settings and push them to the webview.
+   */
+  private sendBrowserSettings(): void {
+    const config = vscode.workspace.getConfiguration("kilo-code.new.browserAutomation")
+    this.postMessage({
+      type: "browserSettingsLoaded",
+      settings: {
+        enabled: config.get<boolean>("enabled", false),
+        useSystemChrome: config.get<boolean>("useSystemChrome", true),
+        headless: config.get<boolean>("headless", false),
+      },
+    })
+  }
+
+  /**
    * Extract sessionID from an SSE event, if applicable.
    * Returns undefined for global events (server.connected, server.heartbeat).
    */
@@ -916,6 +1076,7 @@ export class KiloProvider implements vscode.WebviewViewProvider {
             toolName: event.properties.permission,
             args: event.properties.metadata,
             message: `Permission required: ${event.properties.permission}`,
+            tool: event.properties.tool,
           },
         })
         break
@@ -925,6 +1086,32 @@ export class KiloProvider implements vscode.WebviewViewProvider {
           type: "todoUpdated",
           sessionID: event.properties.sessionID,
           items: event.properties.items,
+        })
+        break
+
+      case "question.asked":
+        this.postMessage({
+          type: "questionRequest",
+          question: {
+            id: event.properties.id,
+            sessionID: event.properties.sessionID,
+            questions: event.properties.questions,
+            tool: event.properties.tool,
+          },
+        })
+        break
+
+      case "question.replied":
+        this.postMessage({
+          type: "questionResolved",
+          requestID: event.properties.requestID,
+        })
+        break
+
+      case "question.rejected":
+        this.postMessage({
+          type: "questionResolved",
+          requestID: event.properties.requestID,
         })
         break
 

@@ -231,23 +231,6 @@
 }
 
 /* ============================================
-   Permission Dialog
-   ============================================ */
-
-.permission-details {
-  padding: 8px;
-  font-size: 12px;
-}
-
-.permission-details pre {
-  margin: 0;
-  font-family: var(--vscode-editor-font-family);
-  font-size: 11px;
-  white-space: pre-wrap;
-  word-break: break-word;
-}
-
-/* ============================================
    Model Selector (uses kilo-ui Popover)
    ============================================ */
 
@@ -399,6 +382,20 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* Dialog Confirmation */
+.dialog-confirm-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 0 24px 12px 24px;
+}
+
+.dialog-confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
 }
 
 /* Session List Items */

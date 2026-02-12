@@ -16,7 +16,9 @@ import { useLanguage } from "../../context/language"
 import { formatRelativeDate } from "../../utils/date"
 import type { SessionInfo } from "../../types/messages"
 
-function dateGroup(iso: string): string {
+const DATE_GROUP_KEYS = ["time.today", "time.yesterday", "time.thisWeek", "time.thisMonth", "time.older"] as const
+
+function dateGroupKey(iso: string): (typeof DATE_GROUP_KEYS)[number] {
   const now = new Date()
   const then = new Date(iso)
 
@@ -25,19 +27,11 @@ function dateGroup(iso: string): string {
   const weekAgo = new Date(today.getTime() - 7 * 86400000)
   const monthAgo = new Date(today.getTime() - 30 * 86400000)
 
-  if (then >= today) return "Today"
-  if (then >= yesterday) return "Yesterday"
-  if (then >= weekAgo) return "This Week"
-  if (then >= monthAgo) return "This Month"
-  return "Older"
-}
-
-const GROUP_ORDER: Record<string, number> = {
-  Today: 0,
-  Yesterday: 1,
-  "This Week": 2,
-  "This Month": 3,
-  Older: 4,
+  if (then >= today) return DATE_GROUP_KEYS[0]
+  if (then >= yesterday) return DATE_GROUP_KEYS[1]
+  if (then >= weekAgo) return DATE_GROUP_KEYS[2]
+  if (then >= monthAgo) return DATE_GROUP_KEYS[3]
+  return DATE_GROUP_KEYS[4]
 }
 
 interface SessionListProps {
@@ -90,9 +84,9 @@ const SessionList: Component<SessionListProps> = (props) => {
   function confirmDelete(s: SessionInfo) {
     dialog.show(() => (
       <Dialog title={language.t("session.delete.title")} fit>
-        <div style={{ display: "flex", "flex-direction": "column", gap: "16px", padding: "0 16px 12px" }}>
+        <div class="dialog-confirm-body">
           <span>{language.t("session.delete.confirm", { name: s.title || language.t("session.untitled") })}</span>
-          <div style={{ display: "flex", "justify-content": "flex-end", gap: "8px" }}>
+          <div class="dialog-confirm-actions">
             <Button variant="ghost" size="large" onClick={() => dialog.close()}>
               {language.t("common.cancel")}
             </Button>
@@ -147,8 +141,11 @@ const SessionList: Component<SessionListProps> = (props) => {
         }}
         search={{ placeholder: language.t("session.search.placeholder"), autofocus: false }}
         emptyMessage={language.t("session.empty")}
-        groupBy={(s) => dateGroup(s.updatedAt)}
-        sortGroupsBy={(a, b) => (GROUP_ORDER[a.category] ?? 99) - (GROUP_ORDER[b.category] ?? 99)}
+        groupBy={(s) => language.t(dateGroupKey(s.updatedAt))}
+        sortGroupsBy={(a, b) => {
+          const rank = Object.fromEntries(DATE_GROUP_KEYS.map((k, i) => [language.t(k), i]))
+          return (rank[a.category] ?? 99) - (rank[b.category] ?? 99)
+        }}
         itemWrapper={wrapItem}
       >
         {(s) => (

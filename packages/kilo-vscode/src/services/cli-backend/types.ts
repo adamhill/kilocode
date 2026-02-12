@@ -82,11 +82,38 @@ export type SSEEvent =
       properties: { sessionID: string; requestID: string; reply: "once" | "always" | "reject" }
     }
   | { type: "todo.updated"; properties: { sessionID: string; items: TodoItem[] } }
+  | { type: "question.asked"; properties: QuestionRequest }
+  | { type: "question.replied"; properties: { sessionID: string; requestID: string; answers: string[][] } }
+  | { type: "question.rejected"; properties: { sessionID: string; requestID: string } }
 
 export interface TodoItem {
   id: string
   content: string
   status: "pending" | "in_progress" | "completed"
+}
+
+// Question types from Question module
+export interface QuestionOption {
+  label: string
+  description: string
+}
+
+export interface QuestionInfo {
+  question: string
+  header: string
+  options: QuestionOption[]
+  multiple?: boolean
+  custom?: boolean
+}
+
+export interface QuestionRequest {
+  id: string
+  sessionID: string
+  questions: QuestionInfo[]
+  tool?: {
+    messageID: string
+    callID: string
+  }
 }
 
 // Agent/mode info from the CLI /agent endpoint
@@ -168,4 +195,128 @@ export interface ProfileData {
   profile: KilocodeProfile
   balance: KilocodeBalance | null
   currentOrgId: string | null
+}
+
+// MCP server status — discriminated union returned by the backend
+export type McpStatus =
+  | { status: "connected" }
+  | { status: "disabled" }
+  | { status: "failed"; error: string }
+  | { status: "needs_auth" }
+  | { status: "needs_client_registration"; error: string }
+
+// MCP server configuration for local (stdio) servers
+export interface McpLocalConfig {
+  type: "local"
+  command: string[]
+  environment?: Record<string, string>
+  enabled?: boolean
+  timeout?: number
+}
+
+// MCP server configuration for remote (SSE) servers
+export interface McpRemoteConfig {
+  type: "remote"
+  url: string
+  enabled?: boolean
+  headers?: Record<string, string>
+  timeout?: number
+}
+
+// Union of all MCP server config types
+export type McpConfig = McpLocalConfig | McpRemoteConfig
+
+// ============================================
+// Backend Config Types (from CLI server)
+// ============================================
+
+/** Permission level for a tool */
+export type PermissionLevel = "allow" | "ask" | "deny"
+
+/** Per-tool permission configuration */
+export type PermissionConfig = Partial<Record<string, PermissionLevel>>
+
+/** Per-agent configuration */
+export interface AgentConfig {
+  model?: string
+  prompt?: string
+  temperature?: number
+  top_p?: number
+  steps?: number
+  permission?: PermissionConfig
+}
+
+/** Custom provider configuration (OpenAI-compatible) */
+export interface ProviderConfig {
+  name?: string
+  api_key?: string
+  base_url?: string
+  models?: Record<string, unknown>
+}
+
+/** MCP server configuration (backend config shape) */
+export interface McpServerConfig {
+  command?: string
+  args?: string[]
+  env?: Record<string, string>
+  url?: string
+  headers?: Record<string, string>
+}
+
+/** Custom command configuration */
+export interface CommandConfig {
+  command: string
+  description?: string
+}
+
+/** Skills configuration */
+export interface SkillsConfig {
+  paths?: string[]
+  urls?: string[]
+}
+
+/** Compaction configuration */
+export interface CompactionConfig {
+  auto?: boolean
+  prune?: boolean
+}
+
+/** Watcher configuration */
+export interface WatcherConfig {
+  ignore?: string[]
+}
+
+/** Experimental flags */
+export interface ExperimentalConfig {
+  disable_paste_summary?: boolean
+  batch_tool?: boolean
+  primary_tools?: string[]
+  continue_loop_on_deny?: boolean
+  mcp_timeout?: number
+}
+
+/** Full backend Config object (partial — all fields optional for PATCH) */
+export interface Config {
+  permission?: PermissionConfig
+  model?: string
+  small_model?: string
+  default_agent?: string
+  agent?: Record<string, AgentConfig>
+  provider?: Record<string, ProviderConfig>
+  disabled_providers?: string[]
+  enabled_providers?: string[]
+  mcp?: Record<string, McpServerConfig>
+  command?: Record<string, CommandConfig>
+  instructions?: string[]
+  skills?: SkillsConfig
+  snapshot?: boolean
+  share?: "manual" | "auto" | "disabled"
+  username?: string
+  watcher?: WatcherConfig
+  formatter?: false | Record<string, unknown>
+  lsp?: false | Record<string, unknown>
+  compaction?: CompactionConfig
+  tools?: Record<string, boolean>
+  layout?: "auto" | "stretch"
+  experimental?: ExperimentalConfig
 }

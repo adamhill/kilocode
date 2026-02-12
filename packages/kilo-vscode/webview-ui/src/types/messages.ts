@@ -105,6 +105,7 @@ export interface PermissionRequest {
   toolName: string
   args: Record<string, unknown>
   message?: string
+  tool?: { messageID: string; callID: string }
 }
 
 // Todo item
@@ -112,6 +113,30 @@ export interface TodoItem {
   id: string
   content: string
   status: "pending" | "in_progress" | "completed"
+}
+
+// Question types
+export interface QuestionOption {
+  label: string
+  description: string
+}
+
+export interface QuestionInfo {
+  question: string
+  header: string
+  options: QuestionOption[]
+  multiple?: boolean
+  custom?: boolean
+}
+
+export interface QuestionRequest {
+  id: string
+  sessionID: string
+  questions: QuestionInfo[]
+  tool?: {
+    messageID: string
+    callID: string
+  }
 }
 
 // Agent/mode info from CLI backend
@@ -180,6 +205,90 @@ export interface Provider {
 export interface ModelSelection {
   providerID: string
   modelID: string
+}
+
+// ============================================
+// Backend Config Types (mirrored for webview)
+// ============================================
+
+export type PermissionLevel = "allow" | "ask" | "deny"
+
+export type PermissionConfig = Partial<Record<string, PermissionLevel>>
+
+export interface AgentConfig {
+  model?: string
+  prompt?: string
+  temperature?: number
+  top_p?: number
+  steps?: number
+  permission?: PermissionConfig
+}
+
+export interface ProviderConfig {
+  name?: string
+  api_key?: string
+  base_url?: string
+  models?: Record<string, unknown>
+}
+
+export interface McpConfig {
+  command?: string
+  args?: string[]
+  env?: Record<string, string>
+  url?: string
+  headers?: Record<string, string>
+}
+
+export interface CommandConfig {
+  command: string
+  description?: string
+}
+
+export interface SkillsConfig {
+  paths?: string[]
+  urls?: string[]
+}
+
+export interface CompactionConfig {
+  auto?: boolean
+  prune?: boolean
+}
+
+export interface WatcherConfig {
+  ignore?: string[]
+}
+
+export interface ExperimentalConfig {
+  disable_paste_summary?: boolean
+  batch_tool?: boolean
+  primary_tools?: string[]
+  continue_loop_on_deny?: boolean
+  mcp_timeout?: number
+}
+
+export interface Config {
+  permission?: PermissionConfig
+  model?: string
+  small_model?: string
+  default_agent?: string
+  agent?: Record<string, AgentConfig>
+  provider?: Record<string, ProviderConfig>
+  disabled_providers?: string[]
+  enabled_providers?: string[]
+  mcp?: Record<string, McpConfig>
+  command?: Record<string, CommandConfig>
+  instructions?: string[]
+  skills?: SkillsConfig
+  snapshot?: boolean
+  share?: "manual" | "auto" | "disabled"
+  username?: string
+  watcher?: WatcherConfig
+  formatter?: false | Record<string, unknown>
+  lsp?: false | Record<string, unknown>
+  compaction?: CompactionConfig
+  tools?: Record<string, boolean>
+  layout?: "auto" | "stretch"
+  experimental?: ExperimentalConfig
 }
 
 // ============================================
@@ -320,6 +429,54 @@ export interface ChatCompletionResultMessage {
   requestId: string
 }
 
+export interface QuestionRequestMessage {
+  type: "questionRequest"
+  question: QuestionRequest
+}
+
+export interface QuestionResolvedMessage {
+  type: "questionResolved"
+  requestID: string
+}
+
+export interface QuestionErrorMessage {
+  type: "questionError"
+  requestID: string
+}
+
+export interface BrowserSettings {
+  enabled: boolean
+  useSystemChrome: boolean
+  headless: boolean
+}
+
+export interface BrowserSettingsLoadedMessage {
+  type: "browserSettingsLoaded"
+  settings: BrowserSettings
+}
+
+export interface ConfigLoadedMessage {
+  type: "configLoaded"
+  config: Config
+}
+
+export interface ConfigUpdatedMessage {
+  type: "configUpdated"
+  config: Config
+}
+
+export interface NotificationSettingsLoadedMessage {
+  type: "notificationSettingsLoaded"
+  settings: {
+    notifyAgent: boolean
+    notifyPermissions: boolean
+    notifyErrors: boolean
+    soundAgent: string
+    soundPermissions: string
+    soundErrors: string
+  }
+}
+
 export type ExtensionMessage =
   | ReadyMessage
   | ConnectionStateMessage
@@ -344,6 +501,13 @@ export type ExtensionMessage =
   | AgentsLoadedMessage
   | AutocompleteSettingsLoadedMessage
   | ChatCompletionResultMessage
+  | QuestionRequestMessage
+  | QuestionResolvedMessage
+  | QuestionErrorMessage
+  | BrowserSettingsLoadedMessage
+  | ConfigLoadedMessage
+  | ConfigUpdatedMessage
+  | NotificationSettingsLoadedMessage
 
 // ============================================
 // Messages FROM webview TO extension
@@ -432,6 +596,17 @@ export interface SetLanguageRequest {
   locale: string
 }
 
+export interface QuestionReplyRequest {
+  type: "questionReply"
+  requestID: string
+  answers: string[][]
+}
+
+export interface QuestionRejectRequest {
+  type: "questionReject"
+  requestID: string
+}
+
 export interface DeleteSessionRequest {
   type: "deleteSession"
   sessionID: string
@@ -463,6 +638,28 @@ export interface ChatCompletionAcceptedMessage {
   type: "chatCompletionAccepted"
   suggestionLength?: number
 }
+export interface UpdateSettingRequest {
+  type: "updateSetting"
+  key: string
+  value: unknown
+}
+
+export interface RequestBrowserSettingsMessage {
+  type: "requestBrowserSettings"
+}
+
+export interface RequestConfigMessage {
+  type: "requestConfig"
+}
+
+export interface UpdateConfigMessage {
+  type: "updateConfig"
+  config: Partial<Config>
+}
+
+export interface RequestNotificationSettingsMessage {
+  type: "requestNotificationSettings"
+}
 
 export type WebviewMessage =
   | SendMessageRequest
@@ -482,12 +679,19 @@ export type WebviewMessage =
   | CompactRequest
   | RequestAgentsMessage
   | SetLanguageRequest
+  | QuestionReplyRequest
+  | QuestionRejectRequest
   | DeleteSessionRequest
   | RenameSessionRequest
   | RequestAutocompleteSettingsMessage
   | UpdateAutocompleteSettingMessage
   | RequestChatCompletionMessage
   | ChatCompletionAcceptedMessage
+  | UpdateSettingRequest
+  | RequestBrowserSettingsMessage
+  | RequestConfigMessage
+  | UpdateConfigMessage
+  | RequestNotificationSettingsMessage
 
 // ============================================
 // VS Code API type

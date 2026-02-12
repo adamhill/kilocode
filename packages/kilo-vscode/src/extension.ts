@@ -4,12 +4,24 @@ import { AgentManagerProvider } from "./AgentManagerProvider"
 import { EXTENSION_DISPLAY_NAME } from "./constants"
 import { KiloConnectionService } from "./services/cli-backend"
 import { registerAutocompleteProvider } from "./services/autocomplete"
+import { BrowserAutomationService } from "./services/browser-automation"
 
 export function activate(context: vscode.ExtensionContext) {
   console.log("Kilo Code extension is now active")
 
   // Create shared connection service (one server for all webviews)
   const connectionService = new KiloConnectionService(context)
+
+  // Create browser automation service (manages Playwright MCP registration)
+  const browserAutomationService = new BrowserAutomationService(connectionService)
+  browserAutomationService.syncWithSettings()
+
+  // Re-register browser automation MCP server on CLI backend reconnect
+  const unsubscribeStateChange = connectionService.onStateChange((state) => {
+    if (state === "connected") {
+      browserAutomationService.reregisterIfEnabled()
+    }
+  })
 
   // Create the provider with shared service
   const provider = new KiloProvider(context.extensionUri, connectionService)
@@ -49,9 +61,11 @@ export function activate(context: vscode.ExtensionContext) {
   // Register autocomplete provider
   registerAutocompleteProvider(context, connectionService)
 
-  // Dispose service when extension deactivates (kills the server)
+  // Dispose services when extension deactivates (kills the server)
   context.subscriptions.push({
     dispose: () => {
+      unsubscribeStateChange()
+      browserAutomationService.dispose()
       provider.dispose()
       connectionService.dispose()
     },

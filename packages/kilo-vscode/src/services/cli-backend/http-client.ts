@@ -7,6 +7,9 @@ import type {
   ProfileData,
   ProviderAuthAuthorization,
   ProviderListResponse,
+  McpStatus,
+  McpConfig,
+  Config,
 } from "./types"
 
 /**
@@ -173,6 +176,27 @@ export class HttpClient {
   }
 
   // ============================================
+  // Config Methods
+  // ============================================
+
+  /**
+   * Get the current backend configuration.
+   */
+  async getConfig(directory: string): Promise<Config> {
+    return this.request<Config>("GET", "/config", undefined, { directory })
+  }
+
+  /**
+   * Update backend configuration (partial merge).
+   * Uses the global config endpoint so changes persist to the user's global
+   * config file (matching the desktop app behaviour). The instance-scoped
+   * PATCH /config writes to a project-local file that is not loaded on restart.
+   */
+  async updateConfig(config: Partial<Config>): Promise<Config> {
+    return this.request<Config>("PATCH", "/global/config", config)
+  }
+
+  // ============================================
   // Messaging Methods
   // ============================================
 
@@ -231,6 +255,24 @@ export class HttpClient {
       { providerID, modelID, auto: false },
       { directory, allowEmpty: true },
     )
+  }
+
+  // ============================================
+  // Question Methods
+  // ============================================
+
+  /**
+   * Reply to a question request with user answers.
+   */
+  async replyToQuestion(requestID: string, answers: string[][], directory: string): Promise<void> {
+    await this.request<void>("POST", `/question/${requestID}/reply`, { answers }, { directory, allowEmpty: true })
+  }
+
+  /**
+   * Reject (dismiss) a question request.
+   */
+  async rejectQuestion(requestID: string, directory: string): Promise<void> {
+    await this.request<void>("POST", `/question/${requestID}/reject`, {}, { directory, allowEmpty: true })
   }
 
   // ============================================
@@ -408,5 +450,37 @@ export class HttpClient {
    */
   async oauthCallback(providerId: string, method: number, directory: string): Promise<boolean> {
     return this.request<boolean>("POST", `/provider/${providerId}/oauth/callback`, { method }, { directory })
+  }
+
+  // ============================================
+  // MCP Methods
+  // ============================================
+
+  /**
+   * Get the status of all MCP servers.
+   */
+  async getMcpStatus(): Promise<Record<string, McpStatus>> {
+    return this.request<Record<string, McpStatus>>("GET", "/mcp")
+  }
+
+  /**
+   * Add or update an MCP server configuration.
+   */
+  async addMcpServer(name: string, config: McpConfig): Promise<Record<string, McpStatus>> {
+    return this.request<Record<string, McpStatus>>("POST", "/mcp", { name, config })
+  }
+
+  /**
+   * Connect an MCP server by name.
+   */
+  async connectMcpServer(name: string): Promise<boolean> {
+    return this.request<boolean>("POST", `/mcp/${encodeURIComponent(name)}/connect`)
+  }
+
+  /**
+   * Disconnect an MCP server by name.
+   */
+  async disconnectMcpServer(name: string): Promise<boolean> {
+    return this.request<boolean>("POST", `/mcp/${encodeURIComponent(name)}/disconnect`)
   }
 }
