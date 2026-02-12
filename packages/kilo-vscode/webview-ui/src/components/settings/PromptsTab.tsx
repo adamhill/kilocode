@@ -19,8 +19,10 @@ const PromptsTab: Component = () => {
             "line-height": "1.5",
           }}
         >
-          Instruction file settings have been moved to{" "}
-          <strong style={{ color: "var(--vscode-foreground)" }}>Agent Behaviour → Rules</strong>.
+          <strong style={{ color: "var(--vscode-foreground)" }}>This section is not implemented yet.</strong> It will
+          contain configuration options and explanatory text related to the selected settings category. During
+          reimplementation, use this space to validate layout, spacing, scrolling behavior, and navigation state before
+          wiring up real controls.
         </p>
       </div>
     </div>
