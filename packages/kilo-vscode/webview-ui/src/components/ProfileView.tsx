@@ -1,4 +1,4 @@
-import { Component, Show, createSignal, createMemo, createEffect, on } from "solid-js"
+import { Component, Show, createSignal, createMemo } from "solid-js"
 import { Button } from "@kilocode/kilo-ui/button"
 import { Card } from "@kilocode/kilo-ui/card"
 import { Select } from "@kilocode/kilo-ui/select"
@@ -20,8 +20,10 @@ const formatBalance = (amount: number): string => {
   return `$${amount.toFixed(2)}`
 }
 
+const PERSONAL = "personal"
+
 interface OrgOption {
-  value: string | null
+  value: string
   label: string
   description?: string
 }
@@ -29,42 +31,39 @@ interface OrgOption {
 const ProfileView: Component<ProfileViewProps> = (props) => {
   const vscode = useVSCode()
   const language = useLanguage()
-  const [switching, setSwitching] = createSignal(false)
+  const [target, setTarget] = createSignal<string | null>(null)
+
+  const switching = createMemo(() => {
+    const t = target()
+    if (t === null) return false
+    const current = props.profileData?.currentOrgId ?? PERSONAL
+    return current !== t
+  })
 
   const orgOptions = createMemo<OrgOption[]>(() => {
     const orgs = props.profileData?.profile.organizations ?? []
-    if (orgs.length === 0) {
-      return []
-    }
+    if (orgs.length === 0) return []
     return [
-      { value: null, label: "Personal Account" },
+      { value: PERSONAL, label: "Personal Account" },
       ...orgs.map((org) => ({ value: org.id, label: org.name, description: org.role })),
     ]
   })
 
   const currentOrg = createMemo(() => {
-    const id = props.profileData?.currentOrgId ?? null
+    const id = props.profileData?.currentOrgId ?? PERSONAL
     return orgOptions().find((o) => o.value === id)
   })
 
-  const handleSelectOrg = (option: OrgOption) => {
-    if (option.value === (props.profileData?.currentOrgId ?? null)) {
-      return
-    }
-    setSwitching(true)
-    vscode.postMessage({ type: "setOrganization", organizationId: option.value })
-    // switching state resets when new profileData arrives
+  const selectOrg = (option: OrgOption | undefined) => {
+    if (!option) return
+    const current = props.profileData?.currentOrgId ?? PERSONAL
+    if (option.value === current) return
+    setTarget(option.value)
+    vscode.postMessage({
+      type: "setOrganization",
+      organizationId: option.value === PERSONAL ? null : option.value,
+    })
   }
-
-  // Reset switching state when profile data changes (org switch completed or failed)
-  createEffect(
-    on(
-      () => props.profileData,
-      () => {
-        setSwitching(false)
-      },
-    ),
-  )
 
   const handleLogin = () => {
     props.onLogin()
@@ -186,9 +185,9 @@ const ProfileView: Component<ProfileViewProps> = (props) => {
                 <Select
                   options={orgOptions()}
                   current={currentOrg()}
-                  value={(o) => o.value ?? "personal"}
+                  value={(o) => o.value}
                   label={(o) => o.label}
-                  onSelect={handleSelectOrg}
+                  onSelect={selectOrg}
                   variant="secondary"
                   size="small"
                   triggerVariant="settings"
