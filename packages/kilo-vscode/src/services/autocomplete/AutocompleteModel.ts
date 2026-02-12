@@ -54,10 +54,14 @@ export class AutocompleteModel {
     if (key) {
       this.apiKey = key
       this.loaded = true
+      console.log(
+        `[Kilo New] AutocompleteModel.reload(): API key found, model=${DEFAULT_MODEL}, provider=${PROVIDER_DISPLAY_NAME}`,
+      )
       return true
     }
 
     this.loaded = true // loaded but no key
+    console.warn("[Kilo New] AutocompleteModel.reload(): No API key configured (kilo-code.new.autocomplete.apiKey)")
     return false
   }
 
@@ -163,17 +167,11 @@ export class AutocompleteModel {
     }
   }
 
-  public getModelName(): string | undefined {
-    if (!this.apiKey) {
-      return undefined
-    }
+  public getModelName(): string {
     return DEFAULT_MODEL
   }
 
-  public getProviderDisplayName(): string | undefined {
-    if (!this.apiKey) {
-      return undefined
-    }
+  public getProviderDisplayName(): string {
     return PROVIDER_DISPLAY_NAME
   }
 

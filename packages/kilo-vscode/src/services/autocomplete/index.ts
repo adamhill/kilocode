@@ -3,6 +3,7 @@ import * as vscode from "vscode"
 import { AutocompleteServiceManager } from "./AutocompleteServiceManager"
 
 export const registerAutocompleteProvider = (context: vscode.ExtensionContext) => {
+  console.log("[Kilo New] registerAutocompleteProvider: creating AutocompleteServiceManager")
   const autocompleteManager = new AutocompleteServiceManager(context)
   context.subscriptions.push(autocompleteManager)
 
