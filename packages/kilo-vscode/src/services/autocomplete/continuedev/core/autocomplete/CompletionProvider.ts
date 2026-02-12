@@ -1,6 +1,5 @@
 import { MinimalConfigProvider } from "./MinimalConfig.js"
 import { IDE, ILLM } from "../index.js"
-import { OpenAI } from "../llm/llms/OpenAI.js"
 import { DEFAULT_AUTOCOMPLETE_OPTS } from "../util/parameters.js"
 import { shouldCompleteMultiline } from "./classification/shouldCompleteMultiline.js"
 import { ContextRetrievalService } from "./context/ContextRetrievalService.js"
@@ -67,10 +66,6 @@ export class CompletionProvider {
     // Set temperature (but don't override)
     if (llm.completionOptions.temperature === undefined) {
       llm.completionOptions.temperature = 0.01
-    }
-
-    if (llm instanceof OpenAI) {
-      llm.useLegacyCompletionsEndpoint = true
     }
 
     return llm
