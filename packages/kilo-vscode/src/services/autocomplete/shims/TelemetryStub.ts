@@ -8,11 +8,11 @@
 export type TelemetryEventName = string
 
 export interface ITelemetryClient {
-	captureEvent(event: TelemetryEventName, properties?: Record<string, unknown>): void
+  captureEvent(event: TelemetryEventName, properties?: Record<string, unknown>): void
 }
 
 export class TelemetryStub implements ITelemetryClient {
-	captureEvent(event: TelemetryEventName, properties?: Record<string, unknown>): void {
-		console.log("[Kilo New] [Telemetry]", event, properties ?? "")
-	}
+  captureEvent(event: TelemetryEventName, properties?: Record<string, unknown>): void {
+    console.log("[Kilo New] [Telemetry]", event, properties ?? "")
+  }
 }

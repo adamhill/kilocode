@@ -439,10 +439,18 @@ export class AutocompleteInlineCompletionProvider implements vscode.InlineComple
     _context: vscode.InlineCompletionContext,
     _token: vscode.CancellationToken,
   ): Promise<vscode.InlineCompletionItem[] | vscode.InlineCompletionList> {
+    console.log("[Kilo New] provideInlineCompletionItems called", {
+      file: document.uri.fsPath,
+      line: position.line,
+      char: position.character,
+      triggerKind: _context.triggerKind,
+    })
+
     const settings = this.getSettings()
     const isAutoTriggerEnabled = settings?.enableAutoTrigger ?? false
 
     if (!isAutoTriggerEnabled) {
+      console.log("[Kilo New] provideInlineCompletionItems: SKIPPED - enableAutoTrigger is false")
       return []
     }
 
@@ -455,6 +463,13 @@ export class AutocompleteInlineCompletionProvider implements vscode.InlineComple
     _context: vscode.InlineCompletionContext,
     _token: vscode.CancellationToken,
   ): Promise<vscode.InlineCompletionItem[] | vscode.InlineCompletionList> {
+    console.log("[Kilo New] provideInlineCompletionItems_Internal called", {
+      file: document.uri.fsPath,
+      lang: document.languageId,
+      line: position.line,
+      char: position.character,
+    })
+
     // Build telemetry context
     const telemetryContext: AutocompleteContext = {
       languageId: document.languageId,
@@ -467,10 +482,16 @@ export class AutocompleteInlineCompletionProvider implements vscode.InlineComple
     if (!this.model || !this.model.hasValidCredentials()) {
       // bail if no model is available or no valid API credentials configured
       // this prevents errors when autocomplete is enabled but no provider is set up
+      console.log("[Kilo New] provideInlineCompletionItems_Internal: SKIPPED - no model or invalid credentials", {
+        hasModel: !!this.model,
+        hasValidCredentials: this.model?.hasValidCredentials(),
+        loaded: this.model?.loaded,
+      })
       return []
     }
 
     if (!document?.uri?.fsPath) {
+      console.log("[Kilo New] provideInlineCompletionItems_Internal: SKIPPED - no fsPath on document")
       return []
     }
 
@@ -487,26 +508,44 @@ export class AutocompleteInlineCompletionProvider implements vscode.InlineComple
 
           if (!controller) {
             // If promise hasn't resolved yet, assume file is ignored
+            console.log("[Kilo New] provideInlineCompletionItems_Internal: SKIPPED - ignoreController not ready")
             return []
           }
 
           const isAccessible = controller.validateAccess(document.fileName)
           if (!isAccessible) {
+            console.log(
+              "[Kilo New] provideInlineCompletionItems_Internal: SKIPPED - file ignored by ignoreController",
+              {
+                file: document.fileName,
+              },
+            )
             return []
           }
         } catch (error) {
-          console.error("[AutocompleteInlineCompletionProvider] Error checking file access:", error)
+          console.error("[Kilo New] Error checking file access:", error)
           // On error, assume file is ignored
           return []
         }
       }
 
       const { prefix, suffix } = extractPrefixSuffix(document, position)
+      console.log("[Kilo New] provideInlineCompletionItems_Internal: prefix/suffix extracted", {
+        prefixLen: prefix.length,
+        suffixLen: suffix.length,
+        prefixLast50: prefix.slice(-50),
+        suffixFirst50: suffix.slice(0, 50),
+      })
 
       // Check cache first - allow mid-word lookups from cache
       const matchingResult = applyFirstLineOnly(findMatchingSuggestion(prefix, suffix, this.suggestionsHistory), prefix)
 
       if (matchingResult !== null) {
+        console.log("[Kilo New] provideInlineCompletionItems_Internal: CACHE HIT", {
+          matchType: matchingResult.matchType,
+          textLen: matchingResult.text.length,
+          textFirst50: matchingResult.text.slice(0, 50),
+        })
         this.lastSuggestion = {
           ...telemetryContext,
           length: matchingResult.text.length,
@@ -521,18 +560,33 @@ export class AutocompleteInlineCompletionProvider implements vscode.InlineComple
       // Only skip new LLM requests during mid-word typing or at end of statement
       // Cache lookups above are still allowed
       if (shouldSkipAutocomplete(prefix, suffix, document.languageId)) {
+        console.log(
+          "[Kilo New] provideInlineCompletionItems_Internal: SKIPPED by contextualSkip (mid-word or end-of-statement)",
+        )
         return []
       }
 
+      console.log("[Kilo New] provideInlineCompletionItems_Internal: building prompt...")
       const { prompt, prefix: promptPrefix, suffix: promptSuffix } = await this.getPrompt(document, position)
+      console.log("[Kilo New] provideInlineCompletionItems_Internal: prompt built", {
+        strategy: prompt.strategy,
+        systemPromptLen: "systemPrompt" in prompt ? (prompt.systemPrompt as string).length : undefined,
+        userPromptLen: "userPrompt" in prompt ? (prompt.userPrompt as string).length : undefined,
+      })
 
       // Update context with strategy now that we know it
       telemetryContext.strategy = prompt.strategy
 
+      console.log("[Kilo New] provideInlineCompletionItems_Internal: calling debouncedFetchAndCacheSuggestion...")
       await this.debouncedFetchAndCacheSuggestion(prompt, promptPrefix, promptSuffix, document.languageId)
+      console.log("[Kilo New] provideInlineCompletionItems_Internal: debouncedFetchAndCacheSuggestion returned")
 
       const cachedResult = applyFirstLineOnly(findMatchingSuggestion(prefix, suffix, this.suggestionsHistory), prefix)
       if (cachedResult) {
+        console.log("[Kilo New] provideInlineCompletionItems_Internal: LLM result found in cache", {
+          textLen: cachedResult.text.length,
+          textFirst50: cachedResult.text.slice(0, 50),
+        })
         this.lastSuggestion = {
           ...telemetryContext,
           length: cachedResult.text.length,
@@ -540,6 +594,9 @@ export class AutocompleteInlineCompletionProvider implements vscode.InlineComple
         this.telemetry?.captureLlmSuggestionReturned(telemetryContext, cachedResult.text.length)
         this.telemetry?.startVisibilityTracking(cachedResult.fillInAtCursor, "llm", telemetryContext)
       } else {
+        console.log(
+          "[Kilo New] provideInlineCompletionItems_Internal: NO result after LLM fetch (empty or not matching)",
+        )
         this.telemetry?.cancelVisibilityTracking() // No suggestion to show - cancel any pending visibility tracking
       }
 
@@ -547,7 +604,7 @@ export class AutocompleteInlineCompletionProvider implements vscode.InlineComple
     } catch (error) {
       // only big catch at the top of the call-chain, if anything goes wrong at a lower level
       // do not catch, just let the error cascade
-      console.error("[AutocompleteInlineCompletionProvider] Error providing inline completion:", error)
+      console.error("[Kilo New] Error providing inline completion:", error)
       return []
     }
   }
@@ -602,15 +659,19 @@ export class AutocompleteInlineCompletionProvider implements vscode.InlineComple
     // Check if any existing pending request covers this one
     const coveringRequest = this.findCoveringPendingRequest(prefix, suffix)
     if (coveringRequest) {
+      console.log("[Kilo New] debouncedFetch: reusing covering pending request")
       // Wait for the existing request to complete - no need to start a new one
       return coveringRequest.promise
     }
 
     // If this is the first call (no pending debounce), execute immediately
     if (this.isFirstCall && this.debounceTimer === null) {
+      console.log("[Kilo New] debouncedFetch: first call — executing immediately")
       this.isFirstCall = false
       return this.fetchAndCacheSuggestion(prompt, prefix, suffix, languageId)
     }
+
+    console.log(`[Kilo New] debouncedFetch: debouncing for ${this.debounceDelayMs}ms`)
 
     // Clear any existing timer (reset the debounce)
     if (this.debounceTimer !== null) {
@@ -650,6 +711,12 @@ export class AutocompleteInlineCompletionProvider implements vscode.InlineComple
     suffix: string,
     languageId: string,
   ): Promise<void> {
+    console.log("[Kilo New] fetchAndCacheSuggestion: ENTERED", {
+      strategy: prompt.strategy,
+      prefixLen: prefix.length,
+      suffixLen: suffix.length,
+      languageId,
+    })
     const startTime = performance.now()
 
     // Build telemetry context for this request
@@ -664,6 +731,7 @@ export class AutocompleteInlineCompletionProvider implements vscode.InlineComple
     // debounced execution (e.g., profile reload calling AutocompleteModel.cleanup()).
     // In that case, do not attempt an LLM call at all.
     if (!this.model || !this.model.hasValidCredentials()) {
+      console.log("[Kilo New] fetchAndCacheSuggestion: ABORTED - credentials invalid at execution time")
       return
     }
 
@@ -672,12 +740,25 @@ export class AutocompleteInlineCompletionProvider implements vscode.InlineComple
       const curriedProcessSuggestion = (text: string) =>
         this.processSuggestion(text, prefix, suffix, this.model, telemetryContext, languageId)
 
+      console.log(
+        `[Kilo New] fetchAndCacheSuggestion: calling ${prompt.strategy === "fim" ? "fimPromptBuilder.getFromFIM" : "holeFiller.getFromChat"}...`,
+      )
+
       const result =
         prompt.strategy === "fim"
           ? await this.fimPromptBuilder.getFromFIM(this.model, prompt, curriedProcessSuggestion)
           : await this.holeFiller.getFromChat(this.model, prompt, curriedProcessSuggestion)
 
       const latencyMs = performance.now() - startTime
+
+      console.log("[Kilo New] fetchAndCacheSuggestion: LLM call completed", {
+        latencyMs: Math.round(latencyMs),
+        suggestionTextLen: result.suggestion.text.length,
+        suggestionTextFirst50: result.suggestion.text.slice(0, 50),
+        cost: result.cost,
+        inputTokens: result.inputTokens,
+        outputTokens: result.outputTokens,
+      })
 
       this.telemetry?.captureLlmRequestCompleted(
         {
@@ -698,6 +779,11 @@ export class AutocompleteInlineCompletionProvider implements vscode.InlineComple
       this.updateSuggestions(result.suggestion)
     } catch (error) {
       const latencyMs = performance.now() - startTime
+      console.error("[Kilo New] fetchAndCacheSuggestion: ERROR", {
+        latencyMs: Math.round(latencyMs),
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+      })
       this.telemetry?.captureLlmRequestFailed(
         {
           latencyMs,
@@ -705,7 +791,7 @@ export class AutocompleteInlineCompletionProvider implements vscode.InlineComple
         },
         telemetryContext,
       )
-      console.error("Error getting inline completion from LLM:", error)
+      console.error("[Kilo New] Error getting inline completion from LLM:", error)
     }
   }
 }

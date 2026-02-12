@@ -700,8 +700,8 @@ Use this as the practical step-by-step transplant procedure.
    - confirm provider/model shown
    - confirm cost increments
 3. (Optional) Webview:
-    - confirm settings update triggers reload
-    - confirm chat textarea completion roundtrip works
+   - confirm settings update triggers reload
+   - confirm chat textarea completion roundtrip works
 
 ## 11. Clarifications
 
@@ -721,12 +721,12 @@ No profile resolver is needed in phase 1. The provider and model are fixed.
 
 ### 11.3 Feature Scope
 
-| Feature | Decision |
-|---------|----------|
-| JetBrains bridge | **Exclude permanently** — delete `AutocompleteJetbrainsBridge.ts` and its tests. This will never be implemented this way. |
-| Chat textarea autocomplete | **Include** |
-| Code actions | **Include** |
-| Continuedev LLM adapters | **Strip to minimum** — remove all adapters not needed for the Kilo Gateway / holefiller path. The module uses `AutocompleteModel`, not the continuedev adapters directly, so most can be removed. |
+| Feature                    | Decision                                                                                                                                                                                          |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| JetBrains bridge           | **Exclude permanently** — delete `AutocompleteJetbrainsBridge.ts` and its tests. This will never be implemented this way.                                                                         |
+| Chat textarea autocomplete | **Include**                                                                                                                                                                                       |
+| Code actions               | **Include**                                                                                                                                                                                       |
+| Continuedev LLM adapters   | **Strip to minimum** — remove all adapters not needed for the Kilo Gateway / holefiller path. The module uses `AutocompleteModel`, not the continuedev adapters directly, so most can be removed. |
 
 ### 11.4 Settings Storage
 

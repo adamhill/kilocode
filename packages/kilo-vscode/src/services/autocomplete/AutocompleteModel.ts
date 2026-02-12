@@ -94,14 +94,29 @@ export class AutocompleteModel {
     userPrompt: string,
     onChunk: (chunk: ApiStreamChunk) => void,
   ): Promise<ResponseMetaData> {
+    console.log("[Kilo New] AutocompleteModel.generateResponse: ENTERED", {
+      hasApiKey: !!this.apiKey,
+      hasClient: !!this.client,
+      systemPromptLen: systemPrompt.length,
+      userPromptLen: userPrompt.length,
+    })
+
     if (!this.apiKey || !this.client) {
-      console.error("[Kilo New] API key is not configured")
+      console.error("[Kilo New] AutocompleteModel.generateResponse: NO API KEY or CLIENT", {
+        hasApiKey: !!this.apiKey,
+        hasClient: !!this.client,
+      })
       throw new Error("API key is not configured. Please set kilo-code.new.autocomplete.apiKey in settings.")
     }
 
     const model = DEFAULT_MODEL
 
-    console.log("[Kilo New] Autocomplete request to", model, "via openai SDK")
+    console.log("[Kilo New] AutocompleteModel.generateResponse: creating stream", {
+      model,
+      baseURL: KILO_GATEWAY_BASE_URL,
+      maxTokens: 1024,
+      temperature: 0.2,
+    })
 
     let cost = 0
     let inputTokens = 0
@@ -109,44 +124,81 @@ export class AutocompleteModel {
     let cacheReadTokens = 0
     let cacheWriteTokens = 0
 
-    const stream = await this.client.chat.completions.create({
-      model,
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: userPrompt },
-      ],
-      stream: true,
-      stream_options: { include_usage: true },
-      max_tokens: 1024,
-      temperature: 0.2,
-    })
+    let stream: Awaited<ReturnType<typeof this.client.chat.completions.create>>
+    try {
+      stream = await this.client.chat.completions.create({
+        model,
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt },
+        ],
+        stream: true,
+        stream_options: { include_usage: true },
+        max_tokens: 1024,
+        temperature: 0.2,
+      })
+      console.log("[Kilo New] AutocompleteModel.generateResponse: stream created successfully")
+    } catch (error) {
+      const err = error as Record<string, unknown>
+      console.error("[Kilo New] AutocompleteModel.generateResponse: STREAM CREATION FAILED", {
+        message: err.message,
+        status: err.status,
+        code: err.code,
+        type: err.type,
+        error: String(error),
+      })
+      throw error
+    }
 
     let chunks = 0
 
-    for await (const chunk of stream) {
-      const content = chunk.choices?.[0]?.delta?.content
-      if (content) {
-        onChunk({ type: "text", text: content })
-        chunks++
-      }
+    try {
+      for await (const chunk of stream) {
+        const content = chunk.choices?.[0]?.delta?.content
+        if (content) {
+          onChunk({ type: "text", text: content })
+          chunks++
+          if (chunks <= 3) {
+            console.log(
+              `[Kilo New] AutocompleteModel.generateResponse: text chunk #${chunks}: "${content.slice(0, 50)}"`,
+            )
+          }
+        }
 
-      // Track usage from the final chunk (has usage when stream_options.include_usage is true)
-      if (chunk.usage) {
-        inputTokens = chunk.usage.prompt_tokens ?? 0
-        outputTokens = chunk.usage.completion_tokens ?? 0
-        const usage = chunk.usage as unknown as Record<string, unknown>
-        const details = usage.prompt_tokens_details as Record<string, number> | undefined
-        cacheReadTokens = details?.cached_tokens ?? 0
-      }
+        // Track usage from the final chunk (has usage when stream_options.include_usage is true)
+        if (chunk.usage) {
+          inputTokens = chunk.usage.prompt_tokens ?? 0
+          outputTokens = chunk.usage.completion_tokens ?? 0
+          const usage = chunk.usage as unknown as Record<string, unknown>
+          const details = usage.prompt_tokens_details as Record<string, number> | undefined
+          cacheReadTokens = details?.cached_tokens ?? 0
+        }
 
-      // Extract cost from kilocode-specific extension
-      const extra = chunk as unknown as Record<string, unknown>
-      if (extra.x_kilocode) {
-        cost = (extra.x_kilocode as Record<string, number>).total_cost ?? 0
+        // Extract cost from kilocode-specific extension
+        const extra = chunk as unknown as Record<string, unknown>
+        if (extra.x_kilocode) {
+          cost = (extra.x_kilocode as Record<string, number>).total_cost ?? 0
+        }
       }
+    } catch (error) {
+      const err = error as Record<string, unknown>
+      console.error("[Kilo New] AutocompleteModel.generateResponse: STREAM ITERATION FAILED", {
+        chunksBeforeError: chunks,
+        message: err.message,
+        status: err.status,
+        code: err.code,
+        error: String(error),
+      })
+      throw error
     }
 
-    console.log(`[Kilo New] Autocomplete response: ${chunks} text chunks, ${inputTokens} in / ${outputTokens} out`)
+    console.log(`[Kilo New] AutocompleteModel.generateResponse: stream complete`, {
+      textChunks: chunks,
+      inputTokens,
+      outputTokens,
+      cost,
+      cacheReadTokens,
+    })
 
     const usageChunk: ApiStreamChunk = {
       type: "usage",
