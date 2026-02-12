@@ -188,6 +188,9 @@ export class KiloProvider implements vscode.WebviewViewProvider {
         case "logout":
           await this.handleLogout()
           break
+        case "setOrganization":
+          await this.handleSetOrganization(message.organizationId)
+          break
         case "refreshProfile":
           await this.handleRefreshProfile()
           break
@@ -897,6 +900,11 @@ export class KiloProvider implements vscode.WebviewViewProvider {
       const profileData = await this.httpClient.getProfile()
       this.postMessage({ type: "profileData", data: profileData })
       this.postMessage({ type: "deviceAuthComplete" })
+
+      // Step 5: If user has organizations, navigate to profile view so they can pick one
+      if (profileData?.profile.organizations && profileData.profile.organizations.length > 0) {
+        this.postMessage({ type: "navigate", view: "profile" })
+      }
     } catch (error) {
       if (attempt !== this.loginAttempt) {
         return
@@ -906,6 +914,24 @@ export class KiloProvider implements vscode.WebviewViewProvider {
         error: error instanceof Error ? error.message : "Login failed",
       })
     }
+  }
+
+  /**
+   * Handle organization switch request from the webview.
+   * Persists the selection and refreshes profile + providers since both change with org context.
+   */
+  private async handleSetOrganization(organizationId: string | null): Promise<void> {
+    if (!this.httpClient) {
+      return
+    }
+
+    console.log("[Kilo New] KiloProvider: 🏢 Switching organization:", organizationId ?? "personal")
+    await this.httpClient.setOrganization(organizationId)
+
+    // Refresh profile (balance changes per org) and providers (models differ per org)
+    const profileData = await this.httpClient.getProfile()
+    this.postMessage({ type: "profileData", data: profileData })
+    await this.fetchAndSendProviders()
   }
 
   /**
