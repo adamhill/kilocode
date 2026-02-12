@@ -7,7 +7,6 @@ import { Component } from "solid-js"
 import { TaskHeader } from "./TaskHeader"
 import { MessageList } from "./MessageList"
 import { PromptInput } from "./PromptInput"
-import { PermissionDialog } from "./PermissionDialog"
 
 interface ChatViewProps {
   onSelectSession?: (id: string) => void
@@ -24,8 +23,6 @@ export const ChatView: Component<ChatViewProps> = (props) => {
       <div class="chat-input">
         <PromptInput />
       </div>
-
-      <PermissionDialog />
     </div>
   )
 }

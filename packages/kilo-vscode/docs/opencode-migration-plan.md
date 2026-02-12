@@ -24,15 +24,16 @@ The rebuild has a working foundation:
 - **Message protocol**: 28 message types in [`messages.ts`](../webview-ui/src/types/messages.ts)
 - **Build pipeline**: dual esbuild (extension + webview), CLI binary provisioning in [`esbuild.js`](../esbuild.js) and [`prepare-cli-binary.mjs`](../scripts/prepare-cli-binary.mjs)
 - **View title bar button**: ✅ Done — [#181](https://github.com/Kilo-Org/kilo/issues/181)
+- **Browser automation**: Playwright MCP integration with settings toggle, lifecycle service, and CLI MCP hub registration in [`BrowserAutomationService`](../src/services/browser-automation/browser-automation-service.ts)
 
 ---
 
 ## Chat UI Feature Parity
 
 | Feature | Status | Details | Backend | Priority |
-| -------------------------------------------------------------------------------------- | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- | -------- |
+| --- | --- | --- | --- | --- |
 | [Auto-Approval Controls](chat-ui-features/auto-approval-controls.md) | ❌ Not started | No auto-approval toggle, scope selectors, or timeout config. Permission dialog exists but only supports per-request decisions. [#171](https://github.com/Kilo-Org/kilo/issues/171) | CLI owns permissions; webview needs config UI | P1 |
-| [Browser Session Controls](chat-ui-features/browser-session-controls.md) | ❌ Not started | No browser automation UI, action replay, or screenshot viewing in chat. | CLI-side (if browser tool exists) + webview | P3 |
+| [Browser Session Controls](chat-ui-features/browser-session-controls.md) | 🔨 Partial | BrowserTab settings UI implemented with enable/disable toggle, system Chrome and headless options. Missing: in-chat browser session controls, action replay, screenshot viewing. | CLI-side (if browser tool exists) + webview | P3 |
 | [Checkpoint & Task Management](chat-ui-features/checkpoint-task-management.md) | ❌ Not started | No checkpoint restore, navigation, or "See New Changes" diff buttons. | CLI session undo/redo/fork + extension git integration | P1 |
 | [Code Block Interactions](chat-ui-features/code-block-interactions.md) | ❌ Not started | No markdown rendering, syntax highlighting, copy button, expand/collapse, or sticky buttons on code blocks. Messages render as plain text. | Webview-only | P0 |
 | [Command Execution](chat-ui-features/command-execution.md) | 🔨 Partial | Tool messages render but lack expandable terminal output, abort-by-PID, exit status indicators, command pattern selectors, and syntax highlighting. | CLI executes commands; webview renders output | P0 |
@@ -57,12 +58,12 @@ The rebuild has a working foundation:
 ## Non-Agent Feature Parity
 
 | Feature | Status | Details | Backend | Priority |
-| ------------------------------------------------------------------------------------------------------- | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- | -------- |
+| --- | --- | --- | --- | --- |
 | [Agent Manager](non-agent-features/agent-manager.md) | 🔨 Partial | Panel exists but renders only `<h1>Agent Manager</h1>`. No session orchestration, parallel worktrees, or resumable sessions. [#178](https://github.com/Kilo-Org/kilo/issues/178) | Extension orchestrates multiple CLI sessions | P1 |
 | [Authentication & Enterprise](non-agent-features/authentication-organization-enterprise-enforcement.md) | 🔨 Partial | Device auth flow works. Missing: org feature flags, MDM policy enforcement. [#160](https://github.com/Kilo-Org/kilo/issues/160) | CLI handles its auth; extension handles org/MDM | P1 |
 | [Auto-Purge](non-agent-features/auto-purge.md) | ❌ Not started | No scheduled cleanup of old session/task storage. | Extension-side (storage ownership TBD) | P3 |
 | [Autocomplete / Ghost](non-agent-features/autocomplete-ghost.md) | ❌ Not started | No inline editor completions, fill-in-the-middle, or chat-input autocomplete. [#164](https://github.com/Kilo-Org/kilo/issues/164) | Extension-side (VS Code InlineCompletionProvider) | P1 |
-| [Browser Automation & URL Ingestion](non-agent-features/browser-automation-url-ingestion.md) | ❌ Not started | No browser control, screenshots, or URL-to-markdown extraction. | CLI (partial); extension for browser automation | P3 |
+| [Browser Automation & URL Ingestion](non-agent-features/browser-automation-url-ingestion.md) | 🔨 Partial | Playwright MCP integration implemented: settings toggle, BrowserAutomationService, CLI MCP hub registration, BrowserTab settings UI. Missing: URL-to-markdown ingestion, screenshot viewing in chat. | CLI MCP hub (POST /mcp); extension manages lifecycle | P3 |
 | [Checkpoints](non-agent-features/checkpoints.md) | ❌ Not started | No shadow git repo, per-task snapshots, restore UI, or diff viewing. Settings tab is a stub. | CLI (partial: session undo/redo); extension for git snapshots | P1 |
 | [Cloud Task Support](non-agent-features/cloud-task-support.md) | ❌ Not started | No cloud sync for tasks across devices. [#168](https://github.com/Kilo-Org/kilo/issues/168) | Kilo cloud API + CLI; extension provides UI | P2 |
 | [Code Actions](non-agent-features/code-actions.md) | ❌ Not started | No VS Code lightbulb/context menu integrations (explain, fix, improve). | Extension-side (VS Code CodeActionProvider) | P2 |
@@ -77,7 +78,7 @@ The rebuild has a working foundation:
 | [Kilo Gateway](non-agent-features/kilo-gateway.md) | 🔨 Partial | Auth flow works but no explicit gateway provider selection or default model. [#176](https://github.com/Kilo-Org/kilo/issues/176) | CLI handles gateway connection; extension provides config UI | P0 |
 | [Localization](non-agent-features/localization-and-locale-alignment.md) | ❌ Not started | No i18n or locale normalization. All UI is English-only. | Extension + webview; CLI locale mapping needed | P3 |
 | [Marketplace](non-agent-features/marketplace.md) | 🔨 Partial | Placeholder view exists but is non-functional. No catalog, install, or update capabilities. [#169](https://github.com/Kilo-Org/kilo/issues/169) | Extension-side | P2 |
-| [MCP & MCP Hub](non-agent-features/mcp-and-mcp-hub.md) | ❌ Not started | No MCP configuration UI, server management, tool allowlisting, or connection status. CLI owns MCP runtime. | CLI owns MCP lifecycle; extension provides config UI | P1 |
+| [MCP & MCP Hub](non-agent-features/mcp-and-mcp-hub.md) | 🔨 Partial | MCP types and HTTP client methods added (getMcpStatus, addMcpServer, connectMcpServer, disconnectMcpServer). Used by BrowserAutomationService. Missing: general MCP configuration UI, server management, tool allowlisting, connection status display. | CLI owns MCP lifecycle; extension provides config UI | P1 |
 | [Mode Switcher](non-agent-features/mode-switcher.md) | ❌ Not started | No mode switching UI (Code, Architect, Ask, Debug, etc.). [#162](https://github.com/Kilo-Org/kilo/issues/162) | CLI manages modes; extension provides switcher UI | P2 |
 | [Model Switcher](non-agent-features/model-switcher.md) | 🔨 Partial | No model switching UI. In progress. [#163](https://github.com/Kilo-Org/kilo/issues/163) | CLI provides model list; extension provides switcher UI | P1 |
 | [Provider Configuration](non-agent-features/provider-configuration.md) | ❌ Not started | No provider add/edit/remove or switching UI. ProvidersTab is a stub. [#175](https://github.com/Kilo-Org/kilo/issues/175) | CLI manages providers; extension provides config UI | P1 |
@@ -98,7 +99,7 @@ The rebuild has a working foundation:
 These items were identified from the [JetBrains plugin analysis](../LESSONS_LEARNED_JETBRAINS.md) — patterns the JetBrains plugin implements that are missing in the VSCode extension. They primarily affect reliability and developer experience rather than feature parity.
 
 | Feature | Status | Details | Scope | Priority |
-| -------------------------------------------------------------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------- | -------- |
+| --- | --- | --- | --- | --- |
 | [SSE Auto-Reconnect](infrastructure/sse-auto-reconnect.md) | ❌ Not started | SSE connection has no reconnect logic. Network hiccups, laptop sleep, or server restart kill the extension with no recovery. | Extension (SSEClient + ConnectionService) | P0 |
 | [HTTP Request Timeouts](infrastructure/http-request-timeouts.md) | ❌ Not started | HTTP client uses bare `fetch()` with no timeouts. Hung requests block indefinitely. | Extension (HttpClient) | P1 |
 | [VSCode Error Notifications](infrastructure/vscode-error-notifications.md) | ❌ Not started | Critical errors (CLI missing, server crash) are only shown in the webview. No `vscode.window.showErrorMessage()` notifications. | Extension (KiloProvider) | P1 |

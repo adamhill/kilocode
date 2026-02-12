@@ -773,10 +773,11 @@ export const dict = {
   "time.hoursAgo": "{{count}}時間前",
   "time.daysAgo": "{{count}}日前",
   "time.monthsAgo": "{{count}}ヶ月前",
-
-  "session.search.placeholder": "セッションを検索...",
-  "session.empty": "セッションはまだありません。+をクリックして新しい会話を始めましょう。",
-  "session.untitled": "無題",
+  "time.today": "今日",
+  "time.yesterday": "昨日",
+  "time.thisWeek": "今週",
+  "time.thisMonth": "今月",
+  "time.older": "それ以前",
 
   "settings.aboutKiloCode.status.connected": "接続済み",
   "settings.aboutKiloCode.status.connecting": "接続中...",
@@ -793,6 +794,16 @@ export const dict = {
   "settings.agentBehaviour.subtab.rules": "ルール",
   "settings.agentBehaviour.subtab.workflows": "ワークフロー",
   "settings.agentBehaviour.subtab.skills": "スキル",
+
+  "settings.browser.description":
+    "有効にすると、AIエージェントがWebページを操作できるようになります — ナビゲーション、クリック、入力、スクリーンショットの撮影。Chromeウィンドウが開き、エージェントの作業を確認できます。",
+  "settings.browser.enable.title": "ブラウザ自動化を有効にする",
+  "settings.browser.enable.description": "Playwright MCPサーバーをCLIバックエンドに登録します。",
+  "settings.browser.systemChrome.title": "システムChromeを使用",
+  "settings.browser.systemChrome.description":
+    "別のChromiumインスタンスの代わりに、インストール済みのChromeブラウザを使用します。",
+  "settings.browser.headless.title": "ヘッドレスモード",
+  "settings.browser.headless.description": "ヘッドレスモードで実行します（ブラウザウィンドウは表示されません）。",
 
   "settings.language.description": "Kilo Code UIの言語を選択します。「自動」はVS Codeの表示言語を使用します。",
   "settings.language.auto": "自動（VS Code言語）",

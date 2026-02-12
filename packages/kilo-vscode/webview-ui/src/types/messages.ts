@@ -105,6 +105,7 @@ export interface PermissionRequest {
   toolName: string
   args: Record<string, unknown>
   message?: string
+  tool?: { messageID: string; callID: string }
 }
 
 // Todo item
@@ -305,6 +306,17 @@ export interface AgentsLoadedMessage {
   defaultAgent: string
 }
 
+export interface BrowserSettings {
+  enabled: boolean
+  useSystemChrome: boolean
+  headless: boolean
+}
+
+export interface BrowserSettingsLoadedMessage {
+  type: "browserSettingsLoaded"
+  settings: BrowserSettings
+}
+
 export type ExtensionMessage =
   | ReadyMessage
   | ConnectionStateMessage
@@ -327,6 +339,7 @@ export type ExtensionMessage =
   | DeviceAuthCancelledMessage
   | ProvidersLoadedMessage
   | AgentsLoadedMessage
+  | BrowserSettingsLoadedMessage
 
 // ============================================
 // Messages FROM webview TO extension
@@ -426,6 +439,16 @@ export interface RenameSessionRequest {
   title: string
 }
 
+export interface UpdateSettingRequest {
+  type: "updateSetting"
+  key: string
+  value: unknown
+}
+
+export interface RequestBrowserSettingsMessage {
+  type: "requestBrowserSettings"
+}
+
 export type WebviewMessage =
   | SendMessageRequest
   | AbortRequest
@@ -446,6 +469,8 @@ export type WebviewMessage =
   | SetLanguageRequest
   | DeleteSessionRequest
   | RenameSessionRequest
+  | UpdateSettingRequest
+  | RequestBrowserSettingsMessage
 
 // ============================================
 // VS Code API type

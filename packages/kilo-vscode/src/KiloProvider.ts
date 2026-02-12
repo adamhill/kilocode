@@ -214,6 +214,12 @@ export class KiloProvider implements vscode.WebviewViewProvider {
         case "renameSession":
           await this.handleRenameSession(message.sessionID, message.title)
           break
+        case "updateSetting":
+          await this.handleUpdateSetting(message.key, message.value)
+          break
+        case "requestBrowserSettings":
+          this.sendBrowserSettings()
+          break
       }
     })
   }
@@ -809,6 +815,33 @@ export class KiloProvider implements vscode.WebviewViewProvider {
   }
 
   /**
+   * Handle a generic setting update from the webview.
+   * The key uses dot notation relative to `kilo-code.new` (e.g. "browserAutomation.enabled").
+   */
+  private async handleUpdateSetting(key: string, value: unknown): Promise<void> {
+    const parts = key.split(".")
+    const section = parts.slice(0, -1).join(".")
+    const leaf = parts[parts.length - 1]
+    const config = vscode.workspace.getConfiguration(`kilo-code.new${section ? `.${section}` : ""}`)
+    await config.update(leaf, value, vscode.ConfigurationTarget.Global)
+  }
+
+  /**
+   * Read the current browser automation settings and push them to the webview.
+   */
+  private sendBrowserSettings(): void {
+    const config = vscode.workspace.getConfiguration("kilo-code.new.browserAutomation")
+    this.postMessage({
+      type: "browserSettingsLoaded",
+      settings: {
+        enabled: config.get<boolean>("enabled", false),
+        useSystemChrome: config.get<boolean>("useSystemChrome", true),
+        headless: config.get<boolean>("headless", false),
+      },
+    })
+  }
+
+  /**
    * Extract sessionID from an SSE event, if applicable.
    * Returns undefined for global events (server.connected, server.heartbeat).
    */
@@ -887,6 +920,7 @@ export class KiloProvider implements vscode.WebviewViewProvider {
             toolName: event.properties.permission,
             args: event.properties.metadata,
             message: `Permission required: ${event.properties.permission}`,
+            tool: event.properties.tool,
           },
         })
         break
