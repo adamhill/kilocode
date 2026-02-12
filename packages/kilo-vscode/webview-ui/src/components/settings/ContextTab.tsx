@@ -1,17 +1,11 @@
 import { Component, For, createSignal } from "solid-js"
-import { useConfig } from "../../context/config"
+import { Switch } from "@kilocode/kilo-ui/switch"
+import { TextField } from "@kilocode/kilo-ui/text-field"
+import { Card } from "@kilocode/kilo-ui/card"
+import { Button } from "@kilocode/kilo-ui/button"
+import { IconButton } from "@kilocode/kilo-ui/icon-button"
 
-const inputStyle = {
-  padding: "4px 8px",
-  "border-radius": "4px",
-  border: "1px solid var(--vscode-input-border, var(--vscode-panel-border))",
-  background: "var(--vscode-input-background)",
-  color: "var(--vscode-input-foreground)",
-  "font-size": "12px",
-  "font-family": "var(--vscode-font-family)",
-  outline: "none",
-  flex: "1",
-}
+import { useConfig } from "../../context/config"
 
 const ContextTab: Component = () => {
   const { config, updateConfig } = useConfig()
@@ -21,9 +15,7 @@ const ContextTab: Component = () => {
 
   const addPattern = () => {
     const value = newPattern().trim()
-    if (!value) {
-      return
-    }
+    if (!value) return
     const current = [...patterns()]
     if (!current.includes(value)) {
       current.push(value)
@@ -41,102 +33,39 @@ const ContextTab: Component = () => {
   return (
     <div>
       {/* Compaction settings */}
-      <div
-        style={{
-          border: "1px solid var(--vscode-panel-border)",
-          "border-radius": "4px",
-          overflow: "hidden",
-          "margin-bottom": "16px",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            "align-items": "center",
-            "justify-content": "space-between",
-            padding: "10px 12px",
-            background: "var(--vscode-editor-background)",
-            "border-bottom": "1px solid var(--vscode-panel-border)",
-          }}
-        >
-          <div>
-            <div style={{ "font-size": "12px", "font-weight": "500", color: "var(--vscode-foreground)" }}>
-              Auto Compaction
-            </div>
-            <div style={{ "font-size": "11px", color: "var(--vscode-descriptionForeground)", "margin-top": "2px" }}>
-              Automatically compact context when it's full
-            </div>
-          </div>
-          <label style={{ display: "flex", "align-items": "center", cursor: "pointer" }}>
-            <input
-              type="checkbox"
-              checked={config().compaction?.auto ?? false}
-              onChange={(e) => updateConfig({ compaction: { ...config().compaction, auto: e.currentTarget.checked } })}
-              style={{ cursor: "pointer" }}
-            />
-          </label>
+      <Card>
+        <div style={{ padding: "8px 0", "border-bottom": "1px solid var(--border-weak-base)" }}>
+          <Switch
+            checked={config().compaction?.auto ?? false}
+            onChange={(checked) => updateConfig({ compaction: { ...config().compaction, auto: checked } })}
+            description="Automatically compact context when it's full"
+          >
+            Auto Compaction
+          </Switch>
         </div>
-        <div
-          style={{
-            display: "flex",
-            "align-items": "center",
-            "justify-content": "space-between",
-            padding: "10px 12px",
-            background: "var(--vscode-editor-background)",
-          }}
-        >
-          <div>
-            <div style={{ "font-size": "12px", "font-weight": "500", color: "var(--vscode-foreground)" }}>
-              Prune Old Outputs
-            </div>
-            <div style={{ "font-size": "11px", color: "var(--vscode-descriptionForeground)", "margin-top": "2px" }}>
-              Remove old tool outputs during compaction
-            </div>
-          </div>
-          <label style={{ display: "flex", "align-items": "center", cursor: "pointer" }}>
-            <input
-              type="checkbox"
-              checked={config().compaction?.prune ?? false}
-              onChange={(e) => updateConfig({ compaction: { ...config().compaction, prune: e.currentTarget.checked } })}
-              style={{ cursor: "pointer" }}
-            />
-          </label>
+        <div style={{ padding: "8px 0" }}>
+          <Switch
+            checked={config().compaction?.prune ?? false}
+            onChange={(checked) => updateConfig({ compaction: { ...config().compaction, prune: checked } })}
+            description="Remove old tool outputs during compaction"
+          >
+            Prune Old Outputs
+          </Switch>
         </div>
-      </div>
+      </Card>
 
-      <div
-        style={{
-          border: "1px solid var(--vscode-panel-border)",
-          "border-radius": "4px",
-          overflow: "hidden",
-        }}
-      >
-        {/* Header */}
+      <h4 style={{ "margin-top": "16px", "margin-bottom": "8px" }}>File Watcher Ignore Patterns</h4>
+
+      <Card>
         <div
           style={{
-            padding: "10px 12px",
-            background: "var(--vscode-editor-background)",
-            "border-bottom": "1px solid var(--vscode-panel-border)",
+            "font-size": "11px",
+            color: "var(--text-weak-base, var(--vscode-descriptionForeground))",
+            "padding-bottom": "8px",
+            "border-bottom": patterns().length > 0 || newPattern() ? "1px solid var(--border-weak-base)" : "none",
           }}
         >
-          <div
-            style={{
-              "font-size": "12px",
-              "font-weight": "500",
-              color: "var(--vscode-foreground)",
-            }}
-          >
-            File Watcher Ignore Patterns
-          </div>
-          <div
-            style={{
-              "font-size": "11px",
-              color: "var(--vscode-descriptionForeground)",
-              "margin-top": "2px",
-            }}
-          >
-            Glob patterns for files the watcher should ignore
-          </div>
+          Glob patterns for files the watcher should ignore
         </div>
 
         {/* Add new pattern */}
@@ -144,37 +73,24 @@ const ContextTab: Component = () => {
           style={{
             display: "flex",
             gap: "8px",
-            padding: "8px 12px",
-            background: "var(--vscode-editor-background)",
-            "border-bottom": patterns().length > 0 ? "1px solid var(--vscode-panel-border)" : "none",
+            "align-items": "center",
+            padding: "8px 0",
+            "border-bottom": patterns().length > 0 ? "1px solid var(--border-weak-base)" : "none",
           }}
         >
-          <input
-            type="text"
-            style={inputStyle}
-            value={newPattern()}
-            placeholder="e.g. **/node_modules/**"
-            onInput={(e) => setNewPattern(e.currentTarget.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                addPattern()
-              }
-            }}
-          />
-          <button
-            onClick={addPattern}
-            style={{
-              padding: "4px 12px",
-              "border-radius": "4px",
-              border: "1px solid var(--vscode-button-border, transparent)",
-              background: "var(--vscode-button-background)",
-              color: "var(--vscode-button-foreground)",
-              "font-size": "12px",
-              cursor: "pointer",
-            }}
-          >
+          <div style={{ flex: 1 }}>
+            <TextField
+              value={newPattern()}
+              placeholder="e.g. **/node_modules/**"
+              onChange={(val) => setNewPattern(val)}
+              onKeyDown={(e: KeyboardEvent) => {
+                if (e.key === "Enter") addPattern()
+              }}
+            />
+          </div>
+          <Button size="small" onClick={addPattern}>
             Add
-          </button>
+          </Button>
         </div>
 
         {/* Pattern list */}
@@ -185,38 +101,23 @@ const ContextTab: Component = () => {
                 display: "flex",
                 "align-items": "center",
                 "justify-content": "space-between",
-                padding: "6px 12px",
-                background: "var(--vscode-editor-background)",
-                "border-bottom": index() < patterns().length - 1 ? "1px solid var(--vscode-panel-border)" : "none",
+                padding: "6px 0",
+                "border-bottom": index() < patterns().length - 1 ? "1px solid var(--border-weak-base)" : "none",
               }}
             >
               <span
                 style={{
-                  "font-size": "12px",
                   "font-family": "var(--vscode-editor-font-family, monospace)",
-                  color: "var(--vscode-foreground)",
+                  "font-size": "12px",
                 }}
               >
                 {pattern}
               </span>
-              <button
-                onClick={() => removePattern(index())}
-                style={{
-                  padding: "2px 8px",
-                  "border-radius": "4px",
-                  border: "1px solid var(--vscode-panel-border)",
-                  background: "transparent",
-                  color: "var(--vscode-descriptionForeground)",
-                  "font-size": "11px",
-                  cursor: "pointer",
-                }}
-              >
-                ✕
-              </button>
+              <IconButton size="small" variant="ghost" icon="close" onClick={() => removePattern(index())} />
             </div>
           )}
         </For>
-      </div>
+      </Card>
     </div>
   )
 }

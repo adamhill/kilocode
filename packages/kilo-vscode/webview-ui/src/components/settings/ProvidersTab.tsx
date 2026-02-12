@@ -1,53 +1,35 @@
-import { Component, For, Show, createSignal, createMemo } from "solid-js"
+import { Component, For, createSignal, createMemo } from "solid-js"
+import { Select } from "@kilocode/kilo-ui/select"
+import { Card } from "@kilocode/kilo-ui/card"
+import { Button } from "@kilocode/kilo-ui/button"
+import { IconButton } from "@kilocode/kilo-ui/icon-button"
 import { useConfig } from "../../context/config"
 import { useProvider } from "../../context/provider"
 
-const inputStyle = {
-  padding: "4px 8px",
-  "border-radius": "4px",
-  border: "1px solid var(--vscode-input-border, var(--vscode-panel-border))",
-  background: "var(--vscode-input-background)",
-  color: "var(--vscode-input-foreground)",
-  "font-size": "12px",
-  "font-family": "var(--vscode-font-family)",
-  outline: "none",
-  width: "240px",
-}
-
-const selectStyle = {
-  padding: "4px 8px",
-  "border-radius": "4px",
-  border: "1px solid var(--vscode-dropdown-border, var(--vscode-panel-border))",
-  background: "var(--vscode-dropdown-background)",
-  color: "var(--vscode-dropdown-foreground)",
-  "font-size": "12px",
-  "font-family": "var(--vscode-font-family)",
-  cursor: "pointer",
-  outline: "none",
-  width: "260px",
-}
-
-interface SettingRowProps {
+interface ModelOption {
+  value: string
   label: string
-  description: string
-  last?: boolean
-  children: any
 }
 
-const SettingRow: Component<SettingRowProps> = (props) => (
+interface ProviderOption {
+  value: string
+  label: string
+}
+
+const SettingsRow: Component<{ label: string; description: string; last?: boolean; children: any }> = (props) => (
   <div
+    data-slot="settings-row"
     style={{
       display: "flex",
       "align-items": "center",
       "justify-content": "space-between",
-      padding: "10px 12px",
-      background: "var(--vscode-editor-background)",
-      "border-bottom": props.last ? "none" : "1px solid var(--vscode-panel-border)",
+      padding: "8px 0",
+      "border-bottom": props.last ? "none" : "1px solid var(--border-weak-base)",
     }}
   >
     <div style={{ flex: 1, "min-width": 0, "margin-right": "12px" }}>
-      <div style={{ "font-size": "12px", "font-weight": "500", color: "var(--vscode-foreground)" }}>{props.label}</div>
-      <div style={{ "font-size": "11px", color: "var(--vscode-descriptionForeground)", "margin-top": "2px" }}>
+      <div style={{ "font-weight": "500" }}>{props.label}</div>
+      <div style={{ "font-size": "11px", color: "var(--text-weak-base, var(--vscode-descriptionForeground))" }}>
         {props.description}
       </div>
     </div>
@@ -59,23 +41,26 @@ const ProvidersTab: Component = () => {
   const { config, updateConfig } = useConfig()
   const provider = useProvider()
 
-  // Build a flat list of available model IDs (provider/model format) from the provider catalog
-  const modelOptions = createMemo(() => {
-    const options: string[] = []
+  const modelOptions = createMemo<ModelOption[]>(() => {
+    const options: ModelOption[] = [{ value: "", label: "Not set (use server default)" }]
     const provs = provider.providers()
     for (const provId of Object.keys(provs)) {
       for (const modelId of Object.keys(provs[provId].models)) {
-        options.push(`${provId}/${modelId}`)
+        const key = `${provId}/${modelId}`
+        options.push({ value: key, label: key })
       }
     }
-    return options.sort()
+    return options.sort((a, b) => a.label.localeCompare(b.label))
   })
 
-  // Provider IDs from the catalog
-  const providerIds = createMemo(() => Object.keys(provider.providers()).sort())
+  const providerOptions = createMemo<ProviderOption[]>(() =>
+    Object.keys(provider.providers())
+      .sort()
+      .map((id) => ({ value: id, label: id })),
+  )
 
-  const [newDisabled, setNewDisabled] = createSignal("")
-  const [newEnabled, setNewEnabled] = createSignal("")
+  const [newDisabled, setNewDisabled] = createSignal<ProviderOption | undefined>()
+  const [newEnabled, setNewEnabled] = createSignal<ProviderOption | undefined>()
 
   const disabledProviders = () => config().disabled_providers ?? []
   const enabledProviders = () => config().enabled_providers ?? []
@@ -96,102 +81,47 @@ const ProvidersTab: Component = () => {
 
   return (
     <div>
-      {/* Model selection section */}
-      <div
-        style={{
-          border: "1px solid var(--vscode-panel-border)",
-          "border-radius": "4px",
-          overflow: "hidden",
-          "margin-bottom": "16px",
-        }}
-      >
-        {/* Default model */}
-        <SettingRow label="Default Model" description="Primary model for conversations (format: provider/model)">
-          <Show
-            when={modelOptions().length > 0}
-            fallback={
-              <input
-                type="text"
-                style={inputStyle}
-                value={config().model ?? ""}
-                placeholder="e.g. anthropic/claude-sonnet-4-20250514"
-                onBlur={(e) => updateConfig({ model: e.currentTarget.value.trim() || undefined })}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.currentTarget.blur()
-                  }
-                }}
-              />
-            }
-          >
-            <select
-              style={selectStyle}
-              value={config().model ?? ""}
-              onChange={(e) => updateConfig({ model: e.currentTarget.value || undefined })}
-            >
-              <option value="">Not set (use server default)</option>
-              <For each={modelOptions()}>{(opt) => <option value={opt}>{opt}</option>}</For>
-            </select>
-          </Show>
-        </SettingRow>
-
-        {/* Small model */}
-        <SettingRow label="Small Model" description="Lightweight model for title generation and other quick tasks" last>
-          <Show
-            when={modelOptions().length > 0}
-            fallback={
-              <input
-                type="text"
-                style={inputStyle}
-                value={config().small_model ?? ""}
-                placeholder="e.g. anthropic/claude-haiku"
-                onBlur={(e) => updateConfig({ small_model: e.currentTarget.value.trim() || undefined })}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.currentTarget.blur()
-                  }
-                }}
-              />
-            }
-          >
-            <select
-              style={selectStyle}
-              value={config().small_model ?? ""}
-              onChange={(e) => updateConfig({ small_model: e.currentTarget.value || undefined })}
-            >
-              <option value="">Not set (use server default)</option>
-              <For each={modelOptions()}>{(opt) => <option value={opt}>{opt}</option>}</For>
-            </select>
-          </Show>
-        </SettingRow>
-      </div>
+      {/* Model selection */}
+      <Card>
+        <SettingsRow label="Default Model" description="Primary model for conversations (format: provider/model)">
+          <Select
+            options={modelOptions()}
+            current={modelOptions().find((o) => o.value === (config().model ?? ""))}
+            value={(o) => o.value}
+            label={(o) => o.label}
+            onSelect={(o) => o && updateConfig({ model: o.value || undefined })}
+            variant="secondary"
+            size="small"
+            triggerVariant="settings"
+          />
+        </SettingsRow>
+        <SettingsRow
+          label="Small Model"
+          description="Lightweight model for title generation and other quick tasks"
+          last
+        >
+          <Select
+            options={modelOptions()}
+            current={modelOptions().find((o) => o.value === (config().small_model ?? ""))}
+            value={(o) => o.value}
+            label={(o) => o.label}
+            onSelect={(o) => o && updateConfig({ small_model: o.value || undefined })}
+            variant="secondary"
+            size="small"
+            triggerVariant="settings"
+          />
+        </SettingsRow>
+      </Card>
 
       {/* Disabled providers */}
-      <h4
-        style={{
-          "font-size": "13px",
-          "margin-top": "0",
-          "margin-bottom": "8px",
-          color: "var(--vscode-foreground)",
-        }}
-      >
-        Disabled Providers
-      </h4>
-      <div
-        style={{
-          border: "1px solid var(--vscode-panel-border)",
-          "border-radius": "4px",
-          overflow: "hidden",
-          "margin-bottom": "16px",
-        }}
-      >
+      <h4 style={{ "margin-top": "16px", "margin-bottom": "8px" }}>Disabled Providers</h4>
+      <Card>
         <div
           style={{
-            padding: "8px 12px",
-            background: "var(--vscode-editor-background)",
-            "border-bottom": disabledProviders().length > 0 ? "1px solid var(--vscode-panel-border)" : "none",
             "font-size": "11px",
-            color: "var(--vscode-descriptionForeground)",
+            color: "var(--text-weak-base, var(--vscode-descriptionForeground))",
+            "padding-bottom": "8px",
+            "border-bottom": "1px solid var(--border-weak-base)",
           }}
         >
           Providers to hide from the provider list
@@ -200,57 +130,35 @@ const ProvidersTab: Component = () => {
           style={{
             display: "flex",
             gap: "8px",
-            padding: "8px 12px",
-            background: "var(--vscode-editor-background)",
-            "border-bottom": disabledProviders().length > 0 ? "1px solid var(--vscode-panel-border)" : "none",
+            "align-items": "center",
+            padding: "8px 0",
+            "border-bottom": disabledProviders().length > 0 ? "1px solid var(--border-weak-base)" : "none",
           }}
         >
-          <Show
-            when={providerIds().length > 0}
-            fallback={
-              <input
-                type="text"
-                style={{ ...inputStyle, flex: "1", width: "auto" }}
-                value={newDisabled()}
-                placeholder="Provider ID"
-                onInput={(e) => setNewDisabled(e.currentTarget.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    addToList("disabled_providers", newDisabled().trim())
-                    setNewDisabled("")
-                  }
-                }}
-              />
-            }
-          >
-            <select
-              style={{ ...selectStyle, flex: "1", width: "auto" }}
-              value={newDisabled()}
-              onChange={(e) => setNewDisabled(e.currentTarget.value)}
-            >
-              <option value="">Select provider…</option>
-              <For each={providerIds().filter((id) => !disabledProviders().includes(id))}>
-                {(id) => <option value={id}>{id}</option>}
-              </For>
-            </select>
-          </Show>
-          <button
+          <div style={{ flex: 1 }}>
+            <Select
+              options={providerOptions().filter((o) => !disabledProviders().includes(o.value))}
+              current={newDisabled()}
+              value={(o) => o.value}
+              label={(o) => o.label}
+              onSelect={(o) => setNewDisabled(o)}
+              variant="secondary"
+              size="small"
+              triggerVariant="settings"
+              placeholder="Select provider…"
+            />
+          </div>
+          <Button
+            size="small"
             onClick={() => {
-              addToList("disabled_providers", newDisabled().trim())
-              setNewDisabled("")
-            }}
-            style={{
-              padding: "4px 12px",
-              "border-radius": "4px",
-              border: "1px solid var(--vscode-button-border, transparent)",
-              background: "var(--vscode-button-background)",
-              color: "var(--vscode-button-foreground)",
-              "font-size": "12px",
-              cursor: "pointer",
+              if (newDisabled()) {
+                addToList("disabled_providers", newDisabled()!.value)
+                setNewDisabled(undefined)
+              }
             }}
           >
             Add
-          </button>
+          </Button>
         </div>
         <For each={disabledProviders()}>
           {(id, index) => (
@@ -259,57 +167,32 @@ const ProvidersTab: Component = () => {
                 display: "flex",
                 "align-items": "center",
                 "justify-content": "space-between",
-                padding: "6px 12px",
-                background: "var(--vscode-editor-background)",
+                padding: "6px 0",
                 "border-bottom":
-                  index() < disabledProviders().length - 1 ? "1px solid var(--vscode-panel-border)" : "none",
+                  index() < disabledProviders().length - 1 ? "1px solid var(--border-weak-base)" : "none",
               }}
             >
-              <span style={{ "font-size": "12px", color: "var(--vscode-foreground)" }}>{id}</span>
-              <button
+              <span style={{ "font-size": "12px" }}>{id}</span>
+              <IconButton
+                size="small"
+                variant="ghost"
+                icon="close"
                 onClick={() => removeFromList("disabled_providers", index())}
-                style={{
-                  padding: "2px 8px",
-                  "border-radius": "4px",
-                  border: "1px solid var(--vscode-panel-border)",
-                  background: "transparent",
-                  color: "var(--vscode-descriptionForeground)",
-                  "font-size": "11px",
-                  cursor: "pointer",
-                }}
-              >
-                ✕
-              </button>
+              />
             </div>
           )}
         </For>
-      </div>
+      </Card>
 
       {/* Enabled providers (allowlist) */}
-      <h4
-        style={{
-          "font-size": "13px",
-          "margin-top": "0",
-          "margin-bottom": "8px",
-          color: "var(--vscode-foreground)",
-        }}
-      >
-        Enabled Providers (Allowlist)
-      </h4>
-      <div
-        style={{
-          border: "1px solid var(--vscode-panel-border)",
-          "border-radius": "4px",
-          overflow: "hidden",
-        }}
-      >
+      <h4 style={{ "margin-top": "16px", "margin-bottom": "8px" }}>Enabled Providers (Allowlist)</h4>
+      <Card>
         <div
           style={{
-            padding: "8px 12px",
-            background: "var(--vscode-editor-background)",
-            "border-bottom": "1px solid var(--vscode-panel-border)",
             "font-size": "11px",
-            color: "var(--vscode-descriptionForeground)",
+            color: "var(--text-weak-base, var(--vscode-descriptionForeground))",
+            "padding-bottom": "8px",
+            "border-bottom": "1px solid var(--border-weak-base)",
           }}
         >
           If set, only these providers will be available (exclusive allowlist)
@@ -318,57 +201,35 @@ const ProvidersTab: Component = () => {
           style={{
             display: "flex",
             gap: "8px",
-            padding: "8px 12px",
-            background: "var(--vscode-editor-background)",
-            "border-bottom": enabledProviders().length > 0 ? "1px solid var(--vscode-panel-border)" : "none",
+            "align-items": "center",
+            padding: "8px 0",
+            "border-bottom": enabledProviders().length > 0 ? "1px solid var(--border-weak-base)" : "none",
           }}
         >
-          <Show
-            when={providerIds().length > 0}
-            fallback={
-              <input
-                type="text"
-                style={{ ...inputStyle, flex: "1", width: "auto" }}
-                value={newEnabled()}
-                placeholder="Provider ID"
-                onInput={(e) => setNewEnabled(e.currentTarget.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    addToList("enabled_providers", newEnabled().trim())
-                    setNewEnabled("")
-                  }
-                }}
-              />
-            }
-          >
-            <select
-              style={{ ...selectStyle, flex: "1", width: "auto" }}
-              value={newEnabled()}
-              onChange={(e) => setNewEnabled(e.currentTarget.value)}
-            >
-              <option value="">Select provider…</option>
-              <For each={providerIds().filter((id) => !enabledProviders().includes(id))}>
-                {(id) => <option value={id}>{id}</option>}
-              </For>
-            </select>
-          </Show>
-          <button
+          <div style={{ flex: 1 }}>
+            <Select
+              options={providerOptions().filter((o) => !enabledProviders().includes(o.value))}
+              current={newEnabled()}
+              value={(o) => o.value}
+              label={(o) => o.label}
+              onSelect={(o) => setNewEnabled(o)}
+              variant="secondary"
+              size="small"
+              triggerVariant="settings"
+              placeholder="Select provider…"
+            />
+          </div>
+          <Button
+            size="small"
             onClick={() => {
-              addToList("enabled_providers", newEnabled().trim())
-              setNewEnabled("")
-            }}
-            style={{
-              padding: "4px 12px",
-              "border-radius": "4px",
-              border: "1px solid var(--vscode-button-border, transparent)",
-              background: "var(--vscode-button-background)",
-              color: "var(--vscode-button-foreground)",
-              "font-size": "12px",
-              cursor: "pointer",
+              if (newEnabled()) {
+                addToList("enabled_providers", newEnabled()!.value)
+                setNewEnabled(undefined)
+              }
             }}
           >
             Add
-          </button>
+          </Button>
         </div>
         <For each={enabledProviders()}>
           {(id, index) => (
@@ -377,31 +238,21 @@ const ProvidersTab: Component = () => {
                 display: "flex",
                 "align-items": "center",
                 "justify-content": "space-between",
-                padding: "6px 12px",
-                background: "var(--vscode-editor-background)",
-                "border-bottom":
-                  index() < enabledProviders().length - 1 ? "1px solid var(--vscode-panel-border)" : "none",
+                padding: "6px 0",
+                "border-bottom": index() < enabledProviders().length - 1 ? "1px solid var(--border-weak-base)" : "none",
               }}
             >
-              <span style={{ "font-size": "12px", color: "var(--vscode-foreground)" }}>{id}</span>
-              <button
+              <span style={{ "font-size": "12px" }}>{id}</span>
+              <IconButton
+                size="small"
+                variant="ghost"
+                icon="close"
                 onClick={() => removeFromList("enabled_providers", index())}
-                style={{
-                  padding: "2px 8px",
-                  "border-radius": "4px",
-                  border: "1px solid var(--vscode-panel-border)",
-                  background: "transparent",
-                  color: "var(--vscode-descriptionForeground)",
-                  "font-size": "11px",
-                  cursor: "pointer",
-                }}
-              >
-                ✕
-              </button>
+              />
             </div>
           )}
         </For>
-      </div>
+      </Card>
     </div>
   )
 }
