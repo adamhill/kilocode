@@ -1,7 +1,7 @@
 import { TelemetryStub, type ITelemetryClient } from "../shims/TelemetryStub"
 import type { AutocompleteContext, CacheMatchType, FillInAtCursorSuggestion } from "../types"
 
-const TelemetryEventName = {
+export const TelemetryEventName = {
   AUTOCOMPLETE_SUGGESTION_REQUESTED: "Autocomplete Suggestion Requested",
   AUTOCOMPLETE_LLM_REQUEST_COMPLETED: "Autocomplete LLM Request Completed",
   AUTOCOMPLETE_LLM_REQUEST_FAILED: "Autocomplete LLM Request Failed",
@@ -10,6 +10,8 @@ const TelemetryEventName = {
   AUTOCOMPLETE_ACCEPT_SUGGESTION: "Autocomplete Accept Suggestion",
   AUTOCOMPLETE_SUGGESTION_FILTERED: "Autocomplete Suggestion Filtered",
   AUTOCOMPLETE_UNIQUE_SUGGESTION_SHOWN: "Autocomplete Unique Suggestion Shown",
+  INLINE_ASSIST_AUTO_TASK: "Inline Assist Auto Task",
+  GHOST_SERVICE_DISABLED: "Ghost Service Disabled",
 } as const
 
 export type { AutocompleteContext, CacheMatchType, FillInAtCursorSuggestion }

@@ -6,7 +6,7 @@ import { AutocompleteModel } from "./AutocompleteModel"
 import { AutocompleteStatusBar } from "./AutocompleteStatusBar"
 import { AutocompleteCodeActionProvider } from "./AutocompleteCodeActionProvider"
 import { AutocompleteInlineCompletionProvider } from "./classic-auto-complete/AutocompleteInlineCompletionProvider"
-import { AutocompleteTelemetry } from "./classic-auto-complete/AutocompleteTelemetry"
+import { AutocompleteTelemetry, TelemetryEventName } from "./classic-auto-complete/AutocompleteTelemetry"
 import type { KiloConnectionService } from "../cli-backend"
 
 const CONFIG_SECTION = "kilo-code.new.autocomplete"
@@ -134,7 +134,7 @@ export class AutocompleteServiceManager {
       enableSmartInlineTaskKeybinding: false,
     })
 
-    this.telemetry.captureEvent("ghost_service_disabled")
+    this.telemetry.captureEvent(TelemetryEventName.GHOST_SERVICE_DISABLED)
 
     await this.load()
   }
@@ -232,7 +232,7 @@ export class AutocompleteServiceManager {
     }
 
     this.taskId = crypto.randomUUID()
-    this.telemetry.captureEvent("inline_assist_auto_task", {
+    this.telemetry.captureEvent(TelemetryEventName.INLINE_ASSIST_AUTO_TASK, {
       taskId: this.taskId,
     })
 
