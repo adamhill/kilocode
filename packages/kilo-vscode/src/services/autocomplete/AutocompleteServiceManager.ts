@@ -1,6 +1,6 @@
 import crypto from "crypto"
 import * as vscode from "vscode"
-import { t } from "../../i18n"
+import { t } from "./shims/i18n"
 import { AutocompleteModel } from "./AutocompleteModel"
 import { AutocompleteStatusBar } from "./AutocompleteStatusBar"
 import { AutocompleteCodeActionProvider } from "./AutocompleteCodeActionProvider"

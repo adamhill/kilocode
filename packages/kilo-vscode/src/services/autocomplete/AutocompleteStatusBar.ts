@@ -1,6 +1,6 @@
 import * as vscode from "vscode"
 import { AUTOCOMPLETE_PROVIDER_MODELS, ProviderName } from "@roo-code/types"
-import { t } from "../../i18n"
+import { t } from "./shims/i18n"
 import { PROVIDERS } from "../../../webview-ui/src/components/settings/constants"
 import type { AutocompleteStatusBarStateProps } from "./types"
 
