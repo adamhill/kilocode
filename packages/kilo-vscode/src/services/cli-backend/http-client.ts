@@ -313,6 +313,14 @@ export class HttpClient {
     }
   }
 
+  /**
+   * Switch the active organization.
+   * Pass null to switch back to personal account.
+   */
+  async setOrganization(organizationId: string | null): Promise<void> {
+    await this.request<boolean>("POST", "/kilo/organization", { organizationId })
+  }
+
   // ============================================
   // FIM Completion Methods
   // ============================================
