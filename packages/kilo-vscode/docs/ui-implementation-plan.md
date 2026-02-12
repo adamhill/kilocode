@@ -737,7 +737,7 @@ Each phase has specific acceptance criteria (listed above). The general verifica
 | Session history     | List renders, selection works, navigation back to chat           |
 | Login flow          | Device auth card renders, QR code displays, success/error states |
 | Theme switching     | Change VS Code theme → webview updates automatically             |
-| Sidebar ↔ tab      | Both webview hosts render identically                            |
+| Sidebar ↔ tab       | Both webview hosts render identically                            |
 | Markdown content    | Headers, lists, code blocks, links render correctly              |
 | Long conversations  | Auto-scroll works, performance is acceptable                     |
 

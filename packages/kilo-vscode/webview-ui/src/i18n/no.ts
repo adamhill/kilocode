@@ -782,10 +782,11 @@ export const dict = {
   "time.hoursAgo": "{{count}}t siden",
   "time.daysAgo": "{{count}}d siden",
   "time.monthsAgo": "{{count}} mnd. siden",
-
-  "session.search.placeholder": "Søk i sesjoner...",
-  "session.empty": "Ingen sesjoner ennå. Klikk + for å starte en ny samtale.",
-  "session.untitled": "Uten tittel",
+  "time.today": "I dag",
+  "time.yesterday": "I går",
+  "time.thisWeek": "Denne uken",
+  "time.thisMonth": "Denne måneden",
+  "time.older": "Eldre",
 
   "settings.aboutKiloCode.status.connected": "Tilkoblet",
   "settings.aboutKiloCode.status.connecting": "Kobler til...",

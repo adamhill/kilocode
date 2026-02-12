@@ -346,6 +346,20 @@
   white-space: nowrap;
 }
 
+/* Dialog Confirmation */
+.dialog-confirm-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 0 24px 12px 24px;
+}
+
+.dialog-confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
 /* Session List Items */
 .session-list [data-slot="list-item-title"] {
   flex: 1;

@@ -778,10 +778,11 @@ export const dict = {
   "time.hoursAgo": "{{count}}시간 전",
   "time.daysAgo": "{{count}}일 전",
   "time.monthsAgo": "{{count}}개월 전",
-
-  "session.search.placeholder": "세션 검색...",
-  "session.empty": "아직 세션이 없습니다. +를 클릭하여 새 대화를 시작하세요.",
-  "session.untitled": "제목 없음",
+  "time.today": "오늘",
+  "time.yesterday": "어제",
+  "time.thisWeek": "이번 주",
+  "time.thisMonth": "이번 달",
+  "time.older": "이전",
 
   "settings.aboutKiloCode.status.connected": "연결됨",
   "settings.aboutKiloCode.status.connecting": "연결 중...",

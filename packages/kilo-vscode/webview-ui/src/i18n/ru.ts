@@ -785,10 +785,11 @@ export const dict = {
   "time.hoursAgo": "{{count}} ч. назад",
   "time.daysAgo": "{{count}} дн. назад",
   "time.monthsAgo": "{{count}} мес. назад",
-
-  "session.search.placeholder": "Поиск сессий...",
-  "session.empty": "Пока нет сессий. Нажмите +, чтобы начать новую беседу.",
-  "session.untitled": "Без названия",
+  "time.today": "Сегодня",
+  "time.yesterday": "Вчера",
+  "time.thisWeek": "На этой неделе",
+  "time.thisMonth": "В этом месяце",
+  "time.older": "Ранее",
 
   "settings.aboutKiloCode.status.connected": "Подключено",
   "settings.aboutKiloCode.status.connecting": "Подключение...",

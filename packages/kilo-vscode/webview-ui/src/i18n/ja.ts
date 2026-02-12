@@ -773,10 +773,11 @@ export const dict = {
   "time.hoursAgo": "{{count}}時間前",
   "time.daysAgo": "{{count}}日前",
   "time.monthsAgo": "{{count}}ヶ月前",
-
-  "session.search.placeholder": "セッションを検索...",
-  "session.empty": "セッションはまだありません。+をクリックして新しい会話を始めましょう。",
-  "session.untitled": "無題",
+  "time.today": "今日",
+  "time.yesterday": "昨日",
+  "time.thisWeek": "今週",
+  "time.thisMonth": "今月",
+  "time.older": "それ以前",
 
   "settings.aboutKiloCode.status.connected": "接続済み",
   "settings.aboutKiloCode.status.connecting": "接続中...",

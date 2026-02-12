@@ -789,10 +789,11 @@ export const dict = {
   "time.hoursAgo": "il y a {{count}}h",
   "time.daysAgo": "il y a {{count}}j",
   "time.monthsAgo": "il y a {{count}} mois",
-
-  "session.search.placeholder": "Rechercher des sessions...",
-  "session.empty": "Aucune session pour l'instant. Cliquez sur + pour démarrer une nouvelle conversation.",
-  "session.untitled": "Sans titre",
+  "time.today": "Aujourd'hui",
+  "time.yesterday": "Hier",
+  "time.thisWeek": "Cette semaine",
+  "time.thisMonth": "Ce mois-ci",
+  "time.older": "Plus ancien",
 
   "settings.aboutKiloCode.status.connected": "Connecté",
   "settings.aboutKiloCode.status.connecting": "Connexion en cours...",

@@ -781,10 +781,11 @@ export const dict = {
   "time.hoursAgo": "{{count}} godz. temu",
   "time.daysAgo": "{{count}} dn. temu",
   "time.monthsAgo": "{{count}} mies. temu",
-
-  "session.search.placeholder": "Szukaj sesji...",
-  "session.empty": "Brak sesji. Kliknij +, aby rozpocząć nową rozmowę.",
-  "session.untitled": "Bez tytułu",
+  "time.today": "Dzisiaj",
+  "time.yesterday": "Wczoraj",
+  "time.thisWeek": "Ten tydzień",
+  "time.thisMonth": "Ten miesiąc",
+  "time.older": "Starsze",
 
   "settings.aboutKiloCode.status.connected": "Połączono",
   "settings.aboutKiloCode.status.connecting": "Łączenie...",

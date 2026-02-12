@@ -779,10 +779,11 @@ export const dict = {
   "time.hoursAgo": "{{count}}t siden",
   "time.daysAgo": "{{count}}d siden",
   "time.monthsAgo": "{{count}} mdr. siden",
-
-  "session.search.placeholder": "Søg i sessioner...",
-  "session.empty": "Ingen sessioner endnu. Klik + for at starte en ny samtale.",
-  "session.untitled": "Uden titel",
+  "time.today": "I dag",
+  "time.yesterday": "I går",
+  "time.thisWeek": "Denne uge",
+  "time.thisMonth": "Denne måned",
+  "time.older": "Ældre",
 
   "settings.aboutKiloCode.status.connected": "Forbundet",
   "settings.aboutKiloCode.status.connecting": "Forbinder...",
