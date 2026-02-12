@@ -2,7 +2,7 @@
 import { ResponseMetaData } from "./types"
 import type { KiloConnectionService } from "../cli-backend"
 
-const DEFAULT_MODEL = "mistralai/codestral-2501"
+const DEFAULT_MODEL = "mistralai/codestral-2508"
 const PROVIDER_DISPLAY_NAME = "Kilo Gateway"
 
 /** Chunk from an LLM streaming response */
