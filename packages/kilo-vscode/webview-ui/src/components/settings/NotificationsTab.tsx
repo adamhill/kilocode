@@ -73,7 +73,6 @@ const NotificationsTab: Component = () => {
 
   return (
     <div>
-      <h4 style={{ "margin-top": "0", "margin-bottom": "8px" }}>Notifications</h4>
       <Card>
         <div style={{ padding: "8px 0", "border-bottom": "1px solid var(--border-weak-base)" }}>
           <Switch
