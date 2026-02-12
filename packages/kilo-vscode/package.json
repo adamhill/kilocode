@@ -262,7 +262,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "eslint src",
-    "test": "vscode-test"
+    "test": "vscode-test",
+    "update-backend": "node scripts/prepare-cli-binary.mjs --force"
   },
   "devDependencies": {
     "@types/diff": "^6.0.0",
