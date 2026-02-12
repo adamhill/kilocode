@@ -400,6 +400,11 @@ export interface DeviceAuthCancelledMessage {
   type: "deviceAuthCancelled"
 }
 
+export interface NavigateMessage {
+  type: "navigate"
+  view: string
+}
+
 export interface ProvidersLoadedMessage {
   type: "providersLoaded"
   providers: Record<string, Provider>
@@ -482,6 +487,7 @@ export type ExtensionMessage =
   | DeviceAuthCompleteMessage
   | DeviceAuthFailedMessage
   | DeviceAuthCancelledMessage
+  | NavigateMessage
   | ProvidersLoadedMessage
   | AgentsLoadedMessage
   | QuestionRequestMessage
@@ -553,6 +559,11 @@ export interface OpenExternalRequest {
 
 export interface CancelLoginRequest {
   type: "cancelLogin"
+}
+
+export interface SetOrganizationRequest {
+  type: "setOrganization"
+  organizationId: string | null
 }
 
 export interface WebviewReadyRequest {
@@ -637,6 +648,7 @@ export type WebviewMessage =
   | RefreshProfileRequest
   | OpenExternalRequest
   | CancelLoginRequest
+  | SetOrganizationRequest
   | WebviewReadyRequest
   | RequestProvidersMessage
   | CompactRequest

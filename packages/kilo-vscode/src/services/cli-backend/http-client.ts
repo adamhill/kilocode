@@ -313,6 +313,15 @@ export class HttpClient {
     }
   }
 
+  /**
+   * Switch the active organization.
+   * Pass null to switch back to personal account.
+   */
+  async setOrganization(organizationId: string | null): Promise<boolean> {
+    await this.request("POST", "/kilo/organization", { organizationId })
+    return true
+  }
+
   // ============================================
   // Auth Methods
   // ============================================
