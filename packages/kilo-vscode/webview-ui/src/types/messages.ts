@@ -305,6 +305,15 @@ export interface AgentsLoadedMessage {
   defaultAgent: string
 }
 
+export interface AutocompleteSettingsLoadedMessage {
+  type: "autocompleteSettingsLoaded"
+  settings: {
+    enableAutoTrigger: boolean
+    enableSmartInlineTaskKeybinding: boolean
+    enableChatAutocomplete: boolean
+  }
+}
+
 export type ExtensionMessage =
   | ReadyMessage
   | ConnectionStateMessage
@@ -327,6 +336,7 @@ export type ExtensionMessage =
   | DeviceAuthCancelledMessage
   | ProvidersLoadedMessage
   | AgentsLoadedMessage
+  | AutocompleteSettingsLoadedMessage
 
 // ============================================
 // Messages FROM webview TO extension
@@ -426,6 +436,16 @@ export interface RenameSessionRequest {
   title: string
 }
 
+export interface RequestAutocompleteSettingsMessage {
+  type: "requestAutocompleteSettings"
+}
+
+export interface UpdateAutocompleteSettingMessage {
+  type: "updateAutocompleteSetting"
+  key: "enableAutoTrigger" | "enableSmartInlineTaskKeybinding" | "enableChatAutocomplete"
+  value: boolean
+}
+
 export type WebviewMessage =
   | SendMessageRequest
   | AbortRequest
@@ -446,6 +466,8 @@ export type WebviewMessage =
   | SetLanguageRequest
   | DeleteSessionRequest
   | RenameSessionRequest
+  | RequestAutocompleteSettingsMessage
+  | UpdateAutocompleteSettingMessage
 
 // ============================================
 // VS Code API type

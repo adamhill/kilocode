@@ -208,6 +208,23 @@ export class KiloProvider implements vscode.WebviewViewProvider {
             .getConfiguration("kilo-code.new")
             .update("language", message.locale || undefined, vscode.ConfigurationTarget.Global)
           break
+        case "requestAutocompleteSettings":
+          this.sendAutocompleteSettings()
+          break
+        case "updateAutocompleteSetting": {
+          const allowedKeys = new Set([
+            "enableAutoTrigger",
+            "enableSmartInlineTaskKeybinding",
+            "enableChatAutocomplete",
+          ])
+          if (allowedKeys.has(message.key)) {
+            await vscode.workspace
+              .getConfiguration("kilo-code.new.autocomplete")
+              .update(message.key, message.value, vscode.ConfigurationTarget.Global)
+            this.sendAutocompleteSettings()
+          }
+          break
+        }
         case "deleteSession":
           await this.handleDeleteSession(message.sessionID)
           break
@@ -923,6 +940,21 @@ export class KiloProvider implements vscode.WebviewViewProvider {
         })
         break
     }
+  }
+
+  /**
+   * Read autocomplete settings from VS Code configuration and push to the webview.
+   */
+  private sendAutocompleteSettings(): void {
+    const config = vscode.workspace.getConfiguration("kilo-code.new.autocomplete")
+    this.postMessage({
+      type: "autocompleteSettingsLoaded",
+      settings: {
+        enableAutoTrigger: config.get<boolean>("enableAutoTrigger", true),
+        enableSmartInlineTaskKeybinding: config.get<boolean>("enableSmartInlineTaskKeybinding", false),
+        enableChatAutocomplete: config.get<boolean>("enableChatAutocomplete", false),
+      },
+    })
   }
 
   /**

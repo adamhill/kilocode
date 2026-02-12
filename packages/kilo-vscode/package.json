@@ -186,11 +186,6 @@
           "type": "boolean",
           "default": false,
           "description": "Enable chat textarea autocomplete"
-        },
-        "kilo-code.new.autocomplete.apiKey": {
-          "type": "string",
-          "default": "",
-          "description": "API key for Kilo Gateway autocomplete"
         }
       }
     }
