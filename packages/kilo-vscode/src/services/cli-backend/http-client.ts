@@ -9,6 +9,7 @@ import type {
   ProviderListResponse,
   McpStatus,
   McpConfig,
+  Config,
 } from "./types"
 
 /**
@@ -172,6 +173,25 @@ export class HttpClient {
    */
   async listAgents(directory: string): Promise<AgentInfo[]> {
     return this.request<AgentInfo[]>("GET", "/agent", undefined, { directory })
+  }
+
+  // ============================================
+  // Config Methods
+  // ============================================
+
+  /**
+   * Get the current backend configuration.
+   */
+  async getConfig(directory: string): Promise<Config> {
+    return this.request<Config>("GET", "/config", undefined, { directory })
+  }
+
+  /**
+   * Update backend configuration (partial merge).
+   * The server merges the provided fields into the existing config.
+   */
+  async updateConfig(config: Partial<Config>, directory: string): Promise<Config> {
+    return this.request<Config>("PATCH", "/config", config, { directory })
   }
 
   // ============================================
