@@ -110,9 +110,7 @@ const AppContent: Component = () => {
   const handleViewAction = (action: string) => {
     switch (action) {
       case "plusButtonClicked":
-        if (session.messages().length > 0 || !session.currentSessionID()) {
-          session.createSession()
-        }
+        session.clearCurrentSession()
         setCurrentView("newTask")
         break
       case "marketplaceButtonClicked":
@@ -151,7 +149,7 @@ const AppContent: Component = () => {
     <div class="container">
       <Switch fallback={<ChatView />}>
         <Match when={currentView() === "newTask"}>
-          <ChatView />
+          <ChatView onSelectSession={handleSelectSession} />
         </Match>
         <Match when={currentView() === "marketplace"}>
           <DummyView title="Marketplace" />

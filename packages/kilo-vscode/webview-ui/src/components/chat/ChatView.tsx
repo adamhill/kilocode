@@ -7,11 +7,14 @@ import { Component, Show } from "solid-js"
 import { TaskHeader } from "./TaskHeader"
 import { MessageList } from "./MessageList"
 import { PromptInput } from "./PromptInput"
-import { PermissionDialog } from "./PermissionDialog"
 import { QuestionDock } from "./QuestionDock"
 import { useSession } from "../../context/session"
 
-export const ChatView: Component = () => {
+interface ChatViewProps {
+  onSelectSession?: (id: string) => void
+}
+
+export const ChatView: Component<ChatViewProps> = (props) => {
   const session = useSession()
 
   const questionRequest = () => session.questions()[0]
@@ -21,7 +24,7 @@ export const ChatView: Component = () => {
     <div class="chat-view">
       <TaskHeader />
       <div class="chat-messages">
-        <MessageList />
+        <MessageList onSelectSession={props.onSelectSession} />
       </div>
 
       <div class="chat-input">
@@ -32,8 +35,6 @@ export const ChatView: Component = () => {
           <PromptInput />
         </Show>
       </div>
-
-      <PermissionDialog />
     </div>
   )
 }

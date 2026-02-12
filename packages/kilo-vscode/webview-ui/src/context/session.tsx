@@ -55,6 +55,7 @@ interface SessionContextValue {
 
   // Session status
   status: Accessor<SessionStatus>
+  loading: Accessor<boolean>
 
   // Messages for current session
   messages: Accessor<Message[]>
@@ -92,8 +93,11 @@ interface SessionContextValue {
   replyToQuestion: (requestID: string, answers: string[][]) => void
   rejectQuestion: (requestID: string) => void
   createSession: () => void
+  clearCurrentSession: () => void
   loadSessions: () => void
   selectSession: (id: string) => void
+  deleteSession: (id: string) => void
+  renameSession: (id: string, title: string) => void
 }
 
 const SessionContext = createContext<SessionContextValue>()
@@ -108,6 +112,7 @@ export const SessionProvider: ParentComponent = (props) => {
 
   // Session status
   const [status, setStatus] = createSignal<SessionStatus>("idle")
+  const [loading, setLoading] = createSignal(false)
 
   // Pending permissions
   const [permissions, setPermissions] = createSignal<PermissionRequest[]>([])
@@ -260,6 +265,14 @@ export const SessionProvider: ParentComponent = (props) => {
         case "sessionUpdated":
           setStore("sessions", message.session.id, message.session)
           break
+
+        case "sessionDeleted":
+          handleSessionDeleted(message.sessionID)
+          break
+
+        case "error":
+          setLoading(false)
+          break
       }
     })
 
@@ -287,6 +300,7 @@ export const SessionProvider: ParentComponent = (props) => {
   }
 
   function handleMessagesLoaded(sessionID: string, messages: Message[]) {
+    if (sessionID === currentSessionID()) setLoading(false)
     setStore("messages", sessionID, messages)
 
     // Also extract parts from messages
@@ -386,6 +400,52 @@ export const SessionProvider: ParentComponent = (props) => {
     batch(() => {
       for (const s of loaded) {
         setStore("sessions", s.id, s)
+      }
+    })
+  }
+
+  function handleSessionDeleted(sessionID: string) {
+    batch(() => {
+      // Collect message IDs so we can clean up their parts
+      const msgs = store.messages[sessionID] ?? []
+      const msgIds = msgs.map((m) => m.id)
+
+      setStore(
+        "sessions",
+        produce((sessions) => {
+          delete sessions[sessionID]
+        }),
+      )
+      setStore(
+        "messages",
+        produce((messages) => {
+          delete messages[sessionID]
+        }),
+      )
+      setStore(
+        "parts",
+        produce((parts) => {
+          for (const id of msgIds) {
+            delete parts[id]
+          }
+        }),
+      )
+      setStore(
+        "todos",
+        produce((todos) => {
+          delete todos[sessionID]
+        }),
+      )
+      setStore(
+        "modelSelections",
+        produce((selections) => {
+          delete selections[sessionID]
+        }),
+      )
+      if (currentSessionID() === sessionID) {
+        setCurrentSessionID(undefined)
+        setStatus("idle")
+        setLoading(false)
       }
     })
   }
@@ -496,6 +556,16 @@ export const SessionProvider: ParentComponent = (props) => {
     vscode.postMessage({ type: "createSession" })
   }
 
+  function clearCurrentSession() {
+    setCurrentSessionID(undefined)
+    setStatus("idle")
+    setLoading(false)
+    setPermissions([])
+    setPendingModelSelection(provider.defaultSelection())
+    setPendingWasUserSet(false)
+    vscode.postMessage({ type: "clearSession" })
+  }
+
   function loadSessions() {
     if (!server.isConnected()) {
       console.warn("[Kilo New] Cannot load sessions: not connected")
@@ -511,7 +581,24 @@ export const SessionProvider: ParentComponent = (props) => {
     }
     setCurrentSessionID(id)
     setStatus("idle")
+    setLoading(true)
     vscode.postMessage({ type: "loadMessages", sessionID: id })
+  }
+
+  function deleteSession(id: string) {
+    if (!server.isConnected()) {
+      console.warn("[Kilo New] Cannot delete session: not connected")
+      return
+    }
+    vscode.postMessage({ type: "deleteSession", sessionID: id })
+  }
+
+  function renameSession(id: string, title: string) {
+    if (!server.isConnected()) {
+      console.warn("[Kilo New] Cannot rename session: not connected")
+      return
+    }
+    vscode.postMessage({ type: "renameSession", sessionID: id, title })
   }
 
   // Computed values
@@ -571,6 +658,7 @@ export const SessionProvider: ParentComponent = (props) => {
     setCurrentSessionID,
     sessions,
     status,
+    loading,
     messages,
     getParts,
     todos,
@@ -590,8 +678,11 @@ export const SessionProvider: ParentComponent = (props) => {
     replyToQuestion,
     rejectQuestion,
     createSession,
+    clearCurrentSession,
     loadSessions,
     selectSession,
+    deleteSession,
+    renameSession,
   }
 
   return <SessionContext.Provider value={value}>{props.children}</SessionContext.Provider>

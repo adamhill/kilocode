@@ -105,6 +105,7 @@ export interface PermissionRequest {
   toolName: string
   args: Record<string, unknown>
   message?: string
+  tool?: { messageID: string; callID: string }
 }
 
 // Todo item
@@ -264,6 +265,11 @@ export interface SessionUpdatedMessage {
   session: SessionInfo
 }
 
+export interface SessionDeletedMessage {
+  type: "sessionDeleted"
+  sessionID: string
+}
+
 export interface MessagesLoadedMessage {
   type: "messagesLoaded"
   sessionID: string
@@ -344,6 +350,7 @@ export type ExtensionMessage =
   | TodoUpdatedMessage
   | SessionCreatedMessage
   | SessionUpdatedMessage
+  | SessionDeletedMessage
   | MessagesLoadedMessage
   | MessageCreatedMessage
   | SessionsLoadedMessage
@@ -385,6 +392,10 @@ export interface PermissionResponseRequest {
 
 export interface CreateSessionRequest {
   type: "createSession"
+}
+
+export interface ClearSessionRequest {
+  type: "clearSession"
 }
 
 export interface LoadMessagesRequest {
@@ -452,11 +463,23 @@ export interface QuestionRejectRequest {
   requestID: string
 }
 
+export interface DeleteSessionRequest {
+  type: "deleteSession"
+  sessionID: string
+}
+
+export interface RenameSessionRequest {
+  type: "renameSession"
+  sessionID: string
+  title: string
+}
+
 export type WebviewMessage =
   | SendMessageRequest
   | AbortRequest
   | PermissionResponseRequest
   | CreateSessionRequest
+  | ClearSessionRequest
   | LoadMessagesRequest
   | LoadSessionsRequest
   | LoginRequest
@@ -471,6 +494,8 @@ export type WebviewMessage =
   | SetLanguageRequest
   | QuestionReplyRequest
   | QuestionRejectRequest
+  | DeleteSessionRequest
+  | RenameSessionRequest
 
 // ============================================
 // VS Code API type
