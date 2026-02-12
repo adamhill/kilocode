@@ -97,7 +97,7 @@ export namespace ToolRegistry {
 
     return [
       InvalidTool,
-      ...(["app", "cli", "desktop"].includes(Flag.KILO_CLIENT) ? [QuestionTool] : []),
+      ...(["app", "cli", "desktop", "vscode"].includes(Flag.KILO_CLIENT) ? [QuestionTool] : []), // kilocode_change
       BashTool,
       ReadTool,
       GlobTool,

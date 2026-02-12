@@ -115,6 +115,30 @@ export interface TodoItem {
   status: "pending" | "in_progress" | "completed"
 }
 
+// Question types
+export interface QuestionOption {
+  label: string
+  description: string
+}
+
+export interface QuestionInfo {
+  question: string
+  header: string
+  options: QuestionOption[]
+  multiple?: boolean
+  custom?: boolean
+}
+
+export interface QuestionRequest {
+  id: string
+  sessionID: string
+  questions: QuestionInfo[]
+  tool?: {
+    messageID: string
+    callID: string
+  }
+}
+
 // Agent/mode info from CLI backend
 export interface AgentInfo {
   name: string
@@ -306,6 +330,21 @@ export interface AgentsLoadedMessage {
   defaultAgent: string
 }
 
+export interface QuestionRequestMessage {
+  type: "questionRequest"
+  question: QuestionRequest
+}
+
+export interface QuestionResolvedMessage {
+  type: "questionResolved"
+  requestID: string
+}
+
+export interface QuestionErrorMessage {
+  type: "questionError"
+  requestID: string
+}
+
 export interface BrowserSettings {
   enabled: boolean
   useSystemChrome: boolean
@@ -339,6 +378,9 @@ export type ExtensionMessage =
   | DeviceAuthCancelledMessage
   | ProvidersLoadedMessage
   | AgentsLoadedMessage
+  | QuestionRequestMessage
+  | QuestionResolvedMessage
+  | QuestionErrorMessage
   | BrowserSettingsLoadedMessage
 
 // ============================================
@@ -428,6 +470,17 @@ export interface SetLanguageRequest {
   locale: string
 }
 
+export interface QuestionReplyRequest {
+  type: "questionReply"
+  requestID: string
+  answers: string[][]
+}
+
+export interface QuestionRejectRequest {
+  type: "questionReject"
+  requestID: string
+}
+
 export interface DeleteSessionRequest {
   type: "deleteSession"
   sessionID: string
@@ -467,6 +520,8 @@ export type WebviewMessage =
   | CompactRequest
   | RequestAgentsMessage
   | SetLanguageRequest
+  | QuestionReplyRequest
+  | QuestionRejectRequest
   | DeleteSessionRequest
   | RenameSessionRequest
   | UpdateSettingRequest

@@ -82,11 +82,38 @@ export type SSEEvent =
       properties: { sessionID: string; requestID: string; reply: "once" | "always" | "reject" }
     }
   | { type: "todo.updated"; properties: { sessionID: string; items: TodoItem[] } }
+  | { type: "question.asked"; properties: QuestionRequest }
+  | { type: "question.replied"; properties: { sessionID: string; requestID: string; answers: string[][] } }
+  | { type: "question.rejected"; properties: { sessionID: string; requestID: string } }
 
 export interface TodoItem {
   id: string
   content: string
   status: "pending" | "in_progress" | "completed"
+}
+
+// Question types from Question module
+export interface QuestionOption {
+  label: string
+  description: string
+}
+
+export interface QuestionInfo {
+  question: string
+  header: string
+  options: QuestionOption[]
+  multiple?: boolean
+  custom?: boolean
+}
+
+export interface QuestionRequest {
+  id: string
+  sessionID: string
+  questions: QuestionInfo[]
+  tool?: {
+    messageID: string
+    callID: string
+  }
 }
 
 // Agent/mode info from the CLI /agent endpoint
