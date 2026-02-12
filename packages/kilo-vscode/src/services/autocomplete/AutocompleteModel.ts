@@ -47,11 +47,9 @@ export class AutocompleteModel {
 
     if (this.connectionService) {
       const state = this.connectionService.getConnectionState()
-      console.log(`[Kilo New] AutocompleteModel.reload(): connectionState=${state}`)
       return state === "connected"
     }
 
-    console.warn("[Kilo New] AutocompleteModel.reload(): No connection service available")
     return false
   }
 
@@ -69,12 +67,6 @@ export class AutocompleteModel {
     onChunk: (text: string) => void,
     _taskId?: string,
   ): Promise<ResponseMetaData> {
-    console.log("[Kilo New] AutocompleteModel.generateFimResponse: ENTERED", {
-      prefixLen: prefix.length,
-      suffixLen: suffix.length,
-      hasConnectionService: !!this.connectionService,
-    })
-
     if (!this.connectionService) {
       throw new Error("Connection service is not available")
     }
@@ -86,20 +78,10 @@ export class AutocompleteModel {
 
     const client = this.connectionService.getHttpClient()
 
-    console.log("[Kilo New] AutocompleteModel.generateFimResponse: calling FIM endpoint", {
-      model: DEFAULT_MODEL,
-    })
-
     const result = await client.fimCompletion(prefix, suffix, onChunk, {
       model: DEFAULT_MODEL,
       maxTokens: 256,
       temperature: 0.2,
-    })
-
-    console.log("[Kilo New] AutocompleteModel.generateFimResponse: complete", {
-      cost: result.cost,
-      inputTokens: result.inputTokens,
-      outputTokens: result.outputTokens,
     })
 
     return {

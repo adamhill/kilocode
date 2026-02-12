@@ -98,18 +98,13 @@ export class AutocompleteServiceManager {
   }
 
   public async load() {
-    console.log("[Kilo New] AutocompleteServiceManager.load(): starting initialization")
-    const hasKey = await this.model.reload()
+    await this.model.reload()
     this.settings = readSettings()
-    console.log(
-      `[Kilo New] AutocompleteServiceManager.load(): model=${this.model.getModelName()}, provider=${this.model.getProviderDisplayName()}, hasKey=${hasKey}, enableAutoTrigger=${this.settings.enableAutoTrigger}`,
-    )
 
     await this.updateGlobalContext()
     this.updateStatusBar()
     await this.updateInlineCompletionProviderRegistration()
     this.setupSnoozeTimerIfNeeded()
-    console.log("[Kilo New] AutocompleteServiceManager.load(): initialization complete")
   }
 
   private async updateInlineCompletionProviderRegistration() {
@@ -122,9 +117,6 @@ export class AutocompleteServiceManager {
     }
 
     if (!shouldBeRegistered) {
-      console.log(
-        `[Kilo New] Inline completion provider NOT registered (enableAutoTrigger=${this.settings?.enableAutoTrigger}, snoozed=${this.isSnoozed()})`,
-      )
       return
     }
 
@@ -134,7 +126,6 @@ export class AutocompleteServiceManager {
       this.inlineCompletionProvider,
     )
     this.context.subscriptions.push(this.inlineCompletionProviderDisposable)
-    console.log("[Kilo New] Inline completion provider registered successfully")
   }
 
   public async disable() {

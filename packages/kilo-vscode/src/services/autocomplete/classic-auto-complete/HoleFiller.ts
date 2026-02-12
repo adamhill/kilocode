@@ -194,43 +194,16 @@ Return the COMPLETION tags`
       if (chunk.type === "text") {
         response += chunk.text
         chunkCount++
-        if (chunkCount <= 3) {
-          console.log(`[Kilo New] HoleFiller.getFromChat: chunk #${chunkCount}: "${chunk.text.slice(0, 50)}"`)
-        }
       }
     }
 
-    console.log("[Kilo New] HoleFiller.getFromChat: ENTERED", {
-      systemPromptLen: systemPrompt.length,
-      userPromptLen: userPrompt.length,
-    })
-    console.log("[Kilo New] HoleFiller.getFromChat: userPrompt (first 200 chars):", userPrompt.slice(0, 200))
-
-    console.log("[Kilo New] HoleFiller.getFromChat: calling model.generateResponse()...")
     const usageInfo = await model.generateResponse(systemPrompt, userPrompt, onChunk)
-    console.log("[Kilo New] HoleFiller.getFromChat: model.generateResponse() returned", {
-      totalChunks: chunkCount,
-      responseLen: response.length,
-      responseFirst100: response.slice(0, 100),
-    })
 
     // Extract just the text from the response - prefix/suffix are handled by the caller
     const completionMatch = response.match(/<COMPLETION>([\s\S]*?)<\/COMPLETION>/i)
     const suggestionText = completionMatch ? (completionMatch[1] || "").replace(/<\/?COMPLETION>/gi, "") : ""
 
-    console.log("[Kilo New] HoleFiller.getFromChat: parsed completion", {
-      hasCompletionTag: !!completionMatch,
-      suggestionTextLen: suggestionText.length,
-      suggestionTextFirst50: suggestionText.slice(0, 50),
-      fullResponse: response,
-    })
-
     const fillInAtCursorSuggestion = processSuggestion(suggestionText)
-
-    console.log("[Kilo New] HoleFiller.getFromChat: after processSuggestion", {
-      finalTextLen: fillInAtCursorSuggestion.text.length,
-      finalTextFirst50: fillInAtCursorSuggestion.text.slice(0, 50),
-    })
 
     return {
       suggestion: fillInAtCursorSuggestion,

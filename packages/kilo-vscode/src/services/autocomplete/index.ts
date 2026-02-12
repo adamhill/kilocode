@@ -7,7 +7,6 @@ export const registerAutocompleteProvider = (
   context: vscode.ExtensionContext,
   connectionService: KiloConnectionService,
 ) => {
-  console.log("[Kilo New] registerAutocompleteProvider: creating AutocompleteServiceManager")
   const autocompleteManager = new AutocompleteServiceManager(context, connectionService)
   context.subscriptions.push(autocompleteManager)
 
