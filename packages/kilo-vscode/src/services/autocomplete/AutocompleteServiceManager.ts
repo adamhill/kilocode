@@ -312,9 +312,9 @@ export class AutocompleteServiceManager {
     return this.model.loaded && !this.model.hasValidCredentials() && !this.model.hasKilocodeProfileWithNoBalance
   }
 
-  private updateCostTracking(_cost: number, _inputTokens: number, _outputTokens: number): void {
+  private updateCostTracking(cost: number, _inputTokens: number, _outputTokens: number): void {
     this.completionCount++
-    this.sessionCost += _cost
+    this.sessionCost += cost
     this.updateStatusBar()
   }
 
