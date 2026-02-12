@@ -37,23 +37,23 @@ VSCodeProvider → ServerProvider → SessionProvider → AppContent
 
 ### What is hand-built vs what could use kilo-ui
 
-| Area                                  | Current                                               | kilo-ui available?                                |
+| Area | Current | kilo-ui available? |
 | ------------------------------------- | ----------------------------------------------------- | ------------------------------------------------- |
-| Buttons (send, abort, login, etc.)    | Raw `<button>` + inline styles                        | Yes — `Button`, `IconButton`                      |
-| Cards (profile, balance, device auth) | Raw `<div>` + inline styles                           | Yes — `Card`                                      |
-| Permission dialog                     | Custom overlay div + CSS                              | Yes — `Dialog`                                    |
-| Settings tabs                         | Custom signal-based tab nav (~80 lines inline styles) | Yes — `Tabs`                                      |
-| Session list                          | Custom `<div>` items + CSS                            | Yes — `List`                                      |
-| Tool call expand/collapse             | Custom toggle buttons                                 | Yes — `Collapsible`, `Accordion`                  |
-| Loading indicators                    | Emoji (`⏳`, `⚙️`)                                    | Yes — `Spinner`                                   |
-| Code blocks                           | Raw `<pre>` tags                                      | Yes — `Code` (with shiki)                         |
-| Markdown rendering                    | **Not implemented** (plain text)                      | Yes — `Markdown`                                  |
-| Diff display                          | **Not implemented**                                   | Yes — `Diff`, `DiffChanges`                       |
-| Tooltips                              | **Not implemented**                                   | Yes — `Tooltip`                                   |
-| Toast notifications                   | **Not implemented**                                   | Yes — `Toast`                                     |
-| Icons                                 | `lucide-solid` in Settings; emoji elsewhere           | Yes — `Icon`                                      |
-| Theming                               | Raw `--vscode-*` CSS vars                             | Yes — `ThemeProvider` + `kilo-vscode` theme       |
-| Settings form controls                | **Not implemented** (14 stub tabs)                    | Yes — `Select`, `Switch`, `Checkbox`, `TextField` |
+| Buttons (send, abort, login, etc.) | Raw `<button>` + inline styles | Yes — `Button`, `IconButton` |
+| Cards (profile, balance, device auth) | Raw `<div>` + inline styles | Yes — `Card` |
+| Permission dialog | Custom overlay div + CSS | Yes — `Dialog` |
+| Settings tabs | Custom signal-based tab nav (~80 lines inline styles) | Yes — `Tabs` |
+| Session list | Custom `<div>` items + CSS | Yes — `List` |
+| Tool call expand/collapse | Custom toggle buttons | Yes — `Collapsible`, `Accordion` |
+| Loading indicators | Emoji (`⏳`, `⚙️`) | Yes — `Spinner` |
+| Code blocks | Raw `<pre>` tags | Yes — `Code` (with shiki) |
+| Markdown rendering | **Not implemented** (plain text) | Yes — `Markdown` |
+| Diff display | **Not implemented** | Yes — `Diff`, `DiffChanges` |
+| Tooltips | **Not implemented** | Yes — `Tooltip` |
+| Toast notifications | **Not implemented** | Yes — `Toast` |
+| Icons | `lucide-solid` in Settings; emoji elsewhere | Yes — `Icon` |
+| Theming | Raw `--vscode-*` CSS vars | Yes — `ThemeProvider` + `kilo-vscode` theme |
+| Settings form controls | **Not implemented** (14 stub tabs) | Yes — `Select`, `Switch`, `Checkbox`, `TextField` |
 
 ---
 
@@ -340,23 +340,23 @@ Before migrating, the following icons must be added to the `icons` map in [`ui/s
 
 ##### Migration mapping
 
-| Settings Tab    | lucide-solid         | kilo-ui `name`  | Notes                         |
+| Settings Tab | lucide-solid | kilo-ui `name` | Notes |
 | --------------- | -------------------- | --------------- | ----------------------------- |
-| Back button     | `ArrowLeft`          | `arrow-left`    | Exact match                   |
-| Providers       | `Plug`               | `providers`     | Semantic match                |
-| Terminal        | `SquareTerminal`     | `console`       | Good match                    |
-| Prompts         | `MessageSquare`      | `speech-bubble` | Good match                    |
-| Checkpoints     | `GitBranch`          | `branch`        | Good match                    |
-| Browser         | `SquareMousePointer` | `window-cursor` | Approximate — review visually |
-| About           | `Info`               | `help`          | Approximate — `?` vs `i` icon |
-| Context         | `Database`           | `server`        | Approximate — review visually |
-| Auto-Approve    | `CheckCheck`         | `checklist`     | Approximate — review visually |
-| Display         | `Monitor`            | `monitor`       | **New icon needed**           |
-| Autocomplete    | `Bot`                | `bot`           | **New icon needed**           |
-| Notifications   | `Bell`               | `bell`          | **New icon needed**           |
-| Agent Behaviour | `Users2`             | `users`         | **New icon needed**           |
-| Experimental    | `FlaskConical`       | `flask`         | **New icon needed**           |
-| Language        | `Globe`              | `globe`         | **New icon needed**           |
+| Back button | `ArrowLeft` | `arrow-left` | Exact match |
+| Providers | `Plug` | `providers` | Semantic match |
+| Terminal | `SquareTerminal` | `console` | Good match |
+| Prompts | `MessageSquare` | `speech-bubble` | Good match |
+| Checkpoints | `GitBranch` | `branch` | Good match |
+| Browser | `SquareMousePointer` | `window-cursor` | Approximate — review visually |
+| About | `Info` | `help` | Approximate — `?` vs `i` icon |
+| Context | `Database` | `server` | Approximate — review visually |
+| Auto-Approve | `CheckCheck` | `checklist` | Approximate — review visually |
+| Display | `Monitor` | `monitor` | **New icon needed** |
+| Autocomplete | `Bot` | `bot` | **New icon needed** |
+| Notifications | `Bell` | `bell` | **New icon needed** |
+| Agent Behaviour | `Users2` | `users` | **New icon needed** |
+| Experimental | `FlaskConical` | `flask` | **New icon needed** |
+| Language | `Globe` | `globe` | **New icon needed** |
 
 Once all lucide icons are replaced and the 6 new icons are added to kilo-ui, remove `lucide-solid` from `package.json` dependencies.
 
@@ -604,31 +604,31 @@ Use for: model selector, mode selector, provider info cards.
 
 ## 6. Component Migration Reference Table
 
-| Current Component             | File                                    | kilo-ui Replacement | Import Path                       |
+| Current Component | File | kilo-ui Replacement | Import Path |
 | ----------------------------- | --------------------------------------- | ------------------- | --------------------------------- |
-| Raw `<button>` elements       | Multiple files                          | `Button`            | `@kilocode/kilo-ui/button`        |
-| SVG icon buttons              | `PromptInput.tsx`                       | `IconButton`        | `@kilocode/kilo-ui/icon-button`   |
-| Emoji spinners (`⏳`, `⚙️`)   | `Message.tsx`                           | `Spinner`           | `@kilocode/kilo-ui/spinner`       |
-| Custom overlay dialog         | `PermissionDialog.tsx`                  | `Dialog`            | `@kilocode/kilo-ui/dialog`        |
-| Inline-styled cards           | `ProfileView.tsx`, `DeviceAuthCard.tsx` | `Card`              | `@kilocode/kilo-ui/card`          |
-| Custom tab navigation         | `Settings.tsx`                          | `Tabs`              | `@kilocode/kilo-ui/tabs`          |
-| Custom list items             | `SessionList.tsx`                       | `List`              | `@kilocode/kilo-ui/list`          |
-| Custom toggle expand/collapse | `Message.tsx`                           | `Collapsible`       | `@kilocode/kilo-ui/collapsible`   |
-| Lucide icons                  | `Settings.tsx`                          | `Icon`              | `@kilocode/kilo-ui/icon`          |
-| Plain text messages           | `Message.tsx`                           | `Markdown`          | `@kilocode/kilo-ui/markdown`      |
-| Raw `<pre>` code blocks       | `Message.tsx`                           | `Code`              | `@kilocode/kilo-ui/code`          |
-| Custom message parts          | `Message.tsx`                           | `MessagePart`       | `@kilocode/kilo-ui/message-part`  |
-| Custom tool display           | `Message.tsx`                           | `BasicTool`         | `@kilocode/kilo-ui/basic-tool`    |
-| _(not implemented)_           | —                                       | `Tooltip`           | `@kilocode/kilo-ui/tooltip`       |
-| _(not implemented)_           | —                                       | `Toast`             | `@kilocode/kilo-ui/toast`         |
-| _(not implemented)_           | —                                       | `DropdownMenu`      | `@kilocode/kilo-ui/dropdown-menu` |
-| _(not implemented)_           | —                                       | `ContextMenu`       | `@kilocode/kilo-ui/context-menu`  |
-| _(not implemented)_           | —                                       | `Select`            | `@kilocode/kilo-ui/select`        |
-| _(not implemented)_           | —                                       | `Switch`            | `@kilocode/kilo-ui/switch`        |
-| _(not implemented)_           | —                                       | `Checkbox`          | `@kilocode/kilo-ui/checkbox`      |
-| _(not implemented)_           | —                                       | `TextField`         | `@kilocode/kilo-ui/text-field`    |
-| _(not implemented)_           | —                                       | `DiffChanges`       | `@kilocode/kilo-ui/diff-changes`  |
-| _(not implemented)_           | —                                       | `Popover`           | `@kilocode/kilo-ui/popover`       |
+| Raw `<button>` elements | Multiple files | `Button` | `@kilocode/kilo-ui/button` |
+| SVG icon buttons | `PromptInput.tsx` | `IconButton` | `@kilocode/kilo-ui/icon-button` |
+| Emoji spinners (`⏳`, `⚙️`) | `Message.tsx` | `Spinner` | `@kilocode/kilo-ui/spinner` |
+| Custom overlay dialog | `PermissionDialog.tsx` | `Dialog` | `@kilocode/kilo-ui/dialog` |
+| Inline-styled cards | `ProfileView.tsx`, `DeviceAuthCard.tsx` | `Card` | `@kilocode/kilo-ui/card` |
+| Custom tab navigation | `Settings.tsx` | `Tabs` | `@kilocode/kilo-ui/tabs` |
+| Custom list items | `SessionList.tsx` | `List` | `@kilocode/kilo-ui/list` |
+| Custom toggle expand/collapse | `Message.tsx` | `Collapsible` | `@kilocode/kilo-ui/collapsible` |
+| Lucide icons | `Settings.tsx` | `Icon` | `@kilocode/kilo-ui/icon` |
+| Plain text messages | `Message.tsx` | `Markdown` | `@kilocode/kilo-ui/markdown` |
+| Raw `<pre>` code blocks | `Message.tsx` | `Code` | `@kilocode/kilo-ui/code` |
+| Custom message parts | `Message.tsx` | `MessagePart` | `@kilocode/kilo-ui/message-part` |
+| Custom tool display | `Message.tsx` | `BasicTool` | `@kilocode/kilo-ui/basic-tool` |
+| _(not implemented)_ | — | `Tooltip` | `@kilocode/kilo-ui/tooltip` |
+| _(not implemented)_ | — | `Toast` | `@kilocode/kilo-ui/toast` |
+| _(not implemented)_ | — | `DropdownMenu` | `@kilocode/kilo-ui/dropdown-menu` |
+| _(not implemented)_ | — | `ContextMenu` | `@kilocode/kilo-ui/context-menu` |
+| _(not implemented)_ | — | `Select` | `@kilocode/kilo-ui/select` |
+| _(not implemented)_ | — | `Switch` | `@kilocode/kilo-ui/switch` |
+| _(not implemented)_ | — | `Checkbox` | `@kilocode/kilo-ui/checkbox` |
+| _(not implemented)_ | — | `TextField` | `@kilocode/kilo-ui/text-field` |
+| _(not implemented)_ | — | `DiffChanges` | `@kilocode/kilo-ui/diff-changes` |
+| _(not implemented)_ | — | `Popover` | `@kilocode/kilo-ui/popover` |
 
 ---
 
@@ -728,40 +728,40 @@ Each phase has specific acceptance criteria (listed above). The general verifica
 
 ### Specific test scenarios
 
-| Scenario            | What to verify                                                   |
+| Scenario | What to verify |
 | ------------------- | ---------------------------------------------------------------- |
-| Fresh webview load  | Styles load, no FOUC, providers initialize                       |
-| Send a message      | Button works, message appears, streaming works                   |
-| Permission dialog   | Dialog opens, buttons work, dialog closes                        |
-| Settings navigation | Tabs switch, form controls work                                  |
-| Session history     | List renders, selection works, navigation back to chat           |
-| Login flow          | Device auth card renders, QR code displays, success/error states |
-| Theme switching     | Change VS Code theme → webview updates automatically             |
-| Sidebar ↔ tab      | Both webview hosts render identically                            |
-| Markdown content    | Headers, lists, code blocks, links render correctly              |
-| Long conversations  | Auto-scroll works, performance is acceptable                     |
+| Fresh webview load | Styles load, no FOUC, providers initialize |
+| Send a message | Button works, message appears, streaming works |
+| Permission dialog | Dialog opens, buttons work, dialog closes |
+| Settings navigation | Tabs switch, form controls work |
+| Session history | List renders, selection works, navigation back to chat |
+| Login flow | Device auth card renders, QR code displays, success/error states |
+| Theme switching | Change VS Code theme → webview updates automatically |
+| Sidebar ↔ tab | Both webview hosts render identically |
+| Markdown content | Headers, lists, code blocks, links render correctly |
+| Long conversations | Auto-scroll works, performance is acceptable |
 
 ---
 
 ## 9. Progress Tracker
 
-| Phase                        | Status        | Date       | Notes                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| Phase | Status | Date | Notes |
 | ---------------------------- | ------------- | ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Phase 0: Foundation          | ✅ Complete   | 2026-02-10 | Build system, CSP, providers, styles wired up. `I18nProvider` locale corrected to accessor. Font loaders (`.woff`, `.woff2`, `.ttf`) added to esbuild. `solidDedupePlugin` added to force single solid-js copy across monorepo.                                                                                                                                                                                                                          |
-| Phase 1.1: Buttons           | ✅ Complete   | 2026-02-10 | All buttons in PromptInput, PermissionDialog, ProfileView, DeviceAuthCard, Settings replaced with `Button`. `IconButton` not used — requires named `icon` prop incompatible with inline SVGs. Settings tab sidebar buttons left as native `<button>` (complex active state styling).                                                                                                                                                                     |
-| Phase 1.2: Spinners          | ✅ Complete   | 2026-02-10 | Emoji loading indicators (`⏳`, `⚙️`) in Message.tsx and DeviceAuthCard.tsx replaced with `Spinner`. Status icons (`✓`, `✕`) kept as-is.                                                                                                                                                                                                                                                                                                                 |
-| Phase 1.3: Permission Dialog | ✅ Complete   | 2026-02-11 | Custom overlay replaced with `Dialog` via `useDialog()` hook + `BasicTool` for collapsible header + `data-component="permission-prompt"` for actions. Removed 7 custom CSS classes. Direct `@kobalte/core` dep removed to avoid dual-package context mismatch.                                                                                                                                                                                           |
-| Phase 1.4: Cards             | ✅ Complete   | 2026-02-11 | Inline-styled card divs in ProfileView (profile + balance) and DeviceAuthCard (5 state cards) replaced with `Card` component. Removed `cardStyle` constant.                                                                                                                                                                                                                                                                                              |
-| Phase 1.5: Icons             | ✅ Complete   | 2026-02-11 | All 15 lucide-solid icons replaced with kilo-ui `Icon`. `lucide-solid` dep removed. Many icons use approximate matches (see deviation #7).                                                                                                                                                                                                                                                                                                               |
-| Phase 2: Settings shell      | ✅ Complete   | 2026-02-11 | Settings shell uses kilo-ui `Tabs` (vertical, `variant="settings"`). ~80 lines of inline styles removed. Icons use `Icon` component. Settings tab _content_ (form controls, backend wiring) is out of scope for this plan. `LanguageTab` demonstrates `Select` usage as reference.                                                                                                                                                                       |
-| Phase 3: Chat UI             | ✅ Complete   | 2026-02-11 | Surpassed original plan: `Message.tsx` now uses kilo-ui's higher-level `Message` component (from `@kilocode/kilo-ui/message-part`) which internally handles Markdown, tool calls (BasicTool), reasoning (Collapsible), and more. `DataProvider` bridge in `App.tsx` adapts session store to SDK format. `MarkedProvider` active. `DiffComponentProvider` and `CodeComponentProvider` deferred (not needed while `Message` handles rendering internally). |
-| Phase 4.5: Popover           | ✅ Complete   | 2026-02-11 | ModelSelector and ModeSwitcher replaced with kilo-ui `Popover`. Removed ~85 lines of custom CSS (positioning, click-outside, z-index). Popover handles dismiss, positioning, and animations via Kobalte.                                                                                                                                                                                                                                                 |
-| I18n system                  | ✅ Complete   | 2026-02-11 | **Beyond original plan.** Full `LanguageProvider` context with 16 locales, 3-layer dictionary merging (app + ui + kilo-i18n), locale resolution (user override → VS Code → browser → "en"), template parameter interpolation. `@kilocode/kilo-i18n` added as dependency.                                                                                                                                                                                 |
-| Phase 4.1: Tooltips          | ✅ Complete   | 2026-02-11 | Added `Tooltip` to send/abort buttons (PromptInput), settings back button, and profile refresh button. Uses `value` prop (not `content`) with i18n keys.                                                                                                                                                                                                                                                                                                 |
-| Phase 4.3: Toast             | ✅ Complete   | 2026-02-11 | `Toast.Region` added to `App.tsx`. `showToast()` used for copy confirmations in `DeviceAuthCard`. Removed `copied` signal state in favor of toast feedback.                                                                                                                                                                                                                                                                                              |
-| Phase 4.4: List              | ✅ Complete   | 2026-02-11 | `SessionList` replaced custom `<div>`-based list with kilo-ui `List` component. Gains keyboard navigation (arrow keys + Enter), fuzzy search on session titles, and `[data-component="list"]` styling. Removed ~55 lines of custom session-list CSS.                                                                                                                                                                                                     |
-| CSS cleanup                  | ✅ Complete   | 2026-02-11 | Removed 91 lines: unused `.prompt-send-button`/`.prompt-abort-button` classes (replaced by kilo-ui `Button`), and `.session-item`/`.session-list-empty` classes (replaced by kilo-ui `List`). `chat.css` now at ~306 lines.                                                                                                                                                                                                                              |
-| Phase 4.2: Menus             | ⬚ Not started | —          | DropdownMenu + ContextMenu for session list actions (rename, delete) and message actions (copy, retry). Depends on backend supporting these operations.                                                                                                                                                                                                                                                                                                  |
+| Phase 0: Foundation | ✅ Complete | 2026-02-10 | Build system, CSP, providers, styles wired up. `I18nProvider` locale corrected to accessor. Font loaders (`.woff`, `.woff2`, `.ttf`) added to esbuild. `solidDedupePlugin` added to force single solid-js copy across monorepo. |
+| Phase 1.1: Buttons | ✅ Complete | 2026-02-10 | All buttons in PromptInput, PermissionDialog, ProfileView, DeviceAuthCard, Settings replaced with `Button`. `IconButton` not used — requires named `icon` prop incompatible with inline SVGs. Settings tab sidebar buttons left as native `<button>` (complex active state styling). |
+| Phase 1.2: Spinners | ✅ Complete | 2026-02-10 | Emoji loading indicators (`⏳`, `⚙️`) in Message.tsx and DeviceAuthCard.tsx replaced with `Spinner`. Status icons (`✓`, `✕`) kept as-is. |
+| Phase 1.3: Permission Dialog | ✅ Complete | 2026-02-11 | Custom overlay replaced with `Dialog` via `useDialog()` hook + `BasicTool` for collapsible header + `data-component="permission-prompt"` for actions. Removed 7 custom CSS classes. Direct `@kobalte/core` dep removed to avoid dual-package context mismatch. |
+| Phase 1.4: Cards | ✅ Complete | 2026-02-11 | Inline-styled card divs in ProfileView (profile + balance) and DeviceAuthCard (5 state cards) replaced with `Card` component. Removed `cardStyle` constant. |
+| Phase 1.5: Icons | ✅ Complete | 2026-02-11 | All 15 lucide-solid icons replaced with kilo-ui `Icon`. `lucide-solid` dep removed. Many icons use approximate matches (see deviation #7). |
+| Phase 2: Settings shell | ✅ Complete | 2026-02-11 | Settings shell uses kilo-ui `Tabs` (vertical, `variant="settings"`). ~80 lines of inline styles removed. Icons use `Icon` component. Settings tab _content_ (form controls, backend wiring) is out of scope for this plan. `LanguageTab` demonstrates `Select` usage as reference. |
+| Phase 3: Chat UI | ✅ Complete | 2026-02-11 | Surpassed original plan: `Message.tsx` now uses kilo-ui's higher-level `Message` component (from `@kilocode/kilo-ui/message-part`) which internally handles Markdown, tool calls (BasicTool), reasoning (Collapsible), and more. `DataProvider` bridge in `App.tsx` adapts session store to SDK format. `MarkedProvider` active. `DiffComponentProvider` and `CodeComponentProvider` deferred (not needed while `Message` handles rendering internally). |
+| Phase 4.5: Popover | ✅ Complete | 2026-02-11 | ModelSelector and ModeSwitcher replaced with kilo-ui `Popover`. Removed ~85 lines of custom CSS (positioning, click-outside, z-index). Popover handles dismiss, positioning, and animations via Kobalte. |
+| I18n system | ✅ Complete | 2026-02-11 | **Beyond original plan.** Full `LanguageProvider` context with 16 locales, 3-layer dictionary merging (app + ui + kilo-i18n), locale resolution (user override → VS Code → browser → "en"), template parameter interpolation. `@kilocode/kilo-i18n` added as dependency. |
+| Phase 4.1: Tooltips | ✅ Complete | 2026-02-11 | Added `Tooltip` to send/abort buttons (PromptInput), settings back button, and profile refresh button. Uses `value` prop (not `content`) with i18n keys. |
+| Phase 4.3: Toast | ✅ Complete | 2026-02-11 | `Toast.Region` added to `App.tsx`. `showToast()` used for copy confirmations in `DeviceAuthCard`. Removed `copied` signal state in favor of toast feedback. |
+| Phase 4.4: List | ✅ Complete | 2026-02-11 | `SessionList` replaced custom `<div>`-based list with kilo-ui `List` component. Gains keyboard navigation (arrow keys + Enter), fuzzy search on session titles, and `[data-component="list"]` styling. Removed ~55 lines of custom session-list CSS. |
+| CSS cleanup | ✅ Complete | 2026-02-11 | Removed 91 lines: unused `.prompt-send-button`/`.prompt-abort-button` classes (replaced by kilo-ui `Button`), and `.session-item`/`.session-list-empty` classes (replaced by kilo-ui `List`). `chat.css` now at ~306 lines. |
+| Phase 4.2: Menus | ⬚ Not started | — | DropdownMenu + ContextMenu for session list actions (rename, delete) and message actions (copy, retry). Depends on backend supporting these operations. |
 
 ### Deviations from plan
 
