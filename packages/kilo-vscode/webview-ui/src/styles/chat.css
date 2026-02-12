@@ -214,6 +214,8 @@
   position: relative;
   z-index: 1;
   background: transparent;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .prompt-input-ghost-overlay {
