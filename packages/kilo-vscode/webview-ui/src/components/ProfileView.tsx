@@ -1,4 +1,4 @@
-import { Component, Show, createSignal, createMemo } from "solid-js"
+import { Component, Show, createSignal, createMemo, createEffect } from "solid-js"
 import { Button } from "@kilocode/kilo-ui/button"
 import { Card } from "@kilocode/kilo-ui/card"
 import { Select } from "@kilocode/kilo-ui/select"
@@ -32,6 +32,12 @@ const ProfileView: Component<ProfileViewProps> = (props) => {
   const vscode = useVSCode()
   const language = useLanguage()
   const [target, setTarget] = createSignal<string | null>(null)
+
+  // Reset pending target whenever profileData changes (success or failure both send a fresh profile)
+  createEffect(() => {
+    props.profileData // track
+    setTarget(null)
+  })
 
   const switching = createMemo(() => {
     const t = target()

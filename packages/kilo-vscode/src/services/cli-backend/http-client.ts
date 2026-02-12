@@ -318,7 +318,7 @@ export class HttpClient {
    * Pass null to switch back to personal account.
    */
   async setOrganization(organizationId: string | null): Promise<void> {
-    await this.request("POST", "/kilo/organization", { organizationId })
+    await this.request<boolean>("POST", "/kilo/organization", { organizationId })
   }
 
   // ============================================
