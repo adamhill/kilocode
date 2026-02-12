@@ -211,7 +211,7 @@ pub fn create_command(app: &tauri::AppHandle, args: &str, extra_env: &[(&str, St
                 "BIN=\"$HOME/.opencode/bin/opencode\"".to_string(),
                 "if [ ! -x \"$BIN\" ]; then".to_string(),
                 format!(
-                    "  curl -fsSL https://kilo.ai/install | bash -s -- --version {} --no-modify-path",
+                    "  curl -fsSL https://kilo.ai/cli/install | bash -s -- --version {} --no-modify-path",
                     shell_escape(&version)
                 ),
                 "fi".to_string(),
