@@ -189,7 +189,9 @@ export class KiloProvider implements vscode.WebviewViewProvider {
           await this.handleLogout()
           break
         case "setOrganization":
-          await this.handleSetOrganization(message.organizationId)
+          if (typeof message.organizationId === "string" || message.organizationId === null) {
+            await this.handleSetOrganization(message.organizationId)
+          }
           break
         case "refreshProfile":
           await this.handleRefreshProfile()
@@ -921,24 +923,25 @@ export class KiloProvider implements vscode.WebviewViewProvider {
    * Persists the selection and refreshes profile + providers since both change with org context.
    */
   private async handleSetOrganization(organizationId: string | null): Promise<void> {
-    if (!this.httpClient) {
+    const client = this.httpClient
+    if (!client) {
       return
     }
 
     console.log("[Kilo New] KiloProvider: Switching organization:", organizationId ?? "personal")
     try {
-      await this.httpClient.setOrganization(organizationId)
+      await client.setOrganization(organizationId)
     } catch (error) {
       console.error("[Kilo New] KiloProvider: Failed to switch organization:", error)
       // Re-fetch current profile to reset webview state (clears switching indicator)
-      const profileData = await this.httpClient.getProfile()
+      const profileData = await client.getProfile()
       this.postMessage({ type: "profileData", data: profileData })
       return
     }
 
     // Org switch succeeded — refresh profile and providers independently (best-effort)
     try {
-      const profileData = await this.httpClient.getProfile()
+      const profileData = await client.getProfile()
       this.postMessage({ type: "profileData", data: profileData })
     } catch (error) {
       console.error("[Kilo New] KiloProvider: Failed to refresh profile after org switch:", error)
