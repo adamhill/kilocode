@@ -1,10 +1,12 @@
 import { Component, createSignal, onCleanup, onMount } from "solid-js"
 import { Switch } from "@kilocode/kilo-ui/switch"
 import { useVSCode } from "../../context/vscode"
+import { useLanguage } from "../../context/language"
 import type { BrowserSettings } from "../../types/messages"
 
 const BrowserTab: Component = () => {
   const { postMessage, onMessage } = useVSCode()
+  const { t } = useLanguage()
 
   const [settings, setSettings] = createSignal<BrowserSettings>({
     enabled: false,
@@ -48,23 +50,19 @@ const BrowserTab: Component = () => {
             "line-height": "1.5",
           }}
         >
-          When enabled, the AI agent can interact with web pages — navigating, clicking, typing, and taking screenshots.
-          A Chrome window will open so you can watch the agent work.
+          {t("settings.browser.description")}
         </p>
       </div>
 
       {/* Enable toggle */}
-      <SettingsRow
-        title="Enable Browser Automation"
-        description="Register the Playwright MCP server with the CLI backend."
-      >
+      <SettingsRow title={t("settings.browser.enable.title")} description={t("settings.browser.enable.description")}>
         <Switch checked={settings().enabled} onChange={(checked: boolean) => update("enabled", checked)} />
       </SettingsRow>
 
       {/* Use System Chrome */}
       <SettingsRow
-        title="Use System Chrome"
-        description="Use your installed Chrome browser instead of a separate Chromium instance."
+        title={t("settings.browser.systemChrome.title")}
+        description={t("settings.browser.systemChrome.description")}
       >
         <Switch
           checked={settings().useSystemChrome}
@@ -73,7 +71,10 @@ const BrowserTab: Component = () => {
       </SettingsRow>
 
       {/* Headless mode */}
-      <SettingsRow title="Headless Mode" description="Run in headless mode (no visible browser window).">
+      <SettingsRow
+        title={t("settings.browser.headless.title")}
+        description={t("settings.browser.headless.description")}
+      >
         <Switch checked={settings().headless} onChange={(checked: boolean) => update("headless", checked)} />
       </SettingsRow>
     </div>

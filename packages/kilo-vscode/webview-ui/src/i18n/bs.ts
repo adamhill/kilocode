@@ -828,6 +828,16 @@ export const dict = {
   "settings.agentBehaviour.subtab.workflows": "Tokovi rada",
   "settings.agentBehaviour.subtab.skills": "Vještine",
 
+  "settings.browser.description":
+    "Kada je omogućeno, AI agent može komunicirati s web stranicama — navigirati, klikati, tipkati i snimati ekran. Chrome prozor će se otvoriti kako biste mogli pratiti rad agenta.",
+  "settings.browser.enable.title": "Omogući automatizaciju preglednika",
+  "settings.browser.enable.description": "Registriraj Playwright MCP server s CLI pozadinom.",
+  "settings.browser.systemChrome.title": "Koristi sistemski Chrome",
+  "settings.browser.systemChrome.description":
+    "Koristite instalirani Chrome preglednik umjesto zasebne Chromium instance.",
+  "settings.browser.headless.title": "Headless način",
+  "settings.browser.headless.description": "Pokreni u headless načinu (bez vidljivog prozora preglednika).",
+
   "settings.language.description": 'Odaberite jezik za Kilo Code sučelje. "Auto" koristi jezik prikaza VS Code-a.',
   "settings.language.auto": "Auto (VS Code jezik)",
   "settings.language.current": "Trenutni:",
