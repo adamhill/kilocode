@@ -50,11 +50,11 @@ Some Kilo Code locale identifiers represent the same language but use different 
 
 Mapping rules (when constructing Kilo CLI-facing locale values):
 
-| Kilo Code locale | Kilo CLI locale | Notes                |
+| Kilo Code locale | Kilo CLI locale | Notes |
 | ---------------- | --------------- | -------------------- |
-| `pt-BR`          | `br`            | Brazilian Portuguese |
-| `zh-CN`          | `zh`            | Simplified Chinese   |
-| `zh-TW`          | `zht`           | Traditional Chinese  |
+| `pt-BR` | `br` | Brazilian Portuguese |
+| `zh-CN` | `zh` | Simplified Chinese |
+| `zh-TW` | `zht` | Traditional Chinese |
 
 All other supported locales map 1:1 (e.g. `de → de`, `fr → fr`).
 
