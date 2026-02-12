@@ -1,5 +1,4 @@
-import { TelemetryService } from "@roo-code/telemetry"
-import { TelemetryEventName } from "@roo-code/types"
+import { TelemetryStub, type ITelemetryClient, type TelemetryEventName } from "../shims/TelemetryStub"
 import type { AutocompleteContext, CacheMatchType, FillInAtCursorSuggestion } from "../types"
 
 export type { AutocompleteContext, CacheMatchType, FillInAtCursorSuggestion }
@@ -83,14 +82,14 @@ export class AutocompleteTelemetry {
     this.autocompleteType = autocompleteType
   }
 
+  private telemetryClient: ITelemetryClient = new TelemetryStub()
+
   private captureEvent(event: TelemetryEventName, properties?: Record<string, unknown>): void {
-    if (TelemetryService.hasInstance()) {
-      const propsWithType = {
-        ...properties,
-        autocompleteType: this.autocompleteType,
-      }
-      TelemetryService.instance.captureEvent(event, propsWithType)
+    const propsWithType = {
+      ...properties,
+      autocompleteType: this.autocompleteType,
     }
+    this.telemetryClient.captureEvent(event, propsWithType)
   }
 
   /**
@@ -103,7 +102,7 @@ export class AutocompleteTelemetry {
    *  - (not captured) request is not answered, for instance because we are debouncing (i.e. user is still typing)
    */
   public captureSuggestionRequested(context: AutocompleteContext): void {
-    this.captureEvent(TelemetryEventName.AUTOCOMPLETE_SUGGESTION_REQUESTED, {
+    this.captureEvent("autocomplete_suggestion_requested", {
       languageId: context.languageId,
       modelId: context.modelId,
       provider: context.provider,
@@ -120,7 +119,7 @@ export class AutocompleteTelemetry {
     reason: "empty_response" | "filtered_by_postprocessing",
     context: AutocompleteContext,
   ): void {
-    this.captureEvent(TelemetryEventName.AUTOCOMPLETE_SUGGESTION_FILTERED, {
+    this.captureEvent("autocomplete_suggestion_filtered", {
       reason,
       ...context,
     })
@@ -134,7 +133,7 @@ export class AutocompleteTelemetry {
    * @param suggestionLength - The length of the suggestion in characters
    */
   public captureCacheHit(matchType: CacheMatchType, context: AutocompleteContext, suggestionLength: number): void {
-    this.captureEvent(TelemetryEventName.AUTOCOMPLETE_SUGGESTION_CACHE_HIT, {
+    this.captureEvent("autocomplete_suggestion_cache_hit", {
       matchType,
       languageId: context.languageId,
       modelId: context.modelId,
@@ -152,7 +151,7 @@ export class AutocompleteTelemetry {
    * @param suggestionLength - The length of the suggestion in characters
    */
   public captureLlmSuggestionReturned(context: AutocompleteContext, suggestionLength: number): void {
-    this.captureEvent(TelemetryEventName.AUTOCOMPLETE_LLM_SUGGESTION_RETURNED, {
+    this.captureEvent("autocomplete_llm_suggestion_returned", {
       ...context,
       suggestionLength,
     })
@@ -173,7 +172,7 @@ export class AutocompleteTelemetry {
     },
     context: AutocompleteContext,
   ): void {
-    this.captureEvent(TelemetryEventName.AUTOCOMPLETE_LLM_REQUEST_COMPLETED, {
+    this.captureEvent("autocomplete_llm_request_completed", {
       ...properties,
       ...context,
     })
@@ -186,7 +185,7 @@ export class AutocompleteTelemetry {
    * @param context - The autocomplete context
    */
   public captureLlmRequestFailed(properties: { latencyMs: number; error: string }, context: AutocompleteContext): void {
-    this.captureEvent(TelemetryEventName.AUTOCOMPLETE_LLM_REQUEST_FAILED, {
+    this.captureEvent("autocomplete_llm_request_failed", {
       ...properties,
       ...context,
     })
@@ -202,7 +201,7 @@ export class AutocompleteTelemetry {
    * @param suggestionLength - Optional length of the accepted suggestion
    */
   public captureAcceptSuggestion(suggestionLength?: number): void {
-    this.captureEvent(TelemetryEventName.AUTOCOMPLETE_ACCEPT_SUGGESTION, {
+    this.captureEvent("autocomplete_accept_suggestion", {
       ...(suggestionLength !== undefined && { suggestionLength }),
     })
   }
@@ -213,7 +212,7 @@ export class AutocompleteTelemetry {
    * @param context - The autocomplete context
    */
   private captureUniqueSuggestionShown(context: AutocompleteContext): void {
-    this.captureEvent(TelemetryEventName.AUTOCOMPLETE_UNIQUE_SUGGESTION_SHOWN, {
+    this.captureEvent("autocomplete_unique_suggestion_shown", {
       ...context,
     })
   }

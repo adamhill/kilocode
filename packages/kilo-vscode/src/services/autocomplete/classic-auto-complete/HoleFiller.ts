@@ -8,7 +8,9 @@ import {
 import { getProcessedSnippets } from "./getProcessedSnippets"
 import { formatSnippets } from "../continuedev/core/autocomplete/templating/formatting"
 import { AutocompleteModel } from "../AutocompleteModel"
-import { ApiStreamChunk } from "../../../api/transform/stream"
+
+/** Chunk from an LLM streaming response */
+type ApiStreamChunk = { type: "text"; text: string } | { type: "usage"; usage: Record<string, unknown> }
 
 export type { HoleFillerAutocompletePrompt, FillInAtCursorSuggestion, ChatCompletionResult }
 

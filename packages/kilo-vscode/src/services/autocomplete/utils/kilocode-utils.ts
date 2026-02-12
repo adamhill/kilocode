@@ -1,7 +1,6 @@
-import { getKiloBaseUriFromToken, AUTOCOMPLETE_PROVIDER_MODELS, AutocompleteProviderKey } from "@roo-code/types"
+// kilocode_change - simplified, removed @roo-code/types dependency
 
-export { AUTOCOMPLETE_PROVIDER_MODELS }
-export type { AutocompleteProviderKey }
+const KILO_BASE_URL = "https://api.kilo.ai"
 
 /**
  * Check if the Kilocode account has a positive balance
@@ -10,30 +9,23 @@ export type { AutocompleteProviderKey }
  * @returns Promise<boolean> - True if balance > 0, false otherwise
  */
 export async function checkKilocodeBalance(kilocodeToken: string, kilocodeOrganizationId?: string): Promise<boolean> {
-  try {
-    const baseUrl = getKiloBaseUriFromToken(kilocodeToken)
+  const headers: Record<string, string> = {
+    Authorization: `Bearer ${kilocodeToken}`,
+  }
 
-    const headers: Record<string, string> = {
-      Authorization: `Bearer ${kilocodeToken}`,
-    }
+  if (kilocodeOrganizationId) {
+    headers["X-KiloCode-OrganizationId"] = kilocodeOrganizationId
+  }
 
-    if (kilocodeOrganizationId) {
-      headers["X-KiloCode-OrganizationId"] = kilocodeOrganizationId
-    }
+  const response = await fetch(`${KILO_BASE_URL}/api/profile/balance`, {
+    headers,
+  })
 
-    const response = await fetch(`${baseUrl}/api/profile/balance`, {
-      headers,
-    })
-
-    if (!response.ok) {
-      return false
-    }
-
-    const data = await response.json()
-    const balance = data.balance ?? 0
-    return balance > 0
-  } catch (error) {
-    console.error("Error checking kilocode balance:", error)
+  if (!response.ok) {
     return false
   }
+
+  const data = (await response.json()) as { balance?: number }
+  const balance = data.balance ?? 0
+  return balance > 0
 }
