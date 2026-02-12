@@ -1,7 +1,11 @@
 import fs from "node:fs"
 import path from "path"
 
-import type { Language, Node as SyntaxNode, Query, Tree } from "web-tree-sitter"
+import type Parser from "web-tree-sitter"
+type Language = Parser.Language
+type SyntaxNode = Parser.SyntaxNode
+type Query = Parser.Query
+type Tree = Parser.Tree
 import { SymbolWithRange } from ".."
 import { getUriFileExtension } from "./uri"
 

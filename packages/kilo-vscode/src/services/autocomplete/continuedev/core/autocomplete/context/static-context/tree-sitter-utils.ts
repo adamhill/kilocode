@@ -1,5 +1,8 @@
 import * as fs from "fs/promises"
-import { Node as SyntaxNode, QueryMatch, Tree } from "web-tree-sitter"
+import type Parser from "web-tree-sitter"
+type SyntaxNode = Parser.SyntaxNode
+type QueryMatch = Parser.QueryMatch
+type Tree = Parser.Tree
 import { getFullLanguageName, getQueryForFile } from "../../../util/treeSitter"
 import { getAst } from "../../util/ast"
 

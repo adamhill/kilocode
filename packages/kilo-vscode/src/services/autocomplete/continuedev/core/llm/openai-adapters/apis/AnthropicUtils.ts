@@ -58,11 +58,14 @@ export function openAiToolChoiceToAnthropicToolChoice(
       }
     default:
       switch (toolChoice.type) {
+        // @ts-expect-error OpenAI SDK version may not include "allowed_tools" type
         case "allowed_tools":
           // Filtering of tools is handled elsewhere
           return {
+            // @ts-expect-error OpenAI SDK version may not include allowed_tools property
             type: toolChoice.allowed_tools.mode === "auto" ? "auto" : "any",
           }
+        // @ts-expect-error OpenAI SDK version may not include "custom" type
         case "custom":
           return undefined // TODO not supported yet
         case "function":

@@ -1,3 +1,4 @@
+// @ts-expect-error js-tiktoken is ESM-only; esbuild handles the import at build time
 import { Tiktoken, encodingForModel as _encodingForModel } from "js-tiktoken"
 import { ChatMessage, CompiledMessagesResult, MessageContent } from "../index.js"
 import { addSpaceToAnyEmptyMessages, chatMessageIsEmpty } from "./messages.js"

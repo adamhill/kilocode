@@ -4,6 +4,16 @@ import Parser from "web-tree-sitter"
 export type ModelRole = "chat" | "edit" | "autocomplete" | "apply" | "repoMapFileSelection"
 export type PromptTemplates = Record<string, any>
 
+// Stub types referenced but not defined in upstream continuedev
+export type MockMessage = ChatMessage
+export interface IFimProvider {
+  streamFim(prefix: string, suffix: string, signal: AbortSignal): AsyncGenerator<string>
+}
+export interface ParameterInformation {
+  label: string | [number, number]
+  documentation?: string
+}
+
 declare global {
   interface Window {
     ide?: "vscode"
@@ -311,13 +321,13 @@ export interface CustomLLMWithOptionals {
     prompt: string,
     signal: AbortSignal,
     options: CompletionOptions,
-    fetch: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>,
+    fetch: (input: string | URL, init?: RequestInit) => Promise<Response>,
   ) => AsyncGenerator<string>
   streamChat?: (
     messages: ChatMessage[],
     signal: AbortSignal,
     options: CompletionOptions,
-    fetch: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>,
+    fetch: (input: string | URL, init?: RequestInit) => Promise<Response>,
   ) => AsyncGenerator<ChatMessage | string>
 }
 

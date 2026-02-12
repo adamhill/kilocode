@@ -8,15 +8,12 @@ const BaseConfig = z.object({
 const BasePlusConfig = BaseConfig.extend({
   apiBase: z.string().optional(),
   apiKey: z.string().optional(),
+  env: z.record(z.union([z.string(), z.number(), z.boolean(), z.undefined()])).optional(),
 })
 
 // OpenAI and compatible
 export const OpenAIConfigSchema = BasePlusConfig.extend({
-	provider: z.union([
-		z.literal("openai"),
-		z.literal("openrouter"),
-		z.literal("mock"),
-	]),
+  provider: z.union([z.literal("openai"), z.literal("openrouter"), z.literal("mock")]),
 })
 export type OpenAIConfig = z.infer<typeof OpenAIConfigSchema>
 
@@ -25,6 +22,4 @@ const _MockConfigSchema = BasePlusConfig.extend({
 })
 
 // Discriminated union — only providers we actually use
-export type LLMConfig =
-	| OpenAIConfig
-	| z.infer<typeof _MockConfigSchema>
+export type LLMConfig = OpenAIConfig | z.infer<typeof _MockConfigSchema>

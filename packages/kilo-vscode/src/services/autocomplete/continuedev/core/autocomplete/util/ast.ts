@@ -1,4 +1,6 @@
-import { Node as SyntaxNode, Tree } from "web-tree-sitter"
+import type Parser from "web-tree-sitter"
+type SyntaxNode = Parser.SyntaxNode
+type Tree = Parser.Tree
 
 import { getParserForFile } from "../../util/treeSitter"
 

@@ -223,7 +223,7 @@ export class OpenAI extends BaseLLM {
       if (response.status === 499) {
         return // Aborted by user
       }
-      const data = await response.json()
+      const data = (await response.json()) as { choices: { message: ChatMessage }[] }
       yield data.choices[0].message
       return
     }
