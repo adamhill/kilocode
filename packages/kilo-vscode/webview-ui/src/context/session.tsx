@@ -393,7 +393,13 @@ export const SessionProvider: ParentComponent = (props) => {
   }
 
   function handleQuestionRequest(question: QuestionRequest) {
-    setQuestions((prev) => [...prev, question])
+    setQuestions((prev) => {
+      const idx = prev.findIndex((q) => q.id === question.id)
+      if (idx === -1) return [...prev, question]
+      const next = prev.slice()
+      next[idx] = question
+      return next
+    })
   }
 
   function handleQuestionResolved(requestID: string) {

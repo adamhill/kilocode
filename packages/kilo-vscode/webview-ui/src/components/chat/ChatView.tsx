@@ -17,8 +17,12 @@ interface ChatViewProps {
 export const ChatView: Component<ChatViewProps> = (props) => {
   const session = useSession()
 
-  const questionRequest = () => session.questions()[0]
-  const blocked = () => session.permissions().length > 0 || session.questions().length > 0
+  const id = () => session.currentSessionID()
+  const sessionQuestions = () => session.questions().filter((q) => q.sessionID === id())
+  const sessionPermissions = () => session.permissions().filter((p) => p.sessionID === id())
+
+  const questionRequest = () => sessionQuestions()[0]
+  const blocked = () => sessionPermissions().length > 0 || sessionQuestions().length > 0
 
   return (
     <div class="chat-view">

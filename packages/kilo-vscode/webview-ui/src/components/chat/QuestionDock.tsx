@@ -217,48 +217,50 @@ export const QuestionDock: Component<{ request: QuestionRequest }> = (props) => 
                   )
                 }}
               </For>
-              <button
-                data-slot="question-option"
-                data-picked={customPicked()}
-                disabled={store.sending}
-                onClick={() => selectOption(options().length)}
-              >
-                <span data-slot="option-label">{language.t("ui.messagePart.option.typeOwnAnswer")}</span>
-                <Show when={!store.editing && input()}>
-                  <span data-slot="option-description">{input()}</span>
+              <Show when={question()?.custom !== false}>
+                <button
+                  data-slot="question-option"
+                  data-picked={customPicked()}
+                  disabled={store.sending}
+                  onClick={() => selectOption(options().length)}
+                >
+                  <span data-slot="option-label">{language.t("ui.messagePart.option.typeOwnAnswer")}</span>
+                  <Show when={!store.editing && input()}>
+                    <span data-slot="option-description">{input()}</span>
+                  </Show>
+                  <Show when={customPicked()}>
+                    <Icon name="check-small" size="normal" />
+                  </Show>
+                </button>
+                <Show when={store.editing}>
+                  <form data-slot="custom-input-form" onSubmit={handleCustomSubmit}>
+                    <input
+                      ref={(el) => setTimeout(() => el.focus(), 0)}
+                      type="text"
+                      data-slot="custom-input"
+                      placeholder={language.t("ui.question.custom.placeholder")}
+                      value={input()}
+                      disabled={store.sending}
+                      onInput={(e) => {
+                        const inputs = [...store.custom]
+                        inputs[store.tab] = e.currentTarget.value
+                        setStore("custom", inputs)
+                      }}
+                    />
+                    <Button type="submit" variant="primary" size="small" disabled={store.sending}>
+                      {multi() ? language.t("ui.common.add") : language.t("ui.common.submit")}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="small"
+                      disabled={store.sending}
+                      onClick={() => setStore("editing", false)}
+                    >
+                      {language.t("ui.common.cancel")}
+                    </Button>
+                  </form>
                 </Show>
-                <Show when={customPicked()}>
-                  <Icon name="check-small" size="normal" />
-                </Show>
-              </button>
-              <Show when={store.editing}>
-                <form data-slot="custom-input-form" onSubmit={handleCustomSubmit}>
-                  <input
-                    ref={(el) => setTimeout(() => el.focus(), 0)}
-                    type="text"
-                    data-slot="custom-input"
-                    placeholder={language.t("ui.question.custom.placeholder")}
-                    value={input()}
-                    disabled={store.sending}
-                    onInput={(e) => {
-                      const inputs = [...store.custom]
-                      inputs[store.tab] = e.currentTarget.value
-                      setStore("custom", inputs)
-                    }}
-                  />
-                  <Button type="submit" variant="primary" size="small" disabled={store.sending}>
-                    {multi() ? language.t("ui.common.add") : language.t("ui.common.submit")}
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="small"
-                    disabled={store.sending}
-                    onClick={() => setStore("editing", false)}
-                  >
-                    {language.t("ui.common.cancel")}
-                  </Button>
-                </form>
               </Show>
             </div>
           </div>
