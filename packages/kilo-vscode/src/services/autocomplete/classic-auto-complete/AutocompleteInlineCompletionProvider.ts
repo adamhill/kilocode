@@ -250,8 +250,8 @@ export class AutocompleteInlineCompletionProvider implements vscode.InlineComple
   public suggestionsHistory: FillInAtCursorSuggestion[] = []
   /** Tracks all pending/in-flight requests */
   private pendingRequests: PendingRequest[] = []
-  public holeFiller: HoleFiller
-  public fimPromptBuilder: FimPromptBuilder
+  private holeFiller: HoleFiller
+  private fimPromptBuilder: FimPromptBuilder
   private model: AutocompleteModel
   private costTrackingCallback: CostTrackingCallback
   private getSettings: () => AutocompleteServiceSettings | null
