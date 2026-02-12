@@ -1,29 +1,57 @@
 import { Component } from "solid-js"
+import { useConfig } from "../../context/config"
 
 const CheckpointsTab: Component = () => {
+  const { config, updateConfig } = useConfig()
+
   return (
     <div>
       <div
         style={{
-          background: "var(--vscode-editor-background)",
           border: "1px solid var(--vscode-panel-border)",
           "border-radius": "4px",
-          padding: "16px",
+          overflow: "hidden",
         }}
       >
-        <p
+        {/* Snapshot toggle */}
+        <div
           style={{
-            "font-size": "12px",
-            color: "var(--vscode-descriptionForeground)",
-            margin: 0,
-            "line-height": "1.5",
+            display: "flex",
+            "align-items": "center",
+            "justify-content": "space-between",
+            padding: "10px 12px",
+            background: "var(--vscode-editor-background)",
           }}
         >
-          <strong style={{ color: "var(--vscode-foreground)" }}>This section is not implemented yet.</strong> It will
-          contain configuration options and explanatory text related to the selected settings category. During
-          reimplementation, use this space to validate layout, spacing, scrolling behavior, and navigation state before
-          wiring up real controls.
-        </p>
+          <div>
+            <div
+              style={{
+                "font-size": "12px",
+                "font-weight": "500",
+                color: "var(--vscode-foreground)",
+              }}
+            >
+              Enable Snapshots
+            </div>
+            <div
+              style={{
+                "font-size": "11px",
+                color: "var(--vscode-descriptionForeground)",
+                "margin-top": "2px",
+              }}
+            >
+              Create checkpoints before file edits so you can restore previous states
+            </div>
+          </div>
+          <label style={{ display: "flex", "align-items": "center", cursor: "pointer" }}>
+            <input
+              type="checkbox"
+              checked={config().snapshot !== false}
+              onChange={(e) => updateConfig({ snapshot: e.currentTarget.checked })}
+              style={{ cursor: "pointer" }}
+            />
+          </label>
+        </div>
       </div>
     </div>
   )
