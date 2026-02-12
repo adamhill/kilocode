@@ -799,6 +799,7 @@ export const dict = {
   "settings.aboutKiloCode.extensionName": "Kilo Code-utvidelse",
 
   "settings.agentBehaviour.subtab.modes": "Moduser",
+  "settings.agentBehaviour.subtab.agents": "Agents",
   "settings.agentBehaviour.subtab.mcpServers": "MCP-servere",
   "settings.agentBehaviour.subtab.rules": "Regler",
   "settings.agentBehaviour.subtab.workflows": "Arbeidsflyter",

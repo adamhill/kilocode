@@ -9,6 +9,7 @@ import type {
   ProviderListResponse,
   McpStatus,
   McpConfig,
+  Config,
 } from "./types"
 
 /**
@@ -172,6 +173,27 @@ export class HttpClient {
    */
   async listAgents(directory: string): Promise<AgentInfo[]> {
     return this.request<AgentInfo[]>("GET", "/agent", undefined, { directory })
+  }
+
+  // ============================================
+  // Config Methods
+  // ============================================
+
+  /**
+   * Get the current backend configuration.
+   */
+  async getConfig(directory: string): Promise<Config> {
+    return this.request<Config>("GET", "/config", undefined, { directory })
+  }
+
+  /**
+   * Update backend configuration (partial merge).
+   * Uses the global config endpoint so changes persist to the user's global
+   * config file (matching the desktop app behaviour). The instance-scoped
+   * PATCH /config writes to a project-local file that is not loaded on restart.
+   */
+  async updateConfig(config: Partial<Config>): Promise<Config> {
+    return this.request<Config>("PATCH", "/global/config", config)
   }
 
   // ============================================

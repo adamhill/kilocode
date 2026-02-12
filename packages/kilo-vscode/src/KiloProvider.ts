@@ -13,6 +13,8 @@ export class KiloProvider implements vscode.WebviewViewProvider {
   private cachedProvidersMessage: unknown = null
   /** Cached agentsLoaded payload so requestAgents can be served before httpClient is ready */
   private cachedAgentsMessage: unknown = null
+  /** Cached configLoaded payload so requestConfig can be served before httpClient is ready */
+  private cachedConfigMessage: unknown = null
 
   private trackedSessionIds: Set<string> = new Set()
   private unsubscribeEvent: (() => void) | null = null
@@ -209,6 +211,12 @@ export class KiloProvider implements vscode.WebviewViewProvider {
         case "questionReject":
           await this.handleQuestionReject(message.requestID)
           break
+        case "requestConfig":
+          await this.fetchAndSendConfig()
+          break
+        case "updateConfig":
+          await this.handleUpdateConfig(message.config)
+          break
         case "setLanguage":
           await vscode.workspace
             .getConfiguration("kilo-code.new")
@@ -225,6 +233,9 @@ export class KiloProvider implements vscode.WebviewViewProvider {
           break
         case "requestBrowserSettings":
           this.sendBrowserSettings()
+          break
+        case "requestNotificationSettings":
+          this.sendNotificationSettings()
           break
       }
     })
@@ -307,6 +318,8 @@ export class KiloProvider implements vscode.WebviewViewProvider {
       // Fetch providers and agents, then send to webview
       await this.fetchAndSendProviders()
       await this.fetchAndSendAgents()
+      await this.fetchAndSendConfig()
+      this.sendNotificationSettings()
 
       console.log("[Kilo New] KiloProvider: ✅ initializeConnection completed successfully")
     } catch (error) {
@@ -585,6 +598,80 @@ export class KiloProvider implements vscode.WebviewViewProvider {
       this.postMessage(message)
     } catch (error) {
       console.error("[Kilo New] KiloProvider: Failed to fetch agents:", error)
+    }
+  }
+
+  /**
+   * Fetch backend config and send to webview.
+   */
+  private async fetchAndSendConfig(): Promise<void> {
+    if (!this.httpClient) {
+      if (this.cachedConfigMessage) {
+        this.postMessage(this.cachedConfigMessage)
+      }
+      return
+    }
+
+    try {
+      const workspaceDir = this.getWorkspaceDirectory()
+      const config = await this.httpClient.getConfig(workspaceDir)
+
+      const message = {
+        type: "configLoaded",
+        config,
+      }
+      this.cachedConfigMessage = message
+      this.postMessage(message)
+    } catch (error) {
+      console.error("[Kilo New] KiloProvider: Failed to fetch config:", error)
+    }
+  }
+
+  /**
+   * Read notification/sound settings from VS Code config and push to webview.
+   */
+  private sendNotificationSettings(): void {
+    const notifications = vscode.workspace.getConfiguration("kilo-code.new.notifications")
+    const sounds = vscode.workspace.getConfiguration("kilo-code.new.sounds")
+    this.postMessage({
+      type: "notificationSettingsLoaded",
+      settings: {
+        notifyAgent: notifications.get<boolean>("agent", true),
+        notifyPermissions: notifications.get<boolean>("permissions", true),
+        notifyErrors: notifications.get<boolean>("errors", true),
+        soundAgent: sounds.get<string>("agent", "default"),
+        soundPermissions: sounds.get<string>("permissions", "default"),
+        soundErrors: sounds.get<string>("errors", "default"),
+      },
+    })
+  }
+
+  /**
+   * Handle config update request from the webview.
+   * Applies a partial config update via the global config endpoint, then pushes
+   * the full merged config back to the webview.
+   */
+  private async handleUpdateConfig(partial: Record<string, unknown>): Promise<void> {
+    if (!this.httpClient) {
+      this.postMessage({ type: "error", message: "Not connected to CLI backend" })
+      return
+    }
+
+    try {
+      const updated = await this.httpClient.updateConfig(partial)
+
+      const message = {
+        type: "configUpdated",
+        config: updated,
+      }
+      this.cachedConfigMessage = { type: "configLoaded", config: updated }
+      this.postMessage(message)
+    } catch (error) {
+      console.error("[Kilo New] KiloProvider: Failed to update config:", error)
+      this.postMessage({
+        type: "error",
+        message: error instanceof Error ? error.message : "Failed to update config",
+      })
     }
   }
 

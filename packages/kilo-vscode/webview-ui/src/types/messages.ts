@@ -208,6 +208,90 @@ export interface ModelSelection {
 }
 
 // ============================================
+// Backend Config Types (mirrored for webview)
+// ============================================
+
+export type PermissionLevel = "allow" | "ask" | "deny"
+
+export type PermissionConfig = Partial<Record<string, PermissionLevel>>
+
+export interface AgentConfig {
+  model?: string
+  prompt?: string
+  temperature?: number
+  top_p?: number
+  steps?: number
+  permission?: PermissionConfig
+}
+
+export interface ProviderConfig {
+  name?: string
+  api_key?: string
+  base_url?: string
+  models?: Record<string, unknown>
+}
+
+export interface McpConfig {
+  command?: string
+  args?: string[]
+  env?: Record<string, string>
+  url?: string
+  headers?: Record<string, string>
+}
+
+export interface CommandConfig {
+  command: string
+  description?: string
+}
+
+export interface SkillsConfig {
+  paths?: string[]
+  urls?: string[]
+}
+
+export interface CompactionConfig {
+  auto?: boolean
+  prune?: boolean
+}
+
+export interface WatcherConfig {
+  ignore?: string[]
+}
+
+export interface ExperimentalConfig {
+  disable_paste_summary?: boolean
+  batch_tool?: boolean
+  primary_tools?: string[]
+  continue_loop_on_deny?: boolean
+  mcp_timeout?: number
+}
+
+export interface Config {
+  permission?: PermissionConfig
+  model?: string
+  small_model?: string
+  default_agent?: string
+  agent?: Record<string, AgentConfig>
+  provider?: Record<string, ProviderConfig>
+  disabled_providers?: string[]
+  enabled_providers?: string[]
+  mcp?: Record<string, McpConfig>
+  command?: Record<string, CommandConfig>
+  instructions?: string[]
+  skills?: SkillsConfig
+  snapshot?: boolean
+  share?: "manual" | "auto" | "disabled"
+  username?: string
+  watcher?: WatcherConfig
+  formatter?: false | Record<string, unknown>
+  lsp?: false | Record<string, unknown>
+  compaction?: CompactionConfig
+  tools?: Record<string, boolean>
+  layout?: "auto" | "stretch"
+  experimental?: ExperimentalConfig
+}
+
+// ============================================
 // Messages FROM extension TO webview
 // ============================================
 
@@ -356,6 +440,28 @@ export interface BrowserSettingsLoadedMessage {
   settings: BrowserSettings
 }
 
+export interface ConfigLoadedMessage {
+  type: "configLoaded"
+  config: Config
+}
+
+export interface ConfigUpdatedMessage {
+  type: "configUpdated"
+  config: Config
+}
+
+export interface NotificationSettingsLoadedMessage {
+  type: "notificationSettingsLoaded"
+  settings: {
+    notifyAgent: boolean
+    notifyPermissions: boolean
+    notifyErrors: boolean
+    soundAgent: string
+    soundPermissions: string
+    soundErrors: string
+  }
+}
+
 export type ExtensionMessage =
   | ReadyMessage
   | ConnectionStateMessage
@@ -382,6 +488,9 @@ export type ExtensionMessage =
   | QuestionResolvedMessage
   | QuestionErrorMessage
   | BrowserSettingsLoadedMessage
+  | ConfigLoadedMessage
+  | ConfigUpdatedMessage
+  | NotificationSettingsLoadedMessage
 
 // ============================================
 // Messages FROM webview TO extension
@@ -502,6 +611,19 @@ export interface RequestBrowserSettingsMessage {
   type: "requestBrowserSettings"
 }
 
+export interface RequestConfigMessage {
+  type: "requestConfig"
+}
+
+export interface UpdateConfigMessage {
+  type: "updateConfig"
+  config: Partial<Config>
+}
+
+export interface RequestNotificationSettingsMessage {
+  type: "requestNotificationSettings"
+}
+
 export type WebviewMessage =
   | SendMessageRequest
   | AbortRequest
@@ -526,6 +648,9 @@ export type WebviewMessage =
   | RenameSessionRequest
   | UpdateSettingRequest
   | RequestBrowserSettingsMessage
+  | RequestConfigMessage
+  | UpdateConfigMessage
+  | RequestNotificationSettingsMessage
 
 // ============================================
 // VS Code API type
