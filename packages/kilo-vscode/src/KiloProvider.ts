@@ -1192,6 +1192,7 @@ export class KiloProvider implements vscode.WebviewViewProvider {
   private _getHtmlForWebview(webview: vscode.Webview): string {
     const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(this.extensionUri, "dist", "webview.js"))
     const styleUri = webview.asWebviewUri(vscode.Uri.joinPath(this.extensionUri, "dist", "webview.css"))
+    const iconsBaseUri = webview.asWebviewUri(vscode.Uri.joinPath(this.extensionUri, "assets", "icons"))
 
     const nonce = getNonce()
 
@@ -1242,6 +1243,7 @@ export class KiloProvider implements vscode.WebviewViewProvider {
 </head>
 <body>
 	<div id="root"></div>
+	<script nonce="${nonce}">window.ICONS_BASE_URI = "${iconsBaseUri}";</script>
 	<script nonce="${nonce}" src="${scriptUri}"></script>
 </body>
 </html>`
