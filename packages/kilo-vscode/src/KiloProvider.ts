@@ -887,6 +887,7 @@ export class KiloProvider implements vscode.WebviewViewProvider {
             toolName: event.properties.permission,
             args: event.properties.metadata,
             message: `Permission required: ${event.properties.permission}`,
+            tool: event.properties.tool,
           },
         })
         break

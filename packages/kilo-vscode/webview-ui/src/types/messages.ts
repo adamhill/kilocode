@@ -105,6 +105,7 @@ export interface PermissionRequest {
   toolName: string
   args: Record<string, unknown>
   message?: string
+  tool?: { messageID: string; callID: string }
 }
 
 // Todo item
