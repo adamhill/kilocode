@@ -5,15 +5,24 @@ import { Button } from "@kilocode/kilo-ui/button"
 import { IconButton } from "@kilocode/kilo-ui/icon-button"
 import { useConfig } from "../../context/config"
 import { useProvider } from "../../context/provider"
-
-interface ModelOption {
-  value: string
-  label: string
-}
+import { ModelSelectorBase } from "../chat/ModelSelector"
+import type { ModelSelection } from "../../types/messages"
 
 interface ProviderOption {
   value: string
   label: string
+}
+
+/** Parse a "provider/model" config string into a ModelSelection (or null). */
+function parseModelConfig(raw: string | undefined): ModelSelection | null {
+  if (!raw) {
+    return null
+  }
+  const slash = raw.indexOf("/")
+  if (slash <= 0) {
+    return null
+  }
+  return { providerID: raw.slice(0, slash), modelID: raw.slice(slash + 1) }
 }
 
 const SettingsRow: Component<{ label: string; description: string; last?: boolean; children: any }> = (props) => (
@@ -41,18 +50,6 @@ const ProvidersTab: Component = () => {
   const { config, updateConfig } = useConfig()
   const provider = useProvider()
 
-  const modelOptions = createMemo<ModelOption[]>(() => {
-    const options: ModelOption[] = [{ value: "", label: "Not set (use server default)" }]
-    const provs = provider.providers()
-    for (const provId of Object.keys(provs)) {
-      for (const modelId of Object.keys(provs[provId].models)) {
-        const key = `${provId}/${modelId}`
-        options.push({ value: key, label: key })
-      }
-    }
-    return options.sort((a, b) => a.label.localeCompare(b.label))
-  })
-
   const providerOptions = createMemo<ProviderOption[]>(() =>
     Object.keys(provider.providers())
       .sort()
@@ -79,20 +76,27 @@ const ProvidersTab: Component = () => {
     updateConfig({ [key]: current })
   }
 
+  function handleModelSelect(configKey: "model" | "small_model") {
+    return (providerID: string, modelID: string) => {
+      if (!providerID || !modelID) {
+        updateConfig({ [configKey]: undefined })
+      } else {
+        updateConfig({ [configKey]: `${providerID}/${modelID}` })
+      }
+    }
+  }
+
   return (
     <div>
       {/* Model selection */}
       <Card>
-        <SettingsRow label="Default Model" description="Primary model for conversations (format: provider/model)">
-          <Select
-            options={modelOptions()}
-            current={modelOptions().find((o) => o.value === (config().model ?? ""))}
-            value={(o) => o.value}
-            label={(o) => o.label}
-            onSelect={(o) => o && updateConfig({ model: o.value || undefined })}
-            variant="secondary"
-            size="small"
-            triggerVariant="settings"
+        <SettingsRow label="Default Model" description="Primary model for conversations">
+          <ModelSelectorBase
+            value={parseModelConfig(config().model)}
+            onSelect={handleModelSelect("model")}
+            placement="bottom-start"
+            allowClear
+            clearLabel="Not set (use server default)"
           />
         </SettingsRow>
         <SettingsRow
@@ -100,15 +104,12 @@ const ProvidersTab: Component = () => {
           description="Lightweight model for title generation and other quick tasks"
           last
         >
-          <Select
-            options={modelOptions()}
-            current={modelOptions().find((o) => o.value === (config().small_model ?? ""))}
-            value={(o) => o.value}
-            label={(o) => o.label}
-            onSelect={(o) => o && updateConfig({ small_model: o.value || undefined })}
-            variant="secondary"
-            size="small"
-            triggerVariant="settings"
+          <ModelSelectorBase
+            value={parseModelConfig(config().small_model)}
+            onSelect={handleModelSelect("small_model")}
+            placement="bottom-start"
+            allowClear
+            clearLabel="Not set (use server default)"
           />
         </SettingsRow>
       </Card>
