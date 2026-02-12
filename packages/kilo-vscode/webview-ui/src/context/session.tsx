@@ -546,7 +546,6 @@ export const SessionProvider: ParentComponent = (props) => {
       requestID,
       answers,
     })
-    setQuestions((prev) => prev.filter((q) => q.id !== requestID))
   }
 
   function rejectQuestion(requestID: string) {
@@ -554,7 +553,6 @@ export const SessionProvider: ParentComponent = (props) => {
       type: "questionReject",
       requestID,
     })
-    setQuestions((prev) => prev.filter((q) => q.id !== requestID))
   }
 
   function createSession() {
