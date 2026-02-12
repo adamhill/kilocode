@@ -341,8 +341,7 @@ export namespace ProviderTransform {
       model.api.id.includes("claude") ||
       model.id.includes("anthropic") ||
       model.id.includes("claude") ||
-      model.api.npm === "@ai-sdk/anthropic" ||
-      isOpenRouterOrKilo
+      model.api.npm === "@ai-sdk/anthropic"
     ) {
       msgs = applyCaching(msgs, model.providerID)
     }
