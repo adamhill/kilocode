@@ -1,52 +1,35 @@
 import { Component, For, Show, createMemo } from "solid-js"
+import { Switch } from "@kilocode/kilo-ui/switch"
+import { Select } from "@kilocode/kilo-ui/select"
+import { TextField } from "@kilocode/kilo-ui/text-field"
+import { Card } from "@kilocode/kilo-ui/card"
 import { useConfig } from "../../context/config"
 
-const selectStyle = {
-  padding: "4px 8px",
-  "border-radius": "4px",
-  border: "1px solid var(--vscode-dropdown-border, var(--vscode-panel-border))",
-  background: "var(--vscode-dropdown-background)",
-  color: "var(--vscode-dropdown-foreground)",
-  "font-size": "12px",
-  "font-family": "var(--vscode-font-family)",
-  cursor: "pointer",
-  outline: "none",
-  "min-width": "100px",
-}
-
-const inputStyle = {
-  padding: "4px 8px",
-  "border-radius": "4px",
-  border: "1px solid var(--vscode-input-border, var(--vscode-panel-border))",
-  background: "var(--vscode-input-background)",
-  color: "var(--vscode-input-foreground)",
-  "font-size": "12px",
-  "font-family": "var(--vscode-font-family)",
-  outline: "none",
-  width: "100px",
-}
-
-interface SettingRowProps {
+interface ShareOption {
+  value: string
   label: string
-  description: string
-  last?: boolean
-  children: any
 }
 
-const SettingRow: Component<SettingRowProps> = (props) => (
+const SHARE_OPTIONS: ShareOption[] = [
+  { value: "manual", label: "Manual" },
+  { value: "auto", label: "Auto" },
+  { value: "disabled", label: "Disabled" },
+]
+
+const SettingsRow: Component<{ label: string; description: string; last?: boolean; children: any }> = (props) => (
   <div
+    data-slot="settings-row"
     style={{
       display: "flex",
       "align-items": "center",
       "justify-content": "space-between",
-      padding: "10px 12px",
-      background: "var(--vscode-editor-background)",
-      "border-bottom": props.last ? "none" : "1px solid var(--vscode-panel-border)",
+      padding: "8px 0",
+      "border-bottom": props.last ? "none" : "1px solid var(--border-weak-base)",
     }}
   >
     <div style={{ flex: 1, "min-width": 0, "margin-right": "12px" }}>
-      <div style={{ "font-size": "12px", "font-weight": "500", color: "var(--vscode-foreground)" }}>{props.label}</div>
-      <div style={{ "font-size": "11px", color: "var(--vscode-descriptionForeground)", "margin-top": "2px" }}>
+      <div style={{ "font-weight": "500" }}>{props.label}</div>
+      <div style={{ "font-size": "11px", color: "var(--text-weak-base, var(--vscode-descriptionForeground))" }}>
         {props.description}
       </div>
     </div>
@@ -67,161 +50,110 @@ const ExperimentalTab: Component = () => {
 
   return (
     <div>
-      <div
-        style={{
-          border: "1px solid var(--vscode-panel-border)",
-          "border-radius": "4px",
-          overflow: "hidden",
-        }}
-      >
+      <Card>
         {/* Share mode */}
-        <SettingRow label="Share Mode" description="How session sharing behaves">
-          <select
-            style={selectStyle}
-            value={config().share ?? "manual"}
-            onChange={(e) => updateConfig({ share: e.currentTarget.value as "manual" | "auto" | "disabled" })}
+        <SettingsRow label="Share Mode" description="How session sharing behaves">
+          <Select
+            options={SHARE_OPTIONS}
+            current={SHARE_OPTIONS.find((o) => o.value === (config().share ?? "manual"))}
+            value={(o) => o.value}
+            label={(o) => o.label}
+            onSelect={(o) => o && updateConfig({ share: o.value as "manual" | "auto" | "disabled" })}
+            variant="secondary"
+            size="small"
+            triggerVariant="settings"
+          />
+        </SettingsRow>
+
+        <div style={{ padding: "8px 0", "border-bottom": "1px solid var(--border-weak-base)" }}>
+          <Switch
+            checked={config().formatter !== false}
+            onChange={(checked) => updateConfig({ formatter: checked ? {} : false })}
+            description="Enable the automatic code formatter"
           >
-            <option value="manual">Manual</option>
-            <option value="auto">Auto</option>
-            <option value="disabled">Disabled</option>
-          </select>
-        </SettingRow>
+            Formatter
+          </Switch>
+        </div>
 
-        {/* Formatter */}
-        <SettingRow label="Formatter" description="Enable the automatic code formatter">
-          <label style={{ display: "flex", "align-items": "center", cursor: "pointer" }}>
-            <input
-              type="checkbox"
-              checked={config().formatter !== false}
-              onChange={(e) => updateConfig({ formatter: e.currentTarget.checked ? {} : false })}
-              style={{ cursor: "pointer" }}
-            />
-          </label>
-        </SettingRow>
+        <div style={{ padding: "8px 0", "border-bottom": "1px solid var(--border-weak-base)" }}>
+          <Switch
+            checked={config().lsp !== false}
+            onChange={(checked) => updateConfig({ lsp: checked ? {} : false })}
+            description="Enable language server protocol integration"
+          >
+            LSP
+          </Switch>
+        </div>
 
-        {/* LSP */}
-        <SettingRow label="LSP" description="Enable language server protocol integration">
-          <label style={{ display: "flex", "align-items": "center", cursor: "pointer" }}>
-            <input
-              type="checkbox"
-              checked={config().lsp !== false}
-              onChange={(e) => updateConfig({ lsp: e.currentTarget.checked ? {} : false })}
-              style={{ cursor: "pointer" }}
-            />
-          </label>
-        </SettingRow>
+        <div style={{ padding: "8px 0", "border-bottom": "1px solid var(--border-weak-base)" }}>
+          <Switch
+            checked={experimental().disable_paste_summary ?? false}
+            onChange={(checked) => updateExperimental("disable_paste_summary", checked)}
+            description="Don't summarize large pasted content"
+          >
+            Disable Paste Summary
+          </Switch>
+        </div>
 
-        {/* Disable paste summary */}
-        <SettingRow label="Disable Paste Summary" description="Don't summarize large pasted content">
-          <label style={{ display: "flex", "align-items": "center", cursor: "pointer" }}>
-            <input
-              type="checkbox"
-              checked={experimental().disable_paste_summary ?? false}
-              onChange={(e) => updateExperimental("disable_paste_summary", e.currentTarget.checked)}
-              style={{ cursor: "pointer" }}
-            />
-          </label>
-        </SettingRow>
+        <div style={{ padding: "8px 0", "border-bottom": "1px solid var(--border-weak-base)" }}>
+          <Switch
+            checked={experimental().batch_tool ?? false}
+            onChange={(checked) => updateExperimental("batch_tool", checked)}
+            description="Enable batching of multiple tool calls"
+          >
+            Batch Tool
+          </Switch>
+        </div>
 
-        {/* Batch tool */}
-        <SettingRow label="Batch Tool" description="Enable batching of multiple tool calls">
-          <label style={{ display: "flex", "align-items": "center", cursor: "pointer" }}>
-            <input
-              type="checkbox"
-              checked={experimental().batch_tool ?? false}
-              onChange={(e) => updateExperimental("batch_tool", e.currentTarget.checked)}
-              style={{ cursor: "pointer" }}
-            />
-          </label>
-        </SettingRow>
-
-        {/* Continue loop on deny */}
-        <SettingRow label="Continue on Deny" description="Continue the agent loop when a permission is denied">
-          <label style={{ display: "flex", "align-items": "center", cursor: "pointer" }}>
-            <input
-              type="checkbox"
-              checked={experimental().continue_loop_on_deny ?? false}
-              onChange={(e) => updateExperimental("continue_loop_on_deny", e.currentTarget.checked)}
-              style={{ cursor: "pointer" }}
-            />
-          </label>
-        </SettingRow>
+        <div style={{ padding: "8px 0", "border-bottom": "1px solid var(--border-weak-base)" }}>
+          <Switch
+            checked={experimental().continue_loop_on_deny ?? false}
+            onChange={(checked) => updateExperimental("continue_loop_on_deny", checked)}
+            description="Continue the agent loop when a permission is denied"
+          >
+            Continue on Deny
+          </Switch>
+        </div>
 
         {/* MCP timeout */}
-        <SettingRow label="MCP Timeout (ms)" description="Timeout for MCP server requests in milliseconds" last>
-          <input
-            type="number"
-            style={inputStyle}
-            value={experimental().mcp_timeout ?? 60000}
-            onChange={(e) => {
-              const value = parseInt(e.currentTarget.value, 10)
-              if (!isNaN(value) && value > 0) {
-                updateExperimental("mcp_timeout", value)
+        <SettingsRow label="MCP Timeout (ms)" description="Timeout for MCP server requests in milliseconds" last>
+          <TextField
+            value={String(experimental().mcp_timeout ?? 60000)}
+            onChange={(val) => {
+              const num = parseInt(val, 10)
+              if (!isNaN(num) && num > 0) {
+                updateExperimental("mcp_timeout", num)
               }
             }}
           />
-        </SettingRow>
-      </div>
+        </SettingsRow>
+      </Card>
 
       {/* Tool toggles */}
       <Show when={config().tools && Object.keys(config().tools ?? {}).length > 0}>
-        <h4
-          style={{
-            "font-size": "13px",
-            "margin-top": "16px",
-            "margin-bottom": "8px",
-            color: "var(--vscode-foreground)",
-          }}
-        >
-          Tool Toggles
-        </h4>
-        <div
-          style={{
-            border: "1px solid var(--vscode-panel-border)",
-            "border-radius": "4px",
-            overflow: "hidden",
-          }}
-        >
+        <h4 style={{ "margin-top": "16px", "margin-bottom": "8px" }}>Tool Toggles</h4>
+        <Card>
           <For each={Object.entries(config().tools ?? {})}>
             {([name, enabled], index) => (
               <div
                 style={{
-                  display: "flex",
-                  "align-items": "center",
-                  "justify-content": "space-between",
-                  padding: "8px 12px",
-                  background: "var(--vscode-editor-background)",
+                  padding: "8px 0",
                   "border-bottom":
                     index() < Object.keys(config().tools ?? {}).length - 1
-                      ? "1px solid var(--vscode-panel-border)"
+                      ? "1px solid var(--border-weak-base)"
                       : "none",
                 }}
               >
-                <span
-                  style={{
-                    "font-size": "12px",
-                    "font-family": "var(--vscode-editor-font-family, monospace)",
-                    color: "var(--vscode-foreground)",
-                  }}
+                <Switch
+                  checked={enabled}
+                  onChange={(checked) => updateConfig({ tools: { ...config().tools, [name]: checked } })}
                 >
                   {name}
-                </span>
-                <label style={{ display: "flex", "align-items": "center", cursor: "pointer" }}>
-                  <input
-                    type="checkbox"
-                    checked={enabled}
-                    onChange={(e) => {
-                      updateConfig({
-                        tools: { ...config().tools, [name]: e.currentTarget.checked },
-                      })
-                    }}
-                    style={{ cursor: "pointer" }}
-                  />
-                </label>
+                </Switch>
               </div>
             )}
           </For>
-        </div>
+        </Card>
       </Show>
     </div>
   )

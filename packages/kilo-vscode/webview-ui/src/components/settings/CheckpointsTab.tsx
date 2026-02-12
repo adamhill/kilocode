@@ -1,4 +1,6 @@
 import { Component } from "solid-js"
+import { Switch } from "@kilocode/kilo-ui/switch"
+import { Card } from "@kilocode/kilo-ui/card"
 import { useConfig } from "../../context/config"
 
 const CheckpointsTab: Component = () => {
@@ -6,53 +8,15 @@ const CheckpointsTab: Component = () => {
 
   return (
     <div>
-      <div
-        style={{
-          border: "1px solid var(--vscode-panel-border)",
-          "border-radius": "4px",
-          overflow: "hidden",
-        }}
-      >
-        {/* Snapshot toggle */}
-        <div
-          style={{
-            display: "flex",
-            "align-items": "center",
-            "justify-content": "space-between",
-            padding: "10px 12px",
-            background: "var(--vscode-editor-background)",
-          }}
+      <Card>
+        <Switch
+          checked={config().snapshot !== false}
+          onChange={(checked) => updateConfig({ snapshot: checked })}
+          description="Create checkpoints before file edits so you can restore previous states"
         >
-          <div>
-            <div
-              style={{
-                "font-size": "12px",
-                "font-weight": "500",
-                color: "var(--vscode-foreground)",
-              }}
-            >
-              Enable Snapshots
-            </div>
-            <div
-              style={{
-                "font-size": "11px",
-                color: "var(--vscode-descriptionForeground)",
-                "margin-top": "2px",
-              }}
-            >
-              Create checkpoints before file edits so you can restore previous states
-            </div>
-          </div>
-          <label style={{ display: "flex", "align-items": "center", cursor: "pointer" }}>
-            <input
-              type="checkbox"
-              checked={config().snapshot !== false}
-              onChange={(e) => updateConfig({ snapshot: e.currentTarget.checked })}
-              style={{ cursor: "pointer" }}
-            />
-          </label>
-        </div>
-      </div>
+          Enable Snapshots
+        </Switch>
+      </Card>
     </div>
   )
 }

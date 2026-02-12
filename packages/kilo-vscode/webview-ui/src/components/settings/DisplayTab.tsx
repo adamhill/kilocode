@@ -1,131 +1,85 @@
 import { Component } from "solid-js"
+import { Select } from "@kilocode/kilo-ui/select"
+import { TextField } from "@kilocode/kilo-ui/text-field"
+import { Card } from "@kilocode/kilo-ui/card"
 import { useConfig } from "../../context/config"
 
-const inputStyle = {
-  padding: "4px 8px",
-  "border-radius": "4px",
-  border: "1px solid var(--vscode-input-border, var(--vscode-panel-border))",
-  background: "var(--vscode-input-background)",
-  color: "var(--vscode-input-foreground)",
-  "font-size": "12px",
-  "font-family": "var(--vscode-font-family)",
-  outline: "none",
-  width: "200px",
+interface LayoutOption {
+  value: string
+  label: string
 }
 
-const selectStyle = {
-  padding: "4px 8px",
-  "border-radius": "4px",
-  border: "1px solid var(--vscode-dropdown-border, var(--vscode-panel-border))",
-  background: "var(--vscode-dropdown-background)",
-  color: "var(--vscode-dropdown-foreground)",
-  "font-size": "12px",
-  "font-family": "var(--vscode-font-family)",
-  cursor: "pointer",
-  outline: "none",
-  "min-width": "120px",
-}
+const LAYOUT_OPTIONS: LayoutOption[] = [
+  { value: "auto", label: "Auto" },
+  { value: "stretch", label: "Stretch" },
+]
 
 const DisplayTab: Component = () => {
   const { config, updateConfig } = useConfig()
 
   return (
     <div>
-      <div
-        style={{
-          border: "1px solid var(--vscode-panel-border)",
-          "border-radius": "4px",
-          overflow: "hidden",
-        }}
-      >
-        {/* Username */}
+      <Card>
         <div
+          data-slot="settings-row"
           style={{
             display: "flex",
             "align-items": "center",
             "justify-content": "space-between",
-            padding: "10px 12px",
-            background: "var(--vscode-editor-background)",
-            "border-bottom": "1px solid var(--vscode-panel-border)",
+            padding: "8px 0",
+            "border-bottom": "1px solid var(--border-weak-base)",
           }}
         >
-          <div>
-            <div
-              style={{
-                "font-size": "12px",
-                "font-weight": "500",
-                color: "var(--vscode-foreground)",
-              }}
-            >
-              Username
-            </div>
+          <div style={{ flex: 1, "min-width": 0, "margin-right": "12px" }}>
+            <div style={{ "font-weight": "500" }}>Username</div>
             <div
               style={{
                 "font-size": "11px",
-                color: "var(--vscode-descriptionForeground)",
-                "margin-top": "2px",
+                color: "var(--text-weak-base, var(--vscode-descriptionForeground))",
               }}
             >
               Custom username displayed in conversations
             </div>
           </div>
-          <input
-            type="text"
-            style={inputStyle}
+          <TextField
             value={config().username ?? ""}
             placeholder="User"
-            onBlur={(e) => {
-              const value = e.currentTarget.value.trim()
-              updateConfig({ username: value || undefined })
-            }}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.currentTarget.blur()
-              }
-            }}
+            onChange={(val) => updateConfig({ username: val.trim() || undefined })}
           />
         </div>
 
-        {/* Layout mode */}
         <div
+          data-slot="settings-row"
           style={{
             display: "flex",
             "align-items": "center",
             "justify-content": "space-between",
-            padding: "10px 12px",
-            background: "var(--vscode-editor-background)",
+            padding: "8px 0",
           }}
         >
-          <div>
-            <div
-              style={{
-                "font-size": "12px",
-                "font-weight": "500",
-                color: "var(--vscode-foreground)",
-              }}
-            >
-              Layout
-            </div>
+          <div style={{ flex: 1, "min-width": 0, "margin-right": "12px" }}>
+            <div style={{ "font-weight": "500" }}>Layout</div>
             <div
               style={{
                 "font-size": "11px",
-                color: "var(--vscode-descriptionForeground)",
-                "margin-top": "2px",
+                color: "var(--text-weak-base, var(--vscode-descriptionForeground))",
               }}
             >
               Layout mode for the chat interface
             </div>
           </div>
-          <select
-            style={selectStyle}
-            value={config().layout ?? "auto"}
-            onChange={(e) => updateConfig({ layout: e.currentTarget.value as "auto" | "stretch" })}
-          >
-            <option value="auto">Auto</option>
-            <option value="stretch">Stretch</option>
-          </select>
+          <Select
+            options={LAYOUT_OPTIONS}
+            current={LAYOUT_OPTIONS.find((o) => o.value === (config().layout ?? "auto"))}
+            value={(o) => o.value}
+            label={(o) => o.label}
+            onSelect={(o) => o && updateConfig({ layout: o.value as "auto" | "stretch" })}
+            variant="secondary"
+            size="small"
+            triggerVariant="settings"
+          />
         </div>
-      </div>
+      </Card>
     </div>
   )
 }
