@@ -43,4 +43,13 @@ export const registerAutocompleteProvider = (
       providedCodeActionKinds: Object.values(autocompleteManager.codeActionProvider.providedCodeActionKinds),
     }),
   )
+
+  // Re-load when autocomplete settings change (e.g. toggled from webview or VS Code settings UI)
+  context.subscriptions.push(
+    vscode.workspace.onDidChangeConfiguration((e) => {
+      if (e.affectsConfiguration("kilo-code.new.autocomplete")) {
+        void autocompleteManager.load()
+      }
+    }),
+  )
 }
