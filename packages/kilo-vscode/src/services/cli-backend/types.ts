@@ -169,3 +169,32 @@ export interface ProfileData {
   balance: KilocodeBalance | null
   currentOrgId: string | null
 }
+
+// MCP server status — discriminated union returned by the backend
+export type McpStatus =
+  | { status: "connected" }
+  | { status: "disabled" }
+  | { status: "failed"; error: string }
+  | { status: "needs_auth" }
+  | { status: "needs_client_registration"; error: string }
+
+// MCP server configuration for local (stdio) servers
+export interface McpLocalConfig {
+  type: "local"
+  command: string[]
+  environment?: Record<string, string>
+  enabled?: boolean
+  timeout?: number
+}
+
+// MCP server configuration for remote (SSE) servers
+export interface McpRemoteConfig {
+  type: "remote"
+  url: string
+  enabled?: boolean
+  headers?: Record<string, string>
+  timeout?: number
+}
+
+// Union of all MCP server config types
+export type McpConfig = McpLocalConfig | McpRemoteConfig
