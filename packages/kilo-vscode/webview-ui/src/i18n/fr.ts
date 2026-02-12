@@ -806,6 +806,7 @@ export const dict = {
   "settings.aboutKiloCode.extensionName": "Extension Kilo Code",
 
   "settings.agentBehaviour.subtab.modes": "Modes",
+  "settings.agentBehaviour.subtab.agents": "Agents",
   "settings.agentBehaviour.subtab.mcpServers": "Serveurs MCP",
   "settings.agentBehaviour.subtab.rules": "Règles",
   "settings.agentBehaviour.subtab.workflows": "Flux de travail",

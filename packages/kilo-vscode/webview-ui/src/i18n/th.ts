@@ -788,6 +788,7 @@ export const dict = {
   "settings.aboutKiloCode.extensionName": "ส่วนขยาย Kilo Code",
 
   "settings.agentBehaviour.subtab.modes": "โหมด",
+  "settings.agentBehaviour.subtab.agents": "Agents",
   "settings.agentBehaviour.subtab.mcpServers": "เซิร์ฟเวอร์ MCP",
   "settings.agentBehaviour.subtab.rules": "กฎ",
   "settings.agentBehaviour.subtab.workflows": "เวิร์กโฟลว์",
