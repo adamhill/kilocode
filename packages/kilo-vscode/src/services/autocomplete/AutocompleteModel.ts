@@ -1,10 +1,8 @@
-// kilocode_change - rewritten to hardcode Kilo Gateway + codestral-2508
-import * as vscode from "vscode"
-import OpenAI from "openai"
+// kilocode_change - rewritten to use CLI backend FIM endpoint
 import { ResponseMetaData } from "./types"
+import type { KiloConnectionService } from "../cli-backend"
 
-const KILO_GATEWAY_BASE_URL = "https://openrouter.kilo.ai/api/v1/"
-const DEFAULT_MODEL = "mistralai/codestral-2508"
+const DEFAULT_MODEL = "mistralai/codestral-2501"
 const PROVIDER_DISPLAY_NAME = "Kilo Gateway"
 
 /** Chunk from an LLM streaming response */
@@ -20,203 +18,111 @@ export type ApiStreamChunk =
     }
 
 export class AutocompleteModel {
-  private apiKey: string | null = null
-  private client: OpenAI | null = null
+  private connectionService: KiloConnectionService | null = null
   public profileName: string | null = null
   public profileType: string | null = null
   public loaded = false
   public hasKilocodeProfileWithNoBalance = false
 
-  constructor(apiKey?: string) {
-    if (apiKey) {
-      this.apiKey = apiKey
-      this.client = new OpenAI({ apiKey, baseURL: KILO_GATEWAY_BASE_URL })
+  constructor(connectionService?: KiloConnectionService) {
+    if (connectionService) {
+      this.connectionService = connectionService
       this.loaded = true
     }
-  }
-
-  private cleanup(): void {
-    this.apiKey = null
-    this.client = null
-    this.profileName = null
-    this.profileType = null
-    this.loaded = false
-    this.hasKilocodeProfileWithNoBalance = false
   }
 
   /**
-   * Load the API key from VS Code settings.
-   * Returns true if a usable key was found.
+   * Set the connection service (can be called after construction when service becomes available)
+   */
+  public setConnectionService(service: KiloConnectionService): void {
+    this.connectionService = service
+  }
+
+  /**
+   * Load model configuration.
+   * Returns true if the connection service is available.
    */
   public async reload(): Promise<boolean> {
-    this.cleanup()
+    this.loaded = true
 
-    const config = vscode.workspace.getConfiguration("kilo-code.new.autocomplete")
-    const key = config.get<string>("apiKey")
-
-    if (key) {
-      this.apiKey = key
-      this.client = new OpenAI({ apiKey: key, baseURL: KILO_GATEWAY_BASE_URL })
-      this.loaded = true
-      console.log(
-        `[Kilo New] AutocompleteModel.reload(): API key found, model=${DEFAULT_MODEL}, provider=${PROVIDER_DISPLAY_NAME}`,
-      )
-      return true
+    if (this.connectionService) {
+      const state = this.connectionService.getConnectionState()
+      console.log(`[Kilo New] AutocompleteModel.reload(): connectionState=${state}`)
+      return state === "connected"
     }
 
-    this.loaded = true // loaded but no key
-    console.warn("[Kilo New] AutocompleteModel.reload(): No API key configured (kilo-code.new.autocomplete.apiKey)")
+    console.warn("[Kilo New] AutocompleteModel.reload(): No connection service available")
     return false
   }
 
   public supportsFim(): boolean {
-    return false
+    return true
   }
 
   /**
-   * FIM is not supported — throws if called.
+   * Generate a FIM (Fill-in-the-Middle) completion via the CLI backend.
+   * The CLI backend handles auth using the stored kilo OAuth token.
    */
   public async generateFimResponse(
-    _prefix: string,
-    _suffix: string,
-    _onChunk: (text: string) => void,
+    prefix: string,
+    suffix: string,
+    onChunk: (text: string) => void,
     _taskId?: string,
   ): Promise<ResponseMetaData> {
-    throw new Error("FIM is not supported. Use holefiller via generateResponse() instead.")
+    console.log("[Kilo New] AutocompleteModel.generateFimResponse: ENTERED", {
+      prefixLen: prefix.length,
+      suffixLen: suffix.length,
+      hasConnectionService: !!this.connectionService,
+    })
+
+    if (!this.connectionService) {
+      throw new Error("Connection service is not available")
+    }
+
+    const state = this.connectionService.getConnectionState()
+    if (state !== "connected") {
+      throw new Error(`CLI backend is not connected (state: ${state})`)
+    }
+
+    const client = this.connectionService.getHttpClient()
+
+    console.log("[Kilo New] AutocompleteModel.generateFimResponse: calling FIM endpoint", {
+      model: DEFAULT_MODEL,
+    })
+
+    const result = await client.fimCompletion(prefix, suffix, onChunk, {
+      model: DEFAULT_MODEL,
+      maxTokens: 256,
+      temperature: 0.2,
+    })
+
+    console.log("[Kilo New] AutocompleteModel.generateFimResponse: complete", {
+      cost: result.cost,
+      inputTokens: result.inputTokens,
+      outputTokens: result.outputTokens,
+    })
+
+    return {
+      cost: result.cost,
+      inputTokens: result.inputTokens,
+      outputTokens: result.outputTokens,
+      cacheWriteTokens: 0,
+      cacheReadTokens: 0,
+    }
   }
 
   /**
-   * Generate response with streaming callback support via Kilo Gateway OpenAI-compatible endpoint.
-   * Uses the openai npm package for reliable streaming in the VS Code Electron environment.
+   * Generate response via chat completions (holefiller fallback).
+   * Not used when FIM is supported, but kept for compatibility.
    */
   public async generateResponse(
     systemPrompt: string,
     userPrompt: string,
     onChunk: (chunk: ApiStreamChunk) => void,
   ): Promise<ResponseMetaData> {
-    console.log("[Kilo New] AutocompleteModel.generateResponse: ENTERED", {
-      hasApiKey: !!this.apiKey,
-      hasClient: !!this.client,
-      systemPromptLen: systemPrompt.length,
-      userPromptLen: userPrompt.length,
-    })
-
-    if (!this.apiKey || !this.client) {
-      console.error("[Kilo New] AutocompleteModel.generateResponse: NO API KEY or CLIENT", {
-        hasApiKey: !!this.apiKey,
-        hasClient: !!this.client,
-      })
-      throw new Error("API key is not configured. Please set kilo-code.new.autocomplete.apiKey in settings.")
-    }
-
-    const model = DEFAULT_MODEL
-
-    console.log("[Kilo New] AutocompleteModel.generateResponse: creating stream", {
-      model,
-      baseURL: KILO_GATEWAY_BASE_URL,
-      maxTokens: 1024,
-      temperature: 0.2,
-    })
-
-    let cost = 0
-    let inputTokens = 0
-    let outputTokens = 0
-    let cacheReadTokens = 0
-    let cacheWriteTokens = 0
-
-    let stream: Awaited<ReturnType<typeof this.client.chat.completions.create>>
-    try {
-      stream = await this.client.chat.completions.create({
-        model,
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt },
-        ],
-        stream: true,
-        stream_options: { include_usage: true },
-        max_tokens: 1024,
-        temperature: 0.2,
-      })
-      console.log("[Kilo New] AutocompleteModel.generateResponse: stream created successfully")
-    } catch (error) {
-      const err = error as Record<string, unknown>
-      console.error("[Kilo New] AutocompleteModel.generateResponse: STREAM CREATION FAILED", {
-        message: err.message,
-        status: err.status,
-        code: err.code,
-        type: err.type,
-        error: String(error),
-      })
-      throw error
-    }
-
-    let chunks = 0
-
-    try {
-      for await (const chunk of stream) {
-        const content = chunk.choices?.[0]?.delta?.content
-        if (content) {
-          onChunk({ type: "text", text: content })
-          chunks++
-          if (chunks <= 3) {
-            console.log(
-              `[Kilo New] AutocompleteModel.generateResponse: text chunk #${chunks}: "${content.slice(0, 50)}"`,
-            )
-          }
-        }
-
-        // Track usage from the final chunk (has usage when stream_options.include_usage is true)
-        if (chunk.usage) {
-          inputTokens = chunk.usage.prompt_tokens ?? 0
-          outputTokens = chunk.usage.completion_tokens ?? 0
-          const usage = chunk.usage as unknown as Record<string, unknown>
-          const details = usage.prompt_tokens_details as Record<string, number> | undefined
-          cacheReadTokens = details?.cached_tokens ?? 0
-        }
-
-        // Extract cost from kilocode-specific extension
-        const extra = chunk as unknown as Record<string, unknown>
-        if (extra.x_kilocode) {
-          cost = (extra.x_kilocode as Record<string, number>).total_cost ?? 0
-        }
-      }
-    } catch (error) {
-      const err = error as Record<string, unknown>
-      console.error("[Kilo New] AutocompleteModel.generateResponse: STREAM ITERATION FAILED", {
-        chunksBeforeError: chunks,
-        message: err.message,
-        status: err.status,
-        code: err.code,
-        error: String(error),
-      })
-      throw error
-    }
-
-    console.log(`[Kilo New] AutocompleteModel.generateResponse: stream complete`, {
-      textChunks: chunks,
-      inputTokens,
-      outputTokens,
-      cost,
-      cacheReadTokens,
-    })
-
-    const usageChunk: ApiStreamChunk = {
-      type: "usage",
-      totalCost: cost,
-      inputTokens,
-      outputTokens,
-      cacheReadTokens,
-      cacheWriteTokens,
-    }
-    onChunk(usageChunk)
-
-    return {
-      cost,
-      inputTokens,
-      outputTokens,
-      cacheWriteTokens,
-      cacheReadTokens,
-    }
+    // FIM is the primary strategy; this method is a fallback.
+    // For now, throw — callers should use generateFimResponse via supportsFim().
+    throw new Error("Chat-based completions are not supported via CLI backend. Use FIM (supportsFim() returns true).")
   }
 
   public getModelName(): string {
@@ -227,7 +133,14 @@ export class AutocompleteModel {
     return PROVIDER_DISPLAY_NAME
   }
 
+  /**
+   * Check if the model has valid credentials.
+   * With CLI backend, credentials are managed by the backend — we just need a connection.
+   */
   public hasValidCredentials(): boolean {
-    return this.apiKey !== null && this.loaded
+    if (!this.connectionService) {
+      return false
+    }
+    return this.connectionService.getConnectionState() === "connected"
   }
 }

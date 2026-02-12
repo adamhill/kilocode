@@ -47,7 +47,7 @@ export function activate(context: vscode.ExtensionContext) {
   )
 
   // Register autocomplete provider
-  registerAutocompleteProvider(context)
+  registerAutocompleteProvider(context, connectionService)
 
   // Dispose service when extension deactivates (kills the server)
   context.subscriptions.push({

@@ -1,10 +1,14 @@
 // kilocode_change - new file
 import * as vscode from "vscode"
 import { AutocompleteServiceManager } from "./AutocompleteServiceManager"
+import type { KiloConnectionService } from "../cli-backend"
 
-export const registerAutocompleteProvider = (context: vscode.ExtensionContext) => {
+export const registerAutocompleteProvider = (
+  context: vscode.ExtensionContext,
+  connectionService: KiloConnectionService,
+) => {
   console.log("[Kilo New] registerAutocompleteProvider: creating AutocompleteServiceManager")
-  const autocompleteManager = new AutocompleteServiceManager(context)
+  const autocompleteManager = new AutocompleteServiceManager(context, connectionService)
   context.subscriptions.push(autocompleteManager)
 
   // Register AutocompleteServiceManager Commands

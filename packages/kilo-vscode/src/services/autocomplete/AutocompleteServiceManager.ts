@@ -7,6 +7,7 @@ import { AutocompleteStatusBar } from "./AutocompleteStatusBar"
 import { AutocompleteCodeActionProvider } from "./AutocompleteCodeActionProvider"
 import { AutocompleteInlineCompletionProvider } from "./classic-auto-complete/AutocompleteInlineCompletionProvider"
 import { AutocompleteTelemetry } from "./classic-auto-complete/AutocompleteTelemetry"
+import type { KiloConnectionService } from "../cli-backend"
 
 const CONFIG_SECTION = "kilo-code.new.autocomplete"
 
@@ -60,7 +61,7 @@ export class AutocompleteServiceManager {
   public readonly inlineCompletionProvider: AutocompleteInlineCompletionProvider
   private inlineCompletionProviderDisposable: vscode.Disposable | null = null
 
-  constructor(context: vscode.ExtensionContext) {
+  constructor(context: vscode.ExtensionContext, connectionService: KiloConnectionService) {
     if (AutocompleteServiceManager._instance) {
       throw new Error(
         "AutocompleteServiceManager is a singleton. Use AutocompleteServiceManager.getInstance() instead.",
@@ -71,7 +72,7 @@ export class AutocompleteServiceManager {
     AutocompleteServiceManager._instance = this
 
     // Register Internal Components
-    this.model = new AutocompleteModel()
+    this.model = new AutocompleteModel(connectionService)
 
     const workspacePath = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath ?? ""
 
