@@ -736,7 +736,7 @@ export class KiloProvider implements vscode.WebviewViewProvider {
     }
 
     try {
-      await this.httpClient.replyToQuestion(requestID, answers)
+      await this.httpClient.replyToQuestion(requestID, answers, this.getWorkspaceDirectory())
     } catch (error) {
       console.error("[Kilo New] KiloProvider: Failed to reply to question:", error)
       this.postMessage({ type: "questionError", requestID })
@@ -753,7 +753,7 @@ export class KiloProvider implements vscode.WebviewViewProvider {
     }
 
     try {
-      await this.httpClient.rejectQuestion(requestID)
+      await this.httpClient.rejectQuestion(requestID, this.getWorkspaceDirectory())
     } catch (error) {
       console.error("[Kilo New] KiloProvider: Failed to reject question:", error)
       this.postMessage({ type: "questionError", requestID })

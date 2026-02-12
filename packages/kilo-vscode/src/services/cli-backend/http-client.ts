@@ -242,15 +242,15 @@ export class HttpClient {
   /**
    * Reply to a question request with user answers.
    */
-  async replyToQuestion(requestID: string, answers: string[][]): Promise<void> {
-    await this.request<void>("POST", `/question/${requestID}/reply`, { answers }, { allowEmpty: true })
+  async replyToQuestion(requestID: string, answers: string[][], directory: string): Promise<void> {
+    await this.request<void>("POST", `/question/${requestID}/reply`, { answers }, { directory, allowEmpty: true })
   }
 
   /**
    * Reject (dismiss) a question request.
    */
-  async rejectQuestion(requestID: string): Promise<void> {
-    await this.request<void>("POST", `/question/${requestID}/reject`, {}, { allowEmpty: true })
+  async rejectQuestion(requestID: string, directory: string): Promise<void> {
+    await this.request<void>("POST", `/question/${requestID}/reject`, {}, { directory, allowEmpty: true })
   }
 
   // ============================================
