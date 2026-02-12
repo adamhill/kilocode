@@ -39,66 +39,66 @@ The module currently routes these via [`AutocompleteModel.generateFimResponse()`
 
 ```ts
 export interface AutocompleteUsage {
-	cost: number
-	inputTokens: number
-	outputTokens: number
-	cacheWriteTokens: number
-	cacheReadTokens: number
+  cost: number
+  inputTokens: number
+  outputTokens: number
+  cacheWriteTokens: number
+  cacheReadTokens: number
 }
 
 export interface AutocompleteModelInfo {
-	providerId: string // stable identifier, e.g. openai, anthropic, custom
-	providerDisplayName?: string // for status bar/UI
-	modelId: string // stable model identifier
-	modelDisplayName?: string
-	supportsFim: boolean
+  providerId: string // stable identifier, e.g. openai, anthropic, custom
+  providerDisplayName?: string // for status bar/UI
+  modelId: string // stable model identifier
+  modelDisplayName?: string
+  supportsFim: boolean
 }
 
 export type ChatStreamChunk = { type: "text"; text: string } | { type: "usage"; usage: AutocompleteUsage }
 
 export interface IAutocompleteLLMProvider {
-	/**
-	 * Returns the currently selected model/provider metadata.
-	 * Used for status bar + telemetry context.
-	 */
-	getModelInfo(): AutocompleteModelInfo | undefined
+  /**
+   * Returns the currently selected model/provider metadata.
+   * Used for status bar + telemetry context.
+   */
+  getModelInfo(): AutocompleteModelInfo | undefined
 
-	/**
-	 * Whether the selected model supports FIM.
-	 * Used to pick between FIM vs hole-filler strategy.
-	 */
-	supportsFim(): boolean
+  /**
+   * Whether the selected model supports FIM.
+   * Used to pick between FIM vs hole-filler strategy.
+   */
+  supportsFim(): boolean
 
-	/**
-	 * Stream a FIM completion. The generator yields raw text chunks.
-	 * Must be abortable.
-	 */
-	streamFim(params: {
-		prefix: string
-		suffix: string
-		signal: AbortSignal
-		requestId?: string
-		onUsage?: (usage: AutocompleteUsage) => void
-	}): AsyncGenerator<string>
+  /**
+   * Stream a FIM completion. The generator yields raw text chunks.
+   * Must be abortable.
+   */
+  streamFim(params: {
+    prefix: string
+    suffix: string
+    signal: AbortSignal
+    requestId?: string
+    onUsage?: (usage: AutocompleteUsage) => void
+  }): AsyncGenerator<string>
 
-	/**
-	 * Stream a chat completion. The generator yields text chunks and MAY yield usage.
-	 * Must be abortable.
-	 */
-	streamChat(params: {
-		systemPrompt: string
-		userPrompt: string
-		signal: AbortSignal
-		requestId?: string
-	}): AsyncGenerator<ChatStreamChunk>
+  /**
+   * Stream a chat completion. The generator yields text chunks and MAY yield usage.
+   * Must be abortable.
+   */
+  streamChat(params: {
+    systemPrompt: string
+    userPrompt: string
+    signal: AbortSignal
+    requestId?: string
+  }): AsyncGenerator<ChatStreamChunk>
 }
 ```
 
 #### Where it is used
 
 - Inline completion pipeline triggers either:
-    - FIM flow via [`AutocompleteModel.generateFimResponse()`](src/services/autocomplete/AutocompleteModel.ts:109), or
-    - Chat flow via [`AutocompleteModel.generateResponse()`](src/services/autocomplete/AutocompleteModel.ts:153).
+  - FIM flow via [`AutocompleteModel.generateFimResponse()`](src/services/autocomplete/AutocompleteModel.ts:109), or
+  - Chat flow via [`AutocompleteModel.generateResponse()`](src/services/autocomplete/AutocompleteModel.ts:153).
 - Strategy selection checks [`AutocompleteModel.supportsFim()`](src/services/autocomplete/AutocompleteModel.ts:98).
 
 #### Notes / constraints
@@ -106,8 +106,8 @@ export interface IAutocompleteLLMProvider {
 - **Streaming is mandatory**: the module assumes tokens/chunks arrive incrementally.
 - **Abort is mandatory**: VS Code frequently cancels inline completion requests.
 - **Usage/cost reporting** is needed for:
-    - status bar display (session cost), and
-    - telemetry properties (latency/cost/tokens).
+  - status bar display (session cost), and
+  - telemetry properties (latency/cost/tokens).
 
 ---
 
@@ -123,27 +123,27 @@ For a new extension, keep this logic but abstract it.
 
 ```ts
 export interface AutocompleteProfile {
-	id: string
-	name?: string
-	type?: "autocomplete" | "general"
-	providerId: string
-	modelId: string
-	// provider-specific credential payload is opaque to autocomplete
-	credentials: unknown
+  id: string
+  name?: string
+  type?: "autocomplete" | "general"
+  providerId: string
+  modelId: string
+  // provider-specific credential payload is opaque to autocomplete
+  credentials: unknown
 }
 
 export interface IAutocompleteProfileResolver {
-	/** Return all configured profiles the host wants autocomplete to consider. */
-	listProfiles(): Promise<AutocompleteProfile[]>
+  /** Return all configured profiles the host wants autocomplete to consider. */
+  listProfiles(): Promise<AutocompleteProfile[]>
 
-	/** Resolve the full profile (including credentials) for a selected profile id. */
-	getProfile(id: string): Promise<AutocompleteProfile>
+  /** Resolve the full profile (including credentials) for a selected profile id. */
+  getProfile(id: string): Promise<AutocompleteProfile>
 
-	/**
-	 * Create an LLM provider instance for the selected profile.
-	 * The autocomplete module treats the provider as opaque beyond the interface.
-	 */
-	buildLLMProvider(profile: AutocompleteProfile): Promise<IAutocompleteLLMProvider>
+  /**
+   * Create an LLM provider instance for the selected profile.
+   * The autocomplete module treats the provider as opaque beyond the interface.
+   */
+  buildLLMProvider(profile: AutocompleteProfile): Promise<IAutocompleteLLMProvider>
 }
 ```
 
@@ -165,13 +165,13 @@ From [`autocompleteServiceSettingsSchema`](src/services/autocomplete/docs/invest
 
 ```ts
 export interface AutocompleteServiceSettings {
-	enableAutoTrigger?: boolean
-	enableSmartInlineTaskKeybinding?: boolean
-	enableChatAutocomplete?: boolean
-	provider?: string
-	model?: string
-	snoozeUntil?: number
-	hasKilocodeProfileWithNoBalance?: boolean
+  enableAutoTrigger?: boolean
+  enableSmartInlineTaskKeybinding?: boolean
+  enableChatAutocomplete?: boolean
+  provider?: string
+  model?: string
+  snoozeUntil?: number
+  hasKilocodeProfileWithNoBalance?: boolean
 }
 ```
 
@@ -181,11 +181,11 @@ The host should own validation (zod or equivalent). The autocomplete module assu
 
 ```ts
 export interface IAutocompleteSettingsStore {
-	getSettings(): Promise<AutocompleteServiceSettings | undefined>
-	setSettings(settings: AutocompleteServiceSettings | undefined): Promise<void>
+  getSettings(): Promise<AutocompleteServiceSettings | undefined>
+  setSettings(settings: AutocompleteServiceSettings | undefined): Promise<void>
 
-	/** Optional: subscribe for settings changes coming from UI/webview. */
-	onDidChangeSettings?(listener: (s: AutocompleteServiceSettings | undefined) => void): { dispose(): void }
+  /** Optional: subscribe for settings changes coming from UI/webview. */
+  onDidChangeSettings?(listener: (s: AutocompleteServiceSettings | undefined) => void): { dispose(): void }
 }
 ```
 
@@ -210,18 +210,18 @@ In current code this is `RooIgnoreController` (see mock interface in [`RooIgnore
 
 ```ts
 export interface IFileIgnoreController {
-	initialize(): Promise<void>
+  initialize(): Promise<void>
 
-	/** True if the file can be read/used as context. */
-	validateAccess(filePath: string): boolean
+  /** True if the file can be read/used as context. */
+  validateAccess(filePath: string): boolean
 
-	/** Filter a list of candidate paths to those allowed. */
-	filterPaths(paths: string[]): string[]
+  /** Filter a list of candidate paths to those allowed. */
+  filterPaths(paths: string[]): string[]
 
-	/** Optional: returns user-facing instructions explaining why access is restricted. */
-	getInstructions(): string | undefined
+  /** Optional: returns user-facing instructions explaining why access is restricted. */
+  getInstructions(): string | undefined
 
-	dispose(): void
+  dispose(): void
 }
 ```
 
@@ -287,7 +287,7 @@ See telemetry summary in [`investigation-vscode-integration.md`](src/services/au
 export type TelemetryEventName = string
 
 export interface ITelemetryClient {
-	captureEvent(event: TelemetryEventName, properties?: Record<string, unknown>): void
+  captureEvent(event: TelemetryEventName, properties?: Record<string, unknown>): void
 }
 ```
 
@@ -396,11 +396,11 @@ For a new extension you can choose either:
 Minimum activation responsibilities:
 
 1. Construct/inject dependencies:
-    - `IAutocompleteSettingsStore`
-    - `IAutocompleteProfileResolver` / `IAutocompleteLLMProvider`
-    - `IFileIgnoreController` factory
-    - `ITelemetryClient`
-    - (optional) `IWebviewBridge`
+   - `IAutocompleteSettingsStore`
+   - `IAutocompleteProfileResolver` / `IAutocompleteLLMProvider`
+   - `IFileIgnoreController` factory
+   - `ITelemetryClient`
+   - (optional) `IWebviewBridge`
 2. Initialize ignore controller and settings defaults.
 3. Create the autocomplete manager and register VS Code providers.
 
@@ -514,10 +514,10 @@ Change plan:
 - Replace `buildApiHandler` / `ApiHandler` / `FimHandler` with `IAutocompleteLLMProvider`.
 - Replace `PROVIDERS` mapping with `providerDisplayName` from `AutocompleteModelInfo`.
 - Keep the public surface area stable where possible:
-    - `supportsFim()`
-    - `generateFimResponse()`
-    - `generateResponse()`
-    - `getModelName()` / `getProviderDisplayName()`
+  - `supportsFim()`
+  - `generateFimResponse()`
+  - `generateResponse()`
+  - `getModelName()` / `getProviderDisplayName()`
 
 ### 6.2 `AutocompleteServiceManager.ts` and `index.ts`
 
@@ -566,9 +566,9 @@ Change plan:
 
 - If the new extension does not support JetBrains, omit it.
 - If you do, implement a dedicated transport layer; keep the bridge logic but replace:
-    - `ClineProvider`
-    - `getKiloCodeWrapperProperties`
-    - any Kilo Code-specific types
+  - `ClineProvider`
+  - `getKiloCodeWrapperProperties`
+  - any Kilo Code-specific types
 
 ---
 
@@ -601,7 +601,7 @@ Transplant plan:
 
 - If the new extension already has i18n, add equivalent keys to its runtime translation system.
 - Otherwise, simplest is:
-    - implement a tiny `t(key, vars?)` function that maps to a JSON bundle.
+  - implement a tiny `t(key, vars?)` function that maps to a JSON bundle.
 
 Minimum runtime keys needed for feature completeness:
 
@@ -665,8 +665,8 @@ Use this as the practical step-by-step transplant procedure.
 ### 10.3 Implement host interfaces
 
 1. Implement [`IAutocompleteSettingsStore`](src/services/autocomplete/docs/TRANSPLANT-PLAN.md:1) (this document) using either:
-    - `ExtensionContext.globalState`, or
-    - `workspace.getConfiguration`.
+   - `ExtensionContext.globalState`, or
+   - `workspace.getConfiguration`.
 2. Implement [`IFileIgnoreController`](src/services/autocomplete/docs/TRANSPLANT-PLAN.md:1) (this document).
 3. Implement [`ITelemetryClient`](src/services/autocomplete/docs/TRANSPLANT-PLAN.md:1) (this document).
 4. Implement [`IAutocompleteProfileResolver`](src/services/autocomplete/docs/TRANSPLANT-PLAN.md:1) (this document).
@@ -681,24 +681,24 @@ Use this as the practical step-by-step transplant procedure.
 ### 10.5 Wire VS Code extension shell
 
 1. Implement activation in `extension.ts`:
-    - instantiate dependencies
-    - call `registerAutocompleteProvider(...)`
+   - instantiate dependencies
+   - call `registerAutocompleteProvider(...)`
 2. Add `package.json` contributions:
-    - activation events
-    - commands
-    - keybindings (optional)
-    - codeActions contribution (optional)
+   - activation events
+   - commands
+   - keybindings (optional)
+   - codeActions contribution (optional)
 3. Ensure context keys used in `when` clauses are set via `vscode.commands.executeCommand("setContext", ...)`.
 
 ### 10.6 Validate runtime behavior
 
 1. Inline completion:
-    - confirm cancellation works
-    - confirm debounce behavior
-    - confirm suggestions appear only for allowed files
+   - confirm cancellation works
+   - confirm debounce behavior
+   - confirm suggestions appear only for allowed files
 2. Status bar:
-    - confirm provider/model shown
-    - confirm cost increments
+   - confirm provider/model shown
+   - confirm cost increments
 3. (Optional) Webview:
-    - confirm settings update triggers reload
-    - confirm chat textarea completion roundtrip works
+   - confirm settings update triggers reload
+   - confirm chat textarea completion roundtrip works

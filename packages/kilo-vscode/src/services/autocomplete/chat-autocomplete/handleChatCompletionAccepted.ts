@@ -9,10 +9,10 @@ let telemetryInstance: AutocompleteTelemetry | null = null
  * Get or create the telemetry instance for chat-textarea autocomplete
  */
 export function getChatAutocompleteTelemetry(): AutocompleteTelemetry {
-	if (!telemetryInstance) {
-		telemetryInstance = new AutocompleteTelemetry("chat-textarea")
-	}
-	return telemetryInstance
+  if (!telemetryInstance) {
+    telemetryInstance = new AutocompleteTelemetry("chat-textarea")
+  }
+  return telemetryInstance
 }
 
 /**
@@ -20,6 +20,6 @@ export function getChatAutocompleteTelemetry(): AutocompleteTelemetry {
  * Captures telemetry when the user accepts a suggestion via Tab or ArrowRight.
  */
 export function handleChatCompletionAccepted(message: WebviewMessage & { type: "chatCompletionAccepted" }): void {
-	const telemetry = getChatAutocompleteTelemetry()
-	telemetry.captureAcceptSuggestion(message.suggestionLength)
+  const telemetry = getChatAutocompleteTelemetry()
+  telemetry.captureAcceptSuggestion(message.suggestionLength)
 }

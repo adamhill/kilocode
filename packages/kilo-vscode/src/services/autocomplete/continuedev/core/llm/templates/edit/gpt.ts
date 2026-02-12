@@ -2,7 +2,7 @@ import { PromptTemplateFunction } from "../../.."
 import { dedent } from "../../../util"
 
 const gptInsertionEditPrompt: PromptTemplateFunction = (_, otherData) => {
-	return dedent`
+  return dedent`
     \`\`\`${otherData.language}
     ${otherData.prefix}[BLANK]${otherData.codeToEdit}${otherData.suffix}
     \`\`\`
@@ -15,7 +15,7 @@ const gptInsertionEditPrompt: PromptTemplateFunction = (_, otherData) => {
 }
 
 const gptFullFileEditPrompt: PromptTemplateFunction = (_, otherData) => {
-	return dedent`
+  return dedent`
     \`\`\`${otherData.language}
     ${otherData.codeToEdit}
     \`\`\`
@@ -28,31 +28,31 @@ const gptFullFileEditPrompt: PromptTemplateFunction = (_, otherData) => {
 }
 
 export const gptEditPrompt: PromptTemplateFunction = (history, otherData) => {
-	if (otherData?.codeToEdit?.trim().length === 0) {
-		return gptInsertionEditPrompt(history, otherData)
-	} else if (otherData?.prefix?.trim().length === 0 && otherData?.suffix?.trim().length === 0) {
-		return gptFullFileEditPrompt(history, otherData)
-	}
+  if (otherData?.codeToEdit?.trim().length === 0) {
+    return gptInsertionEditPrompt(history, otherData)
+  } else if (otherData?.prefix?.trim().length === 0 && otherData?.suffix?.trim().length === 0) {
+    return gptFullFileEditPrompt(history, otherData)
+  }
 
-	const paragraphs = ["The user has requested a section of code in a file to be rewritten."]
+  const paragraphs = ["The user has requested a section of code in a file to be rewritten."]
 
-	if (otherData.prefix?.trim().length > 0) {
-		paragraphs.push(dedent`
+  if (otherData.prefix?.trim().length > 0) {
+    paragraphs.push(dedent`
         This is the prefix of the file:
         \`\`\`${otherData.language}
         ${otherData.prefix}
         \`\`\``)
-	}
+  }
 
-	if (otherData.suffix?.trim().length > 0) {
-		paragraphs.push(dedent`
+  if (otherData.suffix?.trim().length > 0) {
+    paragraphs.push(dedent`
         This is the suffix of the file:
         \`\`\`${otherData.language}
         ${otherData.suffix}
         \`\`\``)
-	}
+  }
 
-	paragraphs.push(dedent`
+  paragraphs.push(dedent`
         This is the code to rewrite:
         \`\`\`${otherData.language}
         ${otherData.codeToEdit}
@@ -64,9 +64,9 @@ export const gptEditPrompt: PromptTemplateFunction = (history, otherData) => {
 
         Here is the rewritten code:`)
 
-	return paragraphs.join("\n\n")
+  return paragraphs.join("\n\n")
 }
 
 export const defaultApplyPrompt: PromptTemplateFunction = (history, otherData) => {
-	return `${otherData.original_code}\n\nThe following code was suggested as an edit:\n\`\`\`\n${otherData.new_code}\n\`\`\`\nPlease apply it to the previous code.`
+  return `${otherData.original_code}\n\nThe following code was suggested as an edit:\n\`\`\`\n${otherData.new_code}\n\`\`\`\nPlease apply it to the previous code.`
 }

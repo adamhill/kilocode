@@ -85,7 +85,7 @@ programmatically in `src/services/autocomplete/index.ts:42-46`:
 
 ```typescript
 vscode.languages.registerCodeActionsProvider("*", autocompleteManager.codeActionProvider, {
-	providedCodeActionKinds: Object.values(autocompleteManager.codeActionProvider.providedCodeActionKinds),
+  providedCodeActionKinds: Object.values(autocompleteManager.codeActionProvider.providedCodeActionKinds),
 })
 ```
 
@@ -100,20 +100,20 @@ provides a QuickFix action that triggers `kilo-code.autocomplete.generateSuggest
 
 1. **Import**: `registerAutocompleteProvider` imported from `./services/autocomplete` (line 49)
 2. **First-install defaults** (lines 400-414): On first install, autocomplete is enabled:
-    ```typescript
-    const currentAutocompleteSettings = contextProxy.getValue("ghostServiceSettings")
-    await contextProxy.setValue("ghostServiceSettings", {
-    	...currentAutocompleteSettings,
-    	enableAutoTrigger: !kiloCodeWrapperJetbrains, // disabled for JetBrains
-    	enableSmartInlineTaskKeybinding: true,
-    })
-    ```
+   ```typescript
+   const currentAutocompleteSettings = contextProxy.getValue("ghostServiceSettings")
+   await contextProxy.setValue("ghostServiceSettings", {
+     ...currentAutocompleteSettings,
+     enableAutoTrigger: !kiloCodeWrapperJetbrains, // disabled for JetBrains
+     enableSmartInlineTaskKeybinding: true,
+   })
+   ```
 3. **Registration** (lines 512-520): Autocomplete is registered unless running as CLI:
-    ```typescript
-    if (kiloCodeWrapperCode !== "cli") {
-    	registerAutocompleteProvider(context, provider)
-    }
-    ```
+   ```typescript
+   if (kiloCodeWrapperCode !== "cli") {
+     registerAutocompleteProvider(context, provider)
+   }
+   ```
 
 ### 2.2 `registerAutocompleteProvider` (`src/services/autocomplete/index.ts`)
 
@@ -172,26 +172,26 @@ Three autocomplete-related message types are handled:
 
 1. **`ghostServiceSettings`** (lines 1972-1982):
 
-    ```typescript
-    case "ghostServiceSettings":
-      const validatedSettings = autocompleteServiceSettingsSchema.parse(message.values)
-      await updateGlobalState("ghostServiceSettings", validatedSettings)
-      await provider.postStateToWebview()
-      vscode.commands.executeCommand("kilo-code.autocomplete.reload")
-    ```
+   ```typescript
+   case "ghostServiceSettings":
+     const validatedSettings = autocompleteServiceSettingsSchema.parse(message.values)
+     await updateGlobalState("ghostServiceSettings", validatedSettings)
+     await provider.postStateToWebview()
+     vscode.commands.executeCommand("kilo-code.autocomplete.reload")
+   ```
 
-    This is the primary way the webview UI writes autocomplete settings.
+   This is the primary way the webview UI writes autocomplete settings.
 
 2. **`snoozeAutocomplete`** (lines 1983-1989):
 
-    ```typescript
-    case "snoozeAutocomplete":
-      if (typeof message.value === "number" && message.value > 0) {
-        await AutocompleteServiceManager.getInstance()?.snooze(message.value)
-      } else {
-        await AutocompleteServiceManager.getInstance()?.unsnooze()
-      }
-    ```
+   ```typescript
+   case "snoozeAutocomplete":
+     if (typeof message.value === "number" && message.value > 0) {
+       await AutocompleteServiceManager.getInstance()?.snooze(message.value)
+     } else {
+       await AutocompleteServiceManager.getInstance()?.unsnooze()
+     }
+   ```
 
 3. **`requestChatCompletion`** (lines 3969-3975): Handles chat textarea FIM autocomplete.
 4. **`chatCompletionAccepted`** (lines 3977-3979): Handles chat completion acceptance telemetry.
@@ -227,16 +227,16 @@ ghostServiceSettings: autocompleteServiceSettingsSchema
 
 ```typescript
 export const autocompleteServiceSettingsSchema = z
-	.object({
-		enableAutoTrigger: z.boolean().optional(),
-		enableSmartInlineTaskKeybinding: z.boolean().optional(),
-		enableChatAutocomplete: z.boolean().optional(),
-		provider: z.string().optional(),
-		model: z.string().optional(),
-		snoozeUntil: z.number().optional(),
-		hasKilocodeProfileWithNoBalance: z.boolean().optional(),
-	})
-	.optional()
+  .object({
+    enableAutoTrigger: z.boolean().optional(),
+    enableSmartInlineTaskKeybinding: z.boolean().optional(),
+    enableChatAutocomplete: z.boolean().optional(),
+    provider: z.string().optional(),
+    model: z.string().optional(),
+    snoozeUntil: z.number().optional(),
+    hasKilocodeProfileWithNoBalance: z.boolean().optional(),
+  })
+  .optional()
 ```
 
 ### 5.3 Read/write patterns
@@ -301,63 +301,63 @@ Namespace: `kilocode:autocomplete.*`
 
 ```jsonc
 {
-	"autocomplete": {
-		"statusBar": {
-			"enabled": "$(kilo-logo) Autocomplete",
-			"snoozed": "snoozed",
-			"warning": "$(warning) Autocomplete",
-			"tooltip": {
-				"basic": "Kilo Code Autocomplete",
-				"disabled": "Kilo Code Autocomplete (disabled)",
-				"noCredits": "...",
-				"noUsableProvider": "...",
-				"sessionTotal": "Session total cost:",
-				"provider": "Provider:",
-				"model": "Model:",
-				"profile": "Profile: ",
-				"defaultProfile": "Default",
-				"completionSummary": "Performed {{count}} completions between {{startTime}} and {{endTime}}, for a total cost of {{cost}}.",
-				"providerInfo": "Autocompletions provided by {{model}} via {{provider}}.",
-			},
-			"cost": {
-				"zero": "$0.00",
-				"lessThanCent": "<$0.01",
-			},
-		},
-		"toggleMessage": "Kilo Code Autocomplete {{status}}",
-		"progress": {
-			"title": "Kilo Code",
-			"analyzing": "Analyzing your code...",
-			"generating": "Generating suggested edits...",
-			"processing": "Processing suggested edits...",
-			"showing": "Displaying suggested edits...",
-		},
-		"input": {
-			"title": "Kilo Code: Quick Task",
-			"placeholder": "e.g., 'refactor this function to be more efficient'",
-		},
-		"commands": {
-			"generateSuggestions": "Kilo Code: Generate Suggested Edits",
-			"displaySuggestions": "Display Suggested Edits",
-			"cancelSuggestions": "Cancel Suggested Edits",
-			"applyCurrentSuggestion": "Apply Current Suggested Edit",
-			"applyAllSuggestions": "Apply All Suggested Edits",
-			"category": "Kilo Code",
-		},
-		"codeAction": {
-			"title": "Kilo Code: Suggested Edits",
-		},
-		"chatParticipant": {
-			"fullName": "Kilo Code Agent",
-			"name": "Agent",
-			"description": "I can help you with quick tasks and suggested edits.",
-		},
-		"incompatibilityExtensionPopup": {
-			"message": "The Kilo Code Autocomplete is being blocked by a conflict with GitHub Copilot. To fix this, you must disable Copilot's inline suggestions.",
-			"disableCopilot": "Disable Copilot",
-			"disableInlineAssist": "Disable Autocomplete",
-		},
-	},
+  "autocomplete": {
+    "statusBar": {
+      "enabled": "$(kilo-logo) Autocomplete",
+      "snoozed": "snoozed",
+      "warning": "$(warning) Autocomplete",
+      "tooltip": {
+        "basic": "Kilo Code Autocomplete",
+        "disabled": "Kilo Code Autocomplete (disabled)",
+        "noCredits": "...",
+        "noUsableProvider": "...",
+        "sessionTotal": "Session total cost:",
+        "provider": "Provider:",
+        "model": "Model:",
+        "profile": "Profile: ",
+        "defaultProfile": "Default",
+        "completionSummary": "Performed {{count}} completions between {{startTime}} and {{endTime}}, for a total cost of {{cost}}.",
+        "providerInfo": "Autocompletions provided by {{model}} via {{provider}}.",
+      },
+      "cost": {
+        "zero": "$0.00",
+        "lessThanCent": "<$0.01",
+      },
+    },
+    "toggleMessage": "Kilo Code Autocomplete {{status}}",
+    "progress": {
+      "title": "Kilo Code",
+      "analyzing": "Analyzing your code...",
+      "generating": "Generating suggested edits...",
+      "processing": "Processing suggested edits...",
+      "showing": "Displaying suggested edits...",
+    },
+    "input": {
+      "title": "Kilo Code: Quick Task",
+      "placeholder": "e.g., 'refactor this function to be more efficient'",
+    },
+    "commands": {
+      "generateSuggestions": "Kilo Code: Generate Suggested Edits",
+      "displaySuggestions": "Display Suggested Edits",
+      "cancelSuggestions": "Cancel Suggested Edits",
+      "applyCurrentSuggestion": "Apply Current Suggested Edit",
+      "applyAllSuggestions": "Apply All Suggested Edits",
+      "category": "Kilo Code",
+    },
+    "codeAction": {
+      "title": "Kilo Code: Suggested Edits",
+    },
+    "chatParticipant": {
+      "fullName": "Kilo Code Agent",
+      "name": "Agent",
+      "description": "I can help you with quick tasks and suggested edits.",
+    },
+    "incompatibilityExtensionPopup": {
+      "message": "The Kilo Code Autocomplete is being blocked by a conflict with GitHub Copilot. To fix this, you must disable Copilot's inline suggestions.",
+      "disableCopilot": "Disable Copilot",
+      "disableInlineAssist": "Disable Autocomplete",
+    },
+  },
 }
 ```
 

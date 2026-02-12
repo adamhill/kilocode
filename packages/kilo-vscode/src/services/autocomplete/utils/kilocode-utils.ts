@@ -10,30 +10,30 @@ export type { AutocompleteProviderKey }
  * @returns Promise<boolean> - True if balance > 0, false otherwise
  */
 export async function checkKilocodeBalance(kilocodeToken: string, kilocodeOrganizationId?: string): Promise<boolean> {
-	try {
-		const baseUrl = getKiloBaseUriFromToken(kilocodeToken)
+  try {
+    const baseUrl = getKiloBaseUriFromToken(kilocodeToken)
 
-		const headers: Record<string, string> = {
-			Authorization: `Bearer ${kilocodeToken}`,
-		}
+    const headers: Record<string, string> = {
+      Authorization: `Bearer ${kilocodeToken}`,
+    }
 
-		if (kilocodeOrganizationId) {
-			headers["X-KiloCode-OrganizationId"] = kilocodeOrganizationId
-		}
+    if (kilocodeOrganizationId) {
+      headers["X-KiloCode-OrganizationId"] = kilocodeOrganizationId
+    }
 
-		const response = await fetch(`${baseUrl}/api/profile/balance`, {
-			headers,
-		})
+    const response = await fetch(`${baseUrl}/api/profile/balance`, {
+      headers,
+    })
 
-		if (!response.ok) {
-			return false
-		}
+    if (!response.ok) {
+      return false
+    }
 
-		const data = await response.json()
-		const balance = data.balance ?? 0
-		return balance > 0
-	} catch (error) {
-		console.error("Error checking kilocode balance:", error)
-		return false
-	}
+    const data = await response.json()
+    const balance = data.balance ?? 0
+    return balance > 0
+  } catch (error) {
+    console.error("Error checking kilocode balance:", error)
+    return false
+  }
 }

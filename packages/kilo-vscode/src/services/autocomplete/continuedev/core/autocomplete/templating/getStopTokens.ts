@@ -12,17 +12,17 @@ const CODE_BLOCK_END = "```"
 const commonStops = [SRC_DIRECTORY, PYTHON_ENCODING, CODE_BLOCK_END]
 
 export function getStopTokens(
-	completionOptions: Partial<CompletionOptions> | undefined,
-	_lang: AutocompleteLanguageInfo,
-	model: string,
+  completionOptions: Partial<CompletionOptions> | undefined,
+  _lang: AutocompleteLanguageInfo,
+  model: string,
 ): string[] {
-	const stopTokens = [
-		...(completionOptions?.stop || []),
-		// ...multilineStops,
-		...commonStops,
-		...(model.toLowerCase().includes("starcoder2") ? STARCODER2_T_ARTIFACTS : []),
-		// ...lang.topLevelKeywords.map((word) => `\n${word}`),
-	]
+  const stopTokens = [
+    ...(completionOptions?.stop || []),
+    // ...multilineStops,
+    ...commonStops,
+    ...(model.toLowerCase().includes("starcoder2") ? STARCODER2_T_ARTIFACTS : []),
+    // ...lang.topLevelKeywords.map((word) => `\n${word}`),
+  ]
 
-	return stopTokens
+  return stopTokens
 }

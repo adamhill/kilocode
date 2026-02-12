@@ -5,5 +5,5 @@ const MAX_NUM_OPEN_CONTEXT_FILES = 20
 
 // stores which files are currently open in the IDE, in viewing order
 export const openedFilesLruCache = new QuickLRU<string, string>({
-	maxSize: MAX_NUM_OPEN_CONTEXT_FILES,
+  maxSize: MAX_NUM_OPEN_CONTEXT_FILES,
 })

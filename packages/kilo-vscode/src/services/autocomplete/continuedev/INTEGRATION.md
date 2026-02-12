@@ -53,41 +53,41 @@ Since this library is fully integrated into Kilocode:
 
 1. **Clone Kilocode repository**:
 
-    ```bash
-    git clone https://github.com/kilocode/kilocode.git
-    cd kilocode
-    ```
+   ```bash
+   git clone https://github.com/kilocode/kilocode.git
+   cd kilocode
+   ```
 
 2. **Install all dependencies**:
 
-    ```bash
-    pnpm install
-    ```
+   ```bash
+   pnpm install
+   ```
 
-    This installs all dependencies for the entire Kilocode monorepo, including those needed by continuedev.
+   This installs all dependencies for the entire Kilocode monorepo, including those needed by continuedev.
 
 3. **Run tests**:
 
-    ```bash
-    # Run all Kilocode tests (includes continuedev tests)
-    cd src && npx vitest run
+   ```bash
+   # Run all Kilocode tests (includes continuedev tests)
+   cd src && npx vitest run
 
-    # Run specific continuedev test file
-    cd src && npx vitest run services/continuedev/core/path/to/test.ts
-    ```
+   # Run specific continuedev test file
+   cd src && npx vitest run services/continuedev/core/path/to/test.ts
+   ```
 
 4. **Type checking**:
 
-    ```bash
-    # Check types for entire Kilocode project (includes continuedev)
-    pnpm check-types
-    ```
+   ```bash
+   # Check types for entire Kilocode project (includes continuedev)
+   pnpm check-types
+   ```
 
 5. **Make code changes**:
-    - Edit files directly in `src/services/continuedev/`
-    - Follow Kilocode's coding standards and practices
-    - Add tests as needed
-    - Ensure all tests pass before submitting
+   - Edit files directly in `src/services/continuedev/`
+   - Follow Kilocode's coding standards and practices
+   - Add tests as needed
+   - Ensure all tests pass before submitting
 
 ## Testing
 

@@ -4,13 +4,13 @@ import { markdownFilter } from "./markdown"
 export type LanguageFilter = (params: AutocompleteSuggestion) => string
 
 const languageFilters: Record<string, LanguageFilter> = {
-	markdown: markdownFilter,
+  markdown: markdownFilter,
 }
 
 export function applyLanguageFilter(params: AutocompleteSuggestion & { languageId: string }): string {
-	const filter = languageFilters[params.languageId]
-	if (!filter) {
-		return params.suggestion
-	}
-	return filter(params)
+  const filter = languageFilters[params.languageId]
+  if (!filter) {
+    return params.suggestion
+  }
+  return filter(params)
 }
