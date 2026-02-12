@@ -345,6 +345,17 @@ export interface QuestionErrorMessage {
   requestID: string
 }
 
+export interface BrowserSettings {
+  enabled: boolean
+  useSystemChrome: boolean
+  headless: boolean
+}
+
+export interface BrowserSettingsLoadedMessage {
+  type: "browserSettingsLoaded"
+  settings: BrowserSettings
+}
+
 export type ExtensionMessage =
   | ReadyMessage
   | ConnectionStateMessage
@@ -370,6 +381,7 @@ export type ExtensionMessage =
   | QuestionRequestMessage
   | QuestionResolvedMessage
   | QuestionErrorMessage
+  | BrowserSettingsLoadedMessage
 
 // ============================================
 // Messages FROM webview TO extension
@@ -480,6 +492,16 @@ export interface RenameSessionRequest {
   title: string
 }
 
+export interface UpdateSettingRequest {
+  type: "updateSetting"
+  key: string
+  value: unknown
+}
+
+export interface RequestBrowserSettingsMessage {
+  type: "requestBrowserSettings"
+}
+
 export type WebviewMessage =
   | SendMessageRequest
   | AbortRequest
@@ -502,6 +524,8 @@ export type WebviewMessage =
   | QuestionRejectRequest
   | DeleteSessionRequest
   | RenameSessionRequest
+  | UpdateSettingRequest
+  | RequestBrowserSettingsMessage
 
 // ============================================
 // VS Code API type
