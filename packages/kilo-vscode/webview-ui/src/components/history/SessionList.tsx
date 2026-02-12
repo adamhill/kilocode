@@ -143,8 +143,8 @@ const SessionList: Component<SessionListProps> = (props) => {
         emptyMessage={language.t("session.empty")}
         groupBy={(s) => language.t(dateGroupKey(s.updatedAt))}
         sortGroupsBy={(a, b) => {
-          const order = DATE_GROUP_KEYS.map((k) => language.t(k))
-          return (order.indexOf(a.category) ?? 99) - (order.indexOf(b.category) ?? 99)
+          const rank = Object.fromEntries(DATE_GROUP_KEYS.map((k, i) => [language.t(k), i]))
+          return (rank[a.category] ?? 99) - (rank[b.category] ?? 99)
         }}
         itemWrapper={wrapItem}
       >
