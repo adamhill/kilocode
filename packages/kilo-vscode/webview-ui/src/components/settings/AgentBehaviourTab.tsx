@@ -4,7 +4,7 @@ import { useSession } from "../../context/session"
 import { useLanguage } from "../../context/language"
 import type { AgentConfig } from "../../types/messages"
 
-type SubtabId = "modes" | "mcpServers" | "rules" | "workflows" | "skills"
+type SubtabId = "agents" | "mcpServers" | "rules" | "workflows" | "skills"
 
 interface SubtabConfig {
   id: SubtabId
@@ -12,7 +12,7 @@ interface SubtabConfig {
 }
 
 const subtabs: SubtabConfig[] = [
-  { id: "modes", labelKey: "settings.agentBehaviour.subtab.modes" },
+  { id: "agents", labelKey: "settings.agentBehaviour.subtab.agents" },
   { id: "mcpServers", labelKey: "settings.agentBehaviour.subtab.mcpServers" },
   { id: "rules", labelKey: "settings.agentBehaviour.subtab.rules" },
   { id: "workflows", labelKey: "settings.agentBehaviour.subtab.workflows" },
@@ -97,7 +97,7 @@ const AgentBehaviourTab: Component = () => {
   const language = useLanguage()
   const { config, updateConfig } = useConfig()
   const session = useSession()
-  const [activeSubtab, setActiveSubtab] = createSignal<SubtabId>("modes")
+  const [activeSubtab, setActiveSubtab] = createSignal<SubtabId>("agents")
   const [selectedAgent, setSelectedAgent] = createSignal<string>("")
   const [newSkillPath, setNewSkillPath] = createSignal("")
   const [newSkillUrl, setNewSkillUrl] = createSignal("")
@@ -174,8 +174,29 @@ const AgentBehaviourTab: Component = () => {
     updateConfig({ skills: { ...config().skills, urls: current } })
   }
 
-  const renderModesSubtab = () => (
+  const renderAgentsSubtab = () => (
     <div>
+      {/* Default agent */}
+      <div
+        style={{
+          border: "1px solid var(--vscode-panel-border)",
+          "border-radius": "4px",
+          overflow: "hidden",
+          "margin-bottom": "12px",
+        }}
+      >
+        <SettingRow label="Default Agent" description="Agent to use when none is specified" last>
+          <select
+            style={selectStyle}
+            value={config().default_agent ?? ""}
+            onChange={(e) => updateConfig({ default_agent: e.currentTarget.value || undefined })}
+          >
+            <option value="">Default</option>
+            <For each={agentNames()}>{(name) => <option value={name}>{name}</option>}</For>
+          </select>
+        </SettingRow>
+      </div>
+
       {/* Agent selector */}
       <div style={{ "margin-bottom": "12px" }}>
         <select
@@ -557,8 +578,8 @@ const AgentBehaviourTab: Component = () => {
 
   const renderSubtabContent = () => {
     switch (activeSubtab()) {
-      case "modes":
-        return renderModesSubtab()
+      case "agents":
+        return renderAgentsSubtab()
       case "mcpServers":
         return renderMcpSubtab()
       case "rules":
@@ -574,60 +595,6 @@ const AgentBehaviourTab: Component = () => {
 
   return (
     <div>
-      {/* Top-level settings */}
-      <div
-        style={{
-          border: "1px solid var(--vscode-panel-border)",
-          "border-radius": "4px",
-          overflow: "hidden",
-          "margin-bottom": "16px",
-        }}
-      >
-        {/* Default agent */}
-        <SettingRow label="Default Agent" description="Agent to use when none is specified">
-          <select
-            style={selectStyle}
-            value={config().default_agent ?? ""}
-            onChange={(e) => updateConfig({ default_agent: e.currentTarget.value || undefined })}
-          >
-            <option value="">Default</option>
-            <For each={agentNames()}>{(name) => <option value={name}>{name}</option>}</For>
-          </select>
-        </SettingRow>
-
-        {/* Auto compaction */}
-        <SettingRow label="Auto Compaction" description="Automatically compact context when it's full">
-          <label style={{ display: "flex", "align-items": "center", cursor: "pointer" }}>
-            <input
-              type="checkbox"
-              checked={config().compaction?.auto ?? false}
-              onChange={(e) =>
-                updateConfig({
-                  compaction: { ...config().compaction, auto: e.currentTarget.checked },
-                })
-              }
-              style={{ cursor: "pointer" }}
-            />
-          </label>
-        </SettingRow>
-
-        {/* Prune old outputs */}
-        <SettingRow label="Prune Old Outputs" description="Remove old tool outputs during compaction" last>
-          <label style={{ display: "flex", "align-items": "center", cursor: "pointer" }}>
-            <input
-              type="checkbox"
-              checked={config().compaction?.prune ?? false}
-              onChange={(e) =>
-                updateConfig({
-                  compaction: { ...config().compaction, prune: e.currentTarget.checked },
-                })
-              }
-              style={{ cursor: "pointer" }}
-            />
-          </label>
-        </SettingRow>
-      </div>
-
       {/* Horizontal subtab bar */}
       <div
         style={{

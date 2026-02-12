@@ -40,6 +40,70 @@ const ContextTab: Component = () => {
 
   return (
     <div>
+      {/* Compaction settings */}
+      <div
+        style={{
+          border: "1px solid var(--vscode-panel-border)",
+          "border-radius": "4px",
+          overflow: "hidden",
+          "margin-bottom": "16px",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            "align-items": "center",
+            "justify-content": "space-between",
+            padding: "10px 12px",
+            background: "var(--vscode-editor-background)",
+            "border-bottom": "1px solid var(--vscode-panel-border)",
+          }}
+        >
+          <div>
+            <div style={{ "font-size": "12px", "font-weight": "500", color: "var(--vscode-foreground)" }}>
+              Auto Compaction
+            </div>
+            <div style={{ "font-size": "11px", color: "var(--vscode-descriptionForeground)", "margin-top": "2px" }}>
+              Automatically compact context when it's full
+            </div>
+          </div>
+          <label style={{ display: "flex", "align-items": "center", cursor: "pointer" }}>
+            <input
+              type="checkbox"
+              checked={config().compaction?.auto ?? false}
+              onChange={(e) => updateConfig({ compaction: { ...config().compaction, auto: e.currentTarget.checked } })}
+              style={{ cursor: "pointer" }}
+            />
+          </label>
+        </div>
+        <div
+          style={{
+            display: "flex",
+            "align-items": "center",
+            "justify-content": "space-between",
+            padding: "10px 12px",
+            background: "var(--vscode-editor-background)",
+          }}
+        >
+          <div>
+            <div style={{ "font-size": "12px", "font-weight": "500", color: "var(--vscode-foreground)" }}>
+              Prune Old Outputs
+            </div>
+            <div style={{ "font-size": "11px", color: "var(--vscode-descriptionForeground)", "margin-top": "2px" }}>
+              Remove old tool outputs during compaction
+            </div>
+          </div>
+          <label style={{ display: "flex", "align-items": "center", cursor: "pointer" }}>
+            <input
+              type="checkbox"
+              checked={config().compaction?.prune ?? false}
+              onChange={(e) => updateConfig({ compaction: { ...config().compaction, prune: e.currentTarget.checked } })}
+              style={{ cursor: "pointer" }}
+            />
+          </label>
+        </div>
+      </div>
+
       <div
         style={{
           border: "1px solid var(--vscode-panel-border)",
