@@ -215,7 +215,6 @@ export function createKiloRoutes(deps: KiloRoutesDeps) {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "x-api-key": token,
             Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
