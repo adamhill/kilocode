@@ -780,10 +780,11 @@ export const dict = {
   "time.hoursAgo": "{{count}}h atrás",
   "time.daysAgo": "{{count}}d atrás",
   "time.monthsAgo": "{{count}} meses atrás",
-
-  "session.search.placeholder": "Pesquisar sessões...",
-  "session.empty": "Nenhuma sessão ainda. Clique em + para iniciar uma nova conversa.",
-  "session.untitled": "Sem título",
+  "time.today": "Hoje",
+  "time.yesterday": "Ontem",
+  "time.thisWeek": "Esta semana",
+  "time.thisMonth": "Este mês",
+  "time.older": "Mais antigo",
 
   "settings.aboutKiloCode.status.connected": "Conectado",
   "settings.aboutKiloCode.status.connecting": "Conectando...",

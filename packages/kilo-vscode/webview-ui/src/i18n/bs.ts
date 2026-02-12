@@ -807,10 +807,11 @@ export const dict = {
   "time.hoursAgo": "prije {{count}}h",
   "time.daysAgo": "prije {{count}}d",
   "time.monthsAgo": "prije {{count}} mj.",
-
-  "session.search.placeholder": "Pretraži sesije...",
-  "session.empty": "Još nema sesija. Kliknite + za pokretanje novog razgovora.",
-  "session.untitled": "Bez naslova",
+  "time.today": "Danas",
+  "time.yesterday": "Jučer",
+  "time.thisWeek": "Ove sedmice",
+  "time.thisMonth": "Ovog mjeseca",
+  "time.older": "Starije",
 
   "settings.aboutKiloCode.status.connected": "Povezano",
   "settings.aboutKiloCode.status.connecting": "Povezivanje...",

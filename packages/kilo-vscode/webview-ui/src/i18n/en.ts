@@ -812,10 +812,11 @@ export const dict = {
   "time.hoursAgo": "{{count}}h ago",
   "time.daysAgo": "{{count}}d ago",
   "time.monthsAgo": "{{count}}mo ago",
-
-  "session.search.placeholder": "Search sessions...",
-  "session.empty": "No sessions yet. Click + to start a new conversation.",
-  "session.untitled": "Untitled",
+  "time.today": "Today",
+  "time.yesterday": "Yesterday",
+  "time.thisWeek": "This Week",
+  "time.thisMonth": "This Month",
+  "time.older": "Older",
 
   "settings.aboutKiloCode.status.connected": "Connected",
   "settings.aboutKiloCode.status.connecting": "Connecting...",

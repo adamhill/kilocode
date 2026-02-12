@@ -771,10 +771,11 @@ export const dict = {
   "time.hoursAgo": "{{count}} ชม. ที่แล้ว",
   "time.daysAgo": "{{count}} วันที่แล้ว",
   "time.monthsAgo": "{{count}} เดือนที่แล้ว",
-
-  "session.search.placeholder": "ค้นหาเซสชัน...",
-  "session.empty": "ยังไม่มีเซสชัน คลิก + เพื่อเริ่มการสนทนาใหม่",
-  "session.untitled": "ไม่มีชื่อ",
+  "time.today": "วันนี้",
+  "time.yesterday": "เมื่อวาน",
+  "time.thisWeek": "สัปดาห์นี้",
+  "time.thisMonth": "เดือนนี้",
+  "time.older": "เก่ากว่า",
 
   "settings.aboutKiloCode.status.connected": "เชื่อมต่อแล้ว",
   "settings.aboutKiloCode.status.connecting": "กำลังเชื่อมต่อ...",

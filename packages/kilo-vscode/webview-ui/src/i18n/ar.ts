@@ -773,10 +773,11 @@ export const dict = {
   "time.hoursAgo": "قبل {{count}} ساعة",
   "time.daysAgo": "قبل {{count}} يوم",
   "time.monthsAgo": "قبل {{count}} شهر",
-
-  "session.search.placeholder": "البحث في الجلسات...",
-  "session.empty": "لا توجد جلسات بعد. انقر على + لبدء محادثة جديدة.",
-  "session.untitled": "بدون عنوان",
+  "time.today": "اليوم",
+  "time.yesterday": "أمس",
+  "time.thisWeek": "هذا الأسبوع",
+  "time.thisMonth": "هذا الشهر",
+  "time.older": "أقدم",
 
   "settings.aboutKiloCode.status.connected": "متصل",
   "settings.aboutKiloCode.status.connecting": "جارٍ الاتصال...",

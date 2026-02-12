@@ -774,10 +774,11 @@ export const dict = {
   "time.hoursAgo": "{{count}} 小时前",
   "time.daysAgo": "{{count}} 天前",
   "time.monthsAgo": "{{count}} 个月前",
-
-  "session.search.placeholder": "搜索会话...",
-  "session.empty": "暂无会话。点击 + 开始新对话。",
-  "session.untitled": "无标题",
+  "time.today": "今天",
+  "time.yesterday": "昨天",
+  "time.thisWeek": "本周",
+  "time.thisMonth": "本月",
+  "time.older": "更早",
 
   "settings.aboutKiloCode.status.connected": "已连接",
   "settings.aboutKiloCode.status.connecting": "连接中...",
