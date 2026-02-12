@@ -68,6 +68,11 @@
           "light": "assets/icons/kilo-light.svg",
           "dark": "assets/icons/kilo-dark.svg"
         }
+      },
+      {
+        "command": "kilo-code.new.autocomplete.generateSuggestions",
+        "title": "Generate Suggested Edits",
+        "category": "Kilo Code"
       }
     ],
     "menus": {
@@ -166,6 +171,26 @@
           "type": "string",
           "default": "kilo/auto",
           "description": "Default model ID for new sessions"
+        },
+        "kilo-code.new.autocomplete.enableAutoTrigger": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable automatic inline completion suggestions"
+        },
+        "kilo-code.new.autocomplete.enableSmartInlineTaskKeybinding": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable smart inline task keybinding"
+        },
+        "kilo-code.new.autocomplete.enableChatAutocomplete": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable chat textarea autocomplete"
+        },
+        "kilo-code.new.autocomplete.apiKey": {
+          "type": "string",
+          "default": "",
+          "description": "API key for Kilo Gateway autocomplete"
         }
       }
     }
