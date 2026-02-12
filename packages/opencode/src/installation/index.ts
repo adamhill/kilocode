@@ -192,7 +192,7 @@ export namespace Installation {
 
   export const VERSION = typeof KILO_VERSION === "string" ? KILO_VERSION : "local"
   export const CHANNEL = typeof KILO_CHANNEL === "string" ? KILO_CHANNEL : "local"
-  export const USER_AGENT = `opencode/${CHANNEL}/${VERSION}/${Flag.KILO_CLIENT}`
+  export const USER_AGENT = `kilo/${CHANNEL}/${VERSION}/${Flag.KILO_CLIENT}` // kilocode_change
 
   export async function latest(installMethod?: Method) {
     const detectedMethod = installMethod || (await method())
