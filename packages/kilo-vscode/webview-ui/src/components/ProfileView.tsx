@@ -1,4 +1,4 @@
-import { Component, Show, createSignal, createMemo } from "solid-js"
+import { Component, Show, createSignal, createMemo, createEffect, on } from "solid-js"
 import { Button } from "@kilocode/kilo-ui/button"
 import { Card } from "@kilocode/kilo-ui/card"
 import { Select } from "@kilocode/kilo-ui/select"
@@ -56,11 +56,15 @@ const ProfileView: Component<ProfileViewProps> = (props) => {
     // switching state resets when new profileData arrives
   }
 
-  // Reset switching state when profile data changes (org switch completed)
-  createMemo(() => {
-    props.profileData
-    setSwitching(false)
-  })
+  // Reset switching state when profile data changes (org switch completed or failed)
+  createEffect(
+    on(
+      () => props.profileData,
+      () => {
+        setSwitching(false)
+      },
+    ),
+  )
 
   const handleLogin = () => {
     props.onLogin()

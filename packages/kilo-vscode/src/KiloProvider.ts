@@ -925,13 +925,20 @@ export class KiloProvider implements vscode.WebviewViewProvider {
       return
     }
 
-    console.log("[Kilo New] KiloProvider: 🏢 Switching organization:", organizationId ?? "personal")
-    await this.httpClient.setOrganization(organizationId)
+    console.log("[Kilo New] KiloProvider: Switching organization:", organizationId ?? "personal")
+    try {
+      await this.httpClient.setOrganization(organizationId)
 
-    // Refresh profile (balance changes per org) and providers (models differ per org)
-    const profileData = await this.httpClient.getProfile()
-    this.postMessage({ type: "profileData", data: profileData })
-    await this.fetchAndSendProviders()
+      // Refresh profile (balance changes per org) and providers (models differ per org)
+      const profileData = await this.httpClient.getProfile()
+      this.postMessage({ type: "profileData", data: profileData })
+      await this.fetchAndSendProviders()
+    } catch (error) {
+      console.error("[Kilo New] KiloProvider: Failed to switch organization:", error)
+      // Re-fetch current profile to reset webview state (clears switching indicator)
+      const profileData = await this.httpClient.getProfile()
+      this.postMessage({ type: "profileData", data: profileData })
+    }
   }
 
   /**

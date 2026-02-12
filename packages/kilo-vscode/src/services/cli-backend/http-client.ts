@@ -317,9 +317,8 @@ export class HttpClient {
    * Switch the active organization.
    * Pass null to switch back to personal account.
    */
-  async setOrganization(organizationId: string | null): Promise<boolean> {
+  async setOrganization(organizationId: string | null): Promise<void> {
     await this.request("POST", "/kilo/organization", { organizationId })
-    return true
   }
 
   // ============================================

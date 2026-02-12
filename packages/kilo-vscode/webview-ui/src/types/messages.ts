@@ -402,7 +402,7 @@ export interface DeviceAuthCancelledMessage {
 
 export interface NavigateMessage {
   type: "navigate"
-  view: string
+  view: "newTask" | "marketplace" | "history" | "profile" | "settings"
 }
 
 export interface ProvidersLoadedMessage {
