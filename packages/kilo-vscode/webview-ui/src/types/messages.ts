@@ -314,6 +314,12 @@ export interface AutocompleteSettingsLoadedMessage {
   }
 }
 
+export interface ChatCompletionResultMessage {
+  type: "chatCompletionResult"
+  text: string
+  requestId: string
+}
+
 export type ExtensionMessage =
   | ReadyMessage
   | ConnectionStateMessage
@@ -337,6 +343,7 @@ export type ExtensionMessage =
   | ProvidersLoadedMessage
   | AgentsLoadedMessage
   | AutocompleteSettingsLoadedMessage
+  | ChatCompletionResultMessage
 
 // ============================================
 // Messages FROM webview TO extension
@@ -446,6 +453,17 @@ export interface UpdateAutocompleteSettingMessage {
   value: boolean
 }
 
+export interface RequestChatCompletionMessage {
+  type: "requestChatCompletion"
+  text: string
+  requestId: string
+}
+
+export interface ChatCompletionAcceptedMessage {
+  type: "chatCompletionAccepted"
+  suggestionLength?: number
+}
+
 export type WebviewMessage =
   | SendMessageRequest
   | AbortRequest
@@ -468,6 +486,8 @@ export type WebviewMessage =
   | RenameSessionRequest
   | RequestAutocompleteSettingsMessage
   | UpdateAutocompleteSettingMessage
+  | RequestChatCompletionMessage
+  | ChatCompletionAcceptedMessage
 
 // ============================================
 // VS Code API type

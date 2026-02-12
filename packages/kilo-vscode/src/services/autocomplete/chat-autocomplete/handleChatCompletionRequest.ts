@@ -2,6 +2,7 @@ import * as vscode from "vscode"
 import { VisibleCodeTracker } from "../context/VisibleCodeTracker"
 import { FileIgnoreController } from "../shims/FileIgnoreController"
 import { ChatTextAreaAutocomplete } from "./ChatTextAreaAutocomplete"
+import type { KiloConnectionService } from "../../cli-backend"
 
 export interface ChatCompletionRequestMessage {
   type: "requestChatCompletion"
@@ -10,7 +11,7 @@ export interface ChatCompletionRequestMessage {
 }
 
 export interface ChatCompletionResponseSender {
-  postMessage(message: { type: "chatCompletionResult"; text: string; requestId: string }): Promise<void>
+  postMessage(message: { type: "chatCompletionResult"; text: string; requestId: string }): void
 }
 
 /**
@@ -20,6 +21,7 @@ export interface ChatCompletionResponseSender {
 export async function handleChatCompletionRequest(
   message: ChatCompletionRequestMessage,
   responseSender: ChatCompletionResponseSender,
+  connectionService: KiloConnectionService,
 ): Promise<void> {
   const userText = message.text || ""
   const requestId = message.requestId || ""
@@ -31,10 +33,10 @@ export async function handleChatCompletionRequest(
   const tracker = new VisibleCodeTracker(workspacePath, ignoreController)
   const visibleContext = await tracker.captureVisibleCode()
 
-  const autocomplete = new ChatTextAreaAutocomplete()
+  const autocomplete = new ChatTextAreaAutocomplete(connectionService)
   const { suggestion } = await autocomplete.getCompletion(userText, visibleContext)
 
-  await responseSender.postMessage({ type: "chatCompletionResult", text: suggestion, requestId })
+  responseSender.postMessage({ type: "chatCompletionResult", text: suggestion, requestId })
 
   ignoreController.dispose()
 }

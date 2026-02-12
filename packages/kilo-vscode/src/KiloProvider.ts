@@ -1,5 +1,7 @@
 import * as vscode from "vscode"
 import { type HttpClient, type SessionInfo, type SSEEvent, type KiloConnectionService } from "./services/cli-backend"
+import { handleChatCompletionRequest } from "./services/autocomplete/chat-autocomplete/handleChatCompletionRequest"
+import { handleChatCompletionAccepted } from "./services/autocomplete/chat-autocomplete/handleChatCompletionAccepted"
 
 export class KiloProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = "kilo-code.new.sidebarView"
@@ -225,6 +227,16 @@ export class KiloProvider implements vscode.WebviewViewProvider {
           }
           break
         }
+        case "requestChatCompletion":
+          void handleChatCompletionRequest(
+            { type: "requestChatCompletion", text: message.text, requestId: message.requestId },
+            { postMessage: (msg) => this.postMessage(msg) },
+            this.connectionService,
+          )
+          break
+        case "chatCompletionAccepted":
+          handleChatCompletionAccepted({ type: "chatCompletionAccepted", suggestionLength: message.suggestionLength })
+          break
         case "deleteSession":
           await this.handleDeleteSession(message.sessionID)
           break

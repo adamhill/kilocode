@@ -181,6 +181,44 @@
   color: var(--vscode-input-placeholderForeground);
 }
 
+/* Ghost text autocomplete overlay */
+.prompt-input-ghost-wrapper {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+.prompt-input-ghost-wrapper .prompt-input {
+  position: relative;
+  z-index: 1;
+  background: transparent;
+}
+
+.prompt-input-ghost-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  padding: 8px 12px;
+  font-family: var(--vscode-font-family);
+  font-size: var(--vscode-font-size, 13px);
+  line-height: 1.4;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.prompt-input-ghost-text-hidden {
+  visibility: hidden;
+}
+
+.prompt-input-ghost-text {
+  color: var(--vscode-editorGhostText-foreground, rgba(255, 255, 255, 0.35));
+}
+
 .prompt-input-actions {
   display: flex;
   gap: 4px;
