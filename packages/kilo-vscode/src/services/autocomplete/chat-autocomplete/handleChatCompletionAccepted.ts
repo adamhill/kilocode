@@ -1,5 +1,9 @@
-import { WebviewMessage } from "../../../shared/WebviewMessage"
 import { AutocompleteTelemetry } from "../classic-auto-complete/AutocompleteTelemetry"
+
+export interface ChatCompletionAcceptedMessage {
+  type: "chatCompletionAccepted"
+  suggestionLength?: number
+}
 
 // Singleton telemetry instance for chat-textarea autocomplete
 // This ensures we use the same instance across requests and acceptance events
@@ -19,7 +23,7 @@ export function getChatAutocompleteTelemetry(): AutocompleteTelemetry {
  * Handles a chat completion accepted event from the webview.
  * Captures telemetry when the user accepts a suggestion via Tab or ArrowRight.
  */
-export function handleChatCompletionAccepted(message: WebviewMessage & { type: "chatCompletionAccepted" }): void {
+export function handleChatCompletionAccepted(message: ChatCompletionAcceptedMessage): void {
   const telemetry = getChatAutocompleteTelemetry()
   telemetry.captureAcceptSuggestion(message.suggestionLength)
 }

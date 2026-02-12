@@ -1,22 +1,8 @@
 import * as vscode from "vscode"
-import { AUTOCOMPLETE_PROVIDER_MODELS, ProviderName } from "@roo-code/types"
 import { t } from "./shims/i18n"
-import { PROVIDERS } from "../../../webview-ui/src/components/settings/constants"
 import type { AutocompleteStatusBarStateProps } from "./types"
 
-// Convert PROVIDERS array to a lookup map for display names
-const PROVIDER_DISPLAY_NAMES = Object.fromEntries(PROVIDERS.map(({ value, label }) => [value, label])) as Record<
-  ProviderName,
-  string
->
-
-/**
- * Get the display names of all supported autocomplete providers
- */
-function getSupportedProviderDisplayNames(): string[] {
-  const providerKeys = Array.from(AUTOCOMPLETE_PROVIDER_MODELS.keys())
-  return providerKeys.map((key) => PROVIDER_DISPLAY_NAMES[key as ProviderName] || key)
-}
+const SUPPORTED_PROVIDER_DISPLAY_NAME = "Kilo Gateway"
 
 export class AutocompleteStatusBar {
   statusBar: vscode.StatusBarItem
@@ -55,8 +41,12 @@ export class AutocompleteStatusBar {
 
   private humanFormatSessionCost(): string {
     const cost = this.props.totalSessionCost
-    if (cost === 0) return t("kilocode:autocomplete.statusBar.cost.zero")
-    if (cost > 0 && cost < 0.01) return t("kilocode:autocomplete.statusBar.cost.lessThanCent") // Less than one cent
+    if (cost === 0) {
+      return t("kilocode:autocomplete.statusBar.cost.zero")
+    }
+    if (cost > 0 && cost < 0.01) {
+      return t("kilocode:autocomplete.statusBar.cost.lessThanCent")
+    }
     return `$${cost.toFixed(2)}`
   }
 
@@ -64,7 +54,9 @@ export class AutocompleteStatusBar {
     this.props = { ...this.props, ...params }
 
     this.updateVisible()
-    if (this.props.enabled) this.render()
+    if (this.props.enabled) {
+      this.render()
+    }
   }
 
   private formatTime(timestamp: number): string {
@@ -116,10 +108,8 @@ export class AutocompleteStatusBar {
 
   private renderNoUsableProviderError() {
     this.statusBar.text = t("kilocode:autocomplete.statusBar.warning")
-    const providers = getSupportedProviderDisplayNames()
-    const providerList = providers.join(", ")
     this.statusBar.tooltip = this.createMarkdownTooltip(
-      t("kilocode:autocomplete.statusBar.tooltip.noUsableProvider", { providers: providerList }),
+      t("kilocode:autocomplete.statusBar.tooltip.noUsableProvider", { providers: SUPPORTED_PROVIDER_DISPLAY_NAME }),
     )
   }
 }
