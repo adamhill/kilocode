@@ -18,7 +18,7 @@ import type { SessionInfo } from "../../types/messages"
 
 const DATE_GROUP_KEYS = ["time.today", "time.yesterday", "time.thisWeek", "time.thisMonth", "time.older"] as const
 
-function dateGroupKey(iso: string): string {
+function dateGroupKey(iso: string): (typeof DATE_GROUP_KEYS)[number] {
   const now = new Date()
   const then = new Date(iso)
 
