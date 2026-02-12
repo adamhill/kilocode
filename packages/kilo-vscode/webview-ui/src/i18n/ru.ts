@@ -807,6 +807,16 @@ export const dict = {
   "settings.agentBehaviour.subtab.workflows": "Рабочие процессы",
   "settings.agentBehaviour.subtab.skills": "Навыки",
 
+  "settings.browser.description":
+    "При включении ИИ-агент может взаимодействовать с веб-страницами — переходить по ссылкам, нажимать, вводить текст и делать скриншоты. Откроется окно Chrome, чтобы вы могли наблюдать за работой агента.",
+  "settings.browser.enable.title": "Включить автоматизацию браузера",
+  "settings.browser.enable.description": "Зарегистрировать сервер Playwright MCP в CLI-бэкенде.",
+  "settings.browser.systemChrome.title": "Использовать системный Chrome",
+  "settings.browser.systemChrome.description":
+    "Использовать установленный браузер Chrome вместо отдельного экземпляра Chromium.",
+  "settings.browser.headless.title": "Безголовый режим",
+  "settings.browser.headless.description": "Запуск в безголовом режиме (без видимого окна браузера).",
+
   "settings.language.description": "Выберите язык интерфейса Kilo Code. «Авто» использует язык отображения VS Code.",
   "settings.language.auto": "Авто (язык VS Code)",
   "settings.language.current": "Текущий:",

@@ -7,6 +7,8 @@ import type {
   ProfileData,
   ProviderAuthAuthorization,
   ProviderListResponse,
+  McpStatus,
+  McpConfig,
 } from "./types"
 
 /**
@@ -302,5 +304,37 @@ export class HttpClient {
    */
   async oauthCallback(providerId: string, method: number, directory: string): Promise<boolean> {
     return this.request<boolean>("POST", `/provider/${providerId}/oauth/callback`, { method }, { directory })
+  }
+
+  // ============================================
+  // MCP Methods
+  // ============================================
+
+  /**
+   * Get the status of all MCP servers.
+   */
+  async getMcpStatus(): Promise<Record<string, McpStatus>> {
+    return this.request<Record<string, McpStatus>>("GET", "/mcp")
+  }
+
+  /**
+   * Add or update an MCP server configuration.
+   */
+  async addMcpServer(name: string, config: McpConfig): Promise<Record<string, McpStatus>> {
+    return this.request<Record<string, McpStatus>>("POST", "/mcp", { name, config })
+  }
+
+  /**
+   * Connect an MCP server by name.
+   */
+  async connectMcpServer(name: string): Promise<boolean> {
+    return this.request<boolean>("POST", `/mcp/${encodeURIComponent(name)}/connect`)
+  }
+
+  /**
+   * Disconnect an MCP server by name.
+   */
+  async disconnectMcpServer(name: string): Promise<boolean> {
+    return this.request<boolean>("POST", `/mcp/${encodeURIComponent(name)}/disconnect`)
   }
 }

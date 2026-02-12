@@ -795,6 +795,16 @@ export const dict = {
   "settings.agentBehaviour.subtab.workflows": "ワークフロー",
   "settings.agentBehaviour.subtab.skills": "スキル",
 
+  "settings.browser.description":
+    "有効にすると、AIエージェントがWebページを操作できるようになります — ナビゲーション、クリック、入力、スクリーンショットの撮影。Chromeウィンドウが開き、エージェントの作業を確認できます。",
+  "settings.browser.enable.title": "ブラウザ自動化を有効にする",
+  "settings.browser.enable.description": "Playwright MCPサーバーをCLIバックエンドに登録します。",
+  "settings.browser.systemChrome.title": "システムChromeを使用",
+  "settings.browser.systemChrome.description":
+    "別のChromiumインスタンスの代わりに、インストール済みのChromeブラウザを使用します。",
+  "settings.browser.headless.title": "ヘッドレスモード",
+  "settings.browser.headless.description": "ヘッドレスモードで実行します（ブラウザウィンドウは表示されません）。",
+
   "settings.language.description": "Kilo Code UIの言語を選択します。「自動」はVS Codeの表示言語を使用します。",
   "settings.language.auto": "自動（VS Code言語）",
   "settings.language.current": "現在：",
