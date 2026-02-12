@@ -334,7 +334,6 @@ export namespace ProviderTransform {
       })
     }
 
-    // kilocode_change - re-enable prompt caching for OpenRouter and Kilo Gateway
     if (
       model.providerID === "anthropic" ||
       model.api.id.includes("anthropic") ||
