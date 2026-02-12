@@ -65,7 +65,7 @@ export const QuestionDock: Component<{ request: QuestionRequest }> = (props) => 
   }
 
   const submit = () => {
-    reply(questions().map((_, i) => store.answers[i] ?? []))
+    reply(questions().map((_, i) => [...(store.answers[i] ?? [])]))
   }
 
   const pick = (answer: string, custom = false) => {
