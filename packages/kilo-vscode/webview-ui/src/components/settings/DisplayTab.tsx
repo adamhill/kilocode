@@ -41,11 +41,13 @@ const DisplayTab: Component = () => {
               Custom username displayed in conversations
             </div>
           </div>
-          <TextField
-            value={config().username ?? ""}
-            placeholder="User"
-            onChange={(val) => updateConfig({ username: val.trim() || undefined })}
-          />
+          <div style={{ width: "160px" }}>
+            <TextField
+              value={config().username ?? ""}
+              placeholder="User"
+              onChange={(val) => updateConfig({ username: val.trim() || undefined })}
+            />
+          </div>
         </div>
 
         <div
