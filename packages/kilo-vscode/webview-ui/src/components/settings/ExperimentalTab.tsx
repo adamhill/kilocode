@@ -65,55 +65,55 @@ const ExperimentalTab: Component = () => {
           />
         </SettingsRow>
 
-        <div style={{ padding: "8px 0", "border-bottom": "1px solid var(--border-weak-base)" }}>
+        <SettingsRow label="Formatter" description="Enable the automatic code formatter">
           <Switch
             checked={config().formatter !== false}
             onChange={(checked) => updateConfig({ formatter: checked ? {} : false })}
-            description="Enable the automatic code formatter"
+            hideLabel
           >
             Formatter
           </Switch>
-        </div>
+        </SettingsRow>
 
-        <div style={{ padding: "8px 0", "border-bottom": "1px solid var(--border-weak-base)" }}>
+        <SettingsRow label="LSP" description="Enable language server protocol integration">
           <Switch
             checked={config().lsp !== false}
             onChange={(checked) => updateConfig({ lsp: checked ? {} : false })}
-            description="Enable language server protocol integration"
+            hideLabel
           >
             LSP
           </Switch>
-        </div>
+        </SettingsRow>
 
-        <div style={{ padding: "8px 0", "border-bottom": "1px solid var(--border-weak-base)" }}>
+        <SettingsRow label="Disable Paste Summary" description="Don't summarize large pasted content">
           <Switch
             checked={experimental().disable_paste_summary ?? false}
             onChange={(checked) => updateExperimental("disable_paste_summary", checked)}
-            description="Don't summarize large pasted content"
+            hideLabel
           >
             Disable Paste Summary
           </Switch>
-        </div>
+        </SettingsRow>
 
-        <div style={{ padding: "8px 0", "border-bottom": "1px solid var(--border-weak-base)" }}>
+        <SettingsRow label="Batch Tool" description="Enable batching of multiple tool calls">
           <Switch
             checked={experimental().batch_tool ?? false}
             onChange={(checked) => updateExperimental("batch_tool", checked)}
-            description="Enable batching of multiple tool calls"
+            hideLabel
           >
             Batch Tool
           </Switch>
-        </div>
+        </SettingsRow>
 
-        <div style={{ padding: "8px 0", "border-bottom": "1px solid var(--border-weak-base)" }}>
+        <SettingsRow label="Continue on Deny" description="Continue the agent loop when a permission is denied">
           <Switch
             checked={experimental().continue_loop_on_deny ?? false}
             onChange={(checked) => updateExperimental("continue_loop_on_deny", checked)}
-            description="Continue the agent loop when a permission is denied"
+            hideLabel
           >
             Continue on Deny
           </Switch>
-        </div>
+        </SettingsRow>
 
         {/* MCP timeout */}
         <SettingsRow label="MCP Timeout (ms)" description="Timeout for MCP server requests in milliseconds" last>
@@ -135,22 +135,15 @@ const ExperimentalTab: Component = () => {
         <Card>
           <For each={Object.entries(config().tools ?? {})}>
             {([name, enabled], index) => (
-              <div
-                style={{
-                  padding: "8px 0",
-                  "border-bottom":
-                    index() < Object.keys(config().tools ?? {}).length - 1
-                      ? "1px solid var(--border-weak-base)"
-                      : "none",
-                }}
-              >
+              <SettingsRow label={name} description="" last={index() >= Object.keys(config().tools ?? {}).length - 1}>
                 <Switch
                   checked={enabled}
                   onChange={(checked) => updateConfig({ tools: { ...config().tools, [name]: checked } })}
+                  hideLabel
                 >
                   {name}
                 </Switch>
-              </div>
+              </SettingsRow>
             )}
           </For>
         </Card>

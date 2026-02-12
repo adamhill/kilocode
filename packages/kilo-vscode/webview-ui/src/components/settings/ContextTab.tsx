@@ -7,6 +7,27 @@ import { IconButton } from "@kilocode/kilo-ui/icon-button"
 
 import { useConfig } from "../../context/config"
 
+const SettingsRow: Component<{ label: string; description: string; last?: boolean; children: any }> = (props) => (
+  <div
+    data-slot="settings-row"
+    style={{
+      display: "flex",
+      "align-items": "center",
+      "justify-content": "space-between",
+      padding: "8px 0",
+      "border-bottom": props.last ? "none" : "1px solid var(--border-weak-base)",
+    }}
+  >
+    <div style={{ flex: 1, "min-width": 0, "margin-right": "12px" }}>
+      <div style={{ "font-weight": "500" }}>{props.label}</div>
+      <div style={{ "font-size": "11px", color: "var(--text-weak-base, var(--vscode-descriptionForeground))" }}>
+        {props.description}
+      </div>
+    </div>
+    {props.children}
+  </div>
+)
+
 const ContextTab: Component = () => {
   const { config, updateConfig } = useConfig()
   const [newPattern, setNewPattern] = createSignal("")
@@ -34,24 +55,24 @@ const ContextTab: Component = () => {
     <div>
       {/* Compaction settings */}
       <Card>
-        <div style={{ padding: "8px 0", "border-bottom": "1px solid var(--border-weak-base)" }}>
+        <SettingsRow label="Auto Compaction" description="Automatically compact context when it's full">
           <Switch
             checked={config().compaction?.auto ?? false}
             onChange={(checked) => updateConfig({ compaction: { ...config().compaction, auto: checked } })}
-            description="Automatically compact context when it's full"
+            hideLabel
           >
             Auto Compaction
           </Switch>
-        </div>
-        <div style={{ padding: "8px 0" }}>
+        </SettingsRow>
+        <SettingsRow label="Prune Old Outputs" description="Remove old tool outputs during compaction" last>
           <Switch
             checked={config().compaction?.prune ?? false}
             onChange={(checked) => updateConfig({ compaction: { ...config().compaction, prune: checked } })}
-            description="Remove old tool outputs during compaction"
+            hideLabel
           >
             Prune Old Outputs
           </Switch>
-        </div>
+        </SettingsRow>
       </Card>
 
       <h4 style={{ "margin-top": "16px", "margin-bottom": "8px" }}>File Watcher Ignore Patterns</h4>

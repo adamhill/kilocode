@@ -74,42 +74,42 @@ const NotificationsTab: Component = () => {
   return (
     <div>
       <Card>
-        <div style={{ padding: "8px 0", "border-bottom": "1px solid var(--border-weak-base)" }}>
+        <SettingsRow label="Agent Completion" description="Show notification when agent completes a task">
           <Switch
             checked={agentNotify()}
             onChange={(checked) => {
               setAgentNotify(checked)
               saveSetting("notifications.agent", checked)
             }}
-            description="Show notification when agent completes a task"
+            hideLabel
           >
             Agent Completion
           </Switch>
-        </div>
-        <div style={{ padding: "8px 0", "border-bottom": "1px solid var(--border-weak-base)" }}>
+        </SettingsRow>
+        <SettingsRow label="Permission Requests" description="Show notification on permission requests">
           <Switch
             checked={permNotify()}
             onChange={(checked) => {
               setPermNotify(checked)
               saveSetting("notifications.permissions", checked)
             }}
-            description="Show notification on permission requests"
+            hideLabel
           >
             Permission Requests
           </Switch>
-        </div>
-        <div style={{ padding: "8px 0" }}>
+        </SettingsRow>
+        <SettingsRow label="Errors" description="Show notification on errors" last>
           <Switch
             checked={errorNotify()}
             onChange={(checked) => {
               setErrorNotify(checked)
               saveSetting("notifications.errors", checked)
             }}
-            description="Show notification on errors"
+            hideLabel
           >
             Errors
           </Switch>
-        </div>
+        </SettingsRow>
       </Card>
 
       <h4 style={{ "margin-top": "16px", "margin-bottom": "8px" }}>Sounds</h4>
