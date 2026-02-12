@@ -261,8 +261,7 @@ export namespace ProviderTransform {
     msgs = unsupportedParts(msgs, model)
     msgs = normalizeMessages(msgs, model, options)
 
-    // kilocode_change - skip caching for OpenRouter/Kilo Gateway to avoid modifying thinking blocks
-    // Anthropic API requires thinking/redacted_thinking blocks to remain exactly unchanged
+    // kilocode_change - identify OpenRouter/Kilo Gateway for thinking block stripping
     const isOpenRouterOrKilo =
       model.api.npm === "@openrouter/ai-sdk-provider" || model.api.npm === "@kilocode/kilo-gateway"
 
@@ -336,13 +335,12 @@ export namespace ProviderTransform {
     }
 
     if (
-      !isOpenRouterOrKilo &&
-      (model.providerID === "anthropic" ||
-        model.api.id.includes("anthropic") ||
-        model.api.id.includes("claude") ||
-        model.id.includes("anthropic") ||
-        model.id.includes("claude") ||
-        model.api.npm === "@ai-sdk/anthropic")
+      model.providerID === "anthropic" ||
+      model.api.id.includes("anthropic") ||
+      model.api.id.includes("claude") ||
+      model.id.includes("anthropic") ||
+      model.id.includes("claude") ||
+      model.api.npm === "@ai-sdk/anthropic"
     ) {
       msgs = applyCaching(msgs, model.providerID)
     }
