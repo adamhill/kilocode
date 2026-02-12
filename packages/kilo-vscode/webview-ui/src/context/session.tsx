@@ -546,7 +546,7 @@ export const SessionProvider: ParentComponent = (props) => {
       requestID,
       answers,
     })
-    // Removal handled by SSE question.replied event via handleQuestionResolved
+    setQuestions((prev) => prev.filter((q) => q.id !== requestID))
   }
 
   function rejectQuestion(requestID: string) {
@@ -554,7 +554,7 @@ export const SessionProvider: ParentComponent = (props) => {
       type: "questionReject",
       requestID,
     })
-    // Removal handled by SSE question.rejected event via handleQuestionResolved
+    setQuestions((prev) => prev.filter((q) => q.id !== requestID))
   }
 
   function createSession() {
