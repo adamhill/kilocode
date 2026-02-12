@@ -450,6 +450,11 @@ export interface ConfigUpdatedMessage {
   config: Config
 }
 
+export interface LocalSettingsLoadedMessage {
+  type: "localSettingsLoaded"
+  settings: Record<string, unknown>
+}
+
 export type ExtensionMessage =
   | ReadyMessage
   | ConnectionStateMessage
@@ -478,6 +483,7 @@ export type ExtensionMessage =
   | BrowserSettingsLoadedMessage
   | ConfigLoadedMessage
   | ConfigUpdatedMessage
+  | LocalSettingsLoadedMessage
 
 // ============================================
 // Messages FROM webview TO extension
@@ -607,6 +613,16 @@ export interface UpdateConfigMessage {
   config: Partial<Config>
 }
 
+export interface SaveLocalSettingMessage {
+  type: "saveLocalSetting"
+  key: string
+  value: unknown
+}
+
+export interface RequestLocalSettingsMessage {
+  type: "requestLocalSettings"
+}
+
 export type WebviewMessage =
   | SendMessageRequest
   | AbortRequest
@@ -633,6 +649,8 @@ export type WebviewMessage =
   | RequestBrowserSettingsMessage
   | RequestConfigMessage
   | UpdateConfigMessage
+  | SaveLocalSettingMessage
+  | RequestLocalSettingsMessage
 
 // ============================================
 // VS Code API type

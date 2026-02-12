@@ -16,6 +16,8 @@ export class KiloProvider implements vscode.WebviewViewProvider {
   /** Cached configLoaded payload so requestConfig can be served before httpClient is ready */
   private cachedConfigMessage: unknown = null
 
+  private readonly globalState: vscode.Memento
+
   private trackedSessionIds: Set<string> = new Set()
   private unsubscribeEvent: (() => void) | null = null
   private unsubscribeState: (() => void) | null = null
@@ -24,7 +26,10 @@ export class KiloProvider implements vscode.WebviewViewProvider {
   constructor(
     private readonly extensionUri: vscode.Uri,
     private readonly connectionService: KiloConnectionService,
-  ) {}
+    globalState: vscode.Memento,
+  ) {
+    this.globalState = globalState
+  }
 
   /**
    * Convenience getter that returns the shared HttpClient or null if not yet connected.
@@ -234,6 +239,12 @@ export class KiloProvider implements vscode.WebviewViewProvider {
         case "requestBrowserSettings":
           this.sendBrowserSettings()
           break
+        case "requestLocalSettings":
+          await this.handleRequestLocalSettings()
+          break
+        case "saveLocalSetting":
+          await this.handleSaveLocalSetting(message.key, message.value)
+          break
       }
     })
   }
@@ -316,6 +327,7 @@ export class KiloProvider implements vscode.WebviewViewProvider {
       await this.fetchAndSendProviders()
       await this.fetchAndSendAgents()
       await this.fetchAndSendConfig()
+      await this.handleRequestLocalSettings()
 
       console.log("[Kilo New] KiloProvider: ✅ initializeConnection completed successfully")
     } catch (error) {
@@ -621,6 +633,32 @@ export class KiloProvider implements vscode.WebviewViewProvider {
     } catch (error) {
       console.error("[Kilo New] KiloProvider: Failed to fetch config:", error)
     }
+  }
+
+  /**
+   * Send all local settings to the webview.
+   */
+  private async handleRequestLocalSettings(): Promise<void> {
+    const keys = [
+      "notifications.agent",
+      "notifications.permissions",
+      "notifications.errors",
+      "sounds.agent",
+      "sounds.permissions",
+      "sounds.errors",
+    ]
+    const settings: Record<string, unknown> = {}
+    for (const key of keys) {
+      settings[key] = this.globalState.get(key)
+    }
+    this.postMessage({ type: "localSettingsLoaded", settings })
+  }
+
+  /**
+   * Save a local setting to globalState.
+   */
+  private async handleSaveLocalSetting(key: string, value: unknown): Promise<void> {
+    await this.globalState.update(key, value)
   }
 
   /**
