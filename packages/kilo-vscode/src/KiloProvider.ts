@@ -725,6 +725,7 @@ export class KiloProvider implements vscode.WebviewViewProvider {
    */
   private async handleQuestionReply(requestID: string, answers: string[][]): Promise<void> {
     if (!this.httpClient) {
+      this.postMessage({ type: "questionError", requestID })
       return
     }
 
@@ -741,6 +742,7 @@ export class KiloProvider implements vscode.WebviewViewProvider {
    */
   private async handleQuestionReject(requestID: string): Promise<void> {
     if (!this.httpClient) {
+      this.postMessage({ type: "questionError", requestID })
       return
     }
 
