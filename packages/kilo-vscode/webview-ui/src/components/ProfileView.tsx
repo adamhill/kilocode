@@ -1,6 +1,7 @@
-import { Component, Show } from "solid-js"
+import { Component, Show, createSignal, createMemo } from "solid-js"
 import { Button } from "@kilocode/kilo-ui/button"
 import { Card } from "@kilocode/kilo-ui/card"
+import { Select } from "@kilocode/kilo-ui/select"
 import { Tooltip } from "@kilocode/kilo-ui/tooltip"
 import { useVSCode } from "../context/vscode"
 import { useLanguage } from "../context/language"
@@ -19,9 +20,47 @@ const formatBalance = (amount: number): string => {
   return `$${amount.toFixed(2)}`
 }
 
+interface OrgOption {
+  value: string | null
+  label: string
+  description?: string
+}
+
 const ProfileView: Component<ProfileViewProps> = (props) => {
   const vscode = useVSCode()
   const language = useLanguage()
+  const [switching, setSwitching] = createSignal(false)
+
+  const orgOptions = createMemo<OrgOption[]>(() => {
+    const orgs = props.profileData?.profile.organizations ?? []
+    if (orgs.length === 0) {
+      return []
+    }
+    return [
+      { value: null, label: "Personal Account" },
+      ...orgs.map((org) => ({ value: org.id, label: org.name, description: org.role })),
+    ]
+  })
+
+  const currentOrg = createMemo(() => {
+    const id = props.profileData?.currentOrgId ?? null
+    return orgOptions().find((o) => o.value === id)
+  })
+
+  const handleSelectOrg = (option: OrgOption) => {
+    if (option.value === (props.profileData?.currentOrgId ?? null)) {
+      return
+    }
+    setSwitching(true)
+    vscode.postMessage({ type: "setOrganization", organizationId: option.value })
+    // switching state resets when new profileData arrives
+  }
+
+  // Reset switching state when profile data changes (org switch completed)
+  createMemo(() => {
+    props.profileData
+    setSwitching(false)
+  })
 
   const handleLogin = () => {
     props.onLogin()
@@ -125,6 +164,34 @@ const ProfileView: Component<ProfileViewProps> = (props) => {
                 {data().profile.email}
               </p>
             </Card>
+
+            {/* Organization selector */}
+            <Show when={orgOptions().length > 0}>
+              <Card>
+                <p
+                  style={{
+                    "font-size": "11px",
+                    "text-transform": "uppercase",
+                    "letter-spacing": "0.5px",
+                    color: "var(--vscode-descriptionForeground)",
+                    margin: "0 0 8px 0",
+                  }}
+                >
+                  Account
+                </p>
+                <Select
+                  options={orgOptions()}
+                  current={currentOrg()}
+                  value={(o) => o.value ?? "personal"}
+                  label={(o) => o.label}
+                  onSelect={handleSelectOrg}
+                  variant="secondary"
+                  size="small"
+                  triggerVariant="settings"
+                  disabled={switching()}
+                />
+              </Card>
+            </Show>
 
             {/* Balance */}
             <Show when={data().balance}>

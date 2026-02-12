@@ -119,6 +119,10 @@ const AppContent: Component = () => {
         console.log("[Kilo New] App: 🎬 action:", message.action)
         handleViewAction(message.action)
       }
+      if (message?.type === "navigate" && message.view) {
+        console.log("[Kilo New] App: 🧭 navigate:", message.view)
+        setCurrentView(message.view)
+      }
     }
     window.addEventListener("message", handler)
     onCleanup(() => window.removeEventListener("message", handler))
