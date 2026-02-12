@@ -1,4 +1,10 @@
 import { Component, createSignal, createMemo, For, Show } from "solid-js"
+import { Select } from "@kilocode/kilo-ui/select"
+import { TextField } from "@kilocode/kilo-ui/text-field"
+import { Card } from "@kilocode/kilo-ui/card"
+import { Button } from "@kilocode/kilo-ui/button"
+import { IconButton } from "@kilocode/kilo-ui/icon-button"
+
 import { useConfig } from "../../context/config"
 import { useSession } from "../../context/session"
 import { useLanguage } from "../../context/language"
@@ -19,28 +25,9 @@ const subtabs: SubtabConfig[] = [
   { id: "skills", labelKey: "settings.agentBehaviour.subtab.skills" },
 ]
 
-const selectStyle = {
-  padding: "4px 8px",
-  "border-radius": "4px",
-  border: "1px solid var(--vscode-dropdown-border, var(--vscode-panel-border))",
-  background: "var(--vscode-dropdown-background)",
-  color: "var(--vscode-dropdown-foreground)",
-  "font-size": "12px",
-  "font-family": "var(--vscode-font-family)",
-  cursor: "pointer",
-  outline: "none",
-  "min-width": "120px",
-}
-
-const inputStyle = {
-  padding: "4px 8px",
-  "border-radius": "4px",
-  border: "1px solid var(--vscode-input-border, var(--vscode-panel-border))",
-  background: "var(--vscode-input-background)",
-  color: "var(--vscode-input-foreground)",
-  "font-size": "12px",
-  "font-family": "var(--vscode-font-family)",
-  outline: "none",
+interface SelectOption {
+  value: string
+  label: string
 }
 
 interface SettingRowProps {
@@ -52,18 +39,18 @@ interface SettingRowProps {
 
 const SettingRow: Component<SettingRowProps> = (props) => (
   <div
+    data-slot="settings-row"
     style={{
       display: "flex",
       "align-items": "center",
       "justify-content": "space-between",
-      padding: "10px 12px",
-      background: "var(--vscode-editor-background)",
-      "border-bottom": props.last ? "none" : "1px solid var(--vscode-panel-border)",
+      padding: "8px 0",
+      "border-bottom": props.last ? "none" : "1px solid var(--border-weak-base)",
     }}
   >
     <div style={{ flex: 1, "min-width": 0, "margin-right": "12px" }}>
-      <div style={{ "font-size": "12px", "font-weight": "500", color: "var(--vscode-foreground)" }}>{props.label}</div>
-      <div style={{ "font-size": "11px", color: "var(--vscode-descriptionForeground)", "margin-top": "2px" }}>
+      <div style={{ "font-weight": "500" }}>{props.label}</div>
+      <div style={{ "font-size": "11px", color: "var(--text-weak-base, var(--vscode-descriptionForeground))" }}>
         {props.description}
       </div>
     </div>
@@ -72,25 +59,18 @@ const SettingRow: Component<SettingRowProps> = (props) => (
 )
 
 const Placeholder: Component<{ text: string }> = (props) => (
-  <div
-    style={{
-      background: "var(--vscode-editor-background)",
-      border: "1px solid var(--vscode-panel-border)",
-      "border-radius": "4px",
-      padding: "16px",
-    }}
-  >
+  <Card>
     <p
       style={{
         "font-size": "12px",
-        color: "var(--vscode-descriptionForeground)",
+        color: "var(--text-weak-base, var(--vscode-descriptionForeground))",
         margin: 0,
         "line-height": "1.5",
       }}
     >
-      <strong style={{ color: "var(--vscode-foreground)" }}>Not yet implemented.</strong> {props.text}
+      <strong>Not yet implemented.</strong> {props.text}
     </p>
-  </div>
+  </Card>
 )
 
 const AgentBehaviourTab: Component = () => {
@@ -114,6 +94,16 @@ const AgentBehaviourTab: Component = () => {
     }
     return names.sort()
   })
+
+  const defaultAgentOptions = createMemo<SelectOption[]>(() => [
+    { value: "", label: "Default" },
+    ...agentNames().map((name) => ({ value: name, label: name })),
+  ])
+
+  const agentSelectorOptions = createMemo<SelectOption[]>(() => [
+    { value: "", label: "Select an agent to configure…" },
+    ...agentNames().map((name) => ({ value: name, label: name })),
+  ])
 
   const currentAgentConfig = createMemo<AgentConfig>(() => {
     const name = selectedAgent()
@@ -199,80 +189,59 @@ const AgentBehaviourTab: Component = () => {
   const renderAgentsSubtab = () => (
     <div>
       {/* Default agent */}
-      <div
-        style={{
-          border: "1px solid var(--vscode-panel-border)",
-          "border-radius": "4px",
-          overflow: "hidden",
-          "margin-bottom": "12px",
-        }}
-      >
+      <Card style={{ "margin-bottom": "12px" }}>
         <SettingRow label="Default Agent" description="Agent to use when none is specified" last>
-          <select
-            style={selectStyle}
-            value={config().default_agent ?? ""}
-            onChange={(e) => updateConfig({ default_agent: e.currentTarget.value || undefined })}
-          >
-            <option value="">Default</option>
-            <For each={agentNames()}>{(name) => <option value={name}>{name}</option>}</For>
-          </select>
+          <Select
+            options={defaultAgentOptions()}
+            current={defaultAgentOptions().find((o) => o.value === (config().default_agent ?? ""))}
+            value={(o) => o.value}
+            label={(o) => o.label}
+            onSelect={(o) => o && updateConfig({ default_agent: o.value || undefined })}
+            variant="secondary"
+            size="small"
+            triggerVariant="settings"
+          />
         </SettingRow>
-      </div>
+      </Card>
 
       {/* Agent selector */}
       <div style={{ "margin-bottom": "12px" }}>
-        <select
-          style={{ ...selectStyle, width: "100%" }}
-          value={selectedAgent()}
-          onChange={(e) => setSelectedAgent(e.currentTarget.value)}
-        >
-          <option value="">Select an agent to configure…</option>
-          <For each={agentNames()}>{(name) => <option value={name}>{name}</option>}</For>
-        </select>
+        <Select
+          options={agentSelectorOptions()}
+          current={agentSelectorOptions().find((o) => o.value === selectedAgent())}
+          value={(o) => o.value}
+          label={(o) => o.label}
+          onSelect={(o) => o && setSelectedAgent(o.value)}
+          variant="secondary"
+          size="small"
+          triggerVariant="settings"
+        />
       </div>
 
       <Show when={selectedAgent()}>
-        <div
-          style={{
-            border: "1px solid var(--vscode-panel-border)",
-            "border-radius": "4px",
-            overflow: "hidden",
-          }}
-        >
+        <Card>
           {/* Model override */}
           <SettingRow label="Model Override" description="Override the default model for this agent">
-            <input
-              type="text"
-              style={{ ...inputStyle, width: "200px" }}
+            <TextField
               value={currentAgentConfig().model ?? ""}
               placeholder="e.g. anthropic/claude-sonnet-4-20250514"
-              onBlur={(e) =>
+              onChange={(val) =>
                 updateAgentConfig(selectedAgent(), {
-                  model: e.currentTarget.value.trim() || undefined,
+                  model: val.trim() || undefined,
                 })
               }
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.currentTarget.blur()
-                }
-              }}
             />
           </SettingRow>
 
           {/* System prompt */}
           <SettingRow label="Custom Prompt" description="Additional system prompt for this agent">
-            <textarea
-              style={{
-                ...inputStyle,
-                width: "200px",
-                height: "60px",
-                resize: "vertical",
-              }}
+            <TextField
               value={currentAgentConfig().prompt ?? ""}
               placeholder="Custom instructions…"
-              onBlur={(e) =>
+              multiline
+              onChange={(val) =>
                 updateAgentConfig(selectedAgent(), {
-                  prompt: e.currentTarget.value.trim() || undefined,
+                  prompt: val.trim() || undefined,
                 })
               }
             />
@@ -280,53 +249,40 @@ const AgentBehaviourTab: Component = () => {
 
           {/* Temperature */}
           <SettingRow label="Temperature" description="Sampling temperature (0-2)">
-            <input
-              type="number"
-              style={{ ...inputStyle, width: "80px" }}
-              value={currentAgentConfig().temperature ?? ""}
+            <TextField
+              value={currentAgentConfig().temperature?.toString() ?? ""}
               placeholder="Default"
-              min="0"
-              max="2"
-              step="0.1"
-              onChange={(e) => {
-                const val = parseFloat(e.currentTarget.value)
-                updateAgentConfig(selectedAgent(), { temperature: isNaN(val) ? undefined : val })
+              onChange={(val) => {
+                const parsed = parseFloat(val)
+                updateAgentConfig(selectedAgent(), { temperature: isNaN(parsed) ? undefined : parsed })
               }}
             />
           </SettingRow>
 
           {/* Top-p */}
           <SettingRow label="Top P" description="Nucleus sampling parameter (0-1)">
-            <input
-              type="number"
-              style={{ ...inputStyle, width: "80px" }}
-              value={currentAgentConfig().top_p ?? ""}
+            <TextField
+              value={currentAgentConfig().top_p?.toString() ?? ""}
               placeholder="Default"
-              min="0"
-              max="1"
-              step="0.05"
-              onChange={(e) => {
-                const val = parseFloat(e.currentTarget.value)
-                updateAgentConfig(selectedAgent(), { top_p: isNaN(val) ? undefined : val })
+              onChange={(val) => {
+                const parsed = parseFloat(val)
+                updateAgentConfig(selectedAgent(), { top_p: isNaN(parsed) ? undefined : parsed })
               }}
             />
           </SettingRow>
 
           {/* Max steps */}
           <SettingRow label="Max Steps" description="Maximum agentic iterations" last>
-            <input
-              type="number"
-              style={{ ...inputStyle, width: "80px" }}
-              value={currentAgentConfig().steps ?? ""}
+            <TextField
+              value={currentAgentConfig().steps?.toString() ?? ""}
               placeholder="Default"
-              min="1"
-              onChange={(e) => {
-                const val = parseInt(e.currentTarget.value, 10)
-                updateAgentConfig(selectedAgent(), { steps: isNaN(val) ? undefined : val })
+              onChange={(val) => {
+                const parsed = parseInt(val, 10)
+                updateAgentConfig(selectedAgent(), { steps: isNaN(parsed) ? undefined : parsed })
               }}
             />
           </SettingRow>
-        </div>
+        </Card>
       </Show>
     </div>
   )
@@ -339,50 +295,32 @@ const AgentBehaviourTab: Component = () => {
         <Show
           when={mcpEntries().length > 0}
           fallback={
-            <div
-              style={{
-                padding: "16px",
-                background: "var(--vscode-editor-background)",
-                border: "1px solid var(--vscode-panel-border)",
-                "border-radius": "4px",
-                "font-size": "12px",
-                color: "var(--vscode-descriptionForeground)",
-              }}
-            >
-              No MCP servers configured. Edit the opencode config file to add MCP servers.
-            </div>
+            <Card>
+              <div
+                style={{
+                  "font-size": "12px",
+                  color: "var(--text-weak-base, var(--vscode-descriptionForeground))",
+                }}
+              >
+                No MCP servers configured. Edit the opencode config file to add MCP servers.
+              </div>
+            </Card>
           }
         >
-          <div
-            style={{
-              border: "1px solid var(--vscode-panel-border)",
-              "border-radius": "4px",
-              overflow: "hidden",
-            }}
-          >
+          <Card>
             <For each={mcpEntries()}>
               {([name, mcp], index) => (
                 <div
                   style={{
-                    padding: "10px 12px",
-                    background: "var(--vscode-editor-background)",
-                    "border-bottom":
-                      index() < mcpEntries().length - 1 ? "1px solid var(--vscode-panel-border)" : "none",
+                    padding: "8px 0",
+                    "border-bottom": index() < mcpEntries().length - 1 ? "1px solid var(--border-weak-base)" : "none",
                   }}
                 >
-                  <div
-                    style={{
-                      "font-size": "12px",
-                      "font-weight": "500",
-                      color: "var(--vscode-foreground)",
-                    }}
-                  >
-                    {name}
-                  </div>
+                  <div style={{ "font-weight": "500" }}>{name}</div>
                   <div
                     style={{
                       "font-size": "11px",
-                      color: "var(--vscode-descriptionForeground)",
+                      color: "var(--text-weak-base, var(--vscode-descriptionForeground))",
                       "margin-top": "4px",
                       "font-family": "var(--vscode-editor-font-family, monospace)",
                     }}
@@ -399,7 +337,7 @@ const AgentBehaviourTab: Component = () => {
                 </div>
               )}
             </For>
-          </div>
+          </Card>
         </Show>
       </div>
     )
@@ -408,59 +346,30 @@ const AgentBehaviourTab: Component = () => {
   const renderSkillsSubtab = () => (
     <div>
       {/* Skill paths */}
-      <h4
-        style={{
-          "font-size": "13px",
-          "margin-top": "0",
-          "margin-bottom": "8px",
-          color: "var(--vscode-foreground)",
-        }}
-      >
-        Skill Folder Paths
-      </h4>
-      <div
-        style={{
-          border: "1px solid var(--vscode-panel-border)",
-          "border-radius": "4px",
-          overflow: "hidden",
-          "margin-bottom": "16px",
-        }}
-      >
+      <h4 style={{ "margin-top": "0", "margin-bottom": "8px" }}>Skill Folder Paths</h4>
+      <Card style={{ "margin-bottom": "16px" }}>
         <div
           style={{
             display: "flex",
             gap: "8px",
-            padding: "8px 12px",
-            background: "var(--vscode-editor-background)",
-            "border-bottom": skillPaths().length > 0 ? "1px solid var(--vscode-panel-border)" : "none",
+            "align-items": "center",
+            padding: "8px 0",
+            "border-bottom": skillPaths().length > 0 ? "1px solid var(--border-weak-base)" : "none",
           }}
         >
-          <input
-            type="text"
-            style={{ ...inputStyle, flex: "1" }}
-            value={newSkillPath()}
-            placeholder="e.g. ./skills"
-            onInput={(e) => setNewSkillPath(e.currentTarget.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                addSkillPath()
-              }
-            }}
-          />
-          <button
-            onClick={addSkillPath}
-            style={{
-              padding: "4px 12px",
-              "border-radius": "4px",
-              border: "1px solid var(--vscode-button-border, transparent)",
-              background: "var(--vscode-button-background)",
-              color: "var(--vscode-button-foreground)",
-              "font-size": "12px",
-              cursor: "pointer",
-            }}
-          >
+          <div style={{ flex: 1 }}>
+            <TextField
+              value={newSkillPath()}
+              placeholder="e.g. ./skills"
+              onChange={(val) => setNewSkillPath(val)}
+              onKeyDown={(e: KeyboardEvent) => {
+                if (e.key === "Enter") addSkillPath()
+              }}
+            />
+          </div>
+          <Button size="small" onClick={addSkillPath}>
             Add
-          </button>
+          </Button>
         </div>
         <For each={skillPaths()}>
           {(path, index) => (
@@ -469,92 +378,49 @@ const AgentBehaviourTab: Component = () => {
                 display: "flex",
                 "align-items": "center",
                 "justify-content": "space-between",
-                padding: "6px 12px",
-                background: "var(--vscode-editor-background)",
-                "border-bottom": index() < skillPaths().length - 1 ? "1px solid var(--vscode-panel-border)" : "none",
+                padding: "6px 0",
+                "border-bottom": index() < skillPaths().length - 1 ? "1px solid var(--border-weak-base)" : "none",
               }}
             >
               <span
                 style={{
-                  "font-size": "12px",
                   "font-family": "var(--vscode-editor-font-family, monospace)",
-                  color: "var(--vscode-foreground)",
+                  "font-size": "12px",
                 }}
               >
                 {path}
               </span>
-              <button
-                onClick={() => removeSkillPath(index())}
-                style={{
-                  padding: "2px 8px",
-                  "border-radius": "4px",
-                  border: "1px solid var(--vscode-panel-border)",
-                  background: "transparent",
-                  color: "var(--vscode-descriptionForeground)",
-                  "font-size": "11px",
-                  cursor: "pointer",
-                }}
-              >
-                ✕
-              </button>
+              <IconButton size="small" variant="ghost" icon="close" onClick={() => removeSkillPath(index())} />
             </div>
           )}
         </For>
-      </div>
+      </Card>
 
       {/* Skill URLs */}
-      <h4
-        style={{
-          "font-size": "13px",
-          "margin-top": "0",
-          "margin-bottom": "8px",
-          color: "var(--vscode-foreground)",
-        }}
-      >
-        Skill URLs
-      </h4>
-      <div
-        style={{
-          border: "1px solid var(--vscode-panel-border)",
-          "border-radius": "4px",
-          overflow: "hidden",
-        }}
-      >
+      <h4 style={{ "margin-top": "0", "margin-bottom": "8px" }}>Skill URLs</h4>
+      <Card>
         <div
           style={{
             display: "flex",
             gap: "8px",
-            padding: "8px 12px",
-            background: "var(--vscode-editor-background)",
-            "border-bottom": skillUrls().length > 0 ? "1px solid var(--vscode-panel-border)" : "none",
+            "align-items": "center",
+            padding: "8px 0",
+            "border-bottom": skillUrls().length > 0 ? "1px solid var(--border-weak-base)" : "none",
           }}
         >
-          <input
-            type="text"
-            style={{ ...inputStyle, flex: "1" }}
-            value={newSkillUrl()}
-            placeholder="e.g. https://example.com/skills"
-            onInput={(e) => setNewSkillUrl(e.currentTarget.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                addSkillUrl()
-              }
-            }}
-          />
-          <button
-            onClick={addSkillUrl}
-            style={{
-              padding: "4px 12px",
-              "border-radius": "4px",
-              border: "1px solid var(--vscode-button-border, transparent)",
-              background: "var(--vscode-button-background)",
-              color: "var(--vscode-button-foreground)",
-              "font-size": "12px",
-              cursor: "pointer",
-            }}
-          >
+          <div style={{ flex: 1 }}>
+            <TextField
+              value={newSkillUrl()}
+              placeholder="e.g. https://example.com/skills"
+              onChange={(val) => setNewSkillUrl(val)}
+              onKeyDown={(e: KeyboardEvent) => {
+                if (e.key === "Enter") addSkillUrl()
+              }}
+            />
+          </div>
+          <Button size="small" onClick={addSkillUrl}>
             Add
-          </button>
+          </Button>
         </div>
         <For each={skillUrls()}>
           {(url, index) => (
@@ -563,64 +429,40 @@ const AgentBehaviourTab: Component = () => {
                 display: "flex",
                 "align-items": "center",
                 "justify-content": "space-between",
-                padding: "6px 12px",
-                background: "var(--vscode-editor-background)",
-                "border-bottom": index() < skillUrls().length - 1 ? "1px solid var(--vscode-panel-border)" : "none",
+                padding: "6px 0",
+                "border-bottom": index() < skillUrls().length - 1 ? "1px solid var(--border-weak-base)" : "none",
               }}
             >
               <span
                 style={{
-                  "font-size": "12px",
                   "font-family": "var(--vscode-editor-font-family, monospace)",
-                  color: "var(--vscode-foreground)",
+                  "font-size": "12px",
                 }}
               >
                 {url}
               </span>
-              <button
-                onClick={() => removeSkillUrl(index())}
-                style={{
-                  padding: "2px 8px",
-                  "border-radius": "4px",
-                  border: "1px solid var(--vscode-panel-border)",
-                  background: "transparent",
-                  color: "var(--vscode-descriptionForeground)",
-                  "font-size": "11px",
-                  cursor: "pointer",
-                }}
-              >
-                ✕
-              </button>
+              <IconButton size="small" variant="ghost" icon="close" onClick={() => removeSkillUrl(index())} />
             </div>
           )}
         </For>
-      </div>
+      </Card>
     </div>
   )
 
   const renderRulesSubtab = () => (
     <div>
-      <div
-        style={{
-          border: "1px solid var(--vscode-panel-border)",
-          "border-radius": "4px",
-          overflow: "hidden",
-        }}
-      >
+      <Card>
         <div
           style={{
-            padding: "10px 12px",
-            background: "var(--vscode-editor-background)",
-            "border-bottom": "1px solid var(--vscode-panel-border)",
+            "padding-bottom": "8px",
+            "border-bottom": "1px solid var(--border-weak-base)",
           }}
         >
-          <div style={{ "font-size": "12px", "font-weight": "500", color: "var(--vscode-foreground)" }}>
-            Additional Instruction Files
-          </div>
+          <div style={{ "font-weight": "500" }}>Additional Instruction Files</div>
           <div
             style={{
               "font-size": "11px",
-              color: "var(--vscode-descriptionForeground)",
+              color: "var(--text-weak-base, var(--vscode-descriptionForeground))",
               "margin-top": "2px",
             }}
           >
@@ -633,37 +475,24 @@ const AgentBehaviourTab: Component = () => {
           style={{
             display: "flex",
             gap: "8px",
-            padding: "8px 12px",
-            background: "var(--vscode-editor-background)",
-            "border-bottom": instructions().length > 0 ? "1px solid var(--vscode-panel-border)" : "none",
+            "align-items": "center",
+            padding: "8px 0",
+            "border-bottom": instructions().length > 0 ? "1px solid var(--border-weak-base)" : "none",
           }}
         >
-          <input
-            type="text"
-            style={{ ...inputStyle, flex: "1" }}
-            value={newInstruction()}
-            placeholder="e.g. ./INSTRUCTIONS.md"
-            onInput={(e) => setNewInstruction(e.currentTarget.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                addInstruction()
-              }
-            }}
-          />
-          <button
-            onClick={addInstruction}
-            style={{
-              padding: "4px 12px",
-              "border-radius": "4px",
-              border: "1px solid var(--vscode-button-border, transparent)",
-              background: "var(--vscode-button-background)",
-              color: "var(--vscode-button-foreground)",
-              "font-size": "12px",
-              cursor: "pointer",
-            }}
-          >
+          <div style={{ flex: 1 }}>
+            <TextField
+              value={newInstruction()}
+              placeholder="e.g. ./INSTRUCTIONS.md"
+              onChange={(val) => setNewInstruction(val)}
+              onKeyDown={(e: KeyboardEvent) => {
+                if (e.key === "Enter") addInstruction()
+              }}
+            />
+          </div>
+          <Button size="small" onClick={addInstruction}>
             Add
-          </button>
+          </Button>
         </div>
 
         {/* Instructions list */}
@@ -674,38 +503,23 @@ const AgentBehaviourTab: Component = () => {
                 display: "flex",
                 "align-items": "center",
                 "justify-content": "space-between",
-                padding: "6px 12px",
-                background: "var(--vscode-editor-background)",
-                "border-bottom": index() < instructions().length - 1 ? "1px solid var(--vscode-panel-border)" : "none",
+                padding: "6px 0",
+                "border-bottom": index() < instructions().length - 1 ? "1px solid var(--border-weak-base)" : "none",
               }}
             >
               <span
                 style={{
-                  "font-size": "12px",
                   "font-family": "var(--vscode-editor-font-family, monospace)",
-                  color: "var(--vscode-foreground)",
+                  "font-size": "12px",
                 }}
               >
                 {path}
               </span>
-              <button
-                onClick={() => removeInstruction(index())}
-                style={{
-                  padding: "2px 8px",
-                  "border-radius": "4px",
-                  border: "1px solid var(--vscode-panel-border)",
-                  background: "transparent",
-                  color: "var(--vscode-descriptionForeground)",
-                  "font-size": "11px",
-                  cursor: "pointer",
-                }}
-              >
-                ✕
-              </button>
+              <IconButton size="small" variant="ghost" icon="close" onClick={() => removeInstruction(index())} />
             </div>
           )}
         </For>
-      </div>
+      </Card>
     </div>
   )
 
