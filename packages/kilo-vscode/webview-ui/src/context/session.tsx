@@ -465,6 +465,19 @@ export const SessionProvider: ParentComponent = (props) => {
           delete selections[sessionID]
         }),
       )
+      // Clean up pending questions/errors for the deleted session
+      const deleted = questions()
+        .filter((q) => q.sessionID === sessionID)
+        .map((q) => q.id)
+      if (deleted.length > 0) {
+        setQuestions((prev) => prev.filter((q) => q.sessionID !== sessionID))
+        setQuestionErrors((prev) => {
+          const next = new Set(prev)
+          for (const id of deleted) next.delete(id)
+          if (next.size === prev.size) return prev
+          return next
+        })
+      }
       if (currentSessionID() === sessionID) {
         setCurrentSessionID(undefined)
         setStatus("idle")
@@ -546,7 +559,17 @@ export const SessionProvider: ParentComponent = (props) => {
     setPermissions((prev) => prev.filter((p) => p.id !== permissionId))
   }
 
+  function clearQuestionError(requestID: string) {
+    setQuestionErrors((prev) => {
+      if (!prev.has(requestID)) return prev
+      const next = new Set(prev)
+      next.delete(requestID)
+      return next
+    })
+  }
+
   function replyToQuestion(requestID: string, answers: string[][]) {
+    clearQuestionError(requestID)
     vscode.postMessage({
       type: "questionReply",
       requestID,
@@ -555,6 +578,7 @@ export const SessionProvider: ParentComponent = (props) => {
   }
 
   function rejectQuestion(requestID: string) {
+    clearQuestionError(requestID)
     vscode.postMessage({
       type: "questionReject",
       requestID,
@@ -578,6 +602,8 @@ export const SessionProvider: ParentComponent = (props) => {
     setStatus("idle")
     setLoading(false)
     setPermissions([])
+    setQuestions([])
+    setQuestionErrors(new Set<string>())
     setPendingModelSelection(provider.defaultSelection())
     setPendingWasUserSet(false)
     vscode.postMessage({ type: "clearSession" })
