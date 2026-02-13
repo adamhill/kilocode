@@ -2,9 +2,15 @@
   "name": "kilo-code",
   "displayName": "Kilo Code",
   "description": "Kilo Code AI Agent & Autocomplete",
-  "version": "1.0.21",
+  "version": "7.0.21",
+  "publisher": "kilocode",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Kilo-Org/kilo.git",
+    "directory": "packages/kilo-vscode"
+  },
   "engines": {
-    "vscode": "^1.109.0"
+    "vscode": "^1.108.0"
   },
   "categories": [
     "Other"
@@ -248,8 +254,7 @@
     }
   },
   "scripts": {
-    "vscode:prepublish": "pnpm run package",
-    "prepare:cli-binary": "node scripts/prepare-cli-binary.mjs",
+    "prepare:cli-binary": "node script/local-bin.mjs",
     "compile": "pnpm run prepare:cli-binary && pnpm run check-types && pnpm run lint && node esbuild.js",
     "watch": "npm-run-all -p watch:*",
     "watch:esbuild": "pnpm run prepare:cli-binary && node esbuild.js --watch",
@@ -262,15 +267,14 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "eslint src",
-    "test": "vscode-test",
-    "update-backend": "node scripts/prepare-cli-binary.mjs --force"
+    "test": "vscode-test"
   },
   "devDependencies": {
     "@types/diff": "^6.0.0",
     "@types/mocha": "^10.0.10",
     "@types/node": "22.x",
     "@types/qrcode": "^1.5.6",
-    "@types/vscode": "^1.109.0",
+    "@types/vscode": "^1.108.0",
     "@vscode/test-cli": "^0.0.12",
     "@vscode/test-electron": "^2.5.2",
     "esbuild": "^0.27.2",
