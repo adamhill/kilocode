@@ -5,5 +5,5 @@ runs:
   using: "composite"
   steps:
     - name: Install Kilo CLI
-      run: bun add -g @kilocode/cli
+      run: curl -fsSL https://kilo.ai/cli/install | bash
       shell: bash
