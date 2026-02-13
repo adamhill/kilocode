@@ -526,6 +526,7 @@ export interface SendMessageRequest {
   providerID?: string
   modelID?: string
   agent?: string
+  files?: Array<{ mime: string; url: string }>
 }
 
 export interface AbortRequest {

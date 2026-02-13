@@ -159,6 +159,7 @@ export class KiloProvider implements vscode.WebviewViewProvider {
             message.providerID,
             message.modelID,
             message.agent,
+            message.files,
           )
           break
         case "abort":
@@ -718,6 +719,7 @@ export class KiloProvider implements vscode.WebviewViewProvider {
     providerID?: string,
     modelID?: string,
     agent?: string,
+    files?: Array<{ mime: string; url: string }>,
   ): Promise<void> {
     if (!this.httpClient) {
       this.postMessage({
@@ -746,8 +748,29 @@ export class KiloProvider implements vscode.WebviewViewProvider {
         throw new Error("No session available")
       }
 
-      // Send message with text part, optional model selection, and optional agent/mode
-      await this.httpClient.sendMessage(targetSessionID, [{ type: "text", text }], workspaceDir, {
+      // Build parts array with file context and user text
+      const parts: Array<{ type: "text"; text: string } | { type: "file"; mime: string; url: string }> = []
+
+      // Inject active editor file as context
+      const editor = vscode.window.activeTextEditor
+      if (editor && editor.document.uri.scheme === "file") {
+        const url = editor.document.uri.toString()
+        const already = files?.some((f) => f.url === url)
+        if (!already) {
+          parts.push({ type: "file", mime: "text/plain", url })
+        }
+      }
+
+      // Add any explicitly attached files from the webview
+      if (files) {
+        for (const f of files) {
+          parts.push({ type: "file", mime: f.mime, url: f.url })
+        }
+      }
+
+      parts.push({ type: "text", text })
+
+      await this.httpClient.sendMessage(targetSessionID, parts, workspaceDir, {
         providerID,
         modelID,
         agent,
