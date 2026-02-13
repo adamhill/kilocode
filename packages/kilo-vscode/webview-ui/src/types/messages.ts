@@ -519,6 +519,11 @@ export type ExtensionMessage =
 // Messages FROM webview TO extension
 // ============================================
 
+export interface FileAttachment {
+  mime: string
+  url: string
+}
+
 export interface SendMessageRequest {
   type: "sendMessage"
   text: string
@@ -526,7 +531,7 @@ export interface SendMessageRequest {
   providerID?: string
   modelID?: string
   agent?: string
-  files?: Array<{ mime: string; url: string }>
+  files?: FileAttachment[]
 }
 
 export interface AbortRequest {
