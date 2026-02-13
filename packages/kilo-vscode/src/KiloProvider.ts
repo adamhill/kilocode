@@ -1,4 +1,5 @@
 import * as vscode from "vscode"
+import { z } from "zod"
 import { type HttpClient, type SessionInfo, type SSEEvent, type KiloConnectionService } from "./services/cli-backend"
 import { handleChatCompletionRequest } from "./services/autocomplete/chat-autocomplete/handleChatCompletionRequest"
 import { handleChatCompletionAccepted } from "./services/autocomplete/chat-autocomplete/handleChatCompletionAccepted"
@@ -152,16 +153,22 @@ export class KiloProvider implements vscode.WebviewViewProvider {
           this.isWebviewReady = true
           await this.syncWebviewState("webviewReady")
           break
-        case "sendMessage":
+        case "sendMessage": {
+          const files = z
+            .array(z.object({ mime: z.string(), url: z.string() }))
+            .optional()
+            .catch(undefined)
+            .parse(message.files)
           await this.handleSendMessage(
             message.text,
             message.sessionID,
             message.providerID,
             message.modelID,
             message.agent,
-            message.files,
+            files,
           )
           break
+        }
         case "abort":
           await this.handleAbort(message.sessionID)
           break
@@ -719,7 +726,7 @@ export class KiloProvider implements vscode.WebviewViewProvider {
     providerID?: string,
     modelID?: string,
     agent?: string,
-    files?: unknown,
+    files?: Array<{ mime: string; url: string }>,
   ): Promise<void> {
     if (!this.httpClient) {
       this.postMessage({
@@ -748,13 +755,6 @@ export class KiloProvider implements vscode.WebviewViewProvider {
         throw new Error("No session available")
       }
 
-      // Sanitize files input from webview (runtime-untyped)
-      const sanitized = Array.isArray(files)
-        ? files.filter(
-            (f): f is { mime: string; url: string } => f && typeof f.mime === "string" && typeof f.url === "string",
-          )
-        : []
-
       // Build parts array with file context and user text
       const parts: Array<{ type: "text"; text: string } | { type: "file"; mime: string; url: string }> = []
 
@@ -762,15 +762,17 @@ export class KiloProvider implements vscode.WebviewViewProvider {
       const editor = vscode.window.activeTextEditor
       if (editor && editor.document.uri.scheme === "file") {
         const url = editor.document.uri.toString()
-        const already = sanitized.some((f) => f.url === url)
+        const already = files?.some((f) => f.url === url)
         if (!already) {
           parts.push({ type: "file", mime: "text/plain", url })
         }
       }
 
       // Add any explicitly attached files from the webview
-      for (const f of sanitized) {
-        parts.push({ type: "file", mime: f.mime, url: f.url })
+      if (files) {
+        for (const f of files) {
+          parts.push({ type: "file", mime: f.mime, url: f.url })
+        }
       }
 
       parts.push({ type: "text", text })
