@@ -190,6 +190,11 @@ export class KiloProvider implements vscode.WebviewViewProvider {
         case "logout":
           await this.handleLogout()
           break
+        case "setOrganization":
+          if (typeof message.organizationId === "string" || message.organizationId === null) {
+            await this.handleSetOrganization(message.organizationId)
+          }
+          break
         case "refreshProfile":
           await this.handleRefreshProfile()
           break
@@ -926,6 +931,11 @@ export class KiloProvider implements vscode.WebviewViewProvider {
       const profileData = await this.httpClient.getProfile()
       this.postMessage({ type: "profileData", data: profileData })
       this.postMessage({ type: "deviceAuthComplete" })
+
+      // Step 5: If user has organizations, navigate to profile view so they can pick one
+      if (profileData?.profile.organizations && profileData.profile.organizations.length > 0) {
+        this.postMessage({ type: "navigate", view: "profile" })
+      }
     } catch (error) {
       if (attempt !== this.loginAttempt) {
         return
@@ -934,6 +944,41 @@ export class KiloProvider implements vscode.WebviewViewProvider {
         type: "deviceAuthFailed",
         error: error instanceof Error ? error.message : "Login failed",
       })
+    }
+  }
+
+  /**
+   * Handle organization switch request from the webview.
+   * Persists the selection and refreshes profile + providers since both change with org context.
+   */
+  private async handleSetOrganization(organizationId: string | null): Promise<void> {
+    const client = this.httpClient
+    if (!client) {
+      return
+    }
+
+    console.log("[Kilo New] KiloProvider: Switching organization:", organizationId ?? "personal")
+    try {
+      await client.setOrganization(organizationId)
+    } catch (error) {
+      console.error("[Kilo New] KiloProvider: Failed to switch organization:", error)
+      // Re-fetch current profile to reset webview state (clears switching indicator)
+      const profileData = await client.getProfile()
+      this.postMessage({ type: "profileData", data: profileData })
+      return
+    }
+
+    // Org switch succeeded — refresh profile and providers independently (best-effort)
+    try {
+      const profileData = await client.getProfile()
+      this.postMessage({ type: "profileData", data: profileData })
+    } catch (error) {
+      console.error("[Kilo New] KiloProvider: Failed to refresh profile after org switch:", error)
+    }
+    try {
+      await this.fetchAndSendProviders()
+    } catch (error) {
+      console.error("[Kilo New] KiloProvider: Failed to refresh providers after org switch:", error)
     }
   }
 
@@ -1192,6 +1237,7 @@ export class KiloProvider implements vscode.WebviewViewProvider {
   private _getHtmlForWebview(webview: vscode.Webview): string {
     const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(this.extensionUri, "dist", "webview.js"))
     const styleUri = webview.asWebviewUri(vscode.Uri.joinPath(this.extensionUri, "dist", "webview.css"))
+    const iconsBaseUri = webview.asWebviewUri(vscode.Uri.joinPath(this.extensionUri, "assets", "icons"))
 
     const nonce = getNonce()
 
@@ -1242,6 +1288,7 @@ export class KiloProvider implements vscode.WebviewViewProvider {
 </head>
 <body>
 	<div id="root"></div>
+	<script nonce="${nonce}">window.ICONS_BASE_URI = "${iconsBaseUri}";</script>
 	<script nonce="${nonce}" src="${scriptUri}"></script>
 </body>
 </html>`
