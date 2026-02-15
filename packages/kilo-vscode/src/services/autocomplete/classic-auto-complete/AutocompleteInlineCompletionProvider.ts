@@ -282,7 +282,7 @@ export class AutocompleteInlineCompletionProvider implements vscode.InlineComple
 
     // Create ignore controller internally
     this.ignoreController = (async () => {
-      const ignoreController = new FileIgnoreController()
+      const ignoreController = new FileIgnoreController(workspacePath)
       await ignoreController.initialize()
       return ignoreController
     })()
