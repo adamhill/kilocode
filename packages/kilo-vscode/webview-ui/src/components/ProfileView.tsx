@@ -247,7 +247,7 @@ const ProfileView: Component<ProfileViewProps> = (props) => {
             {/* Action buttons */}
             <div style={{ display: "flex", gap: "8px" }}>
               <Button variant="secondary" onClick={handleDashboard} style={{ flex: "1" }}>
-                {language.t("profile.action.dashboard")}
+                {language.t("profile.action.dashboard")} TEST
               </Button>
               <Button
                 variant="ghost"

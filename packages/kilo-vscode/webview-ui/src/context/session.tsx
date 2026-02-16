@@ -20,6 +20,7 @@ import { createStore, produce } from "solid-js/store"
 import { useVSCode } from "./vscode"
 import { useServer } from "./server"
 import { useProvider } from "./provider"
+import { restoreHotReloadState } from "../utils/hot-reload"
 import type {
   SessionInfo,
   Message,
@@ -141,6 +142,23 @@ export const SessionProvider: ParentComponent = (props) => {
     parts: {},
     todos: {},
     modelSelections: {},
+  })
+
+  // Restore state from hot reload
+  onMount(() => {
+    const restored = restoreHotReloadState(vscode)
+    if (restored) {
+      if (restored.currentSessionID) {
+        console.log("[Kilo HMR] 🔄 Restoring session:", restored.currentSessionID)
+        setCurrentSessionID(restored.currentSessionID)
+        // Request messages for the restored session
+        vscode.postMessage({ type: "loadMessages", sessionID: restored.currentSessionID })
+      }
+      if (restored.selectedAgent) {
+        console.log("[Kilo HMR] 🔄 Restoring agent:", restored.selectedAgent)
+        setSelectedAgentName(restored.selectedAgent)
+      }
+    }
   })
 
   // Keep pending selection in sync with provider default until the user

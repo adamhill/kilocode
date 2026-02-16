@@ -1,4 +1,4 @@
-import { Component, createSignal, createMemo, Switch, Match, onMount, onCleanup } from "solid-js"
+import { Component, createSignal, createMemo, createEffect, Switch, Match, onMount, onCleanup } from "solid-js"
 import { ThemeProvider } from "@kilocode/kilo-ui/theme"
 import { DialogProvider } from "@kilocode/kilo-ui/context/dialog"
 import { MarkedProvider } from "@kilocode/kilo-ui/context/marked"
@@ -6,7 +6,7 @@ import { DataProvider } from "@kilocode/kilo-ui/context/data"
 import { Toast } from "@kilocode/kilo-ui/toast"
 import Settings from "./components/Settings"
 import ProfileView from "./components/ProfileView"
-import { VSCodeProvider } from "./context/vscode"
+import { VSCodeProvider, useVSCode } from "./context/vscode"
 import { ServerProvider, useServer } from "./context/server"
 import { ProviderProvider } from "./context/provider"
 import { ConfigProvider } from "./context/config"
@@ -15,6 +15,7 @@ import { LanguageProvider } from "./context/language"
 import { ChatView } from "./components/chat"
 import SessionList from "./components/history/SessionList"
 import type { Message as SDKMessage, Part as SDKPart } from "@kilocode/sdk/v2"
+import { restoreHotReloadState } from "./utils/hot-reload"
 import "./styles/chat.css"
 
 type ViewType = "newTask" | "marketplace" | "history" | "profile" | "settings"
@@ -91,6 +92,25 @@ const AppContent: Component = () => {
   const [currentView, setCurrentView] = createSignal<ViewType>("newTask")
   const session = useSession()
   const server = useServer()
+  const vscode = useVSCode()
+
+  // Restore view from hot reload state
+  onMount(() => {
+    const restored = restoreHotReloadState(vscode)
+    if (restored?.currentView && VALID_VIEWS.has(restored.currentView)) {
+      console.log("[Kilo HMR] 🔄 Restored view:", restored.currentView)
+      setCurrentView(restored.currentView as ViewType)
+    }
+  })
+
+  // Expose state getter for hot reload (called by inline script before reload)
+  createEffect(() => {
+    ;(window as any).__getHotReloadState = () => ({
+      currentView: currentView(),
+      currentSessionID: session.currentSessionID(),
+      selectedAgent: session.selectedAgent(),
+    })
+  })
 
   const handleViewAction = (action: string) => {
     switch (action) {
@@ -163,30 +183,36 @@ const AppContent: Component = () => {
 
 // Main App component with context providers
 const App: Component = () => {
-  return (
-    <ThemeProvider defaultTheme="kilo-vscode">
-      <DialogProvider>
-        <VSCodeProvider>
-          <ServerProvider>
-            <LanguageBridge>
-              <MarkedProvider>
-                <ProviderProvider>
-                  <ConfigProvider>
-                    <SessionProvider>
-                      <DataBridge>
-                        <AppContent />
-                      </DataBridge>
-                    </SessionProvider>
-                  </ConfigProvider>
-                </ProviderProvider>
-              </MarkedProvider>
-            </LanguageBridge>
-          </ServerProvider>
-        </VSCodeProvider>
-        <Toast.Region />
-      </DialogProvider>
-    </ThemeProvider>
-  )
+  console.log("[Kilo Debug] App component rendering")
+  try {
+    return (
+      <ThemeProvider defaultTheme="kilo-vscode">
+        <DialogProvider>
+          <VSCodeProvider>
+            <ServerProvider>
+              <LanguageBridge>
+                <MarkedProvider>
+                  <ProviderProvider>
+                    <ConfigProvider>
+                      <SessionProvider>
+                        <DataBridge>
+                          <AppContent />
+                        </DataBridge>
+                      </SessionProvider>
+                    </ConfigProvider>
+                  </ProviderProvider>
+                </MarkedProvider>
+              </LanguageBridge>
+            </ServerProvider>
+          </VSCodeProvider>
+          <Toast.Region />
+        </DialogProvider>
+      </ThemeProvider>
+    )
+  } catch (error) {
+    console.error("[Kilo Debug] Error in App component:", error)
+    throw error
+  }
 }
 
 export default App

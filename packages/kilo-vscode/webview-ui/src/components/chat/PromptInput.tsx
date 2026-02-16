@@ -3,7 +3,7 @@
  * Text input with send/abort buttons and ghost-text autocomplete for the chat interface
  */
 
-import { Component, createSignal, onCleanup, Show } from "solid-js"
+import { Component, createSignal, createEffect, onMount, onCleanup, Show } from "solid-js"
 import { Button } from "@kilocode/kilo-ui/button"
 import { Tooltip } from "@kilocode/kilo-ui/tooltip"
 import { useSession } from "../../context/session"
@@ -12,6 +12,7 @@ import { useLanguage } from "../../context/language"
 import { useVSCode } from "../../context/vscode"
 import { ModelSelector } from "./ModelSelector"
 import { ModeSwitcher } from "./ModeSwitcher"
+import { restoreHotReloadState } from "../../utils/hot-reload"
 
 const AUTOCOMPLETE_DEBOUNCE_MS = 500
 const MIN_TEXT_LENGTH = 3
@@ -31,6 +32,23 @@ export const PromptInput: Component = () => {
   const isBusy = () => session.status() === "busy"
   const isDisabled = () => !server.isConnected()
   const canSend = () => text().trim().length > 0 && !isBusy() && !isDisabled()
+
+  // Restore input text from hot reload
+  onMount(() => {
+    const restored = restoreHotReloadState(vscode)
+    if (restored?.inputText) {
+      console.log("[Kilo HMR] 🔄 Restoring input text")
+      setText(restored.inputText)
+      if (textareaRef) {
+        textareaRef.value = restored.inputText
+      }
+    }
+  })
+
+  // Expose text getter for hot reload (called by inline script before reload)
+  createEffect(() => {
+    ;(window as any).__getPromptInputText = () => text()
+  })
 
   // Listen for chat completion results from the extension
   const unsubscribe = vscode.onMessage((message) => {

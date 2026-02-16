@@ -294,7 +294,9 @@ export class KiloProvider implements vscode.WebviewViewProvider {
 
   /**
    * Set up hot reload watcher for webview in development mode.
-   * Watches dist/webview.* files and reloads the webview when they change.
+   * Watches CSS and JS files separately for optimal hot-swapping.
+   * - CSS: instant hot-swap with no state loss
+   * - JS: state-preserving reload via getState/setState
    */
   private setupWebviewHotReload(webview: vscode.Webview): void {
     // Only enable in development mode
@@ -306,31 +308,49 @@ export class KiloProvider implements vscode.WebviewViewProvider {
     this.webviewWatcherDisposable?.dispose()
     this.debounceTimer && clearTimeout(this.debounceTimer)
 
-    // Watch for changes to webview bundle files
-    const watcher = vscode.workspace.createFileSystemWatcher(
-      new vscode.RelativePattern(this.extensionUri, "dist/webview.*"),
+    // Watch CSS files for instant hot-swap
+    const cssWatcher = vscode.workspace.createFileSystemWatcher(
+      new vscode.RelativePattern(this.extensionUri, "dist/webview.css"),
     )
 
-    const reloadWebview = () => {
+    const reloadCSS = () => {
+      console.log("[Kilo New] KiloProvider: 🎨 Hot-swapping CSS (dev mode)")
+      const styleUri = webview.asWebviewUri(vscode.Uri.joinPath(this.extensionUri, "dist", "webview.css")).toString()
+      const cacheBusted = `${styleUri}?t=${Date.now()}`
+      this.postMessage({
+        type: "hotReloadCSS",
+        href: cacheBusted,
+      })
+    }
+
+    cssWatcher.onDidChange(reloadCSS)
+    cssWatcher.onDidCreate(reloadCSS)
+
+    // Watch JS files for state-preserving reload
+    const jsWatcher = vscode.workspace.createFileSystemWatcher(
+      new vscode.RelativePattern(this.extensionUri, "dist/webview.js"),
+    )
+
+    const reloadJS = () => {
       // Clear any pending reload
       if (this.debounceTimer) {
         clearTimeout(this.debounceTimer)
       }
 
-      // Debounce reloads by 300ms to avoid multiple rapid reloads
+      // Debounce JS reloads by 300ms to avoid multiple rapid reloads
       this.debounceTimer = setTimeout(() => {
-        console.log("[Kilo New] KiloProvider: 🔄 Hot reloading webview (dev mode)")
-        // Force full reload by clearing then reassigning HTML
-        webview.html = ""
-        webview.html = this._getHtmlForWebview(webview)
+        console.log("[Kilo New] KiloProvider: 🔄 Hot reloading JS with state preservation (dev mode)")
+        this.postMessage({
+          type: "hotReloadJS",
+        })
         this.debounceTimer = null
       }, 300)
     }
 
-    watcher.onDidChange(reloadWebview)
-    watcher.onDidCreate(reloadWebview)
+    jsWatcher.onDidChange(reloadJS)
+    jsWatcher.onDidCreate(reloadJS)
 
-    this.webviewWatcherDisposable = watcher
+    this.webviewWatcherDisposable = vscode.Disposable.from(cssWatcher, jsWatcher)
   }
 
   /**
@@ -1320,6 +1340,7 @@ export class KiloProvider implements vscode.WebviewViewProvider {
     const iconsBaseUri = webview.asWebviewUri(vscode.Uri.joinPath(this.extensionUri, "assets", "icons"))
 
     const nonce = getNonce()
+    const isDev = this.context.extensionMode === vscode.ExtensionMode.Development
 
     // CSP allows:
     // - default-src 'none': Block everything by default
@@ -1336,6 +1357,9 @@ export class KiloProvider implements vscode.WebviewViewProvider {
       `img-src ${webview.cspSource} data: https:`,
     ].join("; ")
 
+    // No inline hot reload script - everything handled in the main app (index.tsx)
+    const hotReloadScript = ""
+
     return `<!DOCTYPE html>
 <html lang="en" data-theme="kilo-vscode">
 <head>
@@ -1343,7 +1367,7 @@ export class KiloProvider implements vscode.WebviewViewProvider {
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta http-equiv="Content-Security-Policy" content="${csp}">
 	<title>Kilo Code</title>
-	<link rel="stylesheet" href="${styleUri}">
+	<link id="kilo-stylesheet" rel="stylesheet" href="${styleUri}">
 	<style>
 		html, body {
 			margin: 0;
@@ -1369,7 +1393,7 @@ export class KiloProvider implements vscode.WebviewViewProvider {
 </head>
 <body>
 	<div id="root"></div>
-	<script nonce="${nonce}">window.ICONS_BASE_URI = "${iconsBaseUri}";</script>
+	<script nonce="${nonce}">window.ICONS_BASE_URI = "${iconsBaseUri}";</script>${hotReloadScript}
 	<script nonce="${nonce}" src="${scriptUri}"></script>
 </body>
 </html>`
