@@ -4,6 +4,7 @@ out/**
 node_modules/**
 src/**
 webview-ui/**
+script/**
 .gitignore
 .yarnrc
 .npmrc
@@ -15,6 +16,11 @@ vsc-extension-quickstart.md
 **/*.ts
 **/.vscode-test.*
 pnpm-lock.yaml
+AGENTS.md
+.prettierignore
+
+# Include dist/ directory for compiled extension (production)
+!dist/**
 
 # Include bin/ directory for CLI binary (production)
 !bin/**

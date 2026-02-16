@@ -2,6 +2,12 @@ name: publish-vscode
 
 on:
   workflow_dispatch:
+    inputs:
+      cli_version:
+        description: "CLI release version to use (e.g. v1.0.21, or 'latest')"
+        required: false
+        type: string
+        default: "latest"
   push:
     tags:
       - "vscode-v*.*.*"
@@ -13,9 +19,6 @@ permissions:
 
 jobs:
   publish:
-    # kilocode_change start - disabled for kilo-cli fork (OpenCode VSCode extension publishing)
-    if: false
-    # kilocode_change end
     runs-on: blacksmith-4vcpu-ubuntu-2404
     steps:
       - uses: actions/checkout@v3
@@ -24,17 +27,20 @@ jobs:
 
       - uses: ./.github/actions/setup-bun
 
-      - run: git fetch --force --tags
-      - run: bun install -g @vscode/vsce
+      - name: Setup pnpm
+        run: bun install -g pnpm
+
+      - name: Install @vscode/vsce
+        run: bun install -g @vscode/vsce
 
       - name: Install extension dependencies
-        run: bun install
-        working-directory: ./sdks/vscode
+        run: pnpm install
+        working-directory: ./packages/kilo-vscode
 
-      - name: Publish
-        run: |
-          ./script/publish
-        working-directory: ./sdks/vscode
+      - name: Publish all targets
+        run: bun script/publish.ts
+        working-directory: ./packages/kilo-vscode
         env:
-          VSCE_PAT: ${{ secrets.VSCE_PAT }}
-          OPENVSX_TOKEN: ${{ secrets.OPENVSX_TOKEN }}
+          VSCE_PAT: ${{ secrets.VSCE_TOKEN }}
+          OPENVSX_TOKEN: ${{ secrets.OVSX_TOKEN }}
+          KILO_CLI_VERSION: ${{ inputs.cli_version || 'latest' }}

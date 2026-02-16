@@ -35,6 +35,10 @@
               git
               gh
               playwright-driver.browsers
+              vsce
+              unzip
+              gnutar
+              gzip
               kilo
             ];
             shellHook = ''

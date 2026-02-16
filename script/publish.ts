@@ -41,7 +41,12 @@ const pkgjsons = await Array.fromAsync(
 
 for (const file of pkgjsons) {
   let pkg = await Bun.file(file).text()
-  pkg = pkg.replaceAll(/"version": "[^"]+"/g, `"version": "${Script.version}"`)
+  // kilocode_change start
+  const version = file.includes("packages/kilo-vscode/")
+    ? Script.version.replace(/^\d+/, (m) => String(Number(m) + 6))
+    : Script.version
+  // kilocode_change end
+  pkg = pkg.replaceAll(/"version": "[^"]+"/g, `"version": "${version}"`)
   console.log("updated:", file)
   await Bun.file(file).write(pkg)
 }
