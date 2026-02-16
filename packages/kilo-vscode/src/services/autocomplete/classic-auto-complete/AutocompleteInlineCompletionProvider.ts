@@ -384,7 +384,8 @@ export class AutocompleteInlineCompletionProvider implements vscode.InlineComple
   }
 
   private async disposeIgnoreController(): Promise<void> {
-    ;(await this.ignoreController).dispose()
+    const controller = await this.ignoreController.catch(() => null)
+    controller?.dispose()
   }
 
   /**
