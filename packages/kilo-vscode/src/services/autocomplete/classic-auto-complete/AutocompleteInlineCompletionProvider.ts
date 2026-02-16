@@ -281,9 +281,9 @@ export class AutocompleteInlineCompletionProvider implements vscode.InlineComple
     this.getSettings = getSettings
 
     this.ignoreController = (async () => {
-      const controller = new FileIgnoreController(workspacePath)
-      await controller.initialize()
-      return controller
+      const ignoreController = new FileIgnoreController(workspacePath)
+      await ignoreController.initialize()
+      return ignoreController
     })()
 
     const ide = new VsCodeIde(context)
@@ -384,8 +384,8 @@ export class AutocompleteInlineCompletionProvider implements vscode.InlineComple
   }
 
   private async disposeIgnoreController(): Promise<void> {
-    const controller = await this.ignoreController.catch(() => null)
-    controller?.dispose()
+    const ignoreController = await this.ignoreController.catch(() => null)
+    ignoreController?.dispose()
   }
 
   /**
