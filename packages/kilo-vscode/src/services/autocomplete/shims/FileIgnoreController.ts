@@ -15,22 +15,20 @@ function toPosix(filePath: string): string {
 }
 
 export class FileIgnoreController {
-  private readonly hasWorkspace: boolean
   private workspacePath: string
   private ignoreInstance: Ignore = ignore()
   private loadedContents: Array<{ file: string; content: string }> = []
   private readonly realpathCache = new Map<string, string>()
 
   constructor(workspacePath?: string) {
-    this.hasWorkspace = Boolean(workspacePath)
-    this.workspacePath = this.hasWorkspace ? path.resolve(workspacePath!) : ""
+    this.workspacePath = workspacePath ? path.resolve(workspacePath) : ""
   }
 
   async initialize(): Promise<void> {
     this.ignoreInstance = ignore()
     this.loadedContents = []
 
-    if (!this.hasWorkspace) {
+    if (!this.workspacePath) {
       return
     }
 
@@ -101,7 +99,7 @@ export class FileIgnoreController {
    * When no workspace path was provided, denies all access.
    */
   validateAccess(filePath: string): boolean {
-    if (!this.hasWorkspace) {
+    if (!this.workspacePath) {
       return false
     }
 
@@ -119,7 +117,7 @@ export class FileIgnoreController {
    * When no workspace path was provided, returns an empty array.
    */
   filterPaths(paths: string[]): string[] {
-    if (!this.hasWorkspace) {
+    if (!this.workspacePath) {
       return []
     }
     return paths.filter((candidate) => this.validateAccess(candidate))
