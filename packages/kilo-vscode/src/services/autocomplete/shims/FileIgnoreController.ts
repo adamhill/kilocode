@@ -91,8 +91,8 @@ export class FileIgnoreController {
   validateAccess(filePath: string): boolean {
     const relative = this.toRelativePath(filePath)
     if (!relative) {
-      // Outside workspace or unresolved path: allow by default for compatibility.
-      return true
+      // Outside workspace or unresolvable path: deny by default for security.
+      return false
     }
 
     return !this.ignoreInstance.ignores(relative)
@@ -113,7 +113,7 @@ export class FileIgnoreController {
       return undefined
     }
 
-    const sections = this.loadedContents.map(({ file, content }) => `# ${file}\n\n${content.trimEnd()}\n\n${file}`)
+    const sections = this.loadedContents.map(({ file, content }) => `# ${file}\n\n${content.trimEnd()}`)
     return sections.join("\n\n")
   }
 
