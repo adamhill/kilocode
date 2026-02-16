@@ -482,15 +482,6 @@ export interface NotificationSettingsLoadedMessage {
   }
 }
 
-export interface HotReloadCSSMessage {
-  type: "hotReloadCSS"
-  href: string
-}
-
-export interface HotReloadJSMessage {
-  type: "hotReloadJS"
-}
-
 export type ExtensionMessage =
   | ReadyMessage
   | ConnectionStateMessage
@@ -523,8 +514,6 @@ export type ExtensionMessage =
   | ConfigLoadedMessage
   | ConfigUpdatedMessage
   | NotificationSettingsLoadedMessage
-  | HotReloadCSSMessage
-  | HotReloadJSMessage
 
 // ============================================
 // Messages FROM webview TO extension

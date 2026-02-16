@@ -38,51 +38,12 @@ interface VSCodeContextValue {
 const VSCodeContext = createContext<VSCodeContextValue>()
 
 export const VSCodeProvider: ParentComponent = (props) => {
-  console.log("[Kilo Debug] VSCodeProvider initializing")
   const api = getVSCodeAPI()
-  console.log("[Kilo Debug] VSCodeProvider got API")
   const handlers = new Set<(message: ExtensionMessage) => void>()
 
   // Listen for messages from the extension
   const messageListener = (event: MessageEvent) => {
     const message = event.data as ExtensionMessage
-
-    // Handle hot reload messages first (dev mode only)
-    if (message?.type === "hotReloadCSS") {
-      const link = document.getElementById("kilo-stylesheet") as HTMLLinkElement
-      if (link) {
-        console.log("[Kilo HMR] Swapping CSS")
-        link.href = (message as any).href
-      }
-      return
-    }
-
-    if (message?.type === "hotReloadJS") {
-      console.log("[Kilo HMR] Reloading with state preservation")
-
-      // Collect state from the app
-      const appState = (window as any).__getHotReloadState ? (window as any).__getHotReloadState() : {}
-      const inputText = (window as any).__getPromptInputText ? (window as any).__getPromptInputText() : ""
-
-      // Save current state before reload
-      const state = (api.getState() || {}) as any
-      state._hotReload = {
-        timestamp: Date.now(),
-        currentView: appState.currentView,
-        currentSessionID: appState.currentSessionID,
-        selectedAgent: appState.selectedAgent,
-        inputText,
-      }
-
-      api.setState(state)
-      console.log("[Kilo HMR] Saved state:", state._hotReload)
-
-      // Reload the webview
-      location.reload()
-      return
-    }
-
-    // Forward all other messages to handlers
     handlers.forEach((handler) => handler(message))
   }
 
@@ -105,7 +66,6 @@ export const VSCodeProvider: ParentComponent = (props) => {
     setState: <T,>(state: T) => api.setState(state),
   }
 
-  console.log("[Kilo Debug] VSCodeProvider rendering children")
   return <VSCodeContext.Provider value={value}>{props.children}</VSCodeContext.Provider>
 }
 

@@ -23,13 +23,10 @@ export class KiloProvider implements vscode.WebviewViewProvider {
   private unsubscribeEvent: (() => void) | null = null
   private unsubscribeState: (() => void) | null = null
   private webviewMessageDisposable: vscode.Disposable | null = null
-  private webviewWatcherDisposable: vscode.Disposable | null = null
-  private debounceTimer: NodeJS.Timeout | null = null
 
   constructor(
     private readonly extensionUri: vscode.Uri,
     private readonly connectionService: KiloConnectionService,
-    private readonly context: vscode.ExtensionContext,
   ) {}
 
   /**
@@ -118,9 +115,6 @@ export class KiloProvider implements vscode.WebviewViewProvider {
     // Handle messages from webview (shared handler)
     this.setupWebviewMessageHandler(webviewView.webview)
 
-    // Set up hot reload watcher for development mode
-    this.setupWebviewHotReload(webviewView.webview)
-
     // Initialize connection to CLI backend
     this.initializeConnection()
   }
@@ -142,9 +136,6 @@ export class KiloProvider implements vscode.WebviewViewProvider {
 
     // Handle messages from webview (shared handler)
     this.setupWebviewMessageHandler(panel.webview)
-
-    // Set up hot reload watcher for development mode
-    this.setupWebviewHotReload(panel.webview)
 
     this.initializeConnection()
   }
@@ -290,67 +281,6 @@ export class KiloProvider implements vscode.WebviewViewProvider {
           break
       }
     })
-  }
-
-  /**
-   * Set up hot reload watcher for webview in development mode.
-   * Watches CSS and JS files separately for optimal hot-swapping.
-   * - CSS: instant hot-swap with no state loss
-   * - JS: state-preserving reload via getState/setState
-   */
-  private setupWebviewHotReload(webview: vscode.Webview): void {
-    // Only enable in development mode
-    if (this.context.extensionMode !== vscode.ExtensionMode.Development) {
-      return
-    }
-
-    // Clean up existing watcher if any
-    this.webviewWatcherDisposable?.dispose()
-    this.debounceTimer && clearTimeout(this.debounceTimer)
-
-    // Watch CSS files for instant hot-swap
-    const cssWatcher = vscode.workspace.createFileSystemWatcher(
-      new vscode.RelativePattern(this.extensionUri, "dist/webview.css"),
-    )
-
-    const reloadCSS = () => {
-      console.log("[Kilo New] KiloProvider: 🎨 Hot-swapping CSS (dev mode)")
-      const styleUri = webview.asWebviewUri(vscode.Uri.joinPath(this.extensionUri, "dist", "webview.css")).toString()
-      const cacheBusted = `${styleUri}?t=${Date.now()}`
-      this.postMessage({
-        type: "hotReloadCSS",
-        href: cacheBusted,
-      })
-    }
-
-    cssWatcher.onDidChange(reloadCSS)
-    cssWatcher.onDidCreate(reloadCSS)
-
-    // Watch JS files for state-preserving reload
-    const jsWatcher = vscode.workspace.createFileSystemWatcher(
-      new vscode.RelativePattern(this.extensionUri, "dist/webview.js"),
-    )
-
-    const reloadJS = () => {
-      // Clear any pending reload
-      if (this.debounceTimer) {
-        clearTimeout(this.debounceTimer)
-      }
-
-      // Debounce JS reloads by 300ms to avoid multiple rapid reloads
-      this.debounceTimer = setTimeout(() => {
-        console.log("[Kilo New] KiloProvider: 🔄 Hot reloading JS with state preservation (dev mode)")
-        this.postMessage({
-          type: "hotReloadJS",
-        })
-        this.debounceTimer = null
-      }, 300)
-    }
-
-    jsWatcher.onDidChange(reloadJS)
-    jsWatcher.onDidCreate(reloadJS)
-
-    this.webviewWatcherDisposable = vscode.Disposable.from(cssWatcher, jsWatcher)
   }
 
   /**
@@ -1340,7 +1270,6 @@ export class KiloProvider implements vscode.WebviewViewProvider {
     const iconsBaseUri = webview.asWebviewUri(vscode.Uri.joinPath(this.extensionUri, "assets", "icons"))
 
     const nonce = getNonce()
-    const isDev = this.context.extensionMode === vscode.ExtensionMode.Development
 
     // CSP allows:
     // - default-src 'none': Block everything by default
@@ -1357,9 +1286,6 @@ export class KiloProvider implements vscode.WebviewViewProvider {
       `img-src ${webview.cspSource} data: https:`,
     ].join("; ")
 
-    // No inline hot reload script - everything handled in the main app (index.tsx)
-    const hotReloadScript = ""
-
     return `<!DOCTYPE html>
 <html lang="en" data-theme="kilo-vscode">
 <head>
@@ -1367,7 +1293,7 @@ export class KiloProvider implements vscode.WebviewViewProvider {
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta http-equiv="Content-Security-Policy" content="${csp}">
 	<title>Kilo Code</title>
-	<link id="kilo-stylesheet" rel="stylesheet" href="${styleUri}">
+	<link rel="stylesheet" href="${styleUri}">
 	<style>
 		html, body {
 			margin: 0;
@@ -1393,7 +1319,7 @@ export class KiloProvider implements vscode.WebviewViewProvider {
 </head>
 <body>
 	<div id="root"></div>
-	<script nonce="${nonce}">window.ICONS_BASE_URI = "${iconsBaseUri}";</script>${hotReloadScript}
+	<script nonce="${nonce}">window.ICONS_BASE_URI = "${iconsBaseUri}";</script>
 	<script nonce="${nonce}" src="${scriptUri}"></script>
 </body>
 </html>`
@@ -1407,11 +1333,6 @@ export class KiloProvider implements vscode.WebviewViewProvider {
     this.unsubscribeEvent?.()
     this.unsubscribeState?.()
     this.webviewMessageDisposable?.dispose()
-    this.webviewWatcherDisposable?.dispose()
-    if (this.debounceTimer) {
-      clearTimeout(this.debounceTimer)
-      this.debounceTimer = null
-    }
     this.trackedSessionIds.clear()
   }
 }

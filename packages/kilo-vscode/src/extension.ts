@@ -1,6 +1,4 @@
 import * as vscode from "vscode"
-import * as fs from "fs"
-import * as path from "path"
 import { KiloProvider } from "./KiloProvider"
 import { AgentManagerProvider } from "./AgentManagerProvider"
 import { EXTENSION_DISPLAY_NAME } from "./constants"
@@ -10,24 +8,6 @@ import { BrowserAutomationService } from "./services/browser-automation"
 
 export function activate(context: vscode.ExtensionContext) {
   console.log("Kilo Code extension is now active")
-
-  // kilocode_change - ensure VS Code directories exist to prevent ENOENT errors during webview hot reload
-  // VS Code 1.109+ checks for these directories during webview initialization
-  try {
-    const userConfigPath = path.join(context.globalStorageUri.fsPath, "..", "..", "..", "User")
-    fs.mkdirSync(path.join(userConfigPath, "prompts"), { recursive: true })
-
-    // Also create .github/agents in workspace roots to prevent workspace-specific ENOENT
-    const workspaceFolders = vscode.workspace.workspaceFolders
-    if (workspaceFolders) {
-      for (const folder of workspaceFolders) {
-        const agentsPath = path.join(folder.uri.fsPath, ".github", "agents")
-        fs.mkdirSync(agentsPath, { recursive: true })
-      }
-    }
-  } catch {
-    // Ignore errors (e.g., permissions, already exists)
-  }
 
   // Create shared connection service (one server for all webviews)
   const connectionService = new KiloConnectionService(context)
@@ -44,7 +24,7 @@ export function activate(context: vscode.ExtensionContext) {
   })
 
   // Create the provider with shared service
-  const provider = new KiloProvider(context.extensionUri, connectionService, context)
+  const provider = new KiloProvider(context.extensionUri, connectionService)
 
   // Register the webview view provider for the sidebar
   context.subscriptions.push(vscode.window.registerWebviewViewProvider(KiloProvider.viewType, provider))
@@ -115,7 +95,7 @@ async function openKiloInNewTab(context: vscode.ExtensionContext, connectionServ
     dark: vscode.Uri.joinPath(context.extensionUri, "assets", "icons", "kilo-dark.svg"),
   }
 
-  const tabProvider = new KiloProvider(context.extensionUri, connectionService, context)
+  const tabProvider = new KiloProvider(context.extensionUri, connectionService)
   tabProvider.resolveWebviewPanel(panel)
 
   // Wait for the new panel to become active before locking the editor group.
