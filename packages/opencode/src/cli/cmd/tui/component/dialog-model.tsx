@@ -8,8 +8,8 @@ import { createDialogProviderOptions, DialogProvider } from "./dialog-provider"
 import { useKeybind } from "../context/keybind"
 import * as fuzzysort from "fuzzysort"
 
-// kilocode_change start - Recommended models for Kilo Gateway (order determines display priority)
-const KILO_RECOMMENDED_MODELS = [
+// kilocode_change start - Fallback recommended models when API doesn't return preferredIndex
+const FALLBACK_RECOMMENDED_MODELS = [
   "kilo/auto",
   "anthropic/claude-sonnet-4.5",
   "anthropic/claude-opus-4.5",
@@ -100,7 +100,7 @@ export function DialogModel(props: { providerID?: string }) {
               : undefined,
             // kilocode_change start
             category: connected()
-              ? provider.id === "kilo" && KILO_RECOMMENDED_MODELS.includes(model)
+              ? provider.id === "kilo" && (info.recommended || FALLBACK_RECOMMENDED_MODELS.includes(model))
                 ? "Recommended"
                 : provider.name
               : undefined,
@@ -123,11 +123,11 @@ export function DialogModel(props: { providerID?: string }) {
           sortBy(
             // kilocode_change start - Sort recommended models first for Kilo Gateway
             (x) => {
-              if (x.value.providerID === "kilo") {
-                const idx = KILO_RECOMMENDED_MODELS.indexOf(x.value.modelID)
-                return idx >= 0 ? idx : KILO_RECOMMENDED_MODELS.length + 1
-              }
-              return 0
+              if (x.value.providerID !== "kilo") return 0
+              const model = sync.data.provider.find((p) => p.id === "kilo")?.models[x.value.modelID]
+              if (model?.recommendedIndex !== undefined) return model.recommendedIndex
+              const idx = FALLBACK_RECOMMENDED_MODELS.indexOf(x.value.modelID)
+              return idx >= 0 ? idx : FALLBACK_RECOMMENDED_MODELS.length + 1
             },
             // kilocode_change end
             (x) => x.footer !== "Free",
