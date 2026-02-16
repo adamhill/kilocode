@@ -19,6 +19,7 @@ export class FileIgnoreController {
   private workspacePath: string
   private ignoreInstance: Ignore = ignore()
   private loadedContents: Array<{ file: string; content: string }> = []
+  private readonly realpathCache = new Map<string, string>()
 
   constructor(workspacePath?: string) {
     this.hasWorkspace = Boolean(workspacePath)
@@ -75,10 +76,16 @@ export class FileIgnoreController {
     const absoluteInput = path.isAbsolute(withoutUri) ? withoutUri : path.resolve(this.workspacePath, withoutUri)
 
     let resolved = absoluteInput
-    try {
-      resolved = fs.realpathSync(absoluteInput)
-    } catch {
-      // Keep unresolved path when file does not exist yet.
+    const cached = this.realpathCache.get(absoluteInput)
+    if (cached) {
+      resolved = cached
+    } else {
+      try {
+        resolved = fs.realpathSync(absoluteInput)
+        this.realpathCache.set(absoluteInput, resolved)
+      } catch {
+        // Keep unresolved path when file does not exist yet.
+      }
     }
 
     const relative = path.relative(this.workspacePath, resolved)
