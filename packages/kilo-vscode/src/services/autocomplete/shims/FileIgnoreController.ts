@@ -1,6 +1,5 @@
 import path from "node:path"
-import fs from "node:fs/promises"
-import fsSync from "node:fs"
+import fs from "node:fs"
 import ignore, { type Ignore } from "ignore"
 
 const KILOCODEIGNORE = ".kilocodeignore"
@@ -35,33 +34,27 @@ export class FileIgnoreController {
     }
 
     // Try .kilocodeignore first — if it exists, use only that.
+    // Use existsSync to distinguish "missing" from "unreadable" — permission
+    // errors on readFileSync will propagate instead of being silently swallowed.
     const kilocodeignorePath = path.join(this.workspacePath, KILOCODEIGNORE)
-    let kilocodeignoreContent: string | undefined
-    try {
-      kilocodeignoreContent = await fs.readFile(kilocodeignorePath, "utf-8")
-    } catch {
-      // File does not exist.
-    }
-
-    if (kilocodeignoreContent?.trim()) {
-      this.ignoreInstance.add(kilocodeignoreContent)
-      this.ignoreInstance.add(KILOCODEIGNORE)
-      this.loadedContents.push({ file: KILOCODEIGNORE, content: kilocodeignoreContent })
-      return
+    if (fs.existsSync(kilocodeignorePath)) {
+      const kilocodeignoreContent = fs.readFileSync(kilocodeignorePath, "utf-8")
+      if (kilocodeignoreContent.trim()) {
+        this.ignoreInstance.add(kilocodeignoreContent)
+        this.ignoreInstance.add(KILOCODEIGNORE)
+        this.loadedContents.push({ file: KILOCODEIGNORE, content: kilocodeignoreContent })
+        return
+      }
     }
 
     // Fallback: use .gitignore + hardcoded sensitive patterns.
     const gitignorePath = path.join(this.workspacePath, GITIGNORE)
-    let gitignoreContent: string | undefined
-    try {
-      gitignoreContent = await fs.readFile(gitignorePath, "utf-8")
-    } catch {
-      // File does not exist.
-    }
-
-    if (gitignoreContent?.trim()) {
-      this.ignoreInstance.add(gitignoreContent)
-      this.loadedContents.push({ file: GITIGNORE, content: gitignoreContent })
+    if (fs.existsSync(gitignorePath)) {
+      const gitignoreContent = fs.readFileSync(gitignorePath, "utf-8")
+      if (gitignoreContent.trim()) {
+        this.ignoreInstance.add(gitignoreContent)
+        this.loadedContents.push({ file: GITIGNORE, content: gitignoreContent })
+      }
     }
 
     // Always add sensitive patterns in the fallback path.
@@ -83,7 +76,7 @@ export class FileIgnoreController {
 
     let resolved = absoluteInput
     try {
-      resolved = fsSync.realpathSync(absoluteInput)
+      resolved = fs.realpathSync(absoluteInput)
     } catch {
       // Keep unresolved path when file does not exist yet.
     }
