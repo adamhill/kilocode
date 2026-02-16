@@ -15,7 +15,6 @@ vsc-extension-quickstart.md
 **/*.map
 **/*.ts
 **/.vscode-test.*
-pnpm-lock.yaml
 AGENTS.md
 .prettierignore
 

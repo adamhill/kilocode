@@ -4,8 +4,7 @@ node_modules
 .sst
 .env
 .idea
-.vscode
-!packages/kilo-vscode/.vscode
+!.vscode
 # use vscode workspaces with peacock to have many vscodes with the same repo:
 *.code-workspace
 .codex

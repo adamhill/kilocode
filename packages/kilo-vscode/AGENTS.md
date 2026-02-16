@@ -4,30 +4,35 @@ This file provides guidance to agents when working with code in this repository.
 
 ## Package Context
 
-VSCode extension for Kilo Code. Part of a Bun/Turbo monorepo but this package uses **pnpm** (not Bun).
+VSCode extension for Kilo Code. Part of a Bun/Turbo monorepo using Bun workspace dependencies.
 
 ## Commands
 
 ```bash
-pnpm compile          # Type-check + lint + build
-pnpm watch            # Watch mode (esbuild + tsc)
-pnpm test             # Run tests (requires pretest compilation)
-pnpm lint             # ESLint on src/
-pnpm run format       # Run formatter (do this before committing to avoid styling-only changes in commits)
+bun run compile          # Type-check + lint + build
+bun run watch            # Watch mode (esbuild + tsc)
+bun run test             # Run tests (requires pretest compilation)
+bun run lint             # ESLint on src/
+bun run format           # Run formatter (do this before committing to avoid styling-only changes in commits)
 ```
 
-Single test: `pnpm test -- --grep "test name"`
+Single test: `bun run test -- --grep "test name"`
 
 ## CLI Binary
 
 The extension bundles a CLI backend binary. To build it:
 
 ```bash
-cd ../../packages/opencode && bun install && cd ../../packages/kilo-vscode
-node scripts/prepare-cli-binary.mjs
+bun script/local-bin.ts
 ```
 
-`bun install` in the opencode package is required before the binary can be built.
+Or use `--force` to rebuild:
+
+```bash
+bun script/local-bin.ts --force
+```
+
+The script automatically handles building the opencode package if needed.
 
 ## Architecture (Non-Obvious)
 
@@ -113,4 +118,4 @@ Do not pad markdown table cells for column alignment. Use `| content |` with sin
 
 ## Committing
 
-- Before committing, always run `pnpm run format` so commits don't accidentally include formatting/styling-only diffs.
+- Before committing, always run `bun run format` so commits don't accidentally include formatting/styling-only diffs.

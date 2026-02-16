@@ -43,8 +43,8 @@ mkdirSync(distDir, { recursive: true })
 
 // Compile the extension once (platform-agnostic)
 console.log("\n📦 Compiling extension...")
-await $`pnpm run check-types`
-await $`pnpm run lint`
+await $`bun run check-types`
+await $`bun run lint`
 await $`node ${join(import.meta.dir, "..", "esbuild.js")} --production`
 
 // Process each target
