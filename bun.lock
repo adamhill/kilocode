@@ -189,6 +189,7 @@
         "@kilocode/kilo-i18n": "file:../kilo-i18n",
         "@kilocode/kilo-ui": "file:../kilo-ui",
         "@kilocode/sdk": "file:../sdk/js",
+        "@opencode-ai/ui": "file:../ui",
         "diff": "^7.0.0",
         "dotenv": "^16.4.7",
         "eventsource": "^2.0.2",
