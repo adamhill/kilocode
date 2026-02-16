@@ -3,22 +3,16 @@ import fs from "node:fs/promises"
 import fsSync from "node:fs"
 import ignore, { type Ignore } from "ignore"
 
-const SENSITIVE_PATTERNS = [".env", ".env.local", ".env.production", ".env.staging", ".env.development", ".env.*"]
-const IGNORE_FILES = [".kilocodeignore", ".gitignore"]
+const KILOCODEIGNORE = ".kilocodeignore"
+const GITIGNORE = ".gitignore"
+
+/**
+ * Patterns for sensitive environment files, applied only when no .kilocodeignore exists.
+ */
+const SENSITIVE_PATTERNS = [".env", ".env.*"]
 
 function toPosix(filePath: string): string {
   return filePath.replace(/\\/g, "/")
-}
-
-function isSensitiveFile(filePath: string): boolean {
-  const basename = toPosix(filePath).split("/").pop() ?? ""
-  return SENSITIVE_PATTERNS.some((pattern) => {
-    if (pattern.includes("*")) {
-      const prefix = pattern.split("*")[0]
-      return basename.startsWith(prefix)
-    }
-    return basename === pattern
-  })
 }
 
 export class FileIgnoreController {
@@ -34,23 +28,38 @@ export class FileIgnoreController {
     this.ignoreInstance = ignore()
     this.loadedContents = []
 
-    for (const fileName of IGNORE_FILES) {
-      const ignorePath = path.join(this.workspacePath, fileName)
-      let content: string
-      try {
-        content = await fs.readFile(ignorePath, "utf-8")
-      } catch {
-        continue
-      }
-
-      if (!content.trim()) {
-        continue
-      }
-
-      this.ignoreInstance.add(content)
-      this.ignoreInstance.add(fileName)
-      this.loadedContents.push({ file: fileName, content })
+    // Try .kilocodeignore first — if it exists, use only that.
+    const kilocodeignorePath = path.join(this.workspacePath, KILOCODEIGNORE)
+    let kilocodeignoreContent: string | undefined
+    try {
+      kilocodeignoreContent = await fs.readFile(kilocodeignorePath, "utf-8")
+    } catch {
+      // File does not exist.
     }
+
+    if (kilocodeignoreContent?.trim()) {
+      this.ignoreInstance.add(kilocodeignoreContent)
+      this.ignoreInstance.add(KILOCODEIGNORE)
+      this.loadedContents.push({ file: KILOCODEIGNORE, content: kilocodeignoreContent })
+      return
+    }
+
+    // Fallback: use .gitignore + hardcoded sensitive patterns.
+    const gitignorePath = path.join(this.workspacePath, GITIGNORE)
+    let gitignoreContent: string | undefined
+    try {
+      gitignoreContent = await fs.readFile(gitignorePath, "utf-8")
+    } catch {
+      // File does not exist.
+    }
+
+    if (gitignoreContent?.trim()) {
+      this.ignoreInstance.add(gitignoreContent)
+      this.loadedContents.push({ file: GITIGNORE, content: gitignoreContent })
+    }
+
+    // Always add sensitive patterns in the fallback path.
+    this.ignoreInstance.add(SENSITIVE_PATTERNS)
   }
 
   private toRelativePath(filePath: string): string | null {
@@ -80,10 +89,6 @@ export class FileIgnoreController {
    * Returns true if the file can be read/used as autocomplete context.
    */
   validateAccess(filePath: string): boolean {
-    if (isSensitiveFile(filePath)) {
-      return false
-    }
-
     const relative = this.toRelativePath(filePath)
     if (!relative) {
       // Outside workspace or unresolved path: allow by default for compatibility.
@@ -108,9 +113,7 @@ export class FileIgnoreController {
       return undefined
     }
 
-    const sections = this.loadedContents.map(
-      ({ file, content }) => `# ${file}\n\n${content.trimEnd()}\n\n${file}`,
-    )
+    const sections = this.loadedContents.map(({ file, content }) => `# ${file}\n\n${content.trimEnd()}\n\n${file}`)
     return sections.join("\n\n")
   }
 
