@@ -23,10 +23,13 @@ export class KiloProvider implements vscode.WebviewViewProvider {
   private unsubscribeEvent: (() => void) | null = null
   private unsubscribeState: (() => void) | null = null
   private webviewMessageDisposable: vscode.Disposable | null = null
+  private webviewWatcherDisposable: vscode.Disposable | null = null
+  private debounceTimer: NodeJS.Timeout | null = null
 
   constructor(
     private readonly extensionUri: vscode.Uri,
     private readonly connectionService: KiloConnectionService,
+    private readonly context: vscode.ExtensionContext,
   ) {}
 
   /**
@@ -115,6 +118,9 @@ export class KiloProvider implements vscode.WebviewViewProvider {
     // Handle messages from webview (shared handler)
     this.setupWebviewMessageHandler(webviewView.webview)
 
+    // Set up hot reload watcher for development mode
+    this.setupWebviewHotReload(webviewView.webview)
+
     // Initialize connection to CLI backend
     this.initializeConnection()
   }
@@ -136,6 +142,9 @@ export class KiloProvider implements vscode.WebviewViewProvider {
 
     // Handle messages from webview (shared handler)
     this.setupWebviewMessageHandler(panel.webview)
+
+    // Set up hot reload watcher for development mode
+    this.setupWebviewHotReload(panel.webview)
 
     this.initializeConnection()
   }
@@ -281,6 +290,47 @@ export class KiloProvider implements vscode.WebviewViewProvider {
           break
       }
     })
+  }
+
+  /**
+   * Set up hot reload watcher for webview in development mode.
+   * Watches dist/webview.* files and reloads the webview when they change.
+   */
+  private setupWebviewHotReload(webview: vscode.Webview): void {
+    // Only enable in development mode
+    if (this.context.extensionMode !== vscode.ExtensionMode.Development) {
+      return
+    }
+
+    // Clean up existing watcher if any
+    this.webviewWatcherDisposable?.dispose()
+    this.debounceTimer && clearTimeout(this.debounceTimer)
+
+    // Watch for changes to webview bundle files
+    const watcher = vscode.workspace.createFileSystemWatcher(
+      new vscode.RelativePattern(this.extensionUri, "dist/webview.*"),
+    )
+
+    const reloadWebview = () => {
+      // Clear any pending reload
+      if (this.debounceTimer) {
+        clearTimeout(this.debounceTimer)
+      }
+
+      // Debounce reloads by 300ms to avoid multiple rapid reloads
+      this.debounceTimer = setTimeout(() => {
+        console.log("[Kilo New] KiloProvider: 🔄 Hot reloading webview (dev mode)")
+        // Force full reload by clearing then reassigning HTML
+        webview.html = ""
+        webview.html = this._getHtmlForWebview(webview)
+        this.debounceTimer = null
+      }, 300)
+    }
+
+    watcher.onDidChange(reloadWebview)
+    watcher.onDidCreate(reloadWebview)
+
+    this.webviewWatcherDisposable = watcher
   }
 
   /**
@@ -1333,6 +1383,11 @@ export class KiloProvider implements vscode.WebviewViewProvider {
     this.unsubscribeEvent?.()
     this.unsubscribeState?.()
     this.webviewMessageDisposable?.dispose()
+    this.webviewWatcherDisposable?.dispose()
+    if (this.debounceTimer) {
+      clearTimeout(this.debounceTimer)
+      this.debounceTimer = null
+    }
     this.trackedSessionIds.clear()
   }
 }
