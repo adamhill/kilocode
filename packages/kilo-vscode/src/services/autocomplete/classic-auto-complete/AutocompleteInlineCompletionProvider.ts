@@ -259,7 +259,7 @@ export class AutocompleteInlineCompletionProvider implements vscode.InlineComple
   private recentlyEditedTracker: RecentlyEditedTracker
   private debounceTimer: NodeJS.Timeout | null = null
   private isFirstCall: boolean = true
-  private ignoreController?: Promise<FileIgnoreController>
+  private ignoreController: Promise<FileIgnoreController>
   private acceptedCommand: vscode.Disposable | null = null
   private debounceDelayMs: number = INITIAL_DEBOUNCE_DELAY_MS
   private latencyHistory: number[] = []
@@ -280,14 +280,11 @@ export class AutocompleteInlineCompletionProvider implements vscode.InlineComple
     this.costTrackingCallback = costTrackingCallback
     this.getSettings = getSettings
 
-    // Create ignore controller internally (skip when no workspace folder is open)
-    if (workspacePath) {
-      this.ignoreController = (async () => {
-        const ignoreController = new FileIgnoreController(workspacePath)
-        await ignoreController.initialize()
-        return ignoreController
-      })()
-    }
+    this.ignoreController = (async () => {
+      const controller = new FileIgnoreController(workspacePath)
+      await controller.initialize()
+      return controller
+    })()
 
     const ide = new VsCodeIde(context)
     const contextService = new ContextRetrievalService(ide)
@@ -387,11 +384,7 @@ export class AutocompleteInlineCompletionProvider implements vscode.InlineComple
   }
 
   private async disposeIgnoreController(): Promise<void> {
-    if (this.ignoreController) {
-      const ignoreController = this.ignoreController
-      this.ignoreController = undefined
-      ;(await ignoreController).dispose()
-    }
+    ;(await this.ignoreController).dispose()
   }
 
   /**
@@ -479,7 +472,7 @@ export class AutocompleteInlineCompletionProvider implements vscode.InlineComple
     try {
       // Check if file is ignored (for manual trigger via codeSuggestion)
       // Skip ignore check for untitled documents
-      if (this.ignoreController && !document.isUntitled) {
+      if (!document.isUntitled) {
         try {
           // Try to get the controller with a short timeout
           const controller = await Promise.race([

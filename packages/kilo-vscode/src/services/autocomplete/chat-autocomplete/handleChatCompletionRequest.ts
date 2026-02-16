@@ -28,11 +28,8 @@ export async function handleChatCompletionRequest(
 
   const workspacePath = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath ?? ""
 
-  let ignoreController: FileIgnoreController | null = null
-  if (workspacePath) {
-    ignoreController = new FileIgnoreController(workspacePath)
-    await ignoreController.initialize()
-  }
+  const ignoreController = new FileIgnoreController(workspacePath)
+  await ignoreController.initialize()
 
   const tracker = new VisibleCodeTracker(workspacePath, ignoreController)
   const visibleContext = await tracker.captureVisibleCode()
@@ -42,5 +39,5 @@ export async function handleChatCompletionRequest(
 
   responseSender.postMessage({ type: "chatCompletionResult", text: suggestion, requestId })
 
-  ignoreController?.dispose()
+  ignoreController.dispose()
 }

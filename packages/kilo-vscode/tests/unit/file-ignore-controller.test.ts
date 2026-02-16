@@ -101,4 +101,21 @@ describe("FileIgnoreController", () => {
       expect(controller.validateAccess(path.join(workspace, ".env.local"))).toBe(false)
     })
   })
+
+  describe("when constructed with empty workspace path", () => {
+    it("denies all access", async () => {
+      const controller = new FileIgnoreController("")
+      await controller.initialize()
+
+      expect(controller.validateAccess("/some/file.ts")).toBe(false)
+      expect(controller.validateAccess("relative/file.ts")).toBe(false)
+    })
+
+    it("filterPaths returns empty array", async () => {
+      const controller = new FileIgnoreController("")
+      await controller.initialize()
+
+      expect(controller.filterPaths(["/some/file.ts", "other.ts"])).toEqual([])
+    })
+  })
 })

@@ -16,17 +16,23 @@ function toPosix(filePath: string): string {
 }
 
 export class FileIgnoreController {
+  private readonly hasWorkspace: boolean
   private workspacePath: string
   private ignoreInstance: Ignore = ignore()
   private loadedContents: Array<{ file: string; content: string }> = []
 
   constructor(workspacePath?: string) {
-    this.workspacePath = path.resolve(workspacePath ?? process.cwd())
+    this.hasWorkspace = Boolean(workspacePath)
+    this.workspacePath = this.hasWorkspace ? path.resolve(workspacePath!) : ""
   }
 
   async initialize(): Promise<void> {
     this.ignoreInstance = ignore()
     this.loadedContents = []
+
+    if (!this.hasWorkspace) {
+      return
+    }
 
     // Try .kilocodeignore first — if it exists, use only that.
     const kilocodeignorePath = path.join(this.workspacePath, KILOCODEIGNORE)
@@ -67,7 +73,12 @@ export class FileIgnoreController {
       return null
     }
 
-    const withoutUri = filePath.startsWith("file://") ? filePath.slice("file://".length) : filePath
+    let withoutUri = filePath
+    if (filePath.startsWith("file:///")) {
+      withoutUri = filePath.slice("file:///".length)
+    } else if (filePath.startsWith("file://")) {
+      withoutUri = filePath.slice("file://".length)
+    }
     const absoluteInput = path.isAbsolute(withoutUri) ? withoutUri : path.resolve(this.workspacePath, withoutUri)
 
     let resolved = absoluteInput
@@ -87,8 +98,13 @@ export class FileIgnoreController {
 
   /**
    * Returns true if the file can be read/used as autocomplete context.
+   * When no workspace path was provided, denies all access.
    */
   validateAccess(filePath: string): boolean {
+    if (!this.hasWorkspace) {
+      return false
+    }
+
     const relative = this.toRelativePath(filePath)
     if (!relative) {
       // Outside workspace or unresolvable path: deny by default for security.
@@ -100,8 +116,12 @@ export class FileIgnoreController {
 
   /**
    * Filter a list of candidate paths to those allowed.
+   * When no workspace path was provided, returns an empty array.
    */
   filterPaths(paths: string[]): string[] {
+    if (!this.hasWorkspace) {
+      return []
+    }
     return paths.filter((candidate) => this.validateAccess(candidate))
   }
 
