@@ -280,12 +280,14 @@ export class AutocompleteInlineCompletionProvider implements vscode.InlineComple
     this.costTrackingCallback = costTrackingCallback
     this.getSettings = getSettings
 
-    // Create ignore controller internally
-    this.ignoreController = (async () => {
-      const ignoreController = new FileIgnoreController(workspacePath)
-      await ignoreController.initialize()
-      return ignoreController
-    })()
+    // Create ignore controller internally (skip when no workspace folder is open)
+    if (workspacePath) {
+      this.ignoreController = (async () => {
+        const ignoreController = new FileIgnoreController(workspacePath)
+        await ignoreController.initialize()
+        return ignoreController
+      })()
+    }
 
     const ide = new VsCodeIde(context)
     const contextService = new ContextRetrievalService(ide)
