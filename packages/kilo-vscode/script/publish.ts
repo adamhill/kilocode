@@ -113,7 +113,7 @@ for (const config of targets) {
 
   // Publish for this target
   console.log(`  🚀 Publishing to VS Code Marketplace for ${config.target}...`)
-  await $`vsce publish --pre-release --target ${config.target} --packagePath ${vsixPath}`
+  await $`vsce publish --pre-release --packagePath ${vsixPath}`
   console.log(`  ✅ Published ${config.target}`)
 
   // Note: Open VSX publishing is commented out as it doesn't support prereleases
