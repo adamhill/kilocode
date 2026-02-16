@@ -21,7 +21,7 @@ export const X_KILOCODE_TASKID = HEADER_TASKID
 export const X_KILOCODE_PROJECTID = HEADER_PROJECTID
 export const X_KILOCODE_TESTER = HEADER_TESTER
 export const X_KILOCODE_EDITORNAME = HEADER_EDITORNAME
-export const X_KILOCODE_MACHINEID = HEADER_MACHINEID // kilocode_change
+export const X_KILOCODE_MACHINEID = HEADER_MACHINEID
 
 /**
  * Default headers for KiloCode requests
@@ -47,7 +47,7 @@ export function buildKiloHeaders(
   options?: {
     kilocodeOrganizationId?: string
     kilocodeTesterWarningsDisabledUntil?: number
-    machineId?: string // kilocode_change
+    machineId?: string
   },
 ): Record<string, string> {
   const headers: Record<string, string> = {
@@ -71,11 +71,9 @@ export function buildKiloHeaders(
     headers[X_KILOCODE_TESTER] = TESTER_SUPPRESS_VALUE
   }
 
-  // kilocode_change start - add machine ID header
   if (options?.machineId) {
     headers[X_KILOCODE_MACHINEID] = options.machineId
   }
-  // kilocode_change end
 
   return headers
 }
