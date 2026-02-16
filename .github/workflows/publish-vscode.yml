@@ -27,15 +27,8 @@ jobs:
 
       - uses: ./.github/actions/setup-bun
 
-      - name: Setup pnpm
-        run: bun install -g pnpm
-
       - name: Install @vscode/vsce
         run: bun install -g @vscode/vsce
-
-      - name: Install extension dependencies
-        run: pnpm install
-        working-directory: ./packages/kilo-vscode
 
       - name: Publish all targets
         run: bun script/publish.ts

@@ -4,8 +4,8 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "watch",
-      "dependsOn": ["npm: watch:tsc", "npm: watch:esbuild"],
+      "label": "VSCode - Watch",
+      "dependsOn": ["VSCode - TSC", "VSCode - ESBuild"],
       "presentation": {
         "reveal": "never"
       },
@@ -15,43 +15,56 @@
       }
     },
     {
-      "type": "npm",
-      "script": "watch:esbuild",
+      "label": "VSCode - ESBuild",
+      "type": "shell",
+      "command": "bun",
+      "args": ["run", "watch:esbuild"],
       "group": "build",
       "problemMatcher": "$esbuild-watch",
       "isBackground": true,
-      "label": "npm: watch:esbuild",
       "presentation": {
         "group": "watch",
         "reveal": "never"
+      },
+      "options": {
+        "cwd": "${workspaceFolder}/packages/kilo-vscode"
       }
     },
     {
-      "type": "npm",
-      "script": "watch:tsc",
+      "label": "VSCode - TSC",
+      "type": "shell",
+      "command": "bun",
+      "args": ["run", "watch:tsc"],
       "group": "build",
       "problemMatcher": "$tsc-watch",
       "isBackground": true,
-      "label": "npm: watch:tsc",
       "presentation": {
         "group": "watch",
         "reveal": "never"
+      },
+      "options": {
+        "cwd": "${workspaceFolder}/packages/kilo-vscode"
       }
     },
     {
-      "type": "npm",
-      "script": "watch-tests",
+      "label": "VSCode - Tests",
+      "type": "shell",
+      "command": "bun",
+      "args": ["run", "watch-tests"],
       "problemMatcher": "$tsc-watch",
       "isBackground": true,
       "presentation": {
         "reveal": "never",
         "group": "watchers"
       },
-      "group": "build"
+      "group": "build",
+      "options": {
+        "cwd": "${workspaceFolder}/packages/kilo-vscode"
+      }
     },
     {
-      "label": "tasks: watch-tests",
-      "dependsOn": ["npm: watch", "npm: watch-tests"],
+      "label": "VSCode - Tests (Composite)",
+      "dependsOn": ["VSCode - Watch", "VSCode - Tests"],
       "problemMatcher": []
     }
   ]
