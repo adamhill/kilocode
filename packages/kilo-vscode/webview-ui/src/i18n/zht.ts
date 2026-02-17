@@ -788,7 +788,12 @@ export const dict = {
   "settings.aboutKiloCode.status.label": "狀態：",
   "settings.aboutKiloCode.port.label": "連接埠：",
   "settings.aboutKiloCode.versionInfo": "版本資訊",
+  "settings.aboutKiloCode.version.label": "版本：",
   "settings.aboutKiloCode.extensionName": "Kilo Code 擴充功能",
+  "settings.aboutKiloCode.community": "社群與支援",
+  "settings.aboutKiloCode.feedback.prefix": "如果您有任何問題或回饋，歡迎在以下平台提交 issue",
+  "settings.aboutKiloCode.feedback.or": "或",
+  "settings.aboutKiloCode.support.prefix": "如有帳單或帳戶問題，請聯繫客戶支援",
 
   "settings.agentBehaviour.subtab.modes": "模式",
   "settings.agentBehaviour.subtab.agents": "Agents",

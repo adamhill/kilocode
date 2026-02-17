@@ -803,7 +803,12 @@ export const dict = {
   "settings.aboutKiloCode.status.label": "Estado:",
   "settings.aboutKiloCode.port.label": "Puerto:",
   "settings.aboutKiloCode.versionInfo": "Información de versión",
+  "settings.aboutKiloCode.version.label": "Versión:",
   "settings.aboutKiloCode.extensionName": "Extensión Kilo Code",
+  "settings.aboutKiloCode.community": "Comunidad y soporte",
+  "settings.aboutKiloCode.feedback.prefix": "Si tienes preguntas o comentarios, abre un issue en",
+  "settings.aboutKiloCode.feedback.or": "o",
+  "settings.aboutKiloCode.support.prefix": "Para preguntas de facturación o cuenta, contacta al Soporte al Cliente en",
 
   "settings.agentBehaviour.subtab.modes": "Modos",
   "settings.agentBehaviour.subtab.agents": "Agents",

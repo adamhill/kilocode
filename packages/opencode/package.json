@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
-  "version": "1.0.22",
+  "version": "1.0.23",
   "name": "@kilocode/cli",
   "type": "module",
   "license": "MIT",
@@ -19,7 +19,7 @@
   },
   "bin": {
     "kilo": "./bin/kilo",
-    "kilocode": "./bin/kilo"
+    "kilocode": "./bin/kilocode"
   },
   "randomField": "this-is-a-random-value-12345",
   "exports": {
