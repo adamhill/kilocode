@@ -56,9 +56,9 @@ export function useFileMention(vscode: VSCodeContext): FileMention {
 
   const requestFileSearch = (query: string) => {
     if (fileSearchTimer) clearTimeout(fileSearchTimer)
-    fileSearchCounter++
-    const requestId = `file-search-${fileSearchCounter}`
     fileSearchTimer = setTimeout(() => {
+      fileSearchCounter++
+      const requestId = `file-search-${fileSearchCounter}`
       vscode.postMessage({ type: "requestFileSearch", query, requestId })
     }, FILE_SEARCH_DEBOUNCE_MS)
   }
