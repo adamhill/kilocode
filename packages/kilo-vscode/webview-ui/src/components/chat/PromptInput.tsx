@@ -19,7 +19,7 @@ const AUTOCOMPLETE_DEBOUNCE_MS = 500
 const FILE_SEARCH_DEBOUNCE_MS = 150
 const MIN_TEXT_LENGTH = 3
 
-const AT_PATTERN = /@(\S*)$/
+const AT_PATTERN = /(?:^|\s)@(\S*)$/
 
 export const PromptInput: Component = () => {
   const session = useSession()
@@ -92,13 +92,10 @@ export const PromptInput: Component = () => {
 
   const requestFileSearch = (query: string) => {
     if (fileSearchTimer) clearTimeout(fileSearchTimer)
+    fileSearchCounter++
+    const requestId = `file-search-${fileSearchCounter}`
     fileSearchTimer = setTimeout(() => {
-      fileSearchCounter++
-      vscode.postMessage({
-        type: "requestFileSearch",
-        query,
-        requestId: `file-search-${fileSearchCounter}`,
-      })
+      vscode.postMessage({ type: "requestFileSearch", query, requestId })
     }, FILE_SEARCH_DEBOUNCE_MS)
   }
 
@@ -144,7 +141,8 @@ export const PromptInput: Component = () => {
     const before = val.substring(0, cursor)
     const after = val.substring(cursor)
 
-    const replaced = before.replace(AT_PATTERN, "")
+    // Replace @query but preserve any leading whitespace the pattern consumed
+    const replaced = before.replace(AT_PATTERN, (match) => (match.startsWith(" ") ? " " : ""))
     const newText = replaced + after
     setText(newText)
     textareaRef.value = newText
