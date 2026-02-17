@@ -234,12 +234,26 @@ Every event gets enriched with properties from `KiloProvider.getTelemetryPropert
 ### User Opt-in Model
 
 - Three states: `"unset"`, `"enabled"`, `"disabled"` (see `TelemetrySetting` type)
-- Telemetry enabled only when: **VSCode telemetry level = "all"** AND **user setting ≠ "disabled"**
+- Full telemetry enabled only when: **VS Code telemetry level = `"all"`** AND **user setting ≠ `"disabled"`**
+- VS Code exposes four telemetry levels via `vscode.env.telemetryLevel`:
+  - `"off"` — No telemetry at all
+  - `"crash"` — Only crash reports
+  - `"error"` — Crash reports + errors
+  - `"all"` — Full telemetry enabled
 - Wrapper apps can force telemetry enabled via environment variable
 
 ### VS Code Telemetry Level as Master Control
 
-`vscode.env.telemetryLevel` is passed as a startup parameter to the CLI server. If VS Code telemetry is disabled (level is `"off"` or `"crash"`), the CLI suppresses all PostHog sending entirely. This ensures the user's VS Code telemetry preference is respected across the entire stack — webview, extension host, and CLI.
+`vscode.env.telemetryLevel` is passed as a startup parameter to the CLI server. The CLI maps each level to a specific telemetry behavior:
+
+| VS Code Level | What we send |
+|---------------|-------------|
+| `"off"` | Nothing — CLI telemetry fully disabled |
+| `"crash"` | Only `captureException()` for crashes |
+| `"error"` | Exceptions + error events |
+| `"all"` | All telemetry events |
+
+This ensures the user's VS Code telemetry preference is respected across the entire stack — webview, extension host, and CLI. The mapping is enforced at the CLI server level, so even if the extension host or webview attempts to send an event, the CLI will suppress it based on the configured level.
 
 ### Identity Management
 
