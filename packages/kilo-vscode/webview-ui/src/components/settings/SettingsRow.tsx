@@ -1,7 +1,7 @@
 // kilocode_change - new file
-import { Component } from "solid-js"
+import { Component, JSX } from "solid-js"
 
-const SettingsRow: Component<{ title: string; description: string; last?: boolean; children: any }> = (props) => (
+const SettingsRow: Component<{ title: string; description: string; last?: boolean; children: JSX.Element }> = (props) => (
   <div
     data-slot="settings-row"
     style={{
