@@ -771,7 +771,6 @@ export const dict = {
 
   "prompt.placeholder.connecting": "서버에 연결 중...",
   "prompt.placeholder.default": "메시지를 입력하세요...",
-  "prompt.hint.sendShortcut": "Enter로 전송, Shift+Enter로 줄 바꿈",
 
   "context.usage.sessionCost": "세션 비용",
 

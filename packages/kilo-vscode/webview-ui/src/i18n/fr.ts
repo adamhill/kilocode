@@ -782,7 +782,6 @@ export const dict = {
 
   "prompt.placeholder.connecting": "Connexion au serveur...",
   "prompt.placeholder.default": "Tapez un message...",
-  "prompt.hint.sendShortcut": "Appuyez sur Entrée pour envoyer, Maj+Entrée pour un saut de ligne",
 
   "context.usage.sessionCost": "Coût de la session",
 

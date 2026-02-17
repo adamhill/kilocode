@@ -763,7 +763,6 @@ export const dict = {
 
   "prompt.placeholder.connecting": "正在連線至伺服器...",
   "prompt.placeholder.default": "輸入訊息...",
-  "prompt.hint.sendShortcut": "按 Enter 送出，Shift+Enter 換行",
 
   "context.usage.sessionCost": "工作階段費用",
 

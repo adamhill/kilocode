@@ -775,7 +775,6 @@ export const dict = {
 
   "prompt.placeholder.connecting": "Kobler til server...",
   "prompt.placeholder.default": "Skriv en melding...",
-  "prompt.hint.sendShortcut": "Trykk Enter for å sende, Shift+Enter for ny linje",
 
   "context.usage.sessionCost": "Sesjonskostnad",
 
