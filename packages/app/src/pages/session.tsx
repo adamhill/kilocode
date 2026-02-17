@@ -39,6 +39,7 @@ import { usePermission } from "@/context/permission"
 import { showToast } from "@opencode-ai/ui/toast"
 import { SessionHeader, SessionContextTab, SortableTab, FileVisual, NewSessionView } from "@/components/session"
 import { navMark, navParams } from "@/utils/perf"
+import { Identifier } from "@/utils/id" // kilocode_change
 import { same } from "@/utils/same"
 import { createOpenReviewFile, focusTerminalById, getTabReorderIndex } from "@/pages/session/helpers"
 import { createScrollSpy } from "@/pages/session/scroll-spy"
@@ -150,6 +151,68 @@ export default function Page() {
       })
       .finally(() => setUi("responding", false))
   }
+
+  // kilocode_change start - handle mode switch from question options
+  const handleModeAction = async (input: { mode: string; text: string }) => {
+    const sessionID = params.id
+    if (!sessionID) return
+
+    const idle = () =>
+      new Promise<void>((resolve, reject) => {
+        let done = false
+        const timeout = setTimeout(() => {
+          done = true
+          reject(new Error("Timed out waiting for session idle"))
+        }, 30_000)
+        const check = () => {
+          if (done) return
+          const status = sync.data.session_status[sessionID]
+          if (!status || status.type === "idle") {
+            done = true
+            clearTimeout(timeout)
+            resolve()
+            return
+          }
+          setTimeout(check, 100)
+        }
+        check()
+      })
+
+    try {
+      await idle()
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err)
+      showToast({ title: language.t("common.requestFailed"), description: message })
+      return
+    }
+
+    local.agent.set(input.mode)
+
+    const model = local.model.current()
+    if (!model) return
+
+    const variant = local.model.variant.current()
+    const messageID = Identifier.ascending("message")
+
+    sdk.client.session
+      .prompt({
+        sessionID,
+        agent: input.mode,
+        model: {
+          modelID: model.id,
+          providerID: model.provider.id,
+        },
+        messageID,
+        parts: [{ type: "text", text: input.text }],
+        variant,
+      })
+      .catch((err: unknown) => {
+        const message = err instanceof Error ? err.message : String(err)
+        showToast({ title: language.t("common.requestFailed"), description: message })
+      })
+  }
+  // kilocode_change end
+
   const sessionKey = createMemo(() => `${params.dir}${params.id ? "/" + params.id : ""}`)
   const workspaceKey = createMemo(() => params.dir ?? "")
   const workspaceTabs = createMemo(() => layout.tabs(workspaceKey))
@@ -1697,6 +1760,7 @@ export default function Page() {
               resumeScroll()
             }}
             setPromptDockRef={(el) => (promptDock = el)}
+            onModeAction={handleModeAction}
           />
 
           <Show when={desktopReviewOpen()}>
