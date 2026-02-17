@@ -90,7 +90,7 @@ export function useFileMention(vscode: VSCodeContext): FileMention {
   const onInput = (val: string, cursor: number) => {
     const before = val.substring(0, cursor)
     const match = before.match(AT_PATTERN)
-    if (match) {
+    if (match && match[1].length > 0) {
       setMentionQuery(match[1])
       requestFileSearch(match[1])
     } else {
