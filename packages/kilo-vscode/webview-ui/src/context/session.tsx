@@ -576,7 +576,7 @@ export const SessionProvider: ParentComponent = (props) => {
     // Phase 4: optimistic user message
     const sid = currentSessionID()
     if (sid) {
-      const tempId = `optimistic-${Date.now()}`
+      const tempId = `optimistic-${crypto.randomUUID()}`
       const temp: Message = {
         id: tempId,
         sessionID: sid,
