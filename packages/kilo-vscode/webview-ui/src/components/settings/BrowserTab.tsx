@@ -1,5 +1,6 @@
 import { Component, createSignal, onCleanup, onMount } from "solid-js"
 import { Switch } from "@kilocode/kilo-ui/switch"
+import { Card } from "@kilocode/kilo-ui/card"
 import { useVSCode } from "../../context/vscode"
 import { useLanguage } from "../../context/language"
 import type { BrowserSettings } from "../../types/messages"
@@ -55,29 +56,39 @@ const BrowserTab: Component = () => {
         </p>
       </div>
 
-      {/* Enable toggle */}
-      <SettingsRow title={t("settings.browser.enable.title")} description={t("settings.browser.enable.description")}>
-        <Switch checked={settings().enabled} onChange={(checked: boolean) => update("enabled", checked)} />
-      </SettingsRow>
+      <Card>
+        {/* Enable toggle */}
+        <SettingsRow title={t("settings.browser.enable.title")} description={t("settings.browser.enable.description")}>
+          <Switch checked={settings().enabled} onChange={(checked: boolean) => update("enabled", checked)} hideLabel>
+            {t("settings.browser.enable.title")}
+          </Switch>
+        </SettingsRow>
 
-      {/* Use System Chrome */}
-      <SettingsRow
-        title={t("settings.browser.systemChrome.title")}
-        description={t("settings.browser.systemChrome.description")}
-      >
-        <Switch
-          checked={settings().useSystemChrome}
-          onChange={(checked: boolean) => update("useSystemChrome", checked)}
-        />
-      </SettingsRow>
+        {/* Use System Chrome */}
+        <SettingsRow
+          title={t("settings.browser.systemChrome.title")}
+          description={t("settings.browser.systemChrome.description")}
+        >
+          <Switch
+            checked={settings().useSystemChrome}
+            onChange={(checked: boolean) => update("useSystemChrome", checked)}
+            hideLabel
+          >
+            {t("settings.browser.systemChrome.title")}
+          </Switch>
+        </SettingsRow>
 
-      {/* Headless mode */}
-      <SettingsRow
-        title={t("settings.browser.headless.title")}
-        description={t("settings.browser.headless.description")}
-      >
-        <Switch checked={settings().headless} onChange={(checked: boolean) => update("headless", checked)} />
-      </SettingsRow>
+        {/* Headless mode */}
+        <SettingsRow
+          title={t("settings.browser.headless.title")}
+          description={t("settings.browser.headless.description")}
+          last
+        >
+          <Switch checked={settings().headless} onChange={(checked: boolean) => update("headless", checked)} hideLabel>
+            {t("settings.browser.headless.title")}
+          </Switch>
+        </SettingsRow>
+      </Card>
     </div>
   )
 }
