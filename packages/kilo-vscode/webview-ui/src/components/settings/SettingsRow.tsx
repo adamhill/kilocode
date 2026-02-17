@@ -8,7 +8,7 @@ const SettingsRow: Component<{ title: string; description: string; last?: boolea
       display: "flex",
       "align-items": "center",
       "justify-content": "space-between",
-      padding: "8px 0",
+      padding: "12px 0",
       "border-bottom": props.last ? "none" : "1px solid var(--border-weak-base)",
     }}
   >
