@@ -4,7 +4,7 @@ import { join } from "node:path"
 import { existsSync, mkdirSync, rmSync, chmodSync } from "node:fs"
 
 const packageJson = await Bun.file(join(import.meta.dir, "..", "package.json")).json()
-const version = packageJson.version
+const version = process.env.KILO_VERSION || packageJson.version
 
 console.log(`Building VSCode extension version: ${version}`)
 
