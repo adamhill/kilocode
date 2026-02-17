@@ -276,6 +276,16 @@ export class KiloProvider implements vscode.WebviewViewProvider {
             this.connectionService,
           )
           break
+        case "requestFileSearch": {
+          const client = this.httpClient
+          if (client) {
+            const dir = this.getWorkspaceDirectory()
+            void client.findFiles(message.query, dir).then((paths) => {
+              this.postMessage({ type: "fileSearchResult", paths, requestId: message.requestId })
+            })
+          }
+          break
+        }
         case "chatCompletionAccepted":
           handleChatCompletionAccepted({ type: "chatCompletionAccepted", suggestionLength: message.suggestionLength })
           break

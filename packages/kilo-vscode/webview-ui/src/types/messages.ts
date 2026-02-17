@@ -446,6 +446,12 @@ export interface ChatCompletionResultMessage {
   requestId: string
 }
 
+export interface FileSearchResultMessage {
+  type: "fileSearchResult"
+  paths: string[]
+  requestId: string
+}
+
 export interface QuestionRequestMessage {
   type: "questionRequest"
   question: QuestionRequest
@@ -519,6 +525,7 @@ export type ExtensionMessage =
   | AgentsLoadedMessage
   | AutocompleteSettingsLoadedMessage
   | ChatCompletionResultMessage
+  | FileSearchResultMessage
   | QuestionRequestMessage
   | QuestionResolvedMessage
   | QuestionErrorMessage
@@ -663,6 +670,12 @@ export interface RequestChatCompletionMessage {
   requestId: string
 }
 
+export interface RequestFileSearchMessage {
+  type: "requestFileSearch"
+  query: string
+  requestId: string
+}
+
 export interface ChatCompletionAcceptedMessage {
   type: "chatCompletionAccepted"
   suggestionLength?: number
@@ -716,6 +729,7 @@ export type WebviewMessage =
   | RequestAutocompleteSettingsMessage
   | UpdateAutocompleteSettingMessage
   | RequestChatCompletionMessage
+  | RequestFileSearchMessage
   | ChatCompletionAcceptedMessage
   | UpdateSettingRequest
   | RequestBrowserSettingsMessage
