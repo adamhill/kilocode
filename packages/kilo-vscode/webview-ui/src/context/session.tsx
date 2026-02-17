@@ -20,7 +20,7 @@ import { createStore, produce } from "solid-js/store"
 import { useVSCode } from "./vscode"
 import { useServer } from "./server"
 import { useProvider } from "./provider"
-import { useLanguage } from "./language" // kilocode_change
+import { useLanguage } from "./language"
 import type {
   SessionInfo,
   Message,
@@ -38,7 +38,6 @@ import type {
   FileAttachment,
 } from "../types/messages"
 
-// kilocode_change start - accept translation function for i18n
 // Derive human-readable status from the last streaming part
 function computeStatus(part: Part | undefined, t: (key: string, params?: Record<string, string | number>) => string): string | undefined {
   if (!part) return undefined
@@ -70,7 +69,6 @@ function computeStatus(part: Part | undefined, t: (key: string, params?: Record<
   if (part.type === "text") return t("session.status.writingResponse")
   return undefined
 }
-// kilocode_change end
 
 // Store structure for messages and parts
 interface SessionStore {
@@ -147,7 +145,7 @@ export const SessionProvider: ParentComponent = (props) => {
   const vscode = useVSCode()
   const server = useServer()
   const provider = useProvider()
-  const language = useLanguage() // kilocode_change
+  const language = useLanguage()
 
   // Current session ID
   const [currentSessionID, setCurrentSessionID] = createSignal<string | undefined>()
@@ -768,7 +766,6 @@ export const SessionProvider: ParentComponent = (props) => {
     return messages().reduce((sum, m) => sum + (m.role === "assistant" ? (m.cost ?? 0) : 0), 0)
   })
 
-  // kilocode_change start - use i18n for status text
   // Status text derived from last assistant message parts
   const statusText = createMemo<string | undefined>(() => {
     if (status() === "idle") return undefined
@@ -782,7 +779,6 @@ export const SessionProvider: ParentComponent = (props) => {
     }
     return fallback
   })
-  // kilocode_change end
 
   // Context usage from the last assistant message that has token data
   const contextUsage = createMemo<ContextUsage | undefined>(() => {
