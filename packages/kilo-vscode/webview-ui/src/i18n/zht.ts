@@ -762,7 +762,7 @@ export const dict = {
   "dialog.model.noProviders": "沒有供應商",
 
   "prompt.placeholder.connecting": "正在連線至伺服器...",
-  "prompt.placeholder.default": "輸入訊息...",
+  "prompt.placeholder.default": "輸入訊息... (Enter 送出，Shift+Enter 換行)",
 
   "context.usage.sessionCost": "工作階段費用",
 

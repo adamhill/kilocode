@@ -799,7 +799,7 @@ export const dict = {
   "dialog.model.noProviders": "Nema pružatelja",
 
   "prompt.placeholder.connecting": "Povezivanje na server...",
-  "prompt.placeholder.default": "Unesite poruku...",
+  "prompt.placeholder.default": "Unesite poruku... (Enter za slanje, Shift+Enter za novi red)",
 
   "context.usage.sessionCost": "Cijena sesije",
 

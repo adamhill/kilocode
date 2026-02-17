@@ -777,7 +777,7 @@ export const dict = {
   "dialog.model.noProviders": "Нет провайдеров",
 
   "prompt.placeholder.connecting": "Подключение к серверу...",
-  "prompt.placeholder.default": "Введите сообщение...",
+  "prompt.placeholder.default": "Введите сообщение... (Enter для отправки, Shift+Enter для новой строки)",
 
   "context.usage.sessionCost": "Стоимость сессии",
 
