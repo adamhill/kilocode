@@ -47,9 +47,7 @@ export const QuestionDock: Component<{
     if (store.sending) return undefined
 
     setStore("sending", true)
-    return sdk.client.question
-      .reply({ requestID: props.request.id, answers })
-      .finally(() => setStore("sending", false))
+    return sdk.client.question.reply({ requestID: props.request.id, answers }).finally(() => setStore("sending", false))
   }
 
   const reject = () => {
@@ -63,7 +61,7 @@ export const QuestionDock: Component<{
   }
 
   const submit = () => {
-    reply(questions().map((_, i) => store.answers[i] ?? []))?.catch(fail)
+    reply(questions().map((_, i) => store.answers[i] ?? []))?.catch(fail) // kilocode_change
   }
 
   const pick = (answer: string, custom: boolean = false) => {
