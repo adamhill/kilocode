@@ -76,7 +76,7 @@ You MUST first write the COMPLETE review above (Summary, Issues Found, Detailed 
 ONLY AFTER the full review is written:
 
 - If your recommendation is **APPROVE** with no issues found, you are done. Do NOT call the question tool.
-- If your recommendation is **APPROVE WITH SUGGESTIONS**, **NEEDS CHANGES**, or **NEEDS DISCUSSION**, THEN call the question tool to offer fix suggestions with mode switching.
+- If your recommendation is **APPROVE WITH SUGGESTIONS** or **NEEDS CHANGES**, THEN call the question tool to offer fix suggestions with mode switching.
 
 When calling the question tool, provide exactly 1-3 options (never more than 3). Choose the appropriate mode for each option:
 - mode "code" for direct code fixes (bugs, missing error handling, clear improvements)
