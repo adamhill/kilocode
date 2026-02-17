@@ -39,7 +39,10 @@ import type {
 } from "../types/messages"
 
 // Derive human-readable status from the last streaming part
-function computeStatus(part: Part | undefined, t: (key: string, params?: Record<string, string | number>) => string): string | undefined {
+function computeStatus(
+  part: Part | undefined,
+  t: (key: string, params?: Record<string, string | number>) => string,
+): string | undefined {
   if (!part) return undefined
   if (part.type === "tool") {
     switch (part.tool) {
