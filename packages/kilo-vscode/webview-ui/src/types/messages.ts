@@ -8,6 +8,12 @@ export type ConnectionState = "connecting" | "connected" | "disconnected" | "err
 // Session status (simplified from backend)
 export type SessionStatus = "idle" | "busy" | "retry"
 
+// Rich status info for retry countdown and future extensions
+export type SessionStatusInfo =
+  | { type: "idle" }
+  | { type: "busy" }
+  | { type: "retry"; attempt: number; message: string; next: number }
+
 // Tool state for tool parts
 export type ToolState =
   | { status: "pending"; input: Record<string, unknown> }
@@ -103,6 +109,7 @@ export interface PermissionRequest {
   id: string
   sessionID: string
   toolName: string
+  patterns: string[]
   args: Record<string, unknown>
   message?: string
   tool?: { messageID: string; callID: string }
@@ -326,6 +333,10 @@ export interface SessionStatusMessage {
   type: "sessionStatus"
   sessionID: string
   status: SessionStatus
+  // Retry fields (present when status === "retry")
+  attempt?: number
+  message?: string
+  next?: number
 }
 
 export interface PermissionRequestMessage {

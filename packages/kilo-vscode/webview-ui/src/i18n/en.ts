@@ -800,12 +800,14 @@ export const dict = {
   "session.messages.welcome":
     "Kilo Code is an AI coding assistant. Ask it to build features, fix bugs, or explain your codebase.",
   "session.messages.scrollToBottom": "Scroll to bottom",
+  "session.status.writingResponse": "Writing response...",
+  "session.status.retrying": "Retrying (attempt {{ attempt }})… {{ message }}",
+  "session.status.working": "Working...",
 
   "dialog.model.noProviders": "No providers",
 
   "prompt.placeholder.connecting": "Connecting to server...",
-  "prompt.placeholder.default": "Type a message...",
-  "prompt.hint.sendShortcut": "Press Enter to send, Shift+Enter for new line",
+  "prompt.placeholder.default": "Type a message... (Enter to send, Shift+Enter for new line)",
 
   "context.usage.sessionCost": "Session cost",
 

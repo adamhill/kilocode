@@ -777,12 +777,14 @@ export const dict = {
   "session.messages.welcome":
     "Kilo Code est un assistant de programmation IA. Demandez-lui de créer des fonctionnalités, corriger des bugs ou expliquer votre code.",
   "session.messages.scrollToBottom": "Défiler vers le bas",
+  "session.status.writingResponse": "Rédaction de la réponse…",
+  "session.status.retrying": "Nouvelle tentative (essai {{ attempt }})… {{ message }}",
+  "session.status.working": "En cours…",
 
   "dialog.model.noProviders": "Aucun fournisseur",
 
   "prompt.placeholder.connecting": "Connexion au serveur...",
-  "prompt.placeholder.default": "Tapez un message...",
-  "prompt.hint.sendShortcut": "Appuyez sur Entrée pour envoyer, Maj+Entrée pour un saut de ligne",
+  "prompt.placeholder.default": "Tapez un message... (Entrée pour envoyer, Maj+Entrée pour un saut de ligne)",
 
   "context.usage.sessionCost": "Coût de la session",
 

@@ -767,12 +767,14 @@ export const dict = {
   "session.messages.welcome":
     "Kilo Code er en AI-kodningsassistent. Bed den om at bygge funktioner, rette fejl eller forklare din kodebase.",
   "session.messages.scrollToBottom": "Rul til bunden",
+  "session.status.writingResponse": "Skriver svar…",
+  "session.status.retrying": "Prøver igen (forsøg {{ attempt }})… {{ message }}",
+  "session.status.working": "Arbejder…",
 
   "dialog.model.noProviders": "Ingen udbydere",
 
   "prompt.placeholder.connecting": "Opretter forbindelse til server...",
-  "prompt.placeholder.default": "Skriv en besked...",
-  "prompt.hint.sendShortcut": "Tryk Enter for at sende, Shift+Enter for ny linje",
+  "prompt.placeholder.default": "Skriv en besked... (Enter for at sende, Shift+Enter for ny linje)",
 
   "context.usage.sessionCost": "Sessionsomkostning",
 
