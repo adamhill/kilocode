@@ -761,6 +761,9 @@ export const dict = {
   "session.messages.welcome":
     "Kilo Code هو مساعد ترميز بالذكاء الاصطناعي. اطلب منه بناء ميزات أو إصلاح أخطاء أو شرح قاعدة الشيفرة.",
   "session.messages.scrollToBottom": "التمرير إلى الأسفل",
+  "session.status.writingResponse": "...جارٍ كتابة الرد",
+  "session.status.retrying": "...إعادة المحاولة (المحاولة {{ attempt }})… {{ message }}",
+  "session.status.working": "...جارٍ العمل",
 
   "dialog.model.noProviders": "لا يوجد موفرون",
 

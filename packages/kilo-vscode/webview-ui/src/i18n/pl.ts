@@ -769,6 +769,9 @@ export const dict = {
   "session.messages.welcome":
     "Kilo Code to asystent programowania AI. Poproś go o tworzenie funkcji, naprawę błędów lub wyjaśnienie bazy kodu.",
   "session.messages.scrollToBottom": "Przewiń na dół",
+  "session.status.writingResponse": "Pisanie odpowiedzi…",
+  "session.status.retrying": "Ponawiam próbę ({{ attempt }})… {{ message }}",
+  "session.status.working": "Pracuję…",
 
   "dialog.model.noProviders": "Brak dostawców",
 
