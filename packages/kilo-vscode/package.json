@@ -23,7 +23,8 @@
         {
           "id": "kilo-code-sidebar",
           "title": "Kilo Code (NEW)",
-          "icon": "$(code)"
+          "icon": "assets/icons/kilo-light.png",
+          "darkIcon": "assets/icons/kilo-dark.png"
         }
       ]
     },
