@@ -579,7 +579,7 @@ export type QuestionOption = {
    */
   description: string
   /**
-   * Optional agent/mode to switch to when selected (e.g. code, debug, architect)
+   * Optional agent/mode to switch to when selected (e.g. code, debug, orchestrator)
    */
   mode?: string
 }
