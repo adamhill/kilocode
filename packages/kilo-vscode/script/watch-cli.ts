@@ -50,7 +50,7 @@ async function rebuild() {
     installed = true
 
     const source = sourceBinaryPath()
-    if (!await Bun.file(source).exists()) {
+    if (!(await Bun.file(source).exists())) {
       log(`ERROR: Build completed but no binary found at ${relative(packagesDir, source)}`)
       return
     }
