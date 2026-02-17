@@ -408,6 +408,103 @@
   white-space: nowrap;
 }
 
+/* ============================================
+   Permission Dock
+   ============================================ */
+
+.permission-dock {
+  padding: 12px;
+  border-bottom: 1px solid var(--vscode-panel-border);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.permission-dock-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.permission-dock-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--vscode-foreground);
+}
+
+.permission-dock-type {
+  font-size: 12px;
+  color: var(--vscode-descriptionForeground);
+  padding: 1px 6px;
+  border-radius: 3px;
+  background: var(--vscode-badge-background);
+  color: var(--vscode-badge-foreground);
+}
+
+.permission-dock-patterns {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+.permission-dock-pattern {
+  font-size: 12px;
+  font-family: var(--vscode-editor-font-family, monospace);
+  color: var(--vscode-foreground);
+  word-break: break-all;
+}
+
+.permission-dock-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.permission-btn {
+  padding: 4px 12px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  font-size: 12px;
+  font-family: var(--vscode-font-family);
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.permission-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.permission-btn-deny {
+  background: transparent;
+  color: var(--vscode-foreground);
+  border-color: var(--vscode-input-border);
+}
+
+.permission-btn-deny:hover:not(:disabled) {
+  background: var(--vscode-list-hoverBackground);
+}
+
+.permission-btn-always {
+  background: var(--vscode-button-secondaryBackground, var(--vscode-input-background));
+  color: var(--vscode-button-secondaryForeground, var(--vscode-foreground));
+}
+
+.permission-btn-always:hover:not(:disabled) {
+  background: var(--vscode-button-secondaryHoverBackground, var(--vscode-list-hoverBackground));
+}
+
+.permission-btn-allow {
+  background: var(--vscode-button-background);
+  color: var(--vscode-button-foreground);
+}
+
+.permission-btn-allow:hover:not(:disabled) {
+  background: var(--vscode-button-hoverBackground);
+}
+
 /* Dialog Confirmation */
 .dialog-confirm-body {
   display: flex;
