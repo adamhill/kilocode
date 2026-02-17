@@ -3,7 +3,7 @@
  * Text input with send/abort buttons, ghost-text autocomplete, and @ file mention support
  */
 
-import { Component, createSignal, onCleanup, Show, For } from "solid-js"
+import { Component, createSignal, onCleanup, Show, For, createEffect } from "solid-js"
 import { Button } from "@kilocode/kilo-ui/button"
 import { IconButton } from "@kilocode/kilo-ui/icon-button"
 import { Tooltip } from "@kilocode/kilo-ui/tooltip"
@@ -30,6 +30,7 @@ export const PromptInput: Component = () => {
   const [ghostText, setGhostText] = createSignal("")
 
   let textareaRef: HTMLTextAreaElement | undefined
+  let dropdownRef: HTMLDivElement | undefined
   let debounceTimer: ReturnType<typeof setTimeout> | undefined
   let requestCounter = 0
 
@@ -75,6 +76,16 @@ export const PromptInput: Component = () => {
   }
 
   const dismissSuggestion = () => setGhostText("")
+
+  createEffect(() => {
+    const index = mention.mentionIndex()
+    if (dropdownRef && mention.showMention()) {
+      const activeItem = dropdownRef.querySelector(".file-mention-item--active") as HTMLElement
+      if (activeItem) {
+        activeItem.scrollIntoView({ block: "nearest", behavior: "smooth" })
+      }
+    }
+  })
 
   const adjustHeight = () => {
     if (!textareaRef) return
@@ -142,7 +153,7 @@ export const PromptInput: Component = () => {
   return (
     <div class="prompt-input-container">
       <Show when={mention.showMention()}>
-        <div class="file-mention-dropdown">
+        <div class="file-mention-dropdown" ref={dropdownRef}>
           <For each={mention.mentionResults()}>
             {(path, index) => (
               <div
