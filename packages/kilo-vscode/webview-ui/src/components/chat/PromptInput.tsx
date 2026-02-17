@@ -3,7 +3,7 @@
  * Text input with send/abort buttons, ghost-text autocomplete, and @ file mention support
  */
 
-import { Component, createSignal, onCleanup, Show, For, createEffect } from "solid-js"
+import { Component, createSignal, onCleanup, Show, For } from "solid-js"
 import { Button } from "@kilocode/kilo-ui/button"
 import { IconButton } from "@kilocode/kilo-ui/icon-button"
 import { Tooltip } from "@kilocode/kilo-ui/tooltip"
@@ -77,24 +77,12 @@ export const PromptInput: Component = () => {
 
   const dismissSuggestion = () => setGhostText("")
 
-  createEffect(() => {
-    const index = mention.mentionIndex()
-    const showing = mention.showMention()
-    console.log("[Kilo New] scroll effect:", { index, showing, hasRef: !!dropdownRef })
-    if (showing && dropdownRef) {
-      queueMicrotask(() => {
-        console.log("[Kilo New] scroll microtask:", { hasRef: !!dropdownRef, childCount: dropdownRef?.children.length })
-        if (!dropdownRef) return
-        const items = Array.from(dropdownRef.querySelectorAll(".file-mention-item"))
-        console.log("[Kilo New] scroll items found:", items.length, "target index:", index)
-        const active = items[index] as HTMLElement | undefined
-        if (active) {
-          console.log("[Kilo New] scrolling to item:", index)
-          active.scrollIntoView({ block: "nearest" })
-        }
-      })
-    }
-  })
+  const scrollToActiveItem = () => {
+    if (!dropdownRef) return
+    const items = dropdownRef.querySelectorAll(".file-mention-item")
+    const active = items[mention.mentionIndex()] as HTMLElement | undefined
+    if (active) active.scrollIntoView({ block: "nearest" })
+  }
 
   const adjustHeight = () => {
     if (!textareaRef) return
@@ -116,7 +104,10 @@ export const PromptInput: Component = () => {
   }
 
   const handleKeyDown = (e: KeyboardEvent) => {
-    if (mention.onKeyDown(e, textareaRef, setText)) return
+    if (mention.onKeyDown(e, textareaRef, setText)) {
+      queueMicrotask(scrollToActiveItem)
+      return
+    }
 
     if ((e.key === "Tab" || e.key === "ArrowRight") && ghostText()) {
       e.preventDefault()
