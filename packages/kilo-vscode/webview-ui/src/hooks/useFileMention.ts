@@ -15,7 +15,7 @@ export interface FileMention {
   mentionResults: Accessor<string[]>
   mentionIndex: Accessor<number>
   showMention: Accessor<boolean>
-  onInput: (val: string, cursor: number) => boolean
+  onInput: (val: string, cursor: number) => void
   onKeyDown: (e: KeyboardEvent, textarea: HTMLTextAreaElement | undefined, setText: (text: string) => void) => boolean
   selectFile: (path: string, textarea: HTMLTextAreaElement, setText: (text: string) => void) => void
   setMentionIndex: (index: number) => void
@@ -87,16 +87,15 @@ export function useFileMention(vscode: VSCodeContext): FileMention {
     closeMention()
   }
 
-  const onInput = (val: string, cursor: number): boolean => {
+  const onInput = (val: string, cursor: number) => {
     const before = val.substring(0, cursor)
     const match = before.match(AT_PATTERN)
     if (match) {
       setMentionQuery(match[1])
       requestFileSearch(match[1])
-      return true
+    } else {
+      closeMention()
     }
-    closeMention()
-    return false
   }
 
   const onKeyDown = (
