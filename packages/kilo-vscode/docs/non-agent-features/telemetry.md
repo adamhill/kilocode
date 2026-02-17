@@ -53,6 +53,7 @@ A single class that captures UI events from the extension host and webview, then
 ### 1.2 CLI-side: `kilo-telemetry` Package
 
 Already exists at `packages/kilo-telemetry/`. Handles:
+
 - All PostHog communication (`posthog-node`)
 - OpenTelemetry integration for AI SDK spans
 - Identity management (machineId → email upgrade on auth)
@@ -110,85 +111,85 @@ All events are defined in `TelemetryEventName` enum (`packages/types/src/telemet
 
 ### 3.1 Task Lifecycle
 
-| Event | Properties | Capture Method |
-|-------|-----------|-------------|
-| `Task Created` | `taskId` | `captureTaskCreated()` |
-| `Task Reopened` | `taskId` | `captureTaskRestarted()` |
-| `Task Completed` | `taskId` | `captureTaskCompleted()` |
+| Event                  | Properties                          | Capture Method                 |
+| ---------------------- | ----------------------------------- | ------------------------------ |
+| `Task Created`         | `taskId`                            | `captureTaskCreated()`         |
+| `Task Reopened`        | `taskId`                            | `captureTaskRestarted()`       |
+| `Task Completed`       | `taskId`                            | `captureTaskCompleted()`       |
 | `Conversation Message` | `taskId`, `source` (user/assistant) | `captureConversationMessage()` |
 
 ### 3.2 LLM & AI
 
-| Event | Properties |
-|-------|-----------|
-| `LLM Completion` | `taskId`, `inputTokens`, `outputTokens`, `cacheWriteTokens`, `cacheReadTokens`, `cost`, `completionTime`, `inferenceProvider` |
-| `Context Condensed` | `taskId`, `isAutomaticTrigger`, `usedCustomPrompt`, `usedCustomApiHandler` |
-| `Sliding Window Truncation` | `taskId` |
+| Event                       | Properties                                                                                                                    |
+| --------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `LLM Completion`            | `taskId`, `inputTokens`, `outputTokens`, `cacheWriteTokens`, `cacheReadTokens`, `cost`, `completionTime`, `inferenceProvider` |
+| `Context Condensed`         | `taskId`, `isAutomaticTrigger`, `usedCustomPrompt`, `usedCustomApiHandler`                                                    |
+| `Sliding Window Truncation` | `taskId`                                                                                                                      |
 
 ### 3.3 Tools & Modes
 
-| Event | Properties |
-|-------|-----------|
-| `Tool Used` | `taskId`, `tool`, `toolProtocol` |
-| `Mode Switched` | `taskId`, `newMode` |
-| `Mode Setting Changed` | `settingName` |
-| `Custom Mode Created` | `modeSlug`, `modeName` |
-| `Code Action Used` | `actionType` |
+| Event                  | Properties                       |
+| ---------------------- | -------------------------------- |
+| `Tool Used`            | `taskId`, `tool`, `toolProtocol` |
+| `Mode Switched`        | `taskId`, `newMode`              |
+| `Mode Setting Changed` | `settingName`                    |
+| `Custom Mode Created`  | `modeSlug`, `modeName`           |
+| `Code Action Used`     | `actionType`                     |
 
 ### 3.4 Checkpoints
 
-| Event | Properties |
-|-------|-----------|
-| `Checkpoint Created` | `taskId` |
-| `Checkpoint Restored` | `taskId` |
-| `Checkpoint Diffed` | `taskId` |
+| Event                 | Properties |
+| --------------------- | ---------- |
+| `Checkpoint Created`  | `taskId`   |
+| `Checkpoint Restored` | `taskId`   |
+| `Checkpoint Diffed`   | `taskId`   |
 
 ### 3.5 UI Interactions
 
-| Event | Properties |
-|-------|-----------|
-| `Tab Shown` | `tab` |
-| `Title Button Clicked` | `button` |
-| `Prompt Enhanced` | `taskId` (optional) |
+| Event                  | Properties          |
+| ---------------------- | ------------------- |
+| `Tab Shown`            | `tab`               |
+| `Title Button Clicked` | `button`            |
+| `Prompt Enhanced`      | `taskId` (optional) |
 
 ### 3.6 Marketplace
 
-| Event | Properties |
-|-------|-----------|
+| Event                        | Properties                                                   |
+| ---------------------------- | ------------------------------------------------------------ |
 | `Marketplace Item Installed` | `itemId`, `itemType`, `itemName`, `target`, additional props |
-| `Marketplace Item Removed` | `itemId`, `itemType`, `itemName`, `target` |
+| `Marketplace Item Removed`   | `itemId`, `itemType`, `itemName`, `target`                   |
 
 ### 3.7 Account & Auth
 
-| Event | Properties |
-|-------|-----------|
-| `Account Connect Clicked` | — |
-| `Account Connect Success` | — |
-| `Account Logout Clicked` | — |
-| `Account Logout Success` | — |
+| Event                     | Properties |
+| ------------------------- | ---------- |
+| `Account Connect Clicked` | —          |
+| `Account Connect Success` | —          |
+| `Account Logout Clicked`  | —          |
+| `Account Logout Success`  | —          |
 
 ### 3.8 Error Tracking
 
-| Event | Properties |
-|-------|-----------|
-| `Schema Validation Error` | `schemaName`, `error` (Zod formatted) |
-| `Diff Application Error` | `taskId`, `consecutiveMistakeCount` |
-| `Shell Integration Error` | `taskId` |
-| `Consecutive Mistake Error` | `taskId` |
+| Event                               | Properties                                                      |
+| ----------------------------------- | --------------------------------------------------------------- |
+| `Schema Validation Error`           | `schemaName`, `error` (Zod formatted)                           |
+| `Diff Application Error`            | `taskId`, `consecutiveMistakeCount`                             |
+| `Shell Integration Error`           | `taskId`                                                        |
+| `Consecutive Mistake Error`         | `taskId`                                                        |
 | Exceptions via `captureException()` | Structured via `ApiProviderError` and `ConsecutiveMistakeError` |
 
 ### 3.9 Autocomplete (Kilo-specific)
 
-| Event | Properties |
-|-------|-----------|
-| `Autocomplete Suggestion Requested` | `languageId`, `modelId`, `provider`, `autocompleteType` |
-| `Autocomplete LLM Request Completed` | `latencyMs`, `cost`, `inputTokens`, `outputTokens`, context |
-| `Autocomplete LLM Request Failed` | `latencyMs`, `error`, context |
-| `Autocomplete LLM Suggestion Returned` | context, `suggestionLength` |
-| `Autocomplete Suggestion Cache Hit` | `matchType`, `suggestionLength`, context |
-| `Autocomplete Accept Suggestion` | `suggestionLength` |
-| `Autocomplete Suggestion Filtered` | `reason`, context |
-| `Autocomplete Unique Suggestion Shown` | context (only after 300ms visibility) |
+| Event                                  | Properties                                                  |
+| -------------------------------------- | ----------------------------------------------------------- |
+| `Autocomplete Suggestion Requested`    | `languageId`, `modelId`, `provider`, `autocompleteType`     |
+| `Autocomplete LLM Request Completed`   | `latencyMs`, `cost`, `inputTokens`, `outputTokens`, context |
+| `Autocomplete LLM Request Failed`      | `latencyMs`, `error`, context                               |
+| `Autocomplete LLM Suggestion Returned` | context, `suggestionLength`                                 |
+| `Autocomplete Suggestion Cache Hit`    | `matchType`, `suggestionLength`, context                    |
+| `Autocomplete Accept Suggestion`       | `suggestionLength`                                          |
+| `Autocomplete Suggestion Filtered`     | `reason`, context                                           |
+| `Autocomplete Unique Suggestion Shown` | context (only after 300ms visibility)                       |
 
 ### 3.10 Other (Kilo-specific)
 
@@ -363,6 +364,7 @@ The gateway already sends `X-KILOCODE-TASKID` (session ID) on every request, but
 If any telemetry events or properties are intentionally dropped, renamed, or have their semantics changed, the analytics team (Pedro) must be notified **before** the change ships. This allows analytics dashboards and queries to be updated in parallel.
 
 Checklist for schema changes:
+
 - [ ] Document the change in this file
 - [ ] Create a GitHub issue tagged with `telemetry`
 - [ ] Notify @pedroheyerdahl in the PR description
