@@ -158,18 +158,19 @@ export default function Page() {
   const waitForIdle = (sessionID: string, signal: AbortSignal) =>
     new Promise<void>((resolve, reject) => {
       let settled = false
+      const ref: { dispose?: () => void } = {}
       const settle = (fn: () => void) => {
         if (settled) return
         settled = true
         clearTimeout(timeout)
-        dispose()
+        ref.dispose?.()
         fn()
       }
       const timeout = setTimeout(() => {
         settle(() => reject(new Error("Timed out waiting for session idle")))
       }, 30_000)
 
-      const dispose = createRoot((dispose) => {
+      ref.dispose = createRoot((dispose) => {
         signal.addEventListener("abort", () => settle(() => reject(new Error("Cancelled"))), { once: true })
         createEffect(() => {
           const status = sync.data.session_status[sessionID] ?? { type: "idle" as const }
