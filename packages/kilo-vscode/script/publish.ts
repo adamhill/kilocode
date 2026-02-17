@@ -4,10 +4,7 @@ import { join } from "node:path"
 import { existsSync } from "node:fs"
 import { Script } from "@opencode-ai/script"
 
-const packageJson = await Bun.file(join(import.meta.dir, "..", "package.json")).json()
-const version = packageJson.version
-
-console.log(`Publishing VSCode extension version: ${version}`)
+console.log(`Publishing VSCode extension for release: v${Script.version}`)
 
 const outDir = process.env.VSIX_DIR || join(import.meta.dir, "..", "out")
 console.log(`Using VSIX directory: ${outDir}`)
