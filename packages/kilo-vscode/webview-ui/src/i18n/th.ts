@@ -758,6 +758,9 @@ export const dict = {
   "session.messages.empty": "เริ่มการสนทนาโดยพิมพ์ข้อความด้านล่าง",
   "session.messages.welcome": "Kilo Code เป็นผู้ช่วยเขียนโค้ด AI ขอให้สร้างฟีเจอร์ แก้ไขบัก หรืออธิบายโค้ดเบสของคุณ",
   "session.messages.scrollToBottom": "เลื่อนไปด้านล่าง",
+  "session.status.writingResponse": "กำลังเขียนคำตอบ...",
+  "session.status.retrying": "กำลังลองใหม่ (ครั้งที่ {{ attempt }})… {{ message }}",
+  "session.status.working": "กำลังทำงาน...",
 
   "dialog.model.noProviders": "ไม่มีผู้ให้บริการ",
 

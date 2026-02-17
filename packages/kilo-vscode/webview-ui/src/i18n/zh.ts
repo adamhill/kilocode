@@ -761,6 +761,9 @@ export const dict = {
   "session.messages.empty": "在下方输入消息以开始对话。",
   "session.messages.welcome": "Kilo Code 是一个 AI 编程助手。让它帮你构建功能、修复 bug 或解释代码库。",
   "session.messages.scrollToBottom": "滚动到底部",
+  "session.status.writingResponse": "正在撰写回复…",
+  "session.status.retrying": "正在重试（第 {{ attempt }} 次）… {{ message }}",
+  "session.status.working": "处理中…",
 
   "dialog.model.noProviders": "无供应商",
 
