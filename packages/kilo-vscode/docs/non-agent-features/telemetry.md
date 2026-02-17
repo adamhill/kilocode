@@ -258,6 +258,17 @@ This ensures the user's VS Code telemetry preference is respected across the ent
 - `TASK_MESSAGE` events are excluded from PostHog (contain full conversation)
 - Expected API errors (429, 402) are not reported via `shouldReportApiErrorToTelemetry()`
 
+### Identity Continuity (Old → New Extension)
+
+Users switching from the old extension to the new one must not appear as two different users in PostHog.
+
+- **Old extension**: Uses `vscode.env.machineId` as PostHog `distinct_id`
+- **CLI (`kilo-telemetry`)**: Generates a random UUID stored in `~/.config/kilo/telemetry-id`
+- **Authenticated users**: Both old and new call `alias()` on auth, which merges identities server-side — no issue
+- **Unauthenticated users**: Will have completely different `distinct_id` values with no link
+
+**Action required:** The extension must pass `vscode.env.machineId` to the CLI at startup so `kilo-telemetry` uses it as the `distinct_id` instead of (or aliased with) its own generated UUID. This ensures unauthenticated users maintain identity continuity.
+
 ---
 
 ## 6. Structured Error Classes
@@ -324,3 +335,34 @@ Both have type guards (`isApiProviderError()`, `isConsecutiveMistakeError()`) an
 ### Shared Types
 
 - `zod` — for schema validation of telemetry properties
+
+---
+
+## 9. Gateway Integration
+
+### 9.1 `editor_name` Header
+
+The Kilo Gateway records `editor_name` on every API request for cost attribution by feature. The CLI currently defaults to `"Kilo CLI"`, so when the extension spawns the CLI server, all gateway usage gets misattributed as CLI usage.
+
+**Action required:** The extension must pass `editor_name` (e.g., `"Kilo VSCode"`) as a CLI startup parameter so the gateway correctly attributes requests to the VS Code extension.
+
+### 9.2 `platform` Field in Session Ingest
+
+The session ingest API records a `platform` field per session, which also defaults to `"cli"`. This must be set to identify the new extension (e.g., `"vscode"`) so sessions are correctly attributed.
+
+**Action required:** Pass `platform` as a CLI startup parameter alongside `editor_name`.
+
+### 9.3 `X-KILOCODE-TASKID` Persistence (Nice-to-have)
+
+The gateway already sends `X-KILOCODE-TASKID` (session ID) on every request, but the backend doesn't persist it in `microdollar_usage_metadata`. If persisted, usage records could be joined to sessions for deterministic cost attribution, eliminating the time-matching heuristic currently used for ~20% of records. This is a backend change, not an extension change.
+
+---
+
+## 10. Schema Change Process
+
+If any telemetry events or properties are intentionally dropped, renamed, or have their semantics changed, the analytics team (Pedro) must be notified **before** the change ships. This allows analytics dashboards and queries to be updated in parallel.
+
+Checklist for schema changes:
+- [ ] Document the change in this file
+- [ ] Create a GitHub issue tagged with `telemetry`
+- [ ] Notify @pedroheyerdahl in the PR description
