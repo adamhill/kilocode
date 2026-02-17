@@ -3,7 +3,7 @@ import type { Accessor } from "solid-js"
 import type { FileAttachment, WebviewMessage, ExtensionMessage } from "../types/messages"
 
 const FILE_SEARCH_DEBOUNCE_MS = 150
-const AT_PATTERN = /(?:^|\s)@(\S*)$/
+const AT_PATTERN = /(?:^|\s)@(\S*)$/m
 
 interface VSCodeContext {
   postMessage: (message: WebviewMessage) => void
@@ -34,7 +34,7 @@ export function useFileMention(vscode: VSCodeContext): FileMention {
   let fileSearchTimer: ReturnType<typeof setTimeout> | undefined
   let fileSearchCounter = 0
 
-  const showMention = () => mentionQuery() !== null && mentionResults().length > 0
+  const showMention = () => mentionQuery() !== null
 
   createEffect(() => {
     if (!showMention()) setMentionIndex(0)
@@ -90,7 +90,7 @@ export function useFileMention(vscode: VSCodeContext): FileMention {
   const onInput = (val: string, cursor: number) => {
     const before = val.substring(0, cursor)
     const match = before.match(AT_PATTERN)
-    if (match && match[1].length > 0) {
+    if (match) {
       setMentionQuery(match[1])
       requestFileSearch(match[1])
     } else {

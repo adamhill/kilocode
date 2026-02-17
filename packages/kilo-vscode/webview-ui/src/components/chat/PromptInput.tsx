@@ -80,10 +80,11 @@ export const PromptInput: Component = () => {
   createEffect(() => {
     const index = mention.mentionIndex()
     if (dropdownRef && mention.showMention()) {
-      const activeItem = dropdownRef.querySelector(".file-mention-item--active") as HTMLElement
-      if (activeItem) {
-        activeItem.scrollIntoView({ block: "nearest", behavior: "smooth" })
-      }
+      queueMicrotask(() => {
+        const items = dropdownRef!.children
+        const active = items[index] as HTMLElement | undefined
+        if (active) active.scrollIntoView({ block: "nearest" })
+      })
     }
   })
 
@@ -154,23 +155,28 @@ export const PromptInput: Component = () => {
     <div class="prompt-input-container">
       <Show when={mention.showMention()}>
         <div class="file-mention-dropdown" ref={dropdownRef}>
-          <For each={mention.mentionResults()}>
-            {(path, index) => (
-              <div
-                class="file-mention-item"
-                classList={{ "file-mention-item--active": index() === mention.mentionIndex() }}
-                onMouseDown={(e) => {
-                  e.preventDefault()
-                  if (textareaRef) mention.selectFile(path, textareaRef, setText)
-                }}
-                onMouseEnter={() => mention.setMentionIndex(index())}
-              >
-                <FileIcon node={{ path, type: "file" }} class="file-mention-icon" />
-                <span class="file-mention-name">{fileName(path)}</span>
-                <span class="file-mention-dir">{dirName(path)}</span>
-              </div>
-            )}
-          </For>
+          <Show
+            when={mention.mentionResults().length > 0}
+            fallback={<div class="file-mention-empty">No files found</div>}
+          >
+            <For each={mention.mentionResults()}>
+              {(path, index) => (
+                <div
+                  class="file-mention-item"
+                  classList={{ "file-mention-item--active": index() === mention.mentionIndex() }}
+                  onMouseDown={(e) => {
+                    e.preventDefault()
+                    if (textareaRef) mention.selectFile(path, textareaRef, setText)
+                  }}
+                  onMouseEnter={() => mention.setMentionIndex(index())}
+                >
+                  <FileIcon node={{ path, type: "file" }} class="file-mention-icon" />
+                  <span class="file-mention-name">{fileName(path)}</span>
+                  <span class="file-mention-dir">{dirName(path)}</span>
+                </div>
+              )}
+            </For>
+          </Show>
         </div>
       </Show>
       <div class="prompt-input-wrapper">
