@@ -26,8 +26,6 @@ export const PromptInput: Component = () => {
   const vscode = useVSCode()
   const mention = useFileMention(vscode)
 
-  console.log("[Kilo New] PromptInput component rendered")
-
   const [text, setText] = createSignal("")
   const [ghostText, setGhostText] = createSignal("")
 
@@ -80,15 +78,10 @@ export const PromptInput: Component = () => {
   const dismissSuggestion = () => setGhostText("")
 
   const scrollToActiveItem = () => {
-    console.log("[Kilo New] scrollToActiveItem", { hasRef: !!dropdownRef, index: mention.mentionIndex() })
     if (!dropdownRef) return
     const items = dropdownRef.querySelectorAll(".file-mention-item")
-    console.log("[Kilo New] items found:", items.length)
     const active = items[mention.mentionIndex()] as HTMLElement | undefined
-    if (active) {
-      console.log("[Kilo New] scrolling to", mention.mentionIndex(), active.textContent)
-      active.scrollIntoView({ block: "nearest" })
-    }
+    if (active) active.scrollIntoView({ block: "nearest" })
   }
 
   const adjustHeight = () => {
@@ -111,10 +104,7 @@ export const PromptInput: Component = () => {
   }
 
   const handleKeyDown = (e: KeyboardEvent) => {
-    console.log("[Kilo New] handleKeyDown:", e.key, "showMention:", mention.showMention())
-    const handled = mention.onKeyDown(e, textareaRef, setText)
-    console.log("[Kilo New] mention.onKeyDown returned:", handled)
-    if (handled) {
+    if (mention.onKeyDown(e, textareaRef, setText)) {
       queueMicrotask(scrollToActiveItem)
       return
     }
