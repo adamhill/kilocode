@@ -26,6 +26,8 @@ export const PromptInput: Component = () => {
   const vscode = useVSCode()
   const mention = useFileMention(vscode)
 
+  console.log("[Kilo New] PromptInput component rendered")
+
   const [text, setText] = createSignal("")
   const [ghostText, setGhostText] = createSignal("")
 
