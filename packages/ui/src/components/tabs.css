@@ -405,8 +405,6 @@
         height: 32px;
         border: none;
         border-radius: var(--radius-md);
-        text-decoration: none;
-        outline: none;
 
         /* text-14-medium */
         font-family: var(--font-family-sans);
@@ -421,17 +419,6 @@
           justify-content: flex-start;
           width: 100%;
           height: 100%;
-          text-decoration: none;
-          outline: none;
-          box-shadow: none;
-
-          &:focus,
-          &:focus-visible,
-          &:focus-within {
-            outline: none;
-            box-shadow: none;
-            border: none;
-          }
         }
 
         [data-component="icon"] {
@@ -442,24 +429,17 @@
           background-color: var(--surface-raised-base-hover);
         }
 
-        &:has([data-slot="tabs-trigger"]:focus-visible):not(:has([data-selected])) {
+        &:has([data-slot="tabs-trigger"]:focus-visible) {
           background-color: var(--surface-raised-base-hover);
+          box-shadow: var(--shadow-xs-border-focus);
         }
 
         &:has([data-selected]) {
           background-color: var(--surface-raised-base-active);
           color: var(--text-strong);
-          border: none;
-          outline: none;
-          box-shadow: none;
 
           [data-component="icon"] {
             color: var(--icon-strong-base);
-          }
-
-          [data-slot="tabs-trigger"] {
-            outline: none;
-            box-shadow: none;
           }
 
           &:hover:not(:disabled) {
@@ -475,16 +455,4 @@
   }
 }
 
-/* kilocode_change start - Remove blue focus ring from settings tab triggers */
-[data-component="tabs"][data-variant="settings"] [data-slot="tabs-trigger"] {
-  outline: none !important;
-  box-shadow: none !important;
-}
 
-[data-component="tabs"][data-variant="settings"] [data-slot="tabs-trigger"]:focus,
-[data-component="tabs"][data-variant="settings"] [data-slot="tabs-trigger"]:focus-visible,
-[data-component="tabs"][data-variant="settings"] [data-slot="tabs-trigger"][data-highlighted] {
-  outline: none !important;
-  box-shadow: none !important;
-}
-/* kilocode_change end */

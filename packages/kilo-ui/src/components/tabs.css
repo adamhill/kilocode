@@ -24,9 +24,10 @@
     padding: 4px 0;
     font-size: 13px;
     line-height: normal;
+  }
 
-    &[aria-selected="true"] {
-      border-bottom: 2px solid var(--border-focus, var(--vscode-focusBorder, #007fd4));
-    }
+  /* Alt variant: underline on selected tab */
+  &[data-variant="alt"] [data-slot="tabs-trigger"][aria-selected="true"] {
+    border-bottom: 2px solid var(--border-focus, var(--vscode-focusBorder, #007fd4));
   }
 }
