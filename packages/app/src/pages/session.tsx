@@ -153,38 +153,44 @@ export default function Page() {
   }
 
   // kilocode_change start - handle mode switch from question options
+  let modeActionAbort: AbortController | undefined
+
+  const waitForIdle = (sessionID: string, signal: AbortSignal) =>
+    new Promise<void>((resolve, reject) => {
+      const timeout = setTimeout(() => reject(new Error("Timed out waiting for session idle")), 30_000)
+      signal.addEventListener("abort", () => {
+        clearTimeout(timeout)
+        reject(new Error("Cancelled"))
+      })
+      createEffect(() => {
+        const status = sync.data.session_status[sessionID]
+        if (!status) return // not yet loaded — keep waiting
+        if (status.type !== "idle") return
+        clearTimeout(timeout)
+        resolve()
+      })
+    })
+
+  onCleanup(() => modeActionAbort?.abort())
+
   const handleModeAction = async (input: { mode: string; text: string }) => {
     const sessionID = params.id
     if (!sessionID) return
 
-    const idle = () =>
-      new Promise<void>((resolve, reject) => {
-        let done = false
-        const timeout = setTimeout(() => {
-          done = true
-          reject(new Error("Timed out waiting for session idle"))
-        }, 30_000)
-        const check = () => {
-          if (done) return
-          const status = sync.data.session_status[sessionID]
-          if (!status || status.type === "idle") {
-            done = true
-            clearTimeout(timeout)
-            resolve()
-            return
-          }
-          setTimeout(check, 100)
-        }
-        check()
-      })
+    modeActionAbort?.abort()
+    const controller = new AbortController()
+    modeActionAbort = controller
 
     try {
-      await idle()
+      await waitForIdle(sessionID, controller.signal)
     } catch (err: unknown) {
+      if (controller.signal.aborted) return
       const message = err instanceof Error ? err.message : String(err)
       showToast({ title: language.t("common.requestFailed"), description: message })
       return
     }
+
+    if (controller.signal.aborted) return
 
     local.agent.set(input.mode)
 
