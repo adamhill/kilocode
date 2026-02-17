@@ -765,8 +765,7 @@ export const dict = {
   "dialog.model.noProviders": "لا يوجد موفرون",
 
   "prompt.placeholder.connecting": "جارٍ الاتصال بالخادم...",
-  "prompt.placeholder.default": "اكتب رسالة...",
-  "prompt.hint.sendShortcut": "اضغط Enter للإرسال، Shift+Enter لسطر جديد",
+  "prompt.placeholder.default": "اكتب رسالة... (Enter للإرسال، Shift+Enter لسطر جديد)",
 
   "context.usage.sessionCost": "تكلفة الجلسة",
 

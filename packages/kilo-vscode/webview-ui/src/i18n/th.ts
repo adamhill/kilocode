@@ -762,8 +762,7 @@ export const dict = {
   "dialog.model.noProviders": "ไม่มีผู้ให้บริการ",
 
   "prompt.placeholder.connecting": "กำลังเชื่อมต่อกับเซิร์ฟเวอร์...",
-  "prompt.placeholder.default": "พิมพ์ข้อความ...",
-  "prompt.hint.sendShortcut": "กด Enter เพื่อส่ง, Shift+Enter เพื่อขึ้นบรรทัดใหม่",
+  "prompt.placeholder.default": "พิมพ์ข้อความ... (Enter เพื่อส่ง, Shift+Enter เพื่อขึ้นบรรทัดใหม่)",
 
   "context.usage.sessionCost": "ค่าใช้จ่ายเซสชัน",
 

@@ -777,8 +777,7 @@ export const dict = {
   "dialog.model.noProviders": "Keine Anbieter",
 
   "prompt.placeholder.connecting": "Verbindung zum Server wird hergestellt...",
-  "prompt.placeholder.default": "Nachricht eingeben...",
-  "prompt.hint.sendShortcut": "Enter zum Senden, Shift+Enter für neue Zeile",
+  "prompt.placeholder.default": "Nachricht eingeben... (Enter zum Senden, Shift+Enter für neue Zeile)",
 
   "context.usage.sessionCost": "Sitzungskosten",
 

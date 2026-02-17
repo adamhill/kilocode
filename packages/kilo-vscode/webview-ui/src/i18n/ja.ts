@@ -765,8 +765,7 @@ export const dict = {
   "dialog.model.noProviders": "プロバイダーなし",
 
   "prompt.placeholder.connecting": "サーバーに接続中...",
-  "prompt.placeholder.default": "メッセージを入力...",
-  "prompt.hint.sendShortcut": "Enterで送信、Shift+Enterで改行",
+  "prompt.placeholder.default": "メッセージを入力... (Enterで送信、Shift+Enterで改行)",
 
   "context.usage.sessionCost": "セッションコスト",
 

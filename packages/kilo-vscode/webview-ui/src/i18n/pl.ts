@@ -773,8 +773,7 @@ export const dict = {
   "dialog.model.noProviders": "Brak dostawców",
 
   "prompt.placeholder.connecting": "Łączenie z serwerem...",
-  "prompt.placeholder.default": "Wpisz wiadomość...",
-  "prompt.hint.sendShortcut": "Naciśnij Enter, aby wysłać, Shift+Enter dla nowej linii",
+  "prompt.placeholder.default": "Wpisz wiadomość... (Enter, aby wysłać, Shift+Enter dla nowej linii)",
 
   "context.usage.sessionCost": "Koszt sesji",
 

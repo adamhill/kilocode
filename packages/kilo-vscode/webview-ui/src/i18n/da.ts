@@ -771,8 +771,7 @@ export const dict = {
   "dialog.model.noProviders": "Ingen udbydere",
 
   "prompt.placeholder.connecting": "Opretter forbindelse til server...",
-  "prompt.placeholder.default": "Skriv en besked...",
-  "prompt.hint.sendShortcut": "Tryk Enter for at sende, Shift+Enter for ny linje",
+  "prompt.placeholder.default": "Skriv en besked... (Enter for at sende, Shift+Enter for ny linje)",
 
   "context.usage.sessionCost": "Sessionsomkostning",
 
