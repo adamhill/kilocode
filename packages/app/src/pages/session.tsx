@@ -1,4 +1,4 @@
-import { For, onCleanup, Show, Match, Switch, createMemo, createEffect, on } from "solid-js"
+import { For, onCleanup, Show, Match, Switch, createMemo, createEffect, createRoot, on } from "solid-js"
 import { createMediaQuery } from "@solid-primitives/media"
 import { createResizeObserver } from "@solid-primitives/resize-observer"
 import { Dynamic } from "solid-js/web"
@@ -157,17 +157,27 @@ export default function Page() {
 
   const waitForIdle = (sessionID: string, signal: AbortSignal) =>
     new Promise<void>((resolve, reject) => {
-      const timeout = setTimeout(() => reject(new Error("Timed out waiting for session idle")), 30_000)
-      signal.addEventListener("abort", () => {
+      let settled = false
+      const settle = (fn: () => void) => {
+        if (settled) return
+        settled = true
         clearTimeout(timeout)
-        reject(new Error("Cancelled"))
-      })
-      createEffect(() => {
-        const status = sync.data.session_status[sessionID]
-        if (!status) return // not yet loaded — keep waiting
-        if (status.type !== "idle") return
-        clearTimeout(timeout)
-        resolve()
+        dispose()
+        fn()
+      }
+      const timeout = setTimeout(() => {
+        settle(() => reject(new Error("Timed out waiting for session idle")))
+      }, 30_000)
+
+      const dispose = createRoot((dispose) => {
+        signal.addEventListener("abort", () => settle(() => reject(new Error("Cancelled"))), { once: true })
+        createEffect(() => {
+          const status = sync.data.session_status[sessionID]
+          if (!status) return // not yet loaded — keep waiting
+          if (status.type !== "idle") return
+          settle(() => resolve())
+        })
+        return dispose
       })
     })
 
@@ -194,6 +204,9 @@ export default function Page() {
 
     local.agent.set(input.mode)
 
+    const agent = local.agent.current()
+    if (!agent) return
+
     const model = local.model.current()
     if (!model) return
 
@@ -203,7 +216,7 @@ export default function Page() {
     sdk.client.session
       .prompt({
         sessionID,
-        agent: input.mode,
+        agent: agent.name,
         model: {
           modelID: model.id,
           providerID: model.provider.id,
