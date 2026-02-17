@@ -80,12 +80,16 @@ export const PromptInput: Component = () => {
   createEffect(() => {
     const index = mention.mentionIndex()
     const showing = mention.showMention()
+    console.log("[Kilo New] scroll effect:", { index, showing, hasRef: !!dropdownRef })
     if (showing && dropdownRef) {
       queueMicrotask(() => {
+        console.log("[Kilo New] scroll microtask:", { hasRef: !!dropdownRef, childCount: dropdownRef?.children.length })
         if (!dropdownRef) return
         const items = Array.from(dropdownRef.querySelectorAll(".file-mention-item"))
+        console.log("[Kilo New] scroll items found:", items.length, "target index:", index)
         const active = items[index] as HTMLElement | undefined
         if (active) {
+          console.log("[Kilo New] scrolling to item:", index)
           active.scrollIntoView({ block: "nearest" })
         }
       })
