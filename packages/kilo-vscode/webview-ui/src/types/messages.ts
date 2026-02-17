@@ -305,7 +305,7 @@ export interface Config {
 export interface ReadyMessage {
   type: "ready"
   serverInfo?: ServerInfo
-  extensionVersion?: string // kilocode_change
+  extensionVersion?: string
   vscodeLanguage?: string
   languageOverride?: string
 }

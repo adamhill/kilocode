@@ -1,4 +1,3 @@
-// kilocode_change - new file
 import { Component } from "solid-js"
 import { useLanguage } from "../../context/language"
 import { useVSCode } from "../../context/vscode"
