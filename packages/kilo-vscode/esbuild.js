@@ -144,7 +144,13 @@ async function main() {
       ".woff2": "file",
       ".ttf": "file",
     },
-    plugins: [solidDedupePlugin, pierreWorkerStubPlugin, cssPackageResolvePlugin, solidPlugin(), esbuildProblemMatcherPlugin],
+    plugins: [
+      solidDedupePlugin,
+      pierreWorkerStubPlugin,
+      cssPackageResolvePlugin,
+      solidPlugin(),
+      esbuildProblemMatcherPlugin,
+    ],
   })
 
   if (watch) {

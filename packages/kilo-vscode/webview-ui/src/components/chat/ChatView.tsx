@@ -72,28 +72,13 @@ export const ChatView: Component<ChatViewProps> = (props) => {
               </BasicTool>
               <div data-component="permission-prompt">
                 <div data-slot="permission-actions">
-                  <Button
-                    variant="ghost"
-                    size="small"
-                    onClick={() => decide("reject")}
-                    disabled={responding()}
-                  >
+                  <Button variant="ghost" size="small" onClick={() => decide("reject")} disabled={responding()}>
                     {language.t("ui.permission.deny")}
                   </Button>
-                  <Button
-                    variant="secondary"
-                    size="small"
-                    onClick={() => decide("always")}
-                    disabled={responding()}
-                  >
+                  <Button variant="secondary" size="small" onClick={() => decide("always")} disabled={responding()}>
                     {language.t("ui.permission.allowAlways")}
                   </Button>
-                  <Button
-                    variant="primary"
-                    size="small"
-                    onClick={() => decide("once")}
-                    disabled={responding()}
-                  >
+                  <Button variant="primary" size="small" onClick={() => decide("once")} disabled={responding()}>
                     {language.t("ui.permission.allowOnce")}
                   </Button>
                 </div>
