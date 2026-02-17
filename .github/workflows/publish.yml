@@ -96,6 +96,11 @@ jobs:
 
       - uses: ./.github/actions/setup-bun
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          registry-url: "https://registry.npmjs.org"
+
       - name: Install @vscode/vsce
         run: bun install -g @vscode/vsce
 
@@ -262,6 +267,9 @@ jobs:
           node-version: "24"
           registry-url: "https://registry.npmjs.org"
 
+      - name: Install @vscode/vsce
+        run: bun install -g @vscode/vsce
+
       - name: Setup Git Committer
         id: committer
         uses: ./.github/actions/setup-git-committer
@@ -280,9 +288,6 @@ jobs:
         with:
           name: kilo-vscode
           path: packages/kilo-vscode/out
-
-      - name: Install @vscode/vsce
-        run: bun install -g @vscode/vsce
 
       - name: Cache apt packages (AUR)
         uses: actions/cache@v4
