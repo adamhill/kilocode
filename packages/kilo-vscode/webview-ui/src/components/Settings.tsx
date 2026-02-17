@@ -51,7 +51,6 @@ const Settings: Component<SettingsProps> = (props) => {
       {/* Settings tabs */}
       <Tabs orientation="vertical" variant="settings" defaultValue="providers" style={{ flex: 1, overflow: "hidden" }}>
         <Tabs.List>
-          <Tabs.SectionTitle>{language.t("settings.section.configuration")}</Tabs.SectionTitle>
           <Tabs.Trigger value="providers">
             <Icon name="providers" />
             {language.t("settings.providers.title")}
