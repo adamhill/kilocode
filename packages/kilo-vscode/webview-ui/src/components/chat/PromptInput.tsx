@@ -78,10 +78,15 @@ export const PromptInput: Component = () => {
   const dismissSuggestion = () => setGhostText("")
 
   const scrollToActiveItem = () => {
+    console.log("[Kilo New] scrollToActiveItem", { hasRef: !!dropdownRef, index: mention.mentionIndex() })
     if (!dropdownRef) return
     const items = dropdownRef.querySelectorAll(".file-mention-item")
+    console.log("[Kilo New] items found:", items.length)
     const active = items[mention.mentionIndex()] as HTMLElement | undefined
-    if (active) active.scrollIntoView({ block: "nearest" })
+    if (active) {
+      console.log("[Kilo New] scrolling to", mention.mentionIndex(), active.textContent)
+      active.scrollIntoView({ block: "nearest" })
+    }
   }
 
   const adjustHeight = () => {
