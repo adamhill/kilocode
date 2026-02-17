@@ -409,6 +409,15 @@
 }
 
 /* ============================================
+   Diff / Code containment
+   Ensure the @pierre/diffs copy button stays inside the collapsible
+   ============================================ */
+
+[data-component="collapsible"] {
+  overflow: hidden;
+}
+
+/* ============================================
    Permission Dock
    ============================================ */
 
