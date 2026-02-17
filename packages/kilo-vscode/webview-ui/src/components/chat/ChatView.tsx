@@ -4,6 +4,8 @@
  */
 
 import { Component, For, Show, createSignal } from "solid-js"
+import { Button } from "@kilocode/kilo-ui/button"
+import { BasicTool } from "@kilocode/kilo-ui/basic-tool"
 import { TaskHeader } from "./TaskHeader"
 import { MessageList } from "./MessageList"
 import { PromptInput } from "./PromptInput"
@@ -50,40 +52,51 @@ export const ChatView: Component<ChatViewProps> = (props) => {
         </Show>
         <Show when={permissionRequest()} keyed>
           {(perm) => (
-            <div class="permission-dock">
-              <div class="permission-dock-header">
-                <span class="permission-dock-title">{language.t("notification.permission.title")}</span>
-                <span class="permission-dock-type">{perm.toolName}</span>
-              </div>
-              <Show when={perm.patterns.length > 0}>
-                <div class="permission-dock-patterns">
-                  <For each={perm.patterns}>
-                    {(pattern) => <code class="permission-dock-pattern">{pattern}</code>}
-                  </For>
+            <div data-component="tool-part-wrapper" data-permission="true">
+              <BasicTool
+                icon="checklist"
+                locked
+                defaultOpen
+                trigger={{
+                  title: language.t("notification.permission.title"),
+                  subtitle: perm.toolName,
+                }}
+              >
+                <Show when={perm.patterns.length > 0}>
+                  <div class="permission-dock-patterns">
+                    <For each={perm.patterns}>
+                      {(pattern) => <code class="permission-dock-pattern">{pattern}</code>}
+                    </For>
+                  </div>
+                </Show>
+              </BasicTool>
+              <div data-component="permission-prompt">
+                <div data-slot="permission-actions">
+                  <Button
+                    variant="ghost"
+                    size="small"
+                    onClick={() => decide("reject")}
+                    disabled={responding()}
+                  >
+                    {language.t("ui.permission.deny")}
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    size="small"
+                    onClick={() => decide("always")}
+                    disabled={responding()}
+                  >
+                    {language.t("ui.permission.allowAlways")}
+                  </Button>
+                  <Button
+                    variant="primary"
+                    size="small"
+                    onClick={() => decide("once")}
+                    disabled={responding()}
+                  >
+                    {language.t("ui.permission.allowOnce")}
+                  </Button>
                 </div>
-              </Show>
-              <div class="permission-dock-actions">
-                <button
-                  class="permission-btn permission-btn-deny"
-                  onClick={() => decide("reject")}
-                  disabled={responding()}
-                >
-                  {language.t("ui.permission.deny")}
-                </button>
-                <button
-                  class="permission-btn permission-btn-always"
-                  onClick={() => decide("always")}
-                  disabled={responding()}
-                >
-                  {language.t("ui.permission.allowAlways")}
-                </button>
-                <button
-                  class="permission-btn permission-btn-allow"
-                  onClick={() => decide("once")}
-                  disabled={responding()}
-                >
-                  {language.t("ui.permission.allowOnce")}
-                </button>
               </div>
             </div>
           )}
