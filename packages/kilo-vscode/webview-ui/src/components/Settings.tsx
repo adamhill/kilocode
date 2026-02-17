@@ -163,7 +163,7 @@ const Settings: Component<SettingsProps> = (props) => {
         </Tabs.Content>
         <Tabs.Content value="aboutKiloCode">
           <h3>{language.t("settings.aboutKiloCode.title")}</h3>
-          <AboutKiloCodeTab port={server.serverInfo()?.port ?? null} connectionState={server.connectionState()} />
+          <AboutKiloCodeTab port={server.serverInfo()?.port ?? null} connectionState={server.connectionState()} extensionVersion={server.extensionVersion()} />
         </Tabs.Content>
       </Tabs>
     </div>

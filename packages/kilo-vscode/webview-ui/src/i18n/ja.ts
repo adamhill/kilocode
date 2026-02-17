@@ -791,7 +791,12 @@ export const dict = {
   "settings.aboutKiloCode.status.label": "ステータス：",
   "settings.aboutKiloCode.port.label": "ポート：",
   "settings.aboutKiloCode.versionInfo": "バージョン情報",
+  "settings.aboutKiloCode.version.label": "バージョン：",
   "settings.aboutKiloCode.extensionName": "Kilo Code拡張機能",
+  "settings.aboutKiloCode.community": "コミュニティとサポート",
+  "settings.aboutKiloCode.feedback.prefix": "ご質問やフィードバックがありましたら、お気軽にissueを作成してください",
+  "settings.aboutKiloCode.feedback.or": "または",
+  "settings.aboutKiloCode.support.prefix": "請求やアカウントに関するご質問は、カスタマーサポートまでお問い合わせください",
 
   "settings.agentBehaviour.subtab.modes": "モード",
   "settings.agentBehaviour.subtab.agents": "Agents",

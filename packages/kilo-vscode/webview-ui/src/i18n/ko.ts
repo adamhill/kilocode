@@ -796,7 +796,12 @@ export const dict = {
   "settings.aboutKiloCode.status.label": "상태:",
   "settings.aboutKiloCode.port.label": "포트:",
   "settings.aboutKiloCode.versionInfo": "버전 정보",
+  "settings.aboutKiloCode.version.label": "버전:",
   "settings.aboutKiloCode.extensionName": "Kilo Code 확장 프로그램",
+  "settings.aboutKiloCode.community": "커뮤니티 및 지원",
+  "settings.aboutKiloCode.feedback.prefix": "질문이나 피드백이 있으시면 다음에서 이슈를 열어주세요",
+  "settings.aboutKiloCode.feedback.or": "또는",
+  "settings.aboutKiloCode.support.prefix": "결제 또는 계정 관련 문의는 고객 지원팀에 문의하세요",
 
   "settings.agentBehaviour.subtab.modes": "모드",
   "settings.agentBehaviour.subtab.agents": "Agents",
