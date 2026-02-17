@@ -39,55 +39,25 @@ Key architectural decisions for telemetry in the new extension:
 
 Telemetry is split across two layers: the **CLI** (which owns all agent/LLM/tool events) and the **extension** (which captures UI-only events and proxies them to the CLI).
 
-### 1.1 Telemetry Ownership — CLI vs Extension
+### 1.1 Extension-side: `TelemetryProxy` — Simple Singleton
 
-#### CLI side: `kilo-telemetry` package
+A single class that captures UI events from the extension host and webview, then forwards them to the CLI.
 
-**Package:** `packages/kilo-telemetry/`
+- One singleton instance, created at extension activation
+- `capture(event, properties)` — sends to CLI via `POST /telemetry/capture` and logs to `console.log`
+- Receives webview events via `postMessage` handler
+- Enriches all events with VS Code properties (`vscodeVersion`, `editorName`, `machineId`)
+- No inheritance, no pluggable backends, no abstract classes
+- Respects `vscode.env.telemetryLevel` — if disabled, `capture()` is a no-op
 
-The CLI owns all agent, LLM, and tool telemetry. The `kilo-telemetry` package provides:
+### 1.2 CLI-side: `kilo-telemetry` Package
 
-- `Telemetry.capture()` — sends events to PostHog via `posthog-node`
-- `Telemetry.getTracer()` — OpenTelemetry tracing for spans/traces
-- Identity management (distinct ID, user properties)
-- Consent enforcement (respects VS Code telemetry level passed at CLI startup)
-
-All events related to task lifecycle, LLM completions, tool usage, context condensation, checkpoints, etc. are captured internally by the CLI — the extension never sees or sends these.
-
-#### Extension side: `TelemetryProxy` service
-
-**File:** `packages/kilo-vscode/src/services/telemetry/TelemetryProxy.ts` *(planned)*
-
-A lightweight service in the extension that:
-
-- Captures **UI-only events**: tab views, button clicks, auth UI events, marketplace interactions
-- Exposes typed convenience methods for extension events: `captureTabShown()`, `captureTitleButtonClicked()`, `captureAuthEvent()`, `captureMarketplaceAction()`, etc.
-- Forwards all events to the CLI via `POST /telemetry/capture`
-- Enriches events with VS Code-specific properties (from `KiloProvider.getTelemetryProperties()`)
-- Does **NOT** have methods like `captureLlmCompletion()` or `captureToolUsed()` — those are CLI-internal
-
-### 1.2 `BaseTelemetryClient` — Old Extension Only
-
-> **Note:** This abstraction existed in the old extension's in-process architecture, where the extension itself needed pluggable telemetry backends. In the new architecture, the extension simply proxies events to the CLI — no pluggable client abstraction is needed on the extension side. The CLI's `kilo-telemetry` package handles all backend concerns internally.
-
-### 1.3 `PostHogTelemetryClient` — CLI-side (`kilo-telemetry`)
-
-**Package:** `packages/kilo-telemetry/`
-
-- The CLI uses `posthog-node` internally via the `kilo-telemetry` package
-- The extension **never** touches PostHog directly — all events flow through `POST /telemetry/capture`
-- **Distinct ID**: defaults to `vscode.env.machineId` (passed at CLI startup), upgrades to user email on auth
-- **Privacy filters**: Git properties always filtered; error details filtered for organization users
-- **Opt-in logic**: Requires BOTH VS Code telemetry level = `"all"` AND user opt-in
-- **Event exclusions**: `TASK_MESSAGE` excluded (too verbose)
-
-### 1.4 `DebugTelemetryClient` — CLI-side Only
-
-**Package:** `packages/kilo-telemetry/`
-
-- Logs telemetry events to console in development mode
-- CLI-side only — registered when `NODE_ENV === "development"`
-- The extension can independently log telemetry events to its own VS Code output channel for debugging, but this is separate from the CLI's debug client
+Already exists at `packages/kilo-telemetry/`. Handles:
+- All PostHog communication (`posthog-node`)
+- OpenTelemetry integration for AI SDK spans
+- Identity management (machineId → email upgrade on auth)
+- Privacy filtering (git info stripped, error details filtered for org users)
+- The `POST /telemetry/capture` endpoint (to be added) routes through this package
 
 ### 1.5 Webview Telemetry — `postMessage` Proxy
 
