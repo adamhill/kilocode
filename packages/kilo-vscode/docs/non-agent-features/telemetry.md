@@ -2,18 +2,36 @@
 
 ## Architecture Overview
 
-The extension uses a **dual-layer telemetry architecture**: server-side (PostHog Node SDK in the extension host) and client-side (PostHog JS in the webview). Both layers communicate with PostHog US (`https://us.i.posthog.com`).
+The extension uses a **proxy-based telemetry architecture**: all telemetry flows through the CLI's `kilo-telemetry` package, which uses `posthog-node` internally. The extension host and webview never talk to PostHog directly.
 
 ```mermaid
 graph TD
-    A[Extension Host - Node.js] -->|PostHog Node SDK| P[PostHog US]
-    B[Webview - React/Browser] -->|PostHog JS SDK| P
-    A -->|setProvider| C[ClineProvider - TelemetryPropertiesProvider]
-    C -->|getTelemetryProperties| A
-    D[TelemetryService - Singleton] --> E[PostHogTelemetryClient]
+    B[Webview - SolidJS/Browser] -->|postMessage| A[Extension Host - Node.js]
+    A -->|POST /telemetry/capture| CLI[CLI Server - kilo-telemetry]
+    CLI -->|posthog-node| P[PostHog US]
+    A -->|enriches with VS Code properties| A
+    KP[KiloProvider - TelemetryPropertiesProvider] -->|getTelemetryProperties| A
+    D[TelemetryService - Singleton] --> E[CLITelemetryClient]
     D --> F[DebugTelemetryClient - dev only]
-    B --> G[TelemetryClient - webview singleton]
 ```
+
+---
+
+## Architecture — New Extension
+
+Key architectural decisions for telemetry in the new extension:
+
+1. **CLI/core owns all telemetry sending** — The `kilo-telemetry` package (which uses `posthog-node` internally) is the single point of contact with PostHog. Neither the extension host nor the webview include any PostHog SDK.
+
+2. **Extension proxies UI events through CLI** — The extension host forwards telemetry events to the CLI via `POST /telemetry/capture`. The CLI enriches them with server-side context and sends to PostHog.
+
+3. **Webview sends events via `postMessage`** — The webview has no PostHog SDK. Instead, it fires `postMessage({ type: "telemetry", event, properties })` to the extension host, which enriches the event with VS Code properties and forwards to the CLI endpoint.
+
+4. **VS Code telemetry consent is the master kill switch** — `vscode.env.telemetryLevel` is passed as a startup parameter to the CLI server. If VS Code telemetry is disabled, the CLI suppresses all PostHog sending.
+
+5. **Same PostHog project as old extension** — Events go to the same PostHog project. Old vs new extension events are distinguished via properties (e.g., `extensionVersion`, `architecture: "new"`).
+
+6. **All events from old plan are kept** — Every event category is preserved, including autocomplete, agent manager, marketplace, and memory tracking events.
 
 ---
 
@@ -32,23 +50,24 @@ graph TD
 
 **File:** `packages/telemetry/src/BaseTelemetryClient.ts`
 
-- Holds a `WeakRef` to a `TelemetryPropertiesProvider` (the `ClineProvider`)
+- Holds a `WeakRef` to a `TelemetryPropertiesProvider` (the `KiloProvider`)
 - Implements event subscription/filtering (include/exclude lists via `TelemetryEventSubscription`)
 - Implements property filtering via `isPropertyCapturable()` — subclasses can override
 - Merges provider properties with event-specific properties via `getEventProperties()`
 
-### 1.3 `PostHogTelemetryClient` — Production Client
+### 1.3 `CLITelemetryClient` — Production Client
 
-**File:** `packages/telemetry/src/PostHogTelemetryClient.ts`
+**File:** `packages/telemetry/src/CLITelemetryClient.ts`
 
-- Uses `posthog-node` SDK
+- Forwards events to the CLI server via `POST /telemetry/capture`
+- The CLI uses `kilo-telemetry` (which wraps `posthog-node`) to send events to PostHog
 - **Distinct ID**: defaults to `vscode.env.machineId`, upgrades to user email when authenticated via `updateIdentity()`
 - **Privacy filters**: 
   - Git properties (`repositoryUrl`, `repositoryName`, `defaultBranch`) always filtered
   - Error details (`errorMessage`, `cliPath`, `stderrPreview`) filtered for organization users
 - **Opt-in logic**: Requires BOTH VSCode global telemetry level = `"all"` AND user opt-in
-- **Event exclusions**: `TASK_MESSAGE` is excluded from PostHog (too verbose)
-- **Exception capture**: `captureException()` sends structured errors to PostHog
+- **Event exclusions**: `TASK_MESSAGE` is excluded (too verbose)
+- **Exception capture**: `captureException()` sends structured errors via the CLI endpoint
 
 ### 1.4 `DebugTelemetryClient` — Development Client
 
@@ -57,13 +76,17 @@ graph TD
 - Always enabled, logs to console
 - Registered only in `NODE_ENV === "development"`
 
-### 1.5 `TelemetryClient` (Webview) — Browser-side PostHog
+### 1.5 Webview Telemetry — `postMessage` Proxy
 
-**File:** `webview-ui/src/utils/TelemetryClient.ts`
+**File:** `webview-ui/src/utils/telemetry.ts`
 
-- Uses `posthog-js` (browser SDK)
-- Initialized with API key from extension state, distinct ID = `machineId`
-- Used for frontend-specific events (tab views, button clicks, marketplace interactions)
+The webview does **not** use any PostHog SDK. Instead:
+
+1. The webview calls a thin helper that fires `postMessage({ type: "telemetry", event, properties })` to the extension host.
+2. The extension host receives the message, enriches it with VS Code-specific properties (from `KiloProvider.getTelemetryProperties()`), and forwards the event to the CLI via `POST /telemetry/capture`.
+3. The CLI's `kilo-telemetry` package sends the event to PostHog.
+
+This keeps the webview dependency-free for analytics and ensures all telemetry flows through a single, auditable path.
 
 ---
 
@@ -73,26 +96,28 @@ graph TD
 sequenceDiagram
     participant Ext as extension.ts
     participant TS as TelemetryService
-    participant PH as PostHogTelemetryClient
-    participant CP as ClineProvider
-    participant WV as Webview TelemetryClient
+    participant CLI as CLI Server
+    participant KP as KiloProvider
+    participant WV as Webview
 
-    Ext->>TS: createInstance
-    Ext->>PH: new PostHogTelemetryClient
-    Ext->>TS: register PostHogTelemetryClient
-    Note over PH: API key from env KILOCODE_POSTHOG_API_KEY
-    CP->>TS: setProvider - ClineProvider as provider
-    Note over TS,CP: ClineProvider implements TelemetryPropertiesProvider
-    WV->>WV: updateTelemetryState with apiKey + machineId
-    Note over WV: posthog.init + posthog.identify
+    Ext->>CLI: Start CLI server (pass telemetryLevel from vscode.env)
+    Ext->>TS: createInstance()
+    Ext->>TS: register CLITelemetryClient (points to CLI endpoint)
+    KP->>TS: setProvider(this)
+    Note over TS,KP: KiloProvider implements TelemetryPropertiesProvider
+    WV->>Ext: postMessage({ type: "telemetry", event, properties })
+    Ext->>Ext: Enrich with VS Code properties
+    Ext->>CLI: POST /telemetry/capture
+    CLI->>CLI: kilo-telemetry → posthog-node → PostHog
 ```
 
 **Key code paths:**
 
-1. `extension.ts:119` — `TelemetryService.createInstance()`
-2. `extension.ts:133` — `new PostHogTelemetryClient()` registered
-3. `ClineProvider` constructor — `TelemetryService.instance.setProvider(this)`
-4. Extension shutdown — `TelemetryService.instance.shutdown()`
+1. `extension.ts` — Start CLI server with `telemetryLevel` from `vscode.env.telemetryLevel`
+2. `extension.ts` — `TelemetryService.createInstance()`, register `CLITelemetryClient`
+3. `KiloProvider` constructor — `TelemetryService.instance.setProvider(this)`
+4. Webview posts telemetry messages via `postMessage` → extension host → CLI
+5. Extension shutdown — `TelemetryService.instance.shutdown()`
 
 ---
 
@@ -198,7 +223,7 @@ All events are defined in `TelemetryEventName` enum (`packages/types/src/telemet
 
 ## 4. Properties Attached to Every Event
 
-Every event gets enriched with properties from `ClineProvider.getTelemetryProperties()`:
+Every event gets enriched with properties from `KiloProvider.getTelemetryProperties()`:
 
 ### Static App Properties (computed once)
 
@@ -217,7 +242,7 @@ Every event gets enriched with properties from `ClineProvider.getTelemetryProper
 
 ### Git Properties (computed once)
 
-- `repositoryUrl`, `repositoryName`, `defaultBranch` (filtered out before sending by PostHog client)
+- `repositoryUrl`, `repositoryName`, `defaultBranch` (filtered out before sending by telemetry client)
 
 ---
 
@@ -228,6 +253,10 @@ Every event gets enriched with properties from `ClineProvider.getTelemetryProper
 - Three states: `"unset"`, `"enabled"`, `"disabled"` (see `TelemetrySetting` type)
 - Telemetry enabled only when: **VSCode telemetry level = "all"** AND **user setting ≠ "disabled"**
 - Wrapper apps can force telemetry enabled via environment variable
+
+### VS Code Telemetry Level as Master Control
+
+`vscode.env.telemetryLevel` is passed as a startup parameter to the CLI server. If VS Code telemetry is disabled (level is `"off"` or `"crash"`), the CLI suppresses all PostHog sending entirely. This ensures the user's VS Code telemetry preference is respected across the entire stack — webview, extension host, and CLI.
 
 ### Identity Management
 
@@ -278,9 +307,9 @@ Both have type guards (`isApiProviderError()`, `isConsecutiveMistakeError()`) an
 
 ## 7. Implementation Recommendations for New Extension
 
-1. **Use PostHog** as the analytics backend — the extension uses `posthog-node` server-side and `posthog-js` client-side
+1. **Use `kilo-telemetry` via CLI proxy** — all PostHog communication goes through the CLI's `POST /telemetry/capture` endpoint. The extension does not include `posthog-node` or `posthog-js` directly.
 2. **Singleton service pattern** — single `TelemetryService` instance, multiple pluggable clients
-3. **Properties provider pattern** — the main provider class implements `TelemetryPropertiesProvider` to inject context
+3. **Properties provider pattern** — `KiloProvider` implements `TelemetryPropertiesProvider` to inject VS Code context into every event
 4. **Typed events** — all event names in an enum, with typed capture methods on the service
 5. **Event subscription/filtering** — clients can include/exclude specific events
 6. **Property filtering** — per-client property filtering (privacy controls)
@@ -293,13 +322,17 @@ Both have type guards (`isApiProviderError()`, `isConsecutiveMistakeError()`) an
 
 ## 8. Package Dependencies
 
-### Server-side (Extension Host)
+### Server-side (CLI)
 
-- `posthog-node` — PostHog Node.js SDK
+- `kilo-telemetry` package (already in monorepo, uses `posthog-node` internally)
 
 ### Client-side (Webview)
 
-- `posthog-js` — PostHog browser SDK
+- No PostHog SDK needed — telemetry events are sent via `postMessage` to the extension host
+
+### Extension Host
+
+- No PostHog SDK — events are proxied through the CLI's `POST /telemetry/capture` endpoint
 
 ### Shared Types
 
