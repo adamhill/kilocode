@@ -22,7 +22,7 @@ export function SessionPromptDock(props: {
   onNewSessionWorktreeReset: () => void
   onSubmit: () => void
   setPromptDockRef: (el: HTMLDivElement) => void
-  onModeAction?: (input: { mode: string; text: string }) => void // kilocode_change
+  onModeAction?: (input: { mode: string; text: string; description?: string }) => void // kilocode_change
 }) {
   return (
     <div

@@ -10,7 +10,7 @@ import { useSDK } from "@/context/sdk"
 // kilocode_change start - add onModeAction prop for mode-switching support
 export const QuestionDock: Component<{
   request: QuestionRequest
-  onModeAction?: (input: { mode: string; text: string }) => void
+  onModeAction?: (input: { mode: string; text: string; description?: string }) => void
 }> = (props) => {
   // kilocode_change end
   const sdk = useSDK()
@@ -86,7 +86,8 @@ export const QuestionDock: Component<{
       if (option?.mode && props.onModeAction) {
         const action = props.onModeAction
         const mode = option.mode
-        pending?.then(() => action({ mode, text: answer })).catch(fail)
+        const description = option.description
+        pending?.then(() => action({ mode, text: answer, description }), fail)
       } else {
         pending?.catch(fail)
       }

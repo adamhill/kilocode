@@ -172,8 +172,7 @@ export default function Page() {
       const dispose = createRoot((dispose) => {
         signal.addEventListener("abort", () => settle(() => reject(new Error("Cancelled"))), { once: true })
         createEffect(() => {
-          const status = sync.data.session_status[sessionID]
-          if (!status) return // not yet loaded — keep waiting
+          const status = sync.data.session_status[sessionID] ?? { type: "idle" as const }
           if (status.type !== "idle") return
           settle(() => resolve())
         })
@@ -183,7 +182,7 @@ export default function Page() {
 
   onCleanup(() => modeActionAbort?.abort())
 
-  const handleModeAction = async (input: { mode: string; text: string }) => {
+  const handleModeAction = async (input: { mode: string; text: string; description?: string }) => {
     const sessionID = params.id
     if (!sessionID) return
 
@@ -191,16 +190,21 @@ export default function Page() {
     const controller = new AbortController()
     modeActionAbort = controller
 
-    showToast({ title: `Switching to ${input.mode} mode…`, description: "Waiting for current task to complete" })
+    const toastTimer = setTimeout(() => {
+      showToast({ title: `Switching to ${input.mode} mode…`, description: "Waiting for current task to complete" })
+    }, 500)
 
     try {
       await waitForIdle(sessionID, controller.signal)
     } catch (err: unknown) {
+      clearTimeout(toastTimer)
       if (controller.signal.aborted) return
       const message = err instanceof Error ? err.message : String(err)
       showToast({ title: language.t("common.requestFailed"), description: message })
       return
     }
+
+    clearTimeout(toastTimer)
 
     if (controller.signal.aborted) return
 
@@ -228,7 +232,7 @@ export default function Page() {
           providerID: model.provider.id,
         },
         messageID,
-        parts: [{ type: "text", text: input.text }],
+        parts: [{ type: "text", text: input.description ?? input.text }],
         variant,
       })
       .catch((err: unknown) => {
