@@ -78,7 +78,7 @@ ONLY AFTER the full review is written:
 - If your recommendation is **APPROVE** with no issues found, you are done. Do NOT call the question tool.
 - If your recommendation is **APPROVE WITH SUGGESTIONS** or **NEEDS CHANGES**, THEN call the question tool to offer fix suggestions with mode switching.
 
-When calling the question tool, provide exactly 1-3 options (never more than 3). Choose the appropriate mode for each option:
+When calling the question tool, provide at least one option. Choose the appropriate mode for each option:
 - mode "code" for direct code fixes (bugs, missing error handling, clear improvements)
 - mode "debug" for issues needing investigation before fixing (race conditions, unclear root causes, intermittent failures)
 - mode "orchestrator" when there are many issues (5+) spanning different categories that need coordinated, planned fixes
