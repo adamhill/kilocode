@@ -39,7 +39,11 @@ const AutocompleteTab: Component = () => {
           title="Enable automatic inline completions"
           description="Automatically show inline completion suggestions as you type"
         >
-          <Switch checked={enableAutoTrigger()} onChange={(checked) => updateSetting("enableAutoTrigger", checked)} hideLabel>
+          <Switch
+            checked={enableAutoTrigger()}
+            onChange={(checked) => updateSetting("enableAutoTrigger", checked)}
+            hideLabel
+          >
             Enable automatic inline completions
           </Switch>
         </SettingsRow>
