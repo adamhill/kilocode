@@ -474,3 +474,17 @@
     }
   }
 }
+
+/* kilocode_change start - Remove blue focus ring from settings tab triggers */
+[data-component="tabs"][data-variant="settings"] [data-slot="tabs-trigger"] {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+[data-component="tabs"][data-variant="settings"] [data-slot="tabs-trigger"]:focus,
+[data-component="tabs"][data-variant="settings"] [data-slot="tabs-trigger"]:focus-visible,
+[data-component="tabs"][data-variant="settings"] [data-slot="tabs-trigger"][data-highlighted] {
+  outline: none !important;
+  box-shadow: none !important;
+}
+/* kilocode_change end */
