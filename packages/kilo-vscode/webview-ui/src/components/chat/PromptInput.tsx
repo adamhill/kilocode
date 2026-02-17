@@ -79,11 +79,15 @@ export const PromptInput: Component = () => {
 
   createEffect(() => {
     const index = mention.mentionIndex()
-    if (dropdownRef && mention.showMention()) {
+    const showing = mention.showMention()
+    if (showing && dropdownRef) {
       queueMicrotask(() => {
-        const items = dropdownRef!.children
+        if (!dropdownRef) return
+        const items = Array.from(dropdownRef.querySelectorAll(".file-mention-item"))
         const active = items[index] as HTMLElement | undefined
-        if (active) active.scrollIntoView({ block: "nearest" })
+        if (active) {
+          active.scrollIntoView({ block: "nearest" })
+        }
       })
     }
   })
