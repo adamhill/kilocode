@@ -36,7 +36,7 @@
 ::-webkit-scrollbar-thumb {
   background: rgba(121, 121, 121, 0.4);
   border-radius: 5px;
-  border: 3px solid transparent;
+  border: 3px solid transparent !important;
   background-clip: padding-box;
 }
 
@@ -48,6 +48,11 @@
   background: transparent;
 }
 
+::-webkit-scrollbar-button {
+  display: block;
+  height: 0;
+}
+
 /* ===== VS Code extension: inherit native styling ===== */
 
 html[data-theme="kilo-vscode"] {
@@ -55,6 +60,11 @@ html[data-theme="kilo-vscode"] {
   font-family: var(--vscode-font-family);
   font-size: var(--vscode-font-size);
   font-weight: var(--vscode-font-weight);
+
+  ::-webkit-scrollbar-button {
+    display: block;
+    height: 0;
+  }
 
   ::-webkit-scrollbar-thumb {
     background: var(--vscode-scrollbarSlider-background);
