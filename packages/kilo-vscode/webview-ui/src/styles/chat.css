@@ -458,6 +458,33 @@
   gap: 8px;
 }
 
+/* ============================================
+   Working Indicator
+   ============================================ */
+
+.working-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  font-size: 12px;
+  color: var(--vscode-descriptionForeground);
+}
+
+.working-text {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.working-elapsed {
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.7;
+}
+
 /* Session List Items */
 .session-list [data-slot="list-item-title"] {
   flex: 1;
