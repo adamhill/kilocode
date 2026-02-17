@@ -109,7 +109,10 @@ export const PromptInput: Component = () => {
   }
 
   const handleKeyDown = (e: KeyboardEvent) => {
-    if (mention.onKeyDown(e, textareaRef, setText)) {
+    console.log("[Kilo New] handleKeyDown:", e.key, "showMention:", mention.showMention())
+    const handled = mention.onKeyDown(e, textareaRef, setText)
+    console.log("[Kilo New] mention.onKeyDown returned:", handled)
+    if (handled) {
       queueMicrotask(scrollToActiveItem)
       return
     }
