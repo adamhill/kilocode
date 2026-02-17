@@ -14,7 +14,7 @@ process.chdir(dir)
 
 import pkg from "../package.json"
 import { Script } from "@opencode-ai/script"
-const modelsUrl = process.env.KILO_MODELS_URL || "https://models.dev" // kilocode_change
+const modelsUrl = process.env.KILO_MODELS_URL || "https://models.dev"
 // Fetch and generate models.dev snapshot
 const modelsData = process.env.MODELS_DEV_API_JSON
   ? await Bun.file(process.env.MODELS_DEV_API_JSON).text()
@@ -149,16 +149,16 @@ for (const item of targets) {
       autoloadTsconfig: true,
       autoloadPackageJson: true,
       target: name.replace(pkg.name, "bun") as any,
-      outfile: `dist/${name}/bin/kilo`,
-      execArgv: [`--user-agent=kilo/${Script.version}`, "--use-system-ca", "--"],
+      outfile: `dist/${name}/bin/opencode`,
+      execArgv: [`--user-agent=opencode/${Script.version}`, "--use-system-ca", "--"],
       windows: {},
     },
     entrypoints: ["./src/index.ts", parserWorker, workerPath],
     define: {
-      KILO_VERSION: `'${Script.version}'`, // kilocode_change
+      KILO_VERSION: `'${Script.version}'`,
       OTUI_TREE_SITTER_WORKER_PATH: bunfsRoot + workerRelativePath,
       KILO_WORKER_PATH: workerPath,
-      KILO_CHANNEL: `'${Script.channel}'`, // kilocode_change
+      KILO_CHANNEL: `'${Script.channel}'`,
       KILO_LIBC: item.os === "linux" ? `'${item.abi ?? "glibc"}'` : "",
     },
   })
@@ -171,10 +171,6 @@ for (const item of targets) {
         version: Script.version,
         os: [item.os],
         cpu: [item.arch],
-        repository: {
-          type: "git",
-          url: "https://github.com/Kilo-Org/kilo",
-        },
       },
       null,
       2,
@@ -184,20 +180,14 @@ for (const item of targets) {
 }
 
 if (Script.release) {
-  const archives: string[] = [] // kilocode_change
   for (const key of Object.keys(binaries)) {
-    const archive = key.replace(pkg.name, "kilo") // kilocode_change
     if (key.includes("linux")) {
-      const out = path.resolve("dist", `${archive}.tar.gz`) // kilocode_change
-      await $`tar -czf ${out} *`.cwd(`dist/${key}/bin`) // kilocode_change
-      archives.push(out) // kilocode_change
+      await $`tar -czf ../../${key}.tar.gz *`.cwd(`dist/${key}/bin`)
     } else {
-      const out = path.resolve("dist", `${archive}.zip`) // kilocode_change
-      await $`zip -r ${out} *`.cwd(`dist/${key}/bin`) // kilocode_change
-      archives.push(out) // kilocode_change
+      await $`zip -r ../../${key}.zip *`.cwd(`dist/${key}/bin`)
     }
   }
-  await $`gh release upload v${Script.version} ${archives} --clobber` // kilocode_change
+  await $`gh release upload v${Script.version} ./dist/*.zip ./dist/*.tar.gz --clobber`
 }
 
 export { binaries }
