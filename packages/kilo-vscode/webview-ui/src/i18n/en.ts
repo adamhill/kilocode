@@ -830,6 +830,7 @@ export const dict = {
   "settings.aboutKiloCode.status.label": "Status:",
   "settings.aboutKiloCode.port.label": "Port:",
   "settings.aboutKiloCode.versionInfo": "Version Information",
+  "settings.aboutKiloCode.version.label": "Version:",
   "settings.aboutKiloCode.extensionName": "Kilo Code Extension",
 
   "settings.agentBehaviour.subtab.modes": "Modes",

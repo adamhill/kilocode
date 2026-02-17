@@ -5,6 +5,7 @@ import type { ConnectionState } from "../../types/messages"
 export interface AboutKiloCodeTabProps {
   port: number | null
   connectionState: ConnectionState
+  extensionVersion?: string // kilocode_change
 }
 
 const AboutKiloCodeTab: Component<AboutKiloCodeTabProps> = (props) => {
@@ -150,15 +151,36 @@ const AboutKiloCodeTab: Component<AboutKiloCodeTabProps> = (props) => {
         >
           {language.t("settings.aboutKiloCode.versionInfo")}
         </h4>
-        <p
+
+        {/* kilocode_change start */}
+        {/* Extension Version */}
+        <div
           style={{
-            "font-size": "12px",
-            color: "var(--vscode-descriptionForeground)",
-            margin: 0,
+            display: "flex",
+            "align-items": "center",
+            "margin-bottom": "8px",
           }}
         >
-          {language.t("settings.aboutKiloCode.extensionName")}
-        </p>
+          <span
+            style={{
+              "font-size": "12px",
+              color: "var(--vscode-descriptionForeground)",
+              width: "100px",
+            }}
+          >
+            {language.t("settings.aboutKiloCode.version.label")}
+          </span>
+          <span
+            style={{
+              "font-size": "12px",
+              color: "var(--vscode-foreground)",
+              "font-family": "var(--vscode-editor-font-family, monospace)",
+            }}
+          >
+            {props.extensionVersion ?? "—"}
+          </span>
+        </div>
+        {/* kilocode_change end */}
       </div>
     </div>
   )
