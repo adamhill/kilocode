@@ -1532,6 +1532,8 @@ export type ProviderConfig = {
         input: Array<"text" | "audio" | "image" | "video" | "pdf">
         output: Array<"text" | "audio" | "image" | "video" | "pdf">
       }
+      recommended?: boolean
+      recommendedIndex?: number
       experimental?: boolean
       status?: "alpha" | "beta" | "deprecated"
       options?: {
@@ -1984,6 +1986,8 @@ export type Model = {
       [key: string]: unknown
     }
   }
+  recommended?: boolean
+  recommendedIndex?: number
 }
 
 export type Provider = {
@@ -4052,6 +4056,8 @@ export type ProviderListResponses = {
             input: Array<"text" | "audio" | "image" | "video" | "pdf">
             output: Array<"text" | "audio" | "image" | "video" | "pdf">
           }
+          recommended?: boolean
+          recommendedIndex?: number
           experimental?: boolean
           status?: "alpha" | "beta" | "deprecated"
           options: {
