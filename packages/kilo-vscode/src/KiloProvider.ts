@@ -349,13 +349,13 @@ export class KiloProvider implements vscode.WebviewViewProvider {
 
       if (serverInfo) {
         const langConfig = vscode.workspace.getConfiguration("kilo-code.new")
-      this.postMessage({
-        type: "ready",
-        serverInfo,
-        extensionVersion: this.extensionVersion,
-        vscodeLanguage: vscode.env.language,
-        languageOverride: langConfig.get<string>("language"),
-      })
+        this.postMessage({
+          type: "ready",
+          serverInfo,
+          extensionVersion: this.extensionVersion,
+          vscodeLanguage: vscode.env.language,
+          languageOverride: langConfig.get<string>("language"),
+        })
       }
 
       this.postMessage({ type: "connectionState", state: this.connectionState })

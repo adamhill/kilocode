@@ -810,9 +810,11 @@ export const dict = {
   "settings.aboutKiloCode.version.label": "Version :",
   "settings.aboutKiloCode.extensionName": "Extension Kilo Code",
   "settings.aboutKiloCode.community": "Communauté et support",
-  "settings.aboutKiloCode.feedback.prefix": "Si vous avez des questions ou des commentaires, n'hésitez pas à ouvrir un ticket sur",
+  "settings.aboutKiloCode.feedback.prefix":
+    "Si vous avez des questions ou des commentaires, n'hésitez pas à ouvrir un ticket sur",
   "settings.aboutKiloCode.feedback.or": "ou",
-  "settings.aboutKiloCode.support.prefix": "Pour les questions de facturation ou de compte, contactez le support client à",
+  "settings.aboutKiloCode.support.prefix":
+    "Pour les questions de facturation ou de compte, contactez le support client à",
 
   "settings.agentBehaviour.subtab.modes": "Modes",
   "settings.agentBehaviour.subtab.agents": "Agents",
