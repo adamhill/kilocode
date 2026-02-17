@@ -803,7 +803,12 @@ export const dict = {
   "settings.aboutKiloCode.status.label": "Статус:",
   "settings.aboutKiloCode.port.label": "Порт:",
   "settings.aboutKiloCode.versionInfo": "Информация о версии",
+  "settings.aboutKiloCode.version.label": "Версия:",
   "settings.aboutKiloCode.extensionName": "Расширение Kilo Code",
+  "settings.aboutKiloCode.community": "Сообщество и поддержка",
+  "settings.aboutKiloCode.feedback.prefix": "Если у вас есть вопросы или отзывы, создайте issue на",
+  "settings.aboutKiloCode.feedback.or": "или",
+  "settings.aboutKiloCode.support.prefix": "По вопросам оплаты или аккаунта обращайтесь в службу поддержки по адресу",
 
   "settings.agentBehaviour.subtab.modes": "Режимы",
   "settings.agentBehaviour.subtab.agents": "Agents",

@@ -800,7 +800,12 @@ export const dict = {
   "settings.aboutKiloCode.status.label": "Status:",
   "settings.aboutKiloCode.port.label": "Port:",
   "settings.aboutKiloCode.versionInfo": "Versjonsinformasjon",
+  "settings.aboutKiloCode.version.label": "Versjon:",
   "settings.aboutKiloCode.extensionName": "Kilo Code-utvidelse",
+  "settings.aboutKiloCode.community": "Fellesskap og støtte",
+  "settings.aboutKiloCode.feedback.prefix": "Hvis du har spørsmål eller tilbakemeldinger, åpne gjerne en issue på",
+  "settings.aboutKiloCode.feedback.or": "eller",
+  "settings.aboutKiloCode.support.prefix": "For fakturerings- eller kontospørsmål, kontakt kundestøtte på",
 
   "settings.agentBehaviour.subtab.modes": "Moduser",
   "settings.agentBehaviour.subtab.agents": "Agents",

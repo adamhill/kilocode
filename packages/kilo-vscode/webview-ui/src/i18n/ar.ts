@@ -791,7 +791,12 @@ export const dict = {
   "settings.aboutKiloCode.status.label": "الحالة:",
   "settings.aboutKiloCode.port.label": "المنفذ:",
   "settings.aboutKiloCode.versionInfo": "معلومات الإصدار",
+  "settings.aboutKiloCode.version.label": "الإصدار:",
   "settings.aboutKiloCode.extensionName": "إضافة Kilo Code",
+  "settings.aboutKiloCode.community": "المجتمع والدعم",
+  "settings.aboutKiloCode.feedback.prefix": "إذا كان لديك أي أسئلة أو ملاحظات، لا تتردد في فتح مشكلة على",
+  "settings.aboutKiloCode.feedback.or": "أو",
+  "settings.aboutKiloCode.support.prefix": "لأسئلة الفوترة أو الحساب، تواصل مع دعم العملاء على",
 
   "settings.agentBehaviour.subtab.modes": "الأوضاع",
   "settings.agentBehaviour.subtab.agents": "Agents",
