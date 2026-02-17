@@ -37,44 +37,57 @@ Key architectural decisions for telemetry in the new extension:
 
 ## 1. Core Components
 
-### 1.1 `TelemetryService` — Singleton Facade
+Telemetry is split across two layers: the **CLI** (which owns all agent/LLM/tool events) and the **extension** (which captures UI-only events and proxies them to the CLI).
 
-**File:** `packages/telemetry/src/TelemetryService.ts`
+### 1.1 Telemetry Ownership — CLI vs Extension
 
-- Created once at extension activation via `TelemetryService.createInstance()`
-- Holds an array of `TelemetryClient` implementations
-- Exposes typed convenience methods for each event: `captureTaskCreated()`, `captureLlmCompletion()`, etc.
-- Also handles: `captureException()`, `updateIdentity()`, `updateTelemetryState()`, `shutdown()`
+#### CLI side: `kilo-telemetry` package
 
-### 1.2 `BaseTelemetryClient` — Abstract Base
+**Package:** `packages/kilo-telemetry/`
 
-**File:** `packages/telemetry/src/BaseTelemetryClient.ts`
+The CLI owns all agent, LLM, and tool telemetry. The `kilo-telemetry` package provides:
 
-- Holds a `WeakRef` to a `TelemetryPropertiesProvider` (the `KiloProvider`)
-- Implements event subscription/filtering (include/exclude lists via `TelemetryEventSubscription`)
-- Implements property filtering via `isPropertyCapturable()` — subclasses can override
-- Merges provider properties with event-specific properties via `getEventProperties()`
+- `Telemetry.capture()` — sends events to PostHog via `posthog-node`
+- `Telemetry.getTracer()` — OpenTelemetry tracing for spans/traces
+- Identity management (distinct ID, user properties)
+- Consent enforcement (respects VS Code telemetry level passed at CLI startup)
 
-### 1.3 `CLITelemetryClient` — Production Client
+All events related to task lifecycle, LLM completions, tool usage, context condensation, checkpoints, etc. are captured internally by the CLI — the extension never sees or sends these.
 
-**File:** `packages/telemetry/src/CLITelemetryClient.ts`
+#### Extension side: `TelemetryProxy` service
 
-- Forwards events to the CLI server via `POST /telemetry/capture`
-- The CLI uses `kilo-telemetry` (which wraps `posthog-node`) to send events to PostHog
-- **Distinct ID**: defaults to `vscode.env.machineId`, upgrades to user email when authenticated via `updateIdentity()`
-- **Privacy filters**: 
-  - Git properties (`repositoryUrl`, `repositoryName`, `defaultBranch`) always filtered
-  - Error details (`errorMessage`, `cliPath`, `stderrPreview`) filtered for organization users
-- **Opt-in logic**: Requires BOTH VSCode global telemetry level = `"all"` AND user opt-in
-- **Event exclusions**: `TASK_MESSAGE` is excluded (too verbose)
-- **Exception capture**: `captureException()` sends structured errors via the CLI endpoint
+**File:** `packages/kilo-vscode/src/services/telemetry/TelemetryProxy.ts` *(planned)*
 
-### 1.4 `DebugTelemetryClient` — Development Client
+A lightweight service in the extension that:
 
-**File:** `packages/telemetry/src/DebugTelemetryClient.ts`
+- Captures **UI-only events**: tab views, button clicks, auth UI events, marketplace interactions
+- Exposes typed convenience methods for extension events: `captureTabShown()`, `captureTitleButtonClicked()`, `captureAuthEvent()`, `captureMarketplaceAction()`, etc.
+- Forwards all events to the CLI via `POST /telemetry/capture`
+- Enriches events with VS Code-specific properties (from `KiloProvider.getTelemetryProperties()`)
+- Does **NOT** have methods like `captureLlmCompletion()` or `captureToolUsed()` — those are CLI-internal
 
-- Always enabled, logs to console
-- Registered only in `NODE_ENV === "development"`
+### 1.2 `BaseTelemetryClient` — Old Extension Only
+
+> **Note:** This abstraction existed in the old extension's in-process architecture, where the extension itself needed pluggable telemetry backends. In the new architecture, the extension simply proxies events to the CLI — no pluggable client abstraction is needed on the extension side. The CLI's `kilo-telemetry` package handles all backend concerns internally.
+
+### 1.3 `PostHogTelemetryClient` — CLI-side (`kilo-telemetry`)
+
+**Package:** `packages/kilo-telemetry/`
+
+- The CLI uses `posthog-node` internally via the `kilo-telemetry` package
+- The extension **never** touches PostHog directly — all events flow through `POST /telemetry/capture`
+- **Distinct ID**: defaults to `vscode.env.machineId` (passed at CLI startup), upgrades to user email on auth
+- **Privacy filters**: Git properties always filtered; error details filtered for organization users
+- **Opt-in logic**: Requires BOTH VS Code telemetry level = `"all"` AND user opt-in
+- **Event exclusions**: `TASK_MESSAGE` excluded (too verbose)
+
+### 1.4 `DebugTelemetryClient` — CLI-side Only
+
+**Package:** `packages/kilo-telemetry/`
+
+- Logs telemetry events to console in development mode
+- CLI-side only — registered when `NODE_ENV === "development"`
+- The extension can independently log telemetry events to its own VS Code output channel for debugging, but this is separate from the CLI's debug client
 
 ### 1.5 Webview Telemetry — `postMessage` Proxy
 
