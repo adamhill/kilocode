@@ -96,7 +96,7 @@ export const PromptInput: Component = () => {
   }
 
   const handleKeyDown = (e: KeyboardEvent) => {
-    if (mention.onKeyDown(e, textareaRef)) return
+    if (mention.onKeyDown(e, textareaRef, setText)) return
 
     if ((e.key === "Tab" || e.key === "ArrowRight") && ghostText()) {
       e.preventDefault()
@@ -150,7 +150,7 @@ export const PromptInput: Component = () => {
                 classList={{ "file-mention-item--active": index() === mention.mentionIndex() }}
                 onMouseDown={(e) => {
                   e.preventDefault()
-                  if (textareaRef) mention.selectFile(path, textareaRef)
+                  if (textareaRef) mention.selectFile(path, textareaRef, setText)
                 }}
                 onMouseEnter={() => mention.setMentionIndex(index())}
               >

@@ -16,8 +16,8 @@ export interface FileMention {
   mentionIndex: Accessor<number>
   showMention: Accessor<boolean>
   onInput: (val: string, cursor: number) => boolean
-  onKeyDown: (e: KeyboardEvent, textarea: HTMLTextAreaElement | undefined) => boolean
-  selectFile: (path: string, textarea: HTMLTextAreaElement) => void
+  onKeyDown: (e: KeyboardEvent, textarea: HTMLTextAreaElement | undefined, setText: (text: string) => void) => boolean
+  selectFile: (path: string, textarea: HTMLTextAreaElement, setText: (text: string) => void) => void
   setMentionIndex: (index: number) => void
   removeFile: (path: string) => void
   closeMention: () => void
@@ -68,16 +68,16 @@ export function useFileMention(vscode: VSCodeContext): FileMention {
     setMentionResults([])
   }
 
-  const selectMentionFile = (path: string, textarea: HTMLTextAreaElement) => {
+  const selectMentionFile = (path: string, textarea: HTMLTextAreaElement, setText: (text: string) => void) => {
     const val = textarea.value
     const cursor = textarea.selectionStart ?? val.length
     const before = val.substring(0, cursor)
     const after = val.substring(cursor)
 
-    // Replace @query but preserve any leading whitespace the pattern consumed
     const replaced = before.replace(AT_PATTERN, (match) => (match.startsWith(" ") ? " " : ""))
     const newText = replaced + after
     textarea.value = newText
+    setText(newText)
 
     const newCursor = replaced.length
     textarea.setSelectionRange(newCursor, newCursor)
@@ -99,7 +99,11 @@ export function useFileMention(vscode: VSCodeContext): FileMention {
     return false
   }
 
-  const onKeyDown = (e: KeyboardEvent, textarea: HTMLTextAreaElement | undefined): boolean => {
+  const onKeyDown = (
+    e: KeyboardEvent,
+    textarea: HTMLTextAreaElement | undefined,
+    setText: (text: string) => void,
+  ): boolean => {
     if (!showMention()) return false
 
     if (e.key === "ArrowDown") {
@@ -115,7 +119,7 @@ export function useFileMention(vscode: VSCodeContext): FileMention {
     if (e.key === "Enter" || e.key === "Tab") {
       e.preventDefault()
       const path = mentionResults()[mentionIndex()]
-      if (path && textarea) selectMentionFile(path, textarea)
+      if (path && textarea) selectMentionFile(path, textarea, setText)
       return true
     }
     if (e.key === "Escape") {
