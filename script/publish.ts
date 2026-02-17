@@ -80,5 +80,8 @@ await import(`../packages/sdk/js/script/publish.ts`)
 console.log("\n=== plugin ===\n")
 await import(`../packages/plugin/script/publish.ts`)
 
+console.log("\n=== vscode ===\n")
+await import(`../packages/kilo-vscode/script/publish.ts`)
+
 const dir = new URL("..", import.meta.url).pathname
 process.chdir(dir)
