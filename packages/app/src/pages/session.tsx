@@ -191,6 +191,8 @@ export default function Page() {
     const controller = new AbortController()
     modeActionAbort = controller
 
+    showToast({ title: `Switching to ${input.mode} mode…`, description: "Waiting for current task to complete" })
+
     try {
       await waitForIdle(sessionID, controller.signal)
     } catch (err: unknown) {
@@ -206,6 +208,10 @@ export default function Page() {
 
     const agent = local.agent.current()
     if (!agent) return
+
+    if (agent.name !== input.mode) {
+      showToast({ title: "Agent not available", description: `"${input.mode}" not found, using "${agent.name}"` })
+    }
 
     const model = local.model.current()
     if (!model) return
