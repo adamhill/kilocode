@@ -143,6 +143,7 @@ async function main() {
       ".woff": "file",
       ".woff2": "file",
       ".ttf": "file",
+      ".svg": "dataurl",
     },
     plugins: [
       solidDedupePlugin,
@@ -168,6 +169,7 @@ async function main() {
       ".woff": "file",
       ".woff2": "file",
       ".ttf": "file",
+      ".svg": "dataurl",
     },
     plugins: [
       solidDedupePlugin,

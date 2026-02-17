@@ -6,6 +6,7 @@
 import { Component, createSignal, onCleanup, Show, For, createEffect } from "solid-js"
 import { Button } from "@kilocode/kilo-ui/button"
 import { Tooltip } from "@kilocode/kilo-ui/tooltip"
+import { FileIcon } from "@kilocode/kilo-ui/file-icon"
 import { useSession } from "../../context/session"
 import { useServer } from "../../context/server"
 import { useLanguage } from "../../context/language"
@@ -255,9 +256,12 @@ export const PromptInput: Component = () => {
     session.abort()
   }
 
-  const shortPath = (path: string) => {
+  const fileName = (path: string) => path.split("/").pop() ?? path
+  const dirName = (path: string) => {
     const parts = path.split("/")
-    return parts.length > 2 ? `…/${parts.slice(-2).join("/")}` : path
+    if (parts.length <= 1) return ""
+    const dir = parts.slice(0, -1).join("/")
+    return dir.length > 30 ? `…/${parts.slice(-3, -1).join("/")}` : dir
   }
 
   return (
@@ -275,12 +279,9 @@ export const PromptInput: Component = () => {
                 }}
                 onMouseEnter={() => setMentionIndex(index())}
               >
-                <span class="file-mention-icon">
-                  <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
-                    <path d="M2 2h7l3 3v9H2V2zm7 0v3h3" stroke="currentColor" stroke-width="1" fill="none" />
-                  </svg>
-                </span>
-                <span class="file-mention-path">{shortPath(path)}</span>
+                <FileIcon node={{ path, type: "file" }} class="file-mention-icon" />
+                <span class="file-mention-name">{fileName(path)}</span>
+                <span class="file-mention-dir">{dirName(path)}</span>
               </div>
             )}
           </For>
@@ -341,7 +342,8 @@ export const PromptInput: Component = () => {
           <For each={attachedFiles()}>
             {(path) => (
               <div class="file-chip">
-                <span class="file-chip-name">{shortPath(path)}</span>
+                <FileIcon node={{ path, type: "file" }} class="file-chip-icon" />
+                <span class="file-chip-name">{fileName(path)}</span>
                 <button class="file-chip-remove" onClick={() => removeFile(path)} aria-label="Remove file">
                   ×
                 </button>
