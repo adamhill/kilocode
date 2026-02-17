@@ -15,6 +15,7 @@ import { Message } from "./Message"
 /** Inline working/retry indicator shown below messages while the agent is active. */
 const WorkingIndicator: Component = () => {
   const session = useSession()
+  const language = useLanguage() // kilocode_change
   const [elapsed, setElapsed] = createSignal(0)
 
   // Tick every second while busy
@@ -32,11 +33,13 @@ const WorkingIndicator: Component = () => {
   })
 
   const info = () => session.statusInfo()
+  // kilocode_change start - use i18n for status strings
   const text = () => {
     const i = info()
-    if (i.type === "retry") return `Retrying (attempt ${i.attempt})… ${i.message}`
-    return session.statusText() ?? "Working..."
+    if (i.type === "retry") return language.t("session.status.retrying", { attempt: i.attempt, message: i.message })
+    return session.statusText() ?? language.t("session.status.working")
   }
+  // kilocode_change end
 
   return (
     <Show when={info().type !== "idle"}>
