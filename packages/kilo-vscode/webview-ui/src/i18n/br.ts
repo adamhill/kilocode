@@ -798,7 +798,13 @@ export const dict = {
   "settings.aboutKiloCode.status.label": "Status:",
   "settings.aboutKiloCode.port.label": "Porta:",
   "settings.aboutKiloCode.versionInfo": "Informações da Versão",
+  "settings.aboutKiloCode.version.label": "Versão:",
   "settings.aboutKiloCode.extensionName": "Extensão Kilo Code",
+  "settings.aboutKiloCode.community": "Comunidade e Suporte",
+  "settings.aboutKiloCode.feedback.prefix": "Se você tiver perguntas ou feedback, abra uma issue no",
+  "settings.aboutKiloCode.feedback.or": "ou",
+  "settings.aboutKiloCode.support.prefix":
+    "Para questões de cobrança ou conta, entre em contato com o Suporte ao Cliente em",
 
   "settings.agentBehaviour.subtab.modes": "Modos",
   "settings.agentBehaviour.subtab.agents": "Agents",

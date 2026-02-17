@@ -797,7 +797,13 @@ export const dict = {
   "settings.aboutKiloCode.status.label": "Status:",
   "settings.aboutKiloCode.port.label": "Port:",
   "settings.aboutKiloCode.versionInfo": "Versionsinformation",
+  "settings.aboutKiloCode.version.label": "Version:",
   "settings.aboutKiloCode.extensionName": "Kilo Code-udvidelse",
+  "settings.aboutKiloCode.community": "Fællesskab og support",
+  "settings.aboutKiloCode.feedback.prefix":
+    "Hvis du har spørgsmål eller feedback, er du velkommen til at åbne en issue på",
+  "settings.aboutKiloCode.feedback.or": "eller",
+  "settings.aboutKiloCode.support.prefix": "For fakturerings- eller kontospørgsmål, kontakt kundesupport på",
 
   "settings.agentBehaviour.subtab.modes": "Tilstande",
   "settings.agentBehaviour.subtab.agents": "Agents",
