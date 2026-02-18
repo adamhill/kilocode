@@ -187,8 +187,10 @@ export const PromptInput: Component = () => {
     const sel = session.selected()
     session.sendMessage(message, sel?.providerID, sel?.modelID, files.length > 0 ? files : undefined)
 
+    requestCounter++
     setText("")
     setGhostText("")
+    if (debounceTimer) clearTimeout(debounceTimer)
     mention.closeMention()
 
     if (textareaRef) textareaRef.style.height = "auto"
