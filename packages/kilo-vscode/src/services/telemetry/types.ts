@@ -89,7 +89,4 @@ export interface TelemetryPropertiesProvider {
   getTelemetryProperties(): Record<string, unknown>
 }
 
-/**
- * Extension-level telemetry preference.
- */
-export type TelemetrySetting = "unset" | "enabled" | "disabled"
+

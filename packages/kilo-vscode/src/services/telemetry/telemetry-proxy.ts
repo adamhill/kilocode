@@ -1,11 +1,6 @@
 import * as vscode from "vscode"
-import { TelemetryEventName, type TelemetryPropertiesProvider, type TelemetrySetting } from "./types"
-import {
-  isApiProviderError,
-  getApiProviderErrorProperties,
-  isConsecutiveMistakeError,
-  getConsecutiveMistakeErrorProperties,
-} from "./errors"
+import { TelemetryEventName, type TelemetryPropertiesProvider } from "./types"
+
 
 /**
  * Singleton proxy that captures telemetry events and forwards them to the CLI
@@ -17,7 +12,6 @@ export class TelemetryProxy {
   private url: string | undefined
   private password: string | undefined
   private provider: TelemetryPropertiesProvider | undefined
-  private setting: TelemetrySetting = "unset"
 
   private constructor() {}
 
@@ -39,10 +33,6 @@ export class TelemetryProxy {
 
   setProvider(provider: TelemetryPropertiesProvider) {
     this.provider = provider
-  }
-
-  updateTelemetryState(setting: TelemetrySetting) {
-    this.setting = setting
   }
 
   isVSCodeTelemetryEnabled(): boolean {
@@ -73,30 +63,6 @@ export class TelemetryProxy {
       },
       body: payload,
     }).catch(() => {})
-  }
-
-  /**
-   * Capture an exception. Extracts structured properties from known error types.
-   */
-  captureException(error: Error, extra?: Record<string, unknown>) {
-    const properties: Record<string, unknown> = {
-      error: error.message,
-      errorName: error.name,
-      ...extra,
-    }
-
-    if (isApiProviderError(error)) {
-      Object.assign(properties, getApiProviderErrorProperties(error))
-    }
-
-    if (isConsecutiveMistakeError(error)) {
-      Object.assign(properties, getConsecutiveMistakeErrorProperties(error))
-      this.capture(TelemetryEventName.CONSECUTIVE_MISTAKE_ERROR, properties)
-      return
-    }
-
-    // Generic exception — use the error name as the event or a fallback
-    this.capture(TelemetryEventName.SCHEMA_VALIDATION_ERROR, properties)
   }
 
   /**

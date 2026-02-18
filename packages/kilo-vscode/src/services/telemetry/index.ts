@@ -1,4 +1,4 @@
-export { TelemetryEventName, type TelemetryPropertiesProvider, type TelemetrySetting } from "./types"
+export { TelemetryEventName, type TelemetryPropertiesProvider } from "./types"
 export {
   ApiProviderError,
   isApiProviderError,
