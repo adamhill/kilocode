@@ -3,7 +3,7 @@
  * Text input with send/abort buttons, ghost-text autocomplete, and @ file mention support
  */
 
-import { Component, createSignal, onCleanup, Show, For, Index } from "solid-js"
+import { Component, createSignal, createEffect, on, onCleanup, Show, For, Index, untrack } from "solid-js"
 import { Button } from "@kilocode/kilo-ui/button"
 import { Tooltip } from "@kilocode/kilo-ui/tooltip"
 import { FileIcon } from "@kilocode/kilo-ui/file-icon"
@@ -18,12 +18,17 @@ import { useFileMention } from "../../hooks/useFileMention"
 const AUTOCOMPLETE_DEBOUNCE_MS = 500
 const MIN_TEXT_LENGTH = 3
 
+// Per-session input text storage (module-level so it survives remounts)
+const drafts = new Map<string, string>()
+
 export const PromptInput: Component = () => {
   const session = useSession()
   const server = useServer()
   const language = useLanguage()
   const vscode = useVSCode()
   const mention = useFileMention(vscode)
+
+  const sessionKey = () => session.currentSessionID() ?? "__new__"
 
   const [text, setText] = createSignal("")
   const [ghostText, setGhostText] = createSignal("")
@@ -33,6 +38,24 @@ export const PromptInput: Component = () => {
   let dropdownRef: HTMLDivElement | undefined
   let debounceTimer: ReturnType<typeof setTimeout> | undefined
   let requestCounter = 0
+  // Save/restore input text when switching sessions.
+  // Uses `on()` to track only sessionKey — avoids re-running on every keystroke.
+  createEffect(
+    on(sessionKey, (key, prev) => {
+      if (prev !== undefined && prev !== key) {
+        drafts.set(prev, untrack(text))
+      }
+      const draft = drafts.get(key) ?? ""
+      setText(draft)
+      setGhostText("")
+      if (textareaRef) {
+        textareaRef.value = draft
+        // Reset height then adjust
+        textareaRef.style.height = "auto"
+        textareaRef.style.height = `${Math.min(textareaRef.scrollHeight, 200)}px`
+      }
+    }),
+  )
 
   const isBusy = () => session.status() === "busy"
   const isDisabled = () => !server.isConnected()
@@ -47,6 +70,9 @@ export const PromptInput: Component = () => {
   })
 
   onCleanup(() => {
+    // Persist current draft before unmounting
+    const current = text()
+    if (current) drafts.set(sessionKey(), current)
     unsubscribe()
     if (debounceTimer) clearTimeout(debounceTimer)
   })
@@ -190,6 +216,7 @@ export const PromptInput: Component = () => {
     setGhostText("")
     if (debounceTimer) clearTimeout(debounceTimer)
     mention.closeMention()
+    drafts.delete(sessionKey())
 
     if (textareaRef) textareaRef.style.height = "auto"
   }
