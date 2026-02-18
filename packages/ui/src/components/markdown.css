@@ -155,9 +155,26 @@
     margin-bottom: 2rem;
     overflow: auto;
 
-    scrollbar-width: none;
+    /* Hide vertical scrollbar, show horizontal */
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-weak-base) transparent;
+
     &::-webkit-scrollbar {
-      display: none;
+      width: 0;
+      height: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: var(--border-weak-base);
+      border-radius: 4px;
+
+      &:hover {
+        background: var(--border-strong-base);
+      }
     }
   }
 
