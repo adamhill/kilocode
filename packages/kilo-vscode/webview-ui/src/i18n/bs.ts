@@ -831,6 +831,10 @@ export const dict = {
   "settings.aboutKiloCode.feedback.prefix": "Ako imate pitanja ili povratne informacije, slobodno otvorite issue na",
   "settings.aboutKiloCode.feedback.or": "ili",
   "settings.aboutKiloCode.support.prefix": "Za pitanja o naplati ili računu, kontaktirajte korisničku podršku na",
+  "settings.aboutKiloCode.resetSettings.title": "Resetovanje postavki",
+  "settings.aboutKiloCode.resetSettings.description":
+    "Resetujte sve postavke Kilo Code ekstenzije na zadane vrijednosti. Ovo ne utiče na CLI ili backend konfiguraciju.",
+  "settings.aboutKiloCode.resetSettings.button": "Resetuj sve postavke",
 
   "settings.agentBehaviour.subtab.modes": "Modovi",
   "settings.agentBehaviour.subtab.agents": "Agents",

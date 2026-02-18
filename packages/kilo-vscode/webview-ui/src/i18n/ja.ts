@@ -798,6 +798,10 @@ export const dict = {
   "settings.aboutKiloCode.feedback.or": "または",
   "settings.aboutKiloCode.support.prefix":
     "請求やアカウントに関するご質問は、カスタマーサポートまでお問い合わせください",
+  "settings.aboutKiloCode.resetSettings.title": "設定をリセット",
+  "settings.aboutKiloCode.resetSettings.description":
+    "Kilo Code拡張機能のすべての設定をデフォルト値にリセットします。CLIやバックエンドの設定には影響しません。",
+  "settings.aboutKiloCode.resetSettings.button": "すべての設定をリセット",
 
   "settings.agentBehaviour.subtab.modes": "モード",
   "settings.agentBehaviour.subtab.agents": "Agents",

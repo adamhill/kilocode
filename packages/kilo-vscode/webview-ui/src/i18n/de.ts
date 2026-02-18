@@ -810,6 +810,10 @@ export const dict = {
   "settings.aboutKiloCode.feedback.or": "oder",
   "settings.aboutKiloCode.support.prefix":
     "Bei Abrechnungs- oder Kontofragen wenden Sie sich an den Kundensupport unter",
+  "settings.aboutKiloCode.resetSettings.title": "Einstellungen zurücksetzen",
+  "settings.aboutKiloCode.resetSettings.description":
+    "Alle Kilo Code-Erweiterungseinstellungen auf Standardwerte zurücksetzen. Dies hat keinen Einfluss auf die CLI- oder Backend-Konfiguration.",
+  "settings.aboutKiloCode.resetSettings.button": "Alle Einstellungen zurücksetzen",
 
   "settings.agentBehaviour.subtab.modes": "Modi",
   "settings.agentBehaviour.subtab.agents": "Agents",

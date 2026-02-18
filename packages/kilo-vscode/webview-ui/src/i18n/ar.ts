@@ -797,6 +797,10 @@ export const dict = {
   "settings.aboutKiloCode.feedback.prefix": "إذا كان لديك أي أسئلة أو ملاحظات، لا تتردد في فتح مشكلة على",
   "settings.aboutKiloCode.feedback.or": "أو",
   "settings.aboutKiloCode.support.prefix": "لأسئلة الفوترة أو الحساب، تواصل مع دعم العملاء على",
+  "settings.aboutKiloCode.resetSettings.title": "إعادة تعيين الإعدادات",
+  "settings.aboutKiloCode.resetSettings.description":
+    "إعادة تعيين جميع إعدادات إضافة Kilo Code إلى قيمها الافتراضية. لا يؤثر هذا على تكوين CLI أو الواجهة الخلفية.",
+  "settings.aboutKiloCode.resetSettings.button": "إعادة تعيين جميع الإعدادات",
 
   "settings.agentBehaviour.subtab.modes": "الأوضاع",
   "settings.agentBehaviour.subtab.agents": "Agents",
