@@ -13,7 +13,7 @@ Kilo's **Auto-Triage** automatically analyses every new GitHub issue the moment 
 
 ### 1. Duplicate detection
 
-When an issue arrives, Auto-Triage compares it against every previously-triaged issue in your repository using vector-similarity search. If it finds a match above your configured threshold, it:
+When an issue arrives, Auto-Triage compares it against every previously-triaged issue in your repository using vector-similarity search. If it finds a match, it:
 
 - Posts a comment on the new issue linking to the original, including its title and similarity score.
 - Labels the issue `kilo-triaged` and `kilo-duplicate`.
