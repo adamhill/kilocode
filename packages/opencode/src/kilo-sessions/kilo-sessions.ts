@@ -375,6 +375,19 @@ export namespace KiloSessions {
     ])
   }
 
+  /** Strip credentials from a git remote URL (e.g. https://user:token@github.com/org/repo.git) */
+  function sanitizeGitUrl(raw: string): string {
+    if (!raw.startsWith("http://") && !raw.startsWith("https://")) return raw
+    try {
+      const parsed = new URL(raw)
+      parsed.username = ""
+      parsed.password = ""
+      return parsed.toString()
+    } catch {
+      return raw
+    }
+  }
+
   async function getGitUrl(): Promise<string | undefined> {
     return withInFlightCache(gitUrlKey, ttlMs, async () => {
       const result = await $`git remote`
@@ -409,7 +422,7 @@ export namespace KiloSessions {
         .then((x) => x.trim())
         .catch(() => "")
 
-      return url || undefined
+      return url ? sanitizeGitUrl(url) : undefined
     })
   }
 
