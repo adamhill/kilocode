@@ -24,7 +24,7 @@ jobs:
       - name: Build site
         run: bun run --filter @kilocode/kilo-docs build
         env:
-          POSTHOG_API_KEY: ${{ secrets.POSTHOG_API_KEY }}
+          NEXT_PUBLIC_POSTHOG_KEY: ${{ secrets.POSTHOG_API_KEY }}
 
       - name: Run tests
         run: bun run --filter @kilocode/kilo-docs test
