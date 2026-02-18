@@ -236,7 +236,7 @@ export namespace LLM {
           : input.model.providerID !== "anthropic"
             ? DEFAULT_HEADERS // kilocode_change
             : undefined),
-        ...(input.model.api.npm === "@kilocode/kilo-gateway" && input.agent.name
+        ...(isKilo && input.agent.name
           ? { "x-kilocode-mode": input.agent.name.toLowerCase() }
           : {}),
         // kilocode_change start - add project ID and machine ID headers for kilo provider
