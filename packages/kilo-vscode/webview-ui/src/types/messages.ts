@@ -736,6 +736,7 @@ export interface CreateWorktreeSessionRequest {
   providerID?: string
   modelID?: string
   agent?: string
+  files?: FileAttachment[]
 }
 
 export type WebviewMessage =
