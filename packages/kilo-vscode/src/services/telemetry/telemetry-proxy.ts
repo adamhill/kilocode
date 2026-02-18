@@ -36,8 +36,7 @@ export class TelemetryProxy {
   }
 
   isVSCodeTelemetryEnabled(): boolean {
-    const level = vscode.workspace.getConfiguration("telemetry").get<string>("telemetryLevel", "all")
-    return level === "all"
+    return vscode.env.isTelemetryEnabled
   }
 
   /**
