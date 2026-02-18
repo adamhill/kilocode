@@ -16,8 +16,18 @@ export interface FileMention {
   mentionIndex: Accessor<number>
   showMention: Accessor<boolean>
   onInput: (val: string, cursor: number) => void
-  onKeyDown: (e: KeyboardEvent, textarea: HTMLTextAreaElement | undefined, setText: (text: string) => void) => boolean
-  selectFile: (path: string, textarea: HTMLTextAreaElement, setText: (text: string) => void) => void
+  onKeyDown: (
+    e: KeyboardEvent,
+    textarea: HTMLTextAreaElement | undefined,
+    setText: (text: string) => void,
+    onSelect?: () => void,
+  ) => boolean
+  selectFile: (
+    path: string,
+    textarea: HTMLTextAreaElement,
+    setText: (text: string) => void,
+    onSelect?: () => void,
+  ) => void
   setMentionIndex: (index: number) => void
   closeMention: () => void
   parseFileAttachments: (text: string) => FileAttachment[]
@@ -75,7 +85,12 @@ export function useFileMention(vscode: VSCodeContext): FileMention {
     })
   }
 
-  const selectMentionFile = (path: string, textarea: HTMLTextAreaElement, setText: (text: string) => void) => {
+  const selectMentionFile = (
+    path: string,
+    textarea: HTMLTextAreaElement,
+    setText: (text: string) => void,
+    onSelect?: () => void,
+  ) => {
     const val = textarea.value
     const cursor = textarea.selectionStart ?? val.length
     const before = val.substring(0, cursor)
@@ -95,6 +110,7 @@ export function useFileMention(vscode: VSCodeContext): FileMention {
 
     setMentionedPaths((prev) => new Set([...prev, path]))
     closeMention()
+    onSelect?.()
   }
 
   const onInput = (val: string, cursor: number) => {
@@ -113,6 +129,7 @@ export function useFileMention(vscode: VSCodeContext): FileMention {
     e: KeyboardEvent,
     textarea: HTMLTextAreaElement | undefined,
     setText: (text: string) => void,
+    onSelect?: () => void,
   ): boolean => {
     if (!showMention()) return false
 
@@ -129,7 +146,7 @@ export function useFileMention(vscode: VSCodeContext): FileMention {
     if (e.key === "Enter" || e.key === "Tab") {
       e.preventDefault()
       const path = mentionResults()[mentionIndex()]
-      if (path && textarea) selectMentionFile(path, textarea, setText)
+      if (path && textarea) selectMentionFile(path, textarea, setText, onSelect)
       return true
     }
     if (e.key === "Escape") {

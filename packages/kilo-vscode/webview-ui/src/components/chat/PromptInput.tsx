@@ -156,7 +156,7 @@ export const PromptInput: Component = () => {
   }
 
   const handleKeyDown = (e: KeyboardEvent) => {
-    if (mention.onKeyDown(e, textareaRef, setText)) {
+    if (mention.onKeyDown(e, textareaRef, setText, adjustHeight)) {
       setGhostText("")
       queueMicrotask(scrollToActiveItem)
       return
@@ -217,7 +217,7 @@ export const PromptInput: Component = () => {
                   classList={{ "file-mention-item--active": index() === mention.mentionIndex() }}
                   onMouseDown={(e) => {
                     e.preventDefault()
-                    if (textareaRef) mention.selectFile(path, textareaRef, setText)
+                    if (textareaRef) mention.selectFile(path, textareaRef, setText, adjustHeight)
                   }}
                   onMouseEnter={() => mention.setMentionIndex(index())}
                 >
