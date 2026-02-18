@@ -14,13 +14,11 @@ export namespace Identity {
   export async function getMachineId(): Promise<string> {
     if (machineId) return machineId
 
-    // kilocode_change start - Allow env var override for identity continuity with VS Code extension
     const override = process.env.KILO_MACHINE_ID
     if (override) {
       machineId = override
       return machineId
     }
-    // kilocode_change end
 
     const filepath = path.join(dataPath, "telemetry-id")
     const file = Bun.file(filepath)

@@ -8,7 +8,7 @@ export interface TelemetryProperties {
   appName: string
   appVersion: string
   platform: string
-  editorName?: string // kilocode_change
+  editorName?: string
 }
 
 export namespace Telemetry {
@@ -26,19 +26,15 @@ export namespace Telemetry {
     Identity.setDataPath(options.dataPath)
     props.appVersion = options.version
 
-    // kilocode_change start - Apply env var overrides for editor name and platform
     const editor = process.env.KILO_EDITOR_NAME
     if (editor) props.editorName = editor
     const platform = process.env.KILO_PLATFORM
     if (platform) props.platform = platform
-    // kilocode_change end
 
     Client.init()
 
-    // kilocode_change start - Allow KILO_TELEMETRY_LEVEL to override enabled state
     const level = process.env.KILO_TELEMETRY_LEVEL
     const enabled = level ? level === "all" : options.enabled
-    // kilocode_change end
     Client.setEnabled(enabled)
 
     // Initialize OpenTelemetry tracer for AI SDK spans
