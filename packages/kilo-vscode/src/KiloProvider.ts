@@ -4,11 +4,9 @@ import { type HttpClient, type SessionInfo, type SSEEvent, type KiloConnectionSe
 import { handleChatCompletionRequest } from "./services/autocomplete/chat-autocomplete/handleChatCompletionRequest"
 import { handleChatCompletionAccepted } from "./services/autocomplete/chat-autocomplete/handleChatCompletionAccepted"
 import { buildWebviewHtml } from "./utils"
-// kilocode_change start
 import { TelemetryProxy, type TelemetryPropertiesProvider } from "./services/telemetry"
-// kilocode_change end
 
-export class KiloProvider implements vscode.WebviewViewProvider, TelemetryPropertiesProvider /* kilocode_change */ {
+export class KiloProvider implements vscode.WebviewViewProvider, TelemetryPropertiesProvider {
   public static readonly viewType = "kilo-code.new.sidebarView"
 
   private webview: vscode.Webview | null = null
@@ -40,16 +38,13 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
     private readonly extensionUri: vscode.Uri,
     private readonly connectionService: KiloConnectionService,
   ) {
-    // kilocode_change start — register as telemetry properties provider
     try {
       TelemetryProxy.getInstance().setProvider(this)
     } catch {
       // TelemetryProxy may not be initialized yet — safe to ignore
     }
-    // kilocode_change end
   }
 
-  // kilocode_change start
   getTelemetryProperties(): Record<string, unknown> {
     return {
       appName: "Kilo",
@@ -62,7 +57,6 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
       architecture: "new",
     }
   }
-  // kilocode_change end
 
   /**
    * Convenience getter that returns the shared HttpClient or null if not yet connected.
@@ -404,7 +398,6 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
         case "resetAllSettings":
           await this.handleResetAllSettings()
           break
-        // kilocode_change start — forward webview telemetry to TelemetryProxy
         case "telemetry":
           try {
             TelemetryProxy.getInstance().capture(message.event, message.properties)
@@ -412,7 +405,6 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
             // TelemetryProxy not initialized — safe to ignore
           }
           break
-        // kilocode_change end
       }
     })
   }

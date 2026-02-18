@@ -1,5 +1,3 @@
-// kilocode_change - new file
-
 export { TelemetryEventName, type TelemetryPropertiesProvider, type TelemetrySetting } from "./types"
 export {
   ApiProviderError,

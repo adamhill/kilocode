@@ -5,14 +5,12 @@ import { EXTENSION_DISPLAY_NAME } from "./constants"
 import { KiloConnectionService } from "./services/cli-backend"
 import { registerAutocompleteProvider } from "./services/autocomplete"
 import { BrowserAutomationService } from "./services/browser-automation"
-import { TelemetryProxy } from "./services/telemetry" // kilocode_change
+import { TelemetryProxy } from "./services/telemetry"
 
 export function activate(context: vscode.ExtensionContext) {
   console.log("Kilo Code extension is now active")
 
-  // kilocode_change start — initialize telemetry proxy
   const telemetry = TelemetryProxy.createInstance()
-  // kilocode_change end
 
   // Create shared connection service (one server for all webviews)
   const connectionService = new KiloConnectionService(context)
@@ -21,17 +19,14 @@ export function activate(context: vscode.ExtensionContext) {
   const browserAutomationService = new BrowserAutomationService(connectionService)
   browserAutomationService.syncWithSettings()
 
-  // Re-register browser automation MCP server on CLI backend reconnect
-  // kilocode_change — also configure telemetry when connected
+  // Re-register browser automation MCP server on CLI backend reconnect and configure telemetry
   const unsubscribeStateChange = connectionService.onStateChange((state) => {
     if (state === "connected") {
       browserAutomationService.reregisterIfEnabled()
-      // kilocode_change start — configure telemetry with server URL + password
       const config = connectionService.getServerConfig()
       if (config) {
         telemetry.configure(config.baseUrl, config.password)
       }
-      // kilocode_change end
     }
   })
 
@@ -96,13 +91,11 @@ export function activate(context: vscode.ExtensionContext) {
 }
 
 export function deactivate() {
-  // kilocode_change start
   try {
     TelemetryProxy.getInstance().shutdown()
   } catch {
     // Instance may not exist — safe to ignore
   }
-  // kilocode_change end
 }
 
 async function openKiloInNewTab(context: vscode.ExtensionContext, connectionService: KiloConnectionService) {

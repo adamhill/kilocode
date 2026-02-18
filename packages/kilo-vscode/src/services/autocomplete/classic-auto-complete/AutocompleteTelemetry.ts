@@ -1,4 +1,4 @@
-import { TelemetryProxy, TelemetryEventName } from "../../telemetry" // kilocode_change
+import { TelemetryProxy, TelemetryEventName } from "../../telemetry"
 import type { AutocompleteContext, CacheMatchType, FillInAtCursorSuggestion } from "../types"
 
 export type { AutocompleteContext, CacheMatchType, FillInAtCursorSuggestion }

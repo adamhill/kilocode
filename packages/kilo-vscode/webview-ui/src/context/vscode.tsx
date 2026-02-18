@@ -23,7 +23,7 @@ function getVSCodeAPI(): VSCodeAPI {
         setState: () => {},
       }
     }
-    // kilocode_change — expose on globalThis so non-context code (e.g. telemetry util) can access it
+    // Expose on globalThis so non-context code (e.g. telemetry util) can access it
     ;(globalThis as Record<string, unknown>).__vscodeApi = vscodeApi
   }
   return vscodeApi

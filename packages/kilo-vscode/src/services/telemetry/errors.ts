@@ -1,5 +1,3 @@
-// kilocode_change - new file
-
 /**
  * Generic API provider error for structured error tracking.
  */

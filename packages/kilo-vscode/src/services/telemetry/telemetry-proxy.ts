@@ -1,5 +1,3 @@
-// kilocode_change - new file
-
 import * as vscode from "vscode"
 import { TelemetryEventName, type TelemetryPropertiesProvider, type TelemetrySetting } from "./types"
 import {

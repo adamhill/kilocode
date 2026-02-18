@@ -1,7 +1,7 @@
 import crypto from "crypto"
 import * as vscode from "vscode"
 import { t } from "./shims/i18n"
-import { TelemetryProxy, TelemetryEventName } from "../telemetry" // kilocode_change
+import { TelemetryProxy, TelemetryEventName } from "../telemetry"
 import { AutocompleteModel } from "./AutocompleteModel"
 import { AutocompleteStatusBar } from "./AutocompleteStatusBar"
 import { AutocompleteCodeActionProvider } from "./AutocompleteCodeActionProvider"

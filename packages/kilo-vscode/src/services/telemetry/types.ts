@@ -1,5 +1,3 @@
-// kilocode_change - new file
-
 /**
  * Telemetry event names for the Kilo VS Code extension.
  * These are forwarded to the CLI server via POST /telemetry/capture.

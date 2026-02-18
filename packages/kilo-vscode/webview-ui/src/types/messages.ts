@@ -738,13 +738,11 @@ export interface CreateWorktreeSessionRequest {
   agent?: string
 }
 
-// kilocode_change start
 export interface TelemetryRequest {
   type: "telemetry"
   event: string
   properties?: Record<string, unknown>
 }
-// kilocode_change end
 
 export type WebviewMessage =
   | SendMessageRequest
@@ -781,7 +779,7 @@ export type WebviewMessage =
   | RequestNotificationSettingsMessage
   | ResetAllSettingsRequest
   | CreateWorktreeSessionRequest
-  | TelemetryRequest // kilocode_change
+  | TelemetryRequest
 
 // ============================================
 // VS Code API type

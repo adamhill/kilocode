@@ -1,5 +1,3 @@
-// kilocode_change - new file
-
 /**
  * Thin helper for the webview to send telemetry events to the extension host.
  * The extension host's KiloProvider forwards these to TelemetryProxy → CLI server.
