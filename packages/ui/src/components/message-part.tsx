@@ -1315,7 +1315,6 @@ ToolRegistry.register({
     return (
       <BasicTool
         {...props}
-        defaultOpen
         icon="checklist"
         trigger={{
           title: i18n.t("ui.tool.todos"),
