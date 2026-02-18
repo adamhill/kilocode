@@ -3,9 +3,8 @@
  * Text input with send/abort buttons, ghost-text autocomplete, and @ file mention support
  */
 
-import { Component, createSignal, onCleanup, Show, For } from "solid-js"
+import { Component, createSignal, onCleanup, Show, For, Index } from "solid-js"
 import { Button } from "@kilocode/kilo-ui/button"
-import { IconButton } from "@kilocode/kilo-ui/icon-button"
 import { Tooltip } from "@kilocode/kilo-ui/tooltip"
 import { FileIcon } from "@kilocode/kilo-ui/file-icon"
 import { useSession } from "../../context/session"
@@ -30,6 +29,7 @@ export const PromptInput: Component = () => {
   const [ghostText, setGhostText] = createSignal("")
 
   let textareaRef: HTMLTextAreaElement | undefined
+  let highlightRef: HTMLDivElement | undefined
   let dropdownRef: HTMLDivElement | undefined
   let debounceTimer: ReturnType<typeof setTimeout> | undefined
   let requestCounter = 0
@@ -84,10 +84,55 @@ export const PromptInput: Component = () => {
     if (active) active.scrollIntoView({ block: "nearest" })
   }
 
+  const syncHighlightScroll = () => {
+    if (highlightRef && textareaRef) {
+      highlightRef.scrollTop = textareaRef.scrollTop
+    }
+  }
+
   const adjustHeight = () => {
     if (!textareaRef) return
     textareaRef.style.height = "auto"
     textareaRef.style.height = `${Math.min(textareaRef.scrollHeight, 200)}px`
+  }
+
+  const buildHighlightSegments = (val: string) => {
+    const paths = mention.mentionedPaths()
+    if (paths.size === 0) return [{ text: val, highlight: false }]
+
+    const segments: { text: string; highlight: boolean }[] = []
+    let remaining = val
+    let pos = 0
+
+    while (remaining.length > 0) {
+      let earliest = -1
+      let earliestPath = ""
+
+      for (const path of paths) {
+        const token = `@${path}`
+        const idx = remaining.indexOf(token)
+        if (idx !== -1 && (earliest === -1 || idx < earliest)) {
+          earliest = idx
+          earliestPath = path
+        }
+      }
+
+      if (earliest === -1) {
+        segments.push({ text: remaining, highlight: false })
+        break
+      }
+
+      if (earliest > 0) {
+        segments.push({ text: remaining.substring(0, earliest), highlight: false })
+      }
+
+      const token = `@${earliestPath}`
+      segments.push({ text: token, highlight: true })
+      remaining = remaining.substring(earliest + token.length)
+      pos += earliest + token.length
+    }
+
+    return segments
   }
 
   const handleInput = (e: InputEvent) => {
@@ -96,6 +141,7 @@ export const PromptInput: Component = () => {
     setText(val)
     adjustHeight()
     setGhostText("")
+    syncHighlightScroll()
 
     mention.onInput(val, target.selectionStart ?? val.length)
 
@@ -130,13 +176,12 @@ export const PromptInput: Component = () => {
     const message = text().trim()
     if (!message || isBusy() || isDisabled()) return
 
-    const files = mention.buildFileAttachments()
+    const files = mention.parseFileAttachments(message)
     const sel = session.selected()
     session.sendMessage(message, sel?.providerID, sel?.modelID, files.length > 0 ? files : undefined)
 
     setText("")
     setGhostText("")
-    mention.clearAttachedFiles()
     mention.closeMention()
 
     if (textareaRef) textareaRef.style.height = "auto"
@@ -180,6 +225,18 @@ export const PromptInput: Component = () => {
       </Show>
       <div class="prompt-input-wrapper">
         <div class="prompt-input-ghost-wrapper">
+          <div class="prompt-input-highlight-overlay" ref={highlightRef} aria-hidden="true">
+            <Index each={buildHighlightSegments(text())}>
+              {(seg) => (
+                <Show when={seg().highlight} fallback={<span>{seg().text}</span>}>
+                  <span class="prompt-input-file-mention">{seg().text}</span>
+                </Show>
+              )}
+            </Index>
+            <Show when={ghostText()}>
+              <span class="prompt-input-ghost-text">{ghostText()}</span>
+            </Show>
+          </div>
           <textarea
             ref={textareaRef}
             class="prompt-input"
@@ -189,15 +246,10 @@ export const PromptInput: Component = () => {
             value={text()}
             onInput={handleInput}
             onKeyDown={handleKeyDown}
+            onScroll={syncHighlightScroll}
             disabled={isDisabled()}
             rows={1}
           />
-          <Show when={ghostText()}>
-            <div class="prompt-input-ghost-overlay" aria-hidden="true">
-              <span class="prompt-input-ghost-text-hidden">{text()}</span>
-              <span class="prompt-input-ghost-text">{ghostText()}</span>
-            </div>
-          </Show>
         </div>
       </div>
       <div class="prompt-input-hint">

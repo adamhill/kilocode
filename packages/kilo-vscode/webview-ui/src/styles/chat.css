@@ -188,7 +188,8 @@
   min-height: 54px;
   max-height: 200px;
   padding: 8px;
-  color: var(--vscode-input-foreground);
+  color: transparent;
+  caret-color: var(--vscode-input-foreground);
   font-family: var(--vscode-font-family);
   font-size: 13px;
   line-height: 1.4;
@@ -209,7 +210,7 @@
   color: var(--vscode-input-placeholderForeground);
 }
 
-/* Ghost text autocomplete overlay */
+/* Input overlay (highlight + ghost text) */
 .prompt-input-ghost-wrapper {
   position: relative;
   flex: 1;
@@ -224,25 +225,26 @@
   box-sizing: border-box;
 }
 
-.prompt-input-ghost-overlay {
+.prompt-input-highlight-overlay {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
   pointer-events: none;
-  padding: 8px 12px;
+  padding: 8px;
   font-family: var(--vscode-font-family);
-  font-size: var(--vscode-font-size, 13px);
+  font-size: 13px;
   line-height: 1.4;
   white-space: pre-wrap;
   word-wrap: break-word;
   overflow: hidden;
   z-index: 0;
+  color: var(--vscode-input-foreground);
 }
 
-.prompt-input-ghost-text-hidden {
-  visibility: hidden;
+.prompt-input-file-mention {
+  color: var(--vscode-textLink-foreground, #3794ff);
 }
 
 .prompt-input-ghost-text {
@@ -382,41 +384,6 @@
   font-size: 12px;
   color: var(--vscode-descriptionForeground);
   text-align: center;
-}
-
-/* ============================================
-   File Chips (attached files)
-   ============================================ */
-
-.file-chips-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  padding: 4px 0 2px;
-}
-
-.file-chip {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  background: var(--vscode-badge-background);
-  color: var(--vscode-badge-foreground);
-  border-radius: 3px;
-  padding: 2px 6px 2px 6px;
-  font-size: 11px;
-  max-width: 220px;
-}
-
-.file-chip-icon {
-  flex-shrink: 0;
-  width: 14px;
-  height: 14px;
-}
-
-.file-chip-name {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 /* ============================================

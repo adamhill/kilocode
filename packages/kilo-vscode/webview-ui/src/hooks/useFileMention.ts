@@ -11,7 +11,7 @@ interface VSCodeContext {
 }
 
 export interface FileMention {
-  attachedFiles: Accessor<string[]>
+  mentionedPaths: Accessor<Set<string>>
   mentionResults: Accessor<string[]>
   mentionIndex: Accessor<number>
   showMention: Accessor<boolean>
@@ -19,14 +19,12 @@ export interface FileMention {
   onKeyDown: (e: KeyboardEvent, textarea: HTMLTextAreaElement | undefined, setText: (text: string) => void) => boolean
   selectFile: (path: string, textarea: HTMLTextAreaElement, setText: (text: string) => void) => void
   setMentionIndex: (index: number) => void
-  removeFile: (path: string) => void
   closeMention: () => void
-  buildFileAttachments: () => FileAttachment[]
-  clearAttachedFiles: () => void
+  parseFileAttachments: (text: string) => FileAttachment[]
 }
 
 export function useFileMention(vscode: VSCodeContext): FileMention {
-  const [attachedFiles, setAttachedFiles] = createSignal<string[]>([])
+  const [mentionedPaths, setMentionedPaths] = createSignal<Set<string>>(new Set())
   const [mentionQuery, setMentionQuery] = createSignal<string | null>(null)
   const [mentionResults, setMentionResults] = createSignal<string[]>([])
   const [mentionIndex, setMentionIndex] = createSignal(0)
@@ -58,8 +56,7 @@ export function useFileMention(vscode: VSCodeContext): FileMention {
     if (fileSearchTimer) clearTimeout(fileSearchTimer)
     fileSearchTimer = setTimeout(() => {
       fileSearchCounter++
-      const requestId = `file-search-${fileSearchCounter}`
-      vscode.postMessage({ type: "requestFileSearch", query, requestId })
+      vscode.postMessage({ type: "requestFileSearch", query, requestId: `file-search-${fileSearchCounter}` })
     }, FILE_SEARCH_DEBOUNCE_MS)
   }
 
@@ -68,13 +65,26 @@ export function useFileMention(vscode: VSCodeContext): FileMention {
     setMentionResults([])
   }
 
+  const syncMentionedPaths = (text: string) => {
+    setMentionedPaths((prev) => {
+      const next = new Set<string>()
+      for (const path of prev) {
+        if (text.includes(`@${path}`)) next.add(path)
+      }
+      return next
+    })
+  }
+
   const selectMentionFile = (path: string, textarea: HTMLTextAreaElement, setText: (text: string) => void) => {
     const val = textarea.value
     const cursor = textarea.selectionStart ?? val.length
     const before = val.substring(0, cursor)
     const after = val.substring(cursor)
 
-    const replaced = before.replace(AT_PATTERN, (match) => (match.startsWith(" ") ? " " : ""))
+    const replaced = before.replace(AT_PATTERN, (match) => {
+      const prefix = match.startsWith(" ") ? " " : ""
+      return `${prefix}@${path}`
+    })
     const newText = replaced + after
     textarea.value = newText
     setText(newText)
@@ -83,11 +93,12 @@ export function useFileMention(vscode: VSCodeContext): FileMention {
     textarea.setSelectionRange(newCursor, newCursor)
     textarea.focus()
 
-    setAttachedFiles((prev) => (prev.includes(path) ? prev : [...prev, path]))
+    setMentionedPaths((prev) => new Set([...prev, path]))
     closeMention()
   }
 
   const onInput = (val: string, cursor: number) => {
+    syncMentionedPaths(val)
     const before = val.substring(0, cursor)
     const match = before.match(AT_PATTERN)
     if (match) {
@@ -130,8 +141,19 @@ export function useFileMention(vscode: VSCodeContext): FileMention {
     return false
   }
 
+  const parseFileAttachments = (text: string): FileAttachment[] => {
+    const paths = mentionedPaths()
+    const result: FileAttachment[] = []
+    for (const path of paths) {
+      if (text.includes(`@${path}`)) {
+        result.push({ mime: "text/plain", url: `file://${path}` })
+      }
+    }
+    return result
+  }
+
   return {
-    attachedFiles,
+    mentionedPaths,
     mentionResults,
     mentionIndex,
     showMention,
@@ -139,9 +161,7 @@ export function useFileMention(vscode: VSCodeContext): FileMention {
     onKeyDown,
     selectFile: selectMentionFile,
     setMentionIndex,
-    removeFile: (path) => setAttachedFiles((prev) => prev.filter((p) => p !== path)),
     closeMention,
-    buildFileAttachments: () => attachedFiles().map((path) => ({ mime: "text/plain", url: `file://${path}` })),
-    clearAttachedFiles: () => setAttachedFiles([]),
+    parseFileAttachments,
   }
 }
