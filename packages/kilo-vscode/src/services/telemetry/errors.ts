@@ -1,6 +1,3 @@
-/**
- * Generic API provider error for structured error tracking.
- */
 export class ApiProviderError extends Error {
   constructor(
     message: string,
@@ -14,9 +11,6 @@ export class ApiProviderError extends Error {
   }
 }
 
-/**
- * Type guard for ApiProviderError.
- */
 export function isApiProviderError(error: unknown): error is ApiProviderError {
   return (
     error instanceof Error &&
@@ -27,9 +21,6 @@ export function isApiProviderError(error: unknown): error is ApiProviderError {
   )
 }
 
-/**
- * Extract telemetry properties from an ApiProviderError.
- */
 export function getApiProviderErrorProperties(error: ApiProviderError): Record<string, unknown> {
   return {
     provider: error.provider,
@@ -39,14 +30,8 @@ export function getApiProviderErrorProperties(error: ApiProviderError): Record<s
   }
 }
 
-/**
- * Reason why the consecutive mistake limit was reached.
- */
 export type ConsecutiveMistakeReason = "no_tools_used" | "tool_repetition" | "unknown"
 
-/**
- * Error for consecutive mistake scenarios (agent keeps failing).
- */
 export class ConsecutiveMistakeError extends Error {
   constructor(
     message: string,
@@ -62,9 +47,6 @@ export class ConsecutiveMistakeError extends Error {
   }
 }
 
-/**
- * Type guard for ConsecutiveMistakeError.
- */
 export function isConsecutiveMistakeError(error: unknown): error is ConsecutiveMistakeError {
   return (
     error instanceof Error &&
@@ -75,9 +57,6 @@ export function isConsecutiveMistakeError(error: unknown): error is ConsecutiveM
   )
 }
 
-/**
- * Extract telemetry properties from a ConsecutiveMistakeError.
- */
 export function getConsecutiveMistakeErrorProperties(error: ConsecutiveMistakeError): Record<string, unknown> {
   return {
     taskId: error.taskId,
