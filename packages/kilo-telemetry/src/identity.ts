@@ -13,7 +13,6 @@ export namespace Identity {
 
   export async function getMachineId(): Promise<string | undefined> {
     if (machineId) return machineId
-    
     const override = process.env.KILO_MACHINE_ID
     if (override) {
       machineId = override
