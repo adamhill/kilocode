@@ -102,7 +102,6 @@ export const PromptInput: Component = () => {
 
     const segments: { text: string; highlight: boolean }[] = []
     let remaining = val
-    let pos = 0
 
     while (remaining.length > 0) {
       let earliest = -1
@@ -129,7 +128,6 @@ export const PromptInput: Component = () => {
       const token = `@${earliestPath}`
       segments.push({ text: token, highlight: true })
       remaining = remaining.substring(earliest + token.length)
-      pos += earliest + token.length
     }
 
     return segments

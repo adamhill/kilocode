@@ -3,7 +3,7 @@ import type { Accessor } from "solid-js"
 import type { FileAttachment, WebviewMessage, ExtensionMessage } from "../types/messages"
 
 const FILE_SEARCH_DEBOUNCE_MS = 150
-const AT_PATTERN = /(?:^|\s)@(\S*)$/m
+const AT_PATTERN = /(?:^|\s)@(\S*)$/
 
 interface VSCodeContext {
   postMessage: (message: WebviewMessage) => void
@@ -146,9 +146,10 @@ export function useFileMention(vscode: VSCodeContext): FileMention {
       return true
     }
     if (e.key === "Enter" || e.key === "Tab") {
-      e.preventDefault()
       const path = mentionResults()[mentionIndex()]
-      if (path && textarea) selectMentionFile(path, textarea, setText, onSelect)
+      if (!path) return false
+      e.preventDefault()
+      if (textarea) selectMentionFile(path, textarea, setText, onSelect)
       return true
     }
     if (e.key === "Escape") {
