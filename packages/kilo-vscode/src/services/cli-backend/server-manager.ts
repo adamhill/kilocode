@@ -66,6 +66,12 @@ export class ServerManager {
           ...process.env,
           KILO_SERVER_PASSWORD: password,
           KILO_CLIENT: "vscode",
+          // kilocode_change start — pass telemetry env vars to CLI
+          KILO_TELEMETRY_LEVEL: vscode.workspace.getConfiguration("telemetry").get<string>("telemetryLevel", "all"),
+          KILO_EDITOR_NAME: "Kilo VSCode",
+          KILO_PLATFORM: "vscode",
+          KILO_MACHINE_ID: vscode.env.machineId,
+          // kilocode_change end
         },
         stdio: ["ignore", "pipe", "pipe"],
       })
