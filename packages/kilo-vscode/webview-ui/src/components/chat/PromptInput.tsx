@@ -145,12 +145,19 @@ export const PromptInput: Component = () => {
 
     mention.onInput(val, target.selectionStart ?? val.length)
 
+    if (mention.showMention()) {
+      setGhostText("")
+      if (debounceTimer) clearTimeout(debounceTimer)
+      return
+    }
+
     if (debounceTimer) clearTimeout(debounceTimer)
     debounceTimer = setTimeout(() => requestAutocomplete(val), AUTOCOMPLETE_DEBOUNCE_MS)
   }
 
   const handleKeyDown = (e: KeyboardEvent) => {
     if (mention.onKeyDown(e, textareaRef, setText)) {
+      setGhostText("")
       queueMicrotask(scrollToActiveItem)
       return
     }
