@@ -33,21 +33,8 @@ export class TelemetryProxy {
     return TelemetryProxy.instance
   }
 
-  /**
-   * Return the singleton if it exists, or undefined. Useful for fire-and-forget
-   * callers (e.g. autocomplete telemetry) that should silently no-op when the
-   * proxy has not been initialised yet.
-   */
-  static tryGetInstance(): TelemetryProxy | undefined {
-    return TelemetryProxy.instance
-  }
-
-  /**
-   * Fire-and-forget capture that silently no-ops when the proxy has not been
-   * initialised yet.
-   */
   static tryCapture(event: TelemetryEventName, properties?: Record<string, unknown>) {
-    TelemetryProxy.tryGetInstance()?.capture(event, properties)
+    TelemetryProxy.instance?.capture(event, properties)
   }
 
   /**
@@ -58,39 +45,24 @@ export class TelemetryProxy {
     this.password = password
   }
 
-  /**
-   * Attach a provider that supplies context properties for every event.
-   */
   setProvider(provider: TelemetryPropertiesProvider) {
     this.provider = provider
   }
 
-  /**
-   * Update the extension-level telemetry preference.
-   */
   updateTelemetryState(setting: TelemetrySetting) {
     this.setting = setting
   }
 
-  /**
-   * Check whether telemetry is enabled based on VS Code level + extension setting.
-   */
-  isTelemetryEnabled(): boolean {
-    // Extension setting: "disabled" always wins
-    if (this.setting === "disabled") return false
-
-    // Respect VS Code's global telemetry level (from workspace config)
+  isVSCodeTelemetryEnabled(): boolean {
     const level = vscode.workspace.getConfiguration("telemetry").get<string>("telemetryLevel", "all")
-    if (level !== "all") return false
-
-    return true
+    return level === "all"
   }
 
   /**
    * Fire-and-forget capture. Enriches with provider properties, then POSTs to CLI.
    */
   capture(event: TelemetryEventName, properties?: Record<string, unknown>) {
-    if (!this.isTelemetryEnabled()) return
+    if (!this.isVSCodeTelemetryEnabled()) return
     if (!this.url || !this.password) return
 
     const merged = {
