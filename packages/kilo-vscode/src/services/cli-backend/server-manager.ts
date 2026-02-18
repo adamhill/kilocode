@@ -67,7 +67,7 @@ export class ServerManager {
           KILO_SERVER_PASSWORD: password,
           KILO_CLIENT: "vscode",
           KILO_TELEMETRY_LEVEL: vscode.workspace.getConfiguration("telemetry").get<string>("telemetryLevel", "all"),
-          KILO_EDITOR_NAME: "Kilo VSCode",
+          KILO_EDITOR_NAME: "Kilo VSCode (CLI)",
           KILO_PLATFORM: "vscode",
           KILO_MACHINE_ID: vscode.env.machineId,
         },
