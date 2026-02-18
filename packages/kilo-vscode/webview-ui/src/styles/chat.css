@@ -165,6 +165,7 @@
    ============================================ */
 
 .prompt-input-container {
+  position: relative;
   margin: 12px;
   border-radius: 0.25rem;
   background-color: var(--input-base, var(--vscode-input-background, #3c3c3c));
@@ -329,10 +330,14 @@
    ============================================ */
 
 .file-mention-dropdown {
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 10;
   background: var(--vscode-editorWidget-background, var(--vscode-input-background));
   border: 1px solid var(--vscode-editorWidget-border, var(--vscode-input-border));
   border-radius: 4px;
-  margin-bottom: 4px;
   overflow: hidden;
   max-height: 200px;
   overflow-y: auto;
