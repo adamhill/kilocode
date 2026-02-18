@@ -192,7 +192,10 @@ export default function Page() {
     modeActionAbort = controller
 
     const toastTimer = setTimeout(() => {
-      showToast({ title: `Switching to ${input.mode} mode…`, description: "Waiting for current task to complete" })
+      showToast({
+        title: language.t("session.modeSwitch.switching", { mode: input.mode }),
+        description: language.t("session.modeSwitch.waiting"),
+      })
     }, 500)
 
     try {
@@ -217,7 +220,10 @@ export default function Page() {
     if (!agent) return
 
     if (agent.name !== input.mode) {
-      showToast({ title: "Agent not available", description: `"${input.mode}" not found, using "${agent.name}"` })
+      showToast({
+        title: language.t("session.modeSwitch.notAvailable"),
+        description: language.t("session.modeSwitch.fallback", { requested: input.mode, actual: agent.name }),
+      })
     }
 
     const model = local.model.current()
