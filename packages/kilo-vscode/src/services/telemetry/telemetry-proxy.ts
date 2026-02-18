@@ -12,7 +12,7 @@ import {
  * server via POST /telemetry/capture. The CLI handles PostHog delivery.
  */
 export class TelemetryProxy {
-  private static instance: TelemetryProxy | undefined
+  private static singleton: TelemetryProxy | undefined
 
   private url: string | undefined
   private password: string | undefined
@@ -21,20 +21,12 @@ export class TelemetryProxy {
 
   private constructor() {}
 
-  static createInstance(): TelemetryProxy {
-    TelemetryProxy.instance = new TelemetryProxy()
-    return TelemetryProxy.instance
-  }
-
   static getInstance(): TelemetryProxy {
-    if (!TelemetryProxy.instance) {
-      throw new Error("TelemetryProxy not initialized — call createInstance() first")
-    }
-    return TelemetryProxy.instance
+    return (TelemetryProxy.singleton ??= new TelemetryProxy())
   }
 
   static tryCapture(event: TelemetryEventName, properties?: Record<string, unknown>) {
-    TelemetryProxy.instance?.capture(event, properties)
+    TelemetryProxy.getInstance().capture(event, properties)
   }
 
   /**

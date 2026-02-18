@@ -38,11 +38,7 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
     private readonly extensionUri: vscode.Uri,
     private readonly connectionService: KiloConnectionService,
   ) {
-    try {
-      TelemetryProxy.getInstance().setProvider(this)
-    } catch {
-      // TelemetryProxy may not be initialized yet — safe to ignore
-    }
+    TelemetryProxy.getInstance().setProvider(this)
   }
 
   getTelemetryProperties(): Record<string, unknown> {

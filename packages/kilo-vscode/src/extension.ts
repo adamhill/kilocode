@@ -10,7 +10,7 @@ import { TelemetryProxy } from "./services/telemetry"
 export function activate(context: vscode.ExtensionContext) {
   console.log("Kilo Code extension is now active")
 
-  const telemetry = TelemetryProxy.createInstance()
+  const telemetry = TelemetryProxy.getInstance()
 
   // Create shared connection service (one server for all webviews)
   const connectionService = new KiloConnectionService(context)
@@ -91,11 +91,7 @@ export function activate(context: vscode.ExtensionContext) {
 }
 
 export function deactivate() {
-  try {
-    TelemetryProxy.getInstance().shutdown()
-  } catch {
-    // Instance may not exist — safe to ignore
-  }
+  TelemetryProxy.getInstance().shutdown()
 }
 
 async function openKiloInNewTab(context: vscode.ExtensionContext, connectionService: KiloConnectionService) {
