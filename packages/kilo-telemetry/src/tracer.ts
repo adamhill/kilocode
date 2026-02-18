@@ -11,7 +11,12 @@ let exporter: PostHogSpanExporter | null = null
 let tracer: Tracer | null = null
 
 export namespace TracerSetup {
-  export function init(options: { version: string; enabled: boolean }): Tracer {
+  export function init(options: {
+    version: string
+    enabled: boolean
+    appName: string
+    platform: string
+  }): Tracer {
     if (tracer) return tracer
 
     const client = Client.getClient()
@@ -19,12 +24,16 @@ export namespace TracerSetup {
       throw new Error("PostHog client not initialized. Call Client.init() first.")
     }
 
-    exporter = new PostHogSpanExporter(client, { appVersion: options.version })
+    exporter = new PostHogSpanExporter(client, {
+      appName: options.appName,
+      appVersion: options.version,
+      platform: options.platform,
+    })
     exporter.setEnabled(options.enabled)
 
     provider = new NodeTracerProvider({
       resource: new Resource({
-        [ATTR_SERVICE_NAME]: "kilo-cli",
+        [ATTR_SERVICE_NAME]: options.appName,
         [ATTR_SERVICE_VERSION]: options.version,
       }),
       spanProcessors: [new SimpleSpanProcessor(exporter)],
@@ -34,7 +43,7 @@ export namespace TracerSetup {
     provider.register()
 
     // Get tracer from our provider
-    tracer = provider.getTracer("kilo-cli", options.version)
+    tracer = provider.getTracer(options.appName, options.version)
 
     return tracer
   }

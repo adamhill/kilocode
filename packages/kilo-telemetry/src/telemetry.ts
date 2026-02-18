@@ -43,7 +43,7 @@ export namespace Telemetry {
     Client.setEnabled(enabled)
 
     // Initialize OpenTelemetry tracer for AI SDK spans
-    TracerSetup.init({ version: options.version, enabled })
+    TracerSetup.init({ version: props.appVersion, enabled, appName: props.appName, platform: props.platform })
 
     await Identity.getMachineId()
 
