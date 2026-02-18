@@ -9,7 +9,7 @@ import type { VSCodeAPI, WebviewMessage, ExtensionMessage } from "../types/messa
 // Get the VS Code API (only available in webview context)
 let vscodeApi: VSCodeAPI | undefined
 
-function getVSCodeAPI(): VSCodeAPI {
+export function getVSCodeAPI(): VSCodeAPI {
   if (!vscodeApi) {
     // In VS Code webview, acquireVsCodeApi is available globally
     if (typeof acquireVsCodeApi === "function") {
@@ -23,8 +23,6 @@ function getVSCodeAPI(): VSCodeAPI {
         setState: () => {},
       }
     }
-    // Expose on globalThis so non-context code (e.g. telemetry util) can access it
-    ;(globalThis as Record<string, unknown>).__vscodeApi = vscodeApi
   }
   return vscodeApi
 }
