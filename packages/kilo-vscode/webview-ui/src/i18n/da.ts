@@ -804,6 +804,10 @@ export const dict = {
     "Hvis du har spørgsmål eller feedback, er du velkommen til at åbne en issue på",
   "settings.aboutKiloCode.feedback.or": "eller",
   "settings.aboutKiloCode.support.prefix": "For fakturerings- eller kontospørgsmål, kontakt kundesupport på",
+  "settings.aboutKiloCode.resetSettings.title": "Nulstil indstillinger",
+  "settings.aboutKiloCode.resetSettings.description":
+    "Nulstil alle Kilo Code-udvidelsesindstillinger til standardværdierne. Dette påvirker ikke CLI- eller backend-konfiguration.",
+  "settings.aboutKiloCode.resetSettings.button": "Nulstil alle indstillinger",
 
   "settings.agentBehaviour.subtab.modes": "Tilstande",
   "settings.agentBehaviour.subtab.agents": "Agents",

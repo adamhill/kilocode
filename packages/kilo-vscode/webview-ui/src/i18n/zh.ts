@@ -797,6 +797,10 @@ export const dict = {
   "settings.aboutKiloCode.feedback.prefix": "如果您有任何问题或反馈，欢迎在以下平台提交 issue",
   "settings.aboutKiloCode.feedback.or": "或",
   "settings.aboutKiloCode.support.prefix": "如有账单或账户问题，请联系客户支持",
+  "settings.aboutKiloCode.resetSettings.title": "重置设置",
+  "settings.aboutKiloCode.resetSettings.description":
+    "将所有 Kilo Code 扩展设置重置为默认值。这不会影响 CLI 或后端配置。",
+  "settings.aboutKiloCode.resetSettings.button": "重置所有设置",
 
   "settings.agentBehaviour.subtab.modes": "模式",
   "settings.agentBehaviour.subtab.agents": "Agents",

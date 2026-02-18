@@ -802,6 +802,10 @@ export const dict = {
   "settings.aboutKiloCode.feedback.prefix": "질문이나 피드백이 있으시면 다음에서 이슈를 열어주세요",
   "settings.aboutKiloCode.feedback.or": "또는",
   "settings.aboutKiloCode.support.prefix": "결제 또는 계정 관련 문의는 고객 지원팀에 문의하세요",
+  "settings.aboutKiloCode.resetSettings.title": "설정 초기화",
+  "settings.aboutKiloCode.resetSettings.description":
+    "Kilo Code 확장 프로그램의 모든 설정을 기본값으로 초기화합니다. CLI 또는 백엔드 구성에는 영향을 미치지 않습니다.",
+  "settings.aboutKiloCode.resetSettings.button": "모든 설정 초기화",
 
   "settings.agentBehaviour.subtab.modes": "모드",
   "settings.agentBehaviour.subtab.agents": "Agents",

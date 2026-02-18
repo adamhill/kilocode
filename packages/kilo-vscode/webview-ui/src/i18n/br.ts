@@ -805,6 +805,10 @@ export const dict = {
   "settings.aboutKiloCode.feedback.or": "ou",
   "settings.aboutKiloCode.support.prefix":
     "Para questões de cobrança ou conta, entre em contato com o Suporte ao Cliente em",
+  "settings.aboutKiloCode.resetSettings.title": "Redefinir Configurações",
+  "settings.aboutKiloCode.resetSettings.description":
+    "Redefinir todas as configurações da extensão Kilo Code para os valores padrão. Isso não afeta a configuração do CLI ou do backend.",
+  "settings.aboutKiloCode.resetSettings.button": "Redefinir Todas as Configurações",
 
   "settings.agentBehaviour.subtab.modes": "Modos",
   "settings.agentBehaviour.subtab.agents": "Agents",
