@@ -43,6 +43,14 @@ export class TelemetryProxy {
   }
 
   /**
+   * Fire-and-forget capture that silently no-ops when the proxy has not been
+   * initialised yet.
+   */
+  static tryCapture(event: TelemetryEventName, properties?: Record<string, unknown>) {
+    TelemetryProxy.tryGetInstance()?.capture(event, properties)
+  }
+
+  /**
    * Configure the CLI server connection. Must be called before capture() will send events.
    */
   configure(url: string, password: string) {
