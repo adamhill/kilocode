@@ -52,7 +52,7 @@ export const DataBridge: Component<{ children: any }> = (props) => {
     const id = session.currentSessionID()
     const perms = id ? session.permissions().filter((p) => p.sessionID === id) : []
     return {
-      session: session.sessions().map((s) => ({ ...s, id: s.id, role: "user" as const })),
+      session: session.sessions().map((s) => ({ ...s, id: s.id, role: "user" as const })) as unknown as any[],
       session_status: {} as Record<string, any>,
       session_diff: {} as Record<string, any[]>,
       message: id ? { [id]: session.messages() as unknown as SDKMessage[] } : {},
@@ -72,8 +72,12 @@ export const DataBridge: Component<{ children: any }> = (props) => {
     session.respondToPermission(input.permissionID, input.response)
   }
 
+  const sync = (sessionID: string) => {
+    session.syncSession(sessionID)
+  }
+
   return (
-    <DataProvider data={data()} directory="" onPermissionRespond={respond}>
+    <DataProvider data={data()} directory="" onPermissionRespond={respond} onSyncSession={sync}>
       {props.children}
     </DataProvider>
   )

@@ -103,6 +103,12 @@ interface SessionContextValue {
   // Messages for current session
   messages: Accessor<Message[]>
 
+  // All messages keyed by sessionID (includes child sessions)
+  allMessages: () => Record<string, Message[]>
+
+  // All parts keyed by messageID (includes child sessions)
+  allParts: () => Record<string, Part[]>
+
   // Parts for a specific message
   getParts: (messageID: string) => Part[]
 
@@ -144,6 +150,7 @@ interface SessionContextValue {
   selectSession: (id: string) => void
   deleteSession: (id: string) => void
   renameSession: (id: string, title: string) => void
+  syncSession: (sessionID: string) => void
 }
 
 const SessionContext = createContext<SessionContextValue>()
@@ -792,6 +799,14 @@ export const SessionProvider: ParentComponent = (props) => {
     return store.parts[messageID] || []
   }
 
+  const allMessages = () => store.messages
+
+  const allParts = () => store.parts
+
+  function syncSession(sessionID: string) {
+    vscode.postMessage({ type: "syncSession", sessionID })
+  }
+
   const todos = () => {
     const id = currentSessionID()
     return id ? store.todos[id] || [] : []
@@ -867,6 +882,8 @@ export const SessionProvider: ParentComponent = (props) => {
     selectAgent,
     getSessionAgent: (sessionID: string) => store.agentSelections[sessionID] ?? defaultAgent(),
     getSessionModel: (sessionID: string) => store.modelSelections[sessionID] ?? provider.defaultSelection(),
+    allMessages,
+    allParts,
     sendMessage,
     abort,
     compact,
@@ -879,6 +896,7 @@ export const SessionProvider: ParentComponent = (props) => {
     selectSession,
     deleteSession,
     renameSession,
+    syncSession,
   }
 
   return <SessionContext.Provider value={value}>{props.children}</SessionContext.Provider>
