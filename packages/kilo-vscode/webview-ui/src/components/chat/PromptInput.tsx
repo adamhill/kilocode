@@ -14,6 +14,7 @@ import { useVSCode } from "../../context/vscode"
 import { ModelSelector } from "./ModelSelector"
 import { ModeSwitcher } from "./ModeSwitcher"
 import { useFileMention } from "../../hooks/useFileMention"
+import { useImageAttachments } from "../../hooks/useImageAttachments"
 
 const AUTOCOMPLETE_DEBOUNCE_MS = 500
 const MIN_TEXT_LENGTH = 3
@@ -27,6 +28,7 @@ export const PromptInput: Component = () => {
   const language = useLanguage()
   const vscode = useVSCode()
   const mention = useFileMention(vscode)
+  const imageAttach = useImageAttachments()
 
   const sessionKey = () => session.currentSessionID() ?? "__new__"
 
@@ -59,7 +61,7 @@ export const PromptInput: Component = () => {
 
   const isBusy = () => session.status() === "busy"
   const isDisabled = () => !server.isConnected()
-  const canSend = () => text().trim().length > 0 && !isBusy() && !isDisabled()
+  const canSend = () => (text().trim().length > 0 || imageAttach.images().length > 0) && !isBusy() && !isDisabled()
 
   const unsubscribe = vscode.onMessage((message) => {
     if (message.type !== "chatCompletionResult") return
@@ -205,15 +207,20 @@ export const PromptInput: Component = () => {
 
   const handleSend = () => {
     const message = text().trim()
-    if (!message || isBusy() || isDisabled()) return
+    const imgs = imageAttach.images()
+    if ((!message && imgs.length === 0) || isBusy() || isDisabled()) return
 
-    const files = mention.parseFileAttachments(message)
+    const mentionFiles = mention.parseFileAttachments(message)
+    const imgFiles = imgs.map((img) => ({ mime: img.mime, url: img.dataUrl }))
+    const allFiles = [...mentionFiles, ...imgFiles]
+
     const sel = session.selected()
-    session.sendMessage(message, sel?.providerID, sel?.modelID, files.length > 0 ? files : undefined)
+    session.sendMessage(message, sel?.providerID, sel?.modelID, allFiles.length > 0 ? allFiles : undefined)
 
     requestCounter++
     setText("")
     setGhostText("")
+    imageAttach.clear()
     if (debounceTimer) clearTimeout(debounceTimer)
     mention.closeMention()
     drafts.delete(sessionKey())
@@ -230,7 +237,13 @@ export const PromptInput: Component = () => {
   }
 
   return (
-    <div class="prompt-input-container">
+    <div
+      class="prompt-input-container"
+      classList={{ "prompt-input-container--dragging": imageAttach.dragging() }}
+      onDragOver={imageAttach.handleDragOver}
+      onDragLeave={imageAttach.handleDragLeave}
+      onDrop={imageAttach.handleDrop}
+    >
       <Show when={mention.showMention()}>
         <div class="file-mention-dropdown" ref={dropdownRef}>
           <Show
@@ -257,6 +270,25 @@ export const PromptInput: Component = () => {
           </Show>
         </div>
       </Show>
+      <Show when={imageAttach.images().length > 0}>
+        <div class="image-attachments">
+          <For each={imageAttach.images()}>
+            {(img) => (
+              <div class="image-attachment">
+                <img src={img.dataUrl} alt={img.filename} title={img.filename} />
+                <button
+                  type="button"
+                  class="image-attachment-remove"
+                  onClick={() => imageAttach.remove(img.id)}
+                  aria-label="Remove image"
+                >
+                  ×
+                </button>
+              </div>
+            )}
+          </For>
+        </div>
+      </Show>
       <div class="prompt-input-wrapper">
         <div class="prompt-input-ghost-wrapper">
           <div class="prompt-input-highlight-overlay" ref={highlightRef} aria-hidden="true">
@@ -280,6 +312,7 @@ export const PromptInput: Component = () => {
             value={text()}
             onInput={handleInput}
             onKeyDown={handleKeyDown}
+            onPaste={imageAttach.handlePaste}
             onScroll={syncHighlightScroll}
             disabled={isDisabled()}
             rows={1}
