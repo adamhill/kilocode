@@ -1,5 +1,5 @@
 import { For, Show } from "solid-js"
-import type { QuestionRequest } from "@kilocode/sdk/v2"
+import type { PermissionRequest, QuestionRequest } from "@kilocode/sdk/v2"
 import { Button } from "@opencode-ai/ui/button"
 import { BasicTool } from "@opencode-ai/ui/basic-tool"
 import { PromptInput } from "@/components/prompt-input"
@@ -9,7 +9,7 @@ import { questionSubtitle } from "@/pages/session/session-prompt-helpers"
 export function SessionPromptDock(props: {
   centered: boolean
   questionRequest: () => QuestionRequest | undefined
-  permissionRequest: () => { patterns: string[]; permission: string } | undefined
+  permissionRequest: () => PermissionRequest | undefined
   blocked: boolean
   promptReady: boolean
   handoffPrompt?: string
@@ -57,61 +57,63 @@ export function SessionPromptDock(props: {
 
         <Show when={props.permissionRequest()} keyed>
           {(perm) => (
-            <div data-component="tool-part-wrapper" data-permission="true" class="mb-3">
-              <BasicTool
-                icon="checklist"
-                locked
-                defaultOpen
-                trigger={{
-                  title: props.t("notification.permission.title"),
-                  subtitle:
-                    perm.permission === "doom_loop"
-                      ? props.t("settings.permissions.tool.doom_loop.title")
-                      : perm.permission,
-                }}
-              >
-                <Show when={perm.patterns.length > 0}>
-                  <div class="flex flex-col gap-1 py-2 px-3 max-h-40 overflow-y-auto no-scrollbar">
-                    <For each={perm.patterns}>
-                      {(pattern) => <code class="text-12-regular text-text-base break-all">{pattern}</code>}
-                    </For>
+            <Show when={!perm.tool}>
+              <div data-component="tool-part-wrapper" data-permission="true" class="mb-3">
+                <BasicTool
+                  icon="checklist"
+                  locked
+                  defaultOpen
+                  trigger={{
+                    title: props.t("notification.permission.title"),
+                    subtitle:
+                      perm.permission === "doom_loop"
+                        ? props.t("settings.permissions.tool.doom_loop.title")
+                        : perm.permission,
+                  }}
+                >
+                  <Show when={perm.patterns.length > 0}>
+                    <div class="flex flex-col gap-1 py-2 px-3 max-h-40 overflow-y-auto no-scrollbar">
+                      <For each={perm.patterns}>
+                        {(pattern) => <code class="text-12-regular text-text-base break-all">{pattern}</code>}
+                      </For>
+                    </div>
+                  </Show>
+                  <Show when={perm.permission === "doom_loop"}>
+                    <div class="text-12-regular text-text-weak pb-2 px-3">
+                      {props.t("settings.permissions.tool.doom_loop.description")}
+                    </div>
+                  </Show>
+                </BasicTool>
+                <div data-component="permission-prompt">
+                  <div data-slot="permission-actions">
+                    <Button
+                      variant="ghost"
+                      size="small"
+                      onClick={() => props.onDecide("reject")}
+                      disabled={props.responding}
+                    >
+                      {props.t("ui.permission.deny")}
+                    </Button>
+                    <Button
+                      variant="secondary"
+                      size="small"
+                      onClick={() => props.onDecide("always")}
+                      disabled={props.responding}
+                    >
+                      {props.t("ui.permission.allowAlways")}
+                    </Button>
+                    <Button
+                      variant="primary"
+                      size="small"
+                      onClick={() => props.onDecide("once")}
+                      disabled={props.responding}
+                    >
+                      {props.t("ui.permission.allowOnce")}
+                    </Button>
                   </div>
-                </Show>
-                <Show when={perm.permission === "doom_loop"}>
-                  <div class="text-12-regular text-text-weak pb-2 px-3">
-                    {props.t("settings.permissions.tool.doom_loop.description")}
-                  </div>
-                </Show>
-              </BasicTool>
-              <div data-component="permission-prompt">
-                <div data-slot="permission-actions">
-                  <Button
-                    variant="ghost"
-                    size="small"
-                    onClick={() => props.onDecide("reject")}
-                    disabled={props.responding}
-                  >
-                    {props.t("ui.permission.deny")}
-                  </Button>
-                  <Button
-                    variant="secondary"
-                    size="small"
-                    onClick={() => props.onDecide("always")}
-                    disabled={props.responding}
-                  >
-                    {props.t("ui.permission.allowAlways")}
-                  </Button>
-                  <Button
-                    variant="primary"
-                    size="small"
-                    onClick={() => props.onDecide("once")}
-                    disabled={props.responding}
-                  >
-                    {props.t("ui.permission.allowOnce")}
-                  </Button>
                 </div>
               </div>
-            </div>
+            </Show>
           )}
         </Show>
 
