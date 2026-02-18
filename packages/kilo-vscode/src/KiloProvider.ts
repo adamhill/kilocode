@@ -43,11 +43,11 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
 
   getTelemetryProperties(): Record<string, unknown> {
     return {
-      appName: vscode.env.appName,
+      appName: "kilo-code",
       appVersion: this.extensionVersion,
-      vscodeVersion: vscode.version,
-      platform: process.platform,
+      platform: "vscode",
       editorName: vscode.env.appName,
+      vscodeVersion: vscode.version,
       machineId: vscode.env.machineId,
       vscodeIsTelemetryEnabled: vscode.env.isTelemetryEnabled,
     }
