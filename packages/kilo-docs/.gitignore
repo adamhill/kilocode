@@ -8,3 +8,4 @@ screenshots/
 .beads/
 .env
 next-env.d.ts
+tsconfig.tsbuildinfo
