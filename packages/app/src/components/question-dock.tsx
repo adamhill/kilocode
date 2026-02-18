@@ -87,7 +87,7 @@ export const QuestionDock: Component<{
         const action = props.onModeAction
         const mode = option.mode
         const description = option.description
-        pending?.then(() => action({ mode, text: answer, description }), fail)
+        pending?.then(() => action({ mode, text: answer, description }), fail).catch(fail)
       } else {
         pending?.catch(fail)
       }

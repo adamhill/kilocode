@@ -196,6 +196,8 @@ export default function Page() {
     }, 500)
 
     try {
+      // Allow one microtask for session status to reflect the reply before checking idle
+      await new Promise((r) => setTimeout(r, 0))
       await waitForIdle(sessionID, controller.signal)
     } catch (err: unknown) {
       clearTimeout(toastTimer)
