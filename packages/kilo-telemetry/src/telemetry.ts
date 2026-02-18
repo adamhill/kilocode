@@ -26,11 +26,10 @@ export namespace Telemetry {
     Identity.setDataPath(options.dataPath)
     props.appVersion = options.version
 
+    const app = process.env.KILO_APP_NAME
+    if (app) props.appName = app
     const editor = process.env.KILO_EDITOR_NAME
-    if (editor) {
-      props.editorName = editor
-      props.appName = editor
-    }
+    if (editor) props.editorName = editor
     const platform = process.env.KILO_PLATFORM
     if (platform) props.platform = platform
     const version = process.env.KILO_APP_VERSION
