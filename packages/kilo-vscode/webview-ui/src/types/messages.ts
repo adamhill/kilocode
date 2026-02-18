@@ -729,6 +729,11 @@ export interface ResetAllSettingsRequest {
   type: "resetAllSettings"
 }
 
+export interface SyncSessionRequest {
+  type: "syncSession"
+  sessionID: string
+}
+
 // Agent Manager worktree messages
 export interface CreateWorktreeSessionRequest {
   type: "agentManager.createWorktreeSession"
@@ -772,6 +777,7 @@ export type WebviewMessage =
   | UpdateConfigMessage
   | RequestNotificationSettingsMessage
   | ResetAllSettingsRequest
+  | SyncSessionRequest
   | CreateWorktreeSessionRequest
 
 // ============================================
