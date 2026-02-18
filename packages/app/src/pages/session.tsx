@@ -170,14 +170,14 @@ export default function Page() {
         settle(() => reject(new Error("Timed out waiting for session idle")))
       }, 30_000)
 
-      ref.dispose = createRoot((dispose) => {
+      createRoot((dispose) => {
+        ref.dispose = dispose
         signal.addEventListener("abort", () => settle(() => reject(new Error("Cancelled"))), { once: true })
         createEffect(() => {
-          const status = sync.data.session_status[sessionID] ?? { type: "idle" as const }
-          if (status.type !== "idle") return
+          const status = sync.data.session_status[sessionID]
+          if (!status || status.type !== "idle") return
           settle(() => resolve())
         })
-        return dispose
       })
     })
 
