@@ -29,10 +29,7 @@ export const TelemetryRoutes = lazy(() =>
       "json",
       z.object({
         event: z.string().meta({ description: "Event name" }),
-        properties: z
-          .record(z.string(), z.any())
-          .optional()
-          .meta({ description: "Event properties" }),
+        properties: z.record(z.string(), z.any()).optional().meta({ description: "Event properties" }),
       }),
     ),
     async (c) => {

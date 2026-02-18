@@ -1,7 +1,6 @@
 import * as vscode from "vscode"
 import { TelemetryEventName, type TelemetryPropertiesProvider } from "./types"
 
-
 /**
  * Singleton proxy that captures telemetry events and forwards them to the CLI
  * server via POST /telemetry/capture. The CLI handles PostHog delivery.

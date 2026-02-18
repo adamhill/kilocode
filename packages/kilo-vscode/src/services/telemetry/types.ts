@@ -88,5 +88,3 @@ export enum TelemetryEventName {
 export interface TelemetryPropertiesProvider {
   getTelemetryProperties(): Record<string, unknown>
 }
-
-

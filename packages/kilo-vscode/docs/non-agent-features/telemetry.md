@@ -111,11 +111,11 @@ All events are defined in `TelemetryEventName` enum (`packages/types/src/telemet
 
 ### 3.1 Task Lifecycle
 
-| Event                  | Properties                          | Capture Method                                              |
-| ---------------------- | ----------------------------------- | ----------------------------------------------------------- |
-| `Task Created`         | `taskId`                            | `TelemetryProxy.capture(TelemetryEventName.TASK_CREATED)`         |
-| `Task Reopened`        | `taskId`                            | `TelemetryProxy.capture(TelemetryEventName.TASK_RESTARTED)`       |
-| `Task Completed`       | `taskId`                            | `TelemetryProxy.capture(TelemetryEventName.TASK_COMPLETED)`       |
+| Event                  | Properties                          | Capture Method                                                         |
+| ---------------------- | ----------------------------------- | ---------------------------------------------------------------------- |
+| `Task Created`         | `taskId`                            | `TelemetryProxy.capture(TelemetryEventName.TASK_CREATED)`              |
+| `Task Reopened`        | `taskId`                            | `TelemetryProxy.capture(TelemetryEventName.TASK_RESTARTED)`            |
+| `Task Completed`       | `taskId`                            | `TelemetryProxy.capture(TelemetryEventName.TASK_COMPLETED)`            |
 | `Conversation Message` | `taskId`, `source` (user/assistant) | `TelemetryProxy.capture(TelemetryEventName.TASK_CONVERSATION_MESSAGE)` |
 
 ### 3.2 LLM & AI
