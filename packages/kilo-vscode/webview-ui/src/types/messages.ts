@@ -449,6 +449,7 @@ export interface ChatCompletionResultMessage {
 export interface FileSearchResultMessage {
   type: "fileSearchResult"
   paths: string[]
+  dir: string
   requestId: string
 }
 

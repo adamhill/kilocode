@@ -38,6 +38,7 @@ export function useFileMention(vscode: VSCodeContext): FileMention {
   const [mentionQuery, setMentionQuery] = createSignal<string | null>(null)
   const [mentionResults, setMentionResults] = createSignal<string[]>([])
   const [mentionIndex, setMentionIndex] = createSignal(0)
+  let workspaceDir = ""
 
   let fileSearchTimer: ReturnType<typeof setTimeout> | undefined
   let fileSearchCounter = 0
@@ -50,8 +51,9 @@ export function useFileMention(vscode: VSCodeContext): FileMention {
 
   const unsubscribe = vscode.onMessage((message) => {
     if (message.type !== "fileSearchResult") return
-    const result = message as { type: "fileSearchResult"; paths: string[]; requestId: string }
+    const result = message as { type: "fileSearchResult"; paths: string[]; dir: string; requestId: string }
     if (result.requestId === `file-search-${fileSearchCounter}`) {
+      workspaceDir = result.dir
       setMentionResults(result.paths)
       setMentionIndex(0)
     }
@@ -163,7 +165,8 @@ export function useFileMention(vscode: VSCodeContext): FileMention {
     const result: FileAttachment[] = []
     for (const path of paths) {
       if (text.includes(`@${path}`)) {
-        result.push({ mime: "text/plain", url: `file://${path}` })
+        const abs = path.startsWith("/") ? path : `${workspaceDir}/${path}`
+        result.push({ mime: "text/plain", url: `file://${abs}` })
       }
     }
     return result

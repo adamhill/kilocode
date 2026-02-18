@@ -283,11 +283,11 @@ export class KiloProvider implements vscode.WebviewViewProvider {
             void client
               .findFiles(message.query, dir)
               .then((paths) => {
-                this.postMessage({ type: "fileSearchResult", paths, requestId: message.requestId })
+                this.postMessage({ type: "fileSearchResult", paths, dir, requestId: message.requestId })
               })
               .catch((error) => {
                 console.error("[Kilo New] File search failed:", error)
-                this.postMessage({ type: "fileSearchResult", paths: [], requestId: message.requestId })
+                this.postMessage({ type: "fileSearchResult", paths: [], dir, requestId: message.requestId })
               })
           }
           break
