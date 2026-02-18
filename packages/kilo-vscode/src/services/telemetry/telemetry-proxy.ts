@@ -62,7 +62,7 @@ export class TelemetryProxy {
         "Content-Type": "application/json",
       },
       body: payload,
-    }).catch(() => {})
+    }).catch((err) => console.error("[Kilo New] Telemetry capture failed:", err))
   }
 
   /**
