@@ -50,6 +50,7 @@ export const DataBridge: Component<{ children: any }> = (props) => {
 
   const data = createMemo(() => {
     const id = session.currentSessionID()
+    const perms = id ? session.permissions().filter((p) => p.sessionID === id) : []
     return {
       session: session.sessions().map((s) => ({ ...s, id: s.id, role: "user" as const })),
       session_status: {} as Record<string, any>,
@@ -63,7 +64,7 @@ export const DataBridge: Component<{ children: any }> = (props) => {
               .filter(([, parts]) => (parts as SDKPart[]).length > 0),
           )
         : {},
-      permission: id ? { [id]: session.permissions() as unknown as any[] } : {},
+      permission: id ? { [id]: perms as unknown as any[] } : {},
     }
   })
 
