@@ -1,4 +1,4 @@
-import { createSignal, onCleanup, onMount } from "solid-js"
+import { createSignal } from "solid-js"
 
 export const ACCEPTED_IMAGE_TYPES = ["image/png", "image/jpeg", "image/gif", "image/webp"]
 
@@ -60,12 +60,10 @@ export function useImageAttachments() {
 
   const handleDrop = (event: DragEvent) => {
     setDragging(false)
+    event.preventDefault()
     const files = event.dataTransfer?.files
     if (!files) return
-    const imageFiles = Array.from(files).filter((f) => ACCEPTED_IMAGE_TYPES.includes(f.type))
-    if (imageFiles.length === 0) return
-    event.preventDefault()
-    for (const file of imageFiles) add(file)
+    for (const file of Array.from(files)) add(file)
   }
 
   return {
