@@ -17,19 +17,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Normalize the path to resolve traversal sequences before checking bounds
     const sanitizedPath = path.normalize(mdPath).replace(/^\/+/, "")
 
-    // Construct the file path - try .md extension
     const pagesDir = path.join(process.cwd(), "pages")
-    let filePath = path.join(pagesDir, `${sanitizedPath}.md`)
+    const resolvedPagesDir = path.resolve(pagesDir)
 
-    // Check if it's an index file
-    if (!fs.existsSync(filePath)) {
-      filePath = path.join(pagesDir, sanitizedPath, "index.md")
+    // Verify bounds BEFORE any filesystem probes to prevent info leakage
+    const candidatePath = path.resolve(pagesDir, `${sanitizedPath}.md`)
+    const candidateIndexPath = path.resolve(pagesDir, sanitizedPath, "index.md")
+
+    if (!candidatePath.startsWith(resolvedPagesDir) || !candidateIndexPath.startsWith(resolvedPagesDir)) {
+      return res.status(403).json({ error: "Access denied" })
     }
 
-    // Verify the path is within the pages directory
-    const resolvedPath = path.resolve(filePath)
-    if (!resolvedPath.startsWith(path.resolve(pagesDir))) {
-      return res.status(403).json({ error: "Access denied" })
+    // Now safe to probe filesystem
+    let resolvedPath = candidatePath
+    if (!fs.existsSync(resolvedPath)) {
+      resolvedPath = candidateIndexPath
     }
 
     if (!fs.existsSync(resolvedPath)) {
