@@ -10,6 +10,9 @@ import { clearInFlightCache, withInFlightCache } from "@/kilo-sessions/inflight-
 import type * as SDK from "@kilocode/sdk/v2"
 import z from "zod"
 import { KILO_API_BASE } from "@kilocode/kilo-gateway"
+import { $ } from "bun"
+import { Instance } from "@/project/instance"
+import { Vcs } from "@/project/vcs"
 
 export namespace KiloSessions {
   const log = Log.create({ service: "kilo-sessions" })
@@ -23,6 +26,7 @@ export namespace KiloSessions {
   const tokenKey = "kilo-sessions:token"
   const orgKey = "kilo-sessions:org"
   const clientKey = "kilo-sessions:client"
+  const gitUrlKey = "kilo-sessions:git-url"
 
   const ttlMs = 10_000
 
@@ -31,6 +35,7 @@ export namespace KiloSessions {
     clearInFlightCache(tokenValidKey)
     clearInFlightCache(clientKey)
     clearInFlightCache(orgKey)
+    clearInFlightCache(gitUrlKey)
   }
 
   async function authValid(token: string) {
@@ -370,13 +375,55 @@ export namespace KiloSessions {
     ])
   }
 
+  async function getGitUrl(): Promise<string | undefined> {
+    return withInFlightCache(gitUrlKey, ttlMs, async () => {
+      const result = await $`git remote`
+        .quiet()
+        .nothrow()
+        .cwd(Instance.worktree)
+        .text()
+        .catch(() => "")
+
+      const remotes = result
+        .split("\n")
+        .map((line) => line.trim())
+        .filter(Boolean)
+
+      if (remotes.length === 0) return undefined
+
+      const remote = remotes.includes("origin")
+        ? "origin"
+        : remotes.length === 1
+          ? remotes[0]
+          : remotes.includes("upstream")
+            ? "upstream"
+            : undefined
+
+      if (!remote) return undefined
+
+      const url = await $`git config --get remote.${remote}.url`
+        .quiet()
+        .nothrow()
+        .cwd(Instance.worktree)
+        .text()
+        .then((x) => x.trim())
+        .catch(() => "")
+
+      return url || undefined
+    })
+  }
+
   async function meta() {
     const platform = process.env["KILO_PLATFORM"] || "cli"
     const orgId = await getOrgId()
+    const gitBranch = await Vcs.branch().catch(() => undefined)
+    const gitUrl = await getGitUrl().catch(() => undefined)
 
     return {
       platform,
       ...(orgId ? { orgId } : {}),
+      ...(gitUrl ? { gitUrl } : {}),
+      ...(gitBranch ? { gitBranch } : {}),
     }
   }
 
