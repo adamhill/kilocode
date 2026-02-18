@@ -1094,9 +1094,7 @@ export class KiloProvider implements vscode.WebviewViewProvider {
 
     const prefix = "kilo-code.new."
     const ext = vscode.extensions.getExtension("kilocode.kilo-code")
-    const properties = ext?.packageJSON?.contributes?.configuration?.properties as
-      | Record<string, unknown>
-      | undefined
+    const properties = ext?.packageJSON?.contributes?.configuration?.properties as Record<string, unknown> | undefined
     if (!properties) return
 
     for (const key of Object.keys(properties)) {
