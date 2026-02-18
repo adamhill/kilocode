@@ -351,6 +351,10 @@
 
   [data-component="checkbox"] {
     gap: 8px;
+
+    [data-slot="checkbox-checkbox-label"] {
+      line-height: var(--line-height-normal);
+    }
   }
 
   [data-slot="message-part-todo-content"] {
