@@ -1,6 +1,6 @@
 ---
-title: "Code Reviews"
-description: "Automate code reviews with AI assistance"
+title: "Auto Triage"
+description: "Automate GitHub issue triage with AI assistance"
 ---
 
 # Auto-Triage
