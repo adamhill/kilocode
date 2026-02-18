@@ -33,6 +33,8 @@ export namespace Telemetry {
     }
     const platform = process.env.KILO_PLATFORM
     if (platform) props.platform = platform
+    const version = process.env.KILO_APP_VERSION
+    if (version) props.appVersion = version
 
     Client.init()
 

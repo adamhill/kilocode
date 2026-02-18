@@ -70,6 +70,7 @@ export class ServerManager {
           KILO_EDITOR_NAME: "Kilo VSCode (CLI)",
           KILO_PLATFORM: "vscode",
           KILO_MACHINE_ID: vscode.env.machineId,
+          KILO_APP_VERSION: this.context.extension.packageJSON.version,
         },
         stdio: ["ignore", "pipe", "pipe"],
       })
