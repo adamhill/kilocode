@@ -774,6 +774,12 @@ export interface CreateWorktreeSessionRequest {
   files?: FileAttachment[]
 }
 
+export interface TelemetryRequest {
+  type: "telemetry"
+  event: string
+  properties?: Record<string, unknown>
+}
+
 export type WebviewMessage =
   | SendMessageRequest
   | AbortRequest
@@ -812,6 +818,7 @@ export type WebviewMessage =
   | CreateWorktreeSessionRequest
   | RequestNotificationsMessage
   | DismissNotificationMessage
+  | TelemetryRequest
 
 // ============================================
 // VS Code API type

@@ -10,8 +10,9 @@ import {
 import { handleChatCompletionRequest } from "./services/autocomplete/chat-autocomplete/handleChatCompletionRequest"
 import { handleChatCompletionAccepted } from "./services/autocomplete/chat-autocomplete/handleChatCompletionAccepted"
 import { buildWebviewHtml } from "./utils"
+import { TelemetryProxy, type TelemetryPropertiesProvider } from "./services/telemetry"
 
-export class KiloProvider implements vscode.WebviewViewProvider {
+export class KiloProvider implements vscode.WebviewViewProvider, TelemetryPropertiesProvider {
   public static readonly viewType = "kilo-code.new.sidebarView"
 
   private webview: vscode.Webview | null = null
@@ -45,7 +46,21 @@ export class KiloProvider implements vscode.WebviewViewProvider {
     private readonly extensionUri: vscode.Uri,
     private readonly connectionService: KiloConnectionService,
     private readonly extensionContext?: vscode.ExtensionContext,
-  ) {}
+  ) {
+    TelemetryProxy.getInstance().setProvider(this)
+  }
+
+  getTelemetryProperties(): Record<string, unknown> {
+    return {
+      appName: "kilo-code",
+      appVersion: this.extensionVersion,
+      platform: "vscode",
+      editorName: vscode.env.appName,
+      vscodeVersion: vscode.version,
+      machineId: vscode.env.machineId,
+      vscodeIsTelemetryEnabled: vscode.env.isTelemetryEnabled,
+    }
+  }
 
   /**
    * Convenience getter that returns the shared HttpClient or null if not yet connected.
@@ -400,6 +415,9 @@ export class KiloProvider implements vscode.WebviewViewProvider {
           break
         case "resetAllSettings":
           await this.handleResetAllSettings()
+          break
+        case "telemetry":
+          TelemetryProxy.capture(message.event, message.properties)
           break
       }
     })
