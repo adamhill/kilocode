@@ -199,7 +199,13 @@ export const PromptInput: Component = () => {
             </div>
           </Show>
         </div>
-        <div class="prompt-input-actions">
+      </div>
+      <div class="prompt-input-hint">
+        <div class="prompt-input-hint-selectors">
+          <ModeSwitcher />
+          <ModelSelector />
+        </div>
+        <div class="prompt-input-hint-actions">
           <Show
             when={isBusy()}
             fallback={
@@ -232,29 +238,6 @@ export const PromptInput: Component = () => {
             </Tooltip>
           </Show>
         </div>
-      </div>
-      <Show when={mention.attachedFiles().length > 0}>
-        <div class="file-chips-row">
-          <For each={mention.attachedFiles()}>
-            {(path) => (
-              <div class="file-chip">
-                <FileIcon node={{ path, type: "file" }} class="file-chip-icon" />
-                <span class="file-chip-name">{fileName(path)}</span>
-                <IconButton
-                  icon="close-small"
-                  variant="ghost"
-                  size="small"
-                  aria-label="Remove file"
-                  onClick={() => mention.removeFile(path)}
-                />
-              </div>
-            )}
-          </For>
-        </div>
-      </Show>
-      <div class="prompt-input-hint">
-        <ModeSwitcher />
-        <ModelSelector />
       </div>
     </div>
   )
