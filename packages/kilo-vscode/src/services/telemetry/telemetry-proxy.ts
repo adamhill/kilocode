@@ -135,66 +135,6 @@ export class TelemetryProxy {
     this.capture(TelemetryEventName.SCHEMA_VALIDATION_ERROR, properties)
   }
 
-  // ============================================
-  // Typed capture helpers
-  // ============================================
-
-  captureTaskCreated(properties: Record<string, unknown>) {
-    this.capture(TelemetryEventName.TASK_CREATED, properties)
-  }
-
-  captureTaskReopened(properties: Record<string, unknown>) {
-    this.capture(TelemetryEventName.TASK_RESTARTED, properties)
-  }
-
-  captureTaskCompleted(properties: Record<string, unknown>) {
-    this.capture(TelemetryEventName.TASK_COMPLETED, properties)
-  }
-
-  captureConversationMessage(properties: Record<string, unknown>) {
-    this.capture(TelemetryEventName.TASK_CONVERSATION_MESSAGE, properties)
-  }
-
-  captureLlmCompletion(properties: Record<string, unknown>) {
-    this.capture(TelemetryEventName.LLM_COMPLETION, properties)
-  }
-
-  captureToolUsed(properties: Record<string, unknown>) {
-    this.capture(TelemetryEventName.TOOL_USED, properties)
-  }
-
-  captureModeSwitched(properties: Record<string, unknown>) {
-    this.capture(TelemetryEventName.MODE_SWITCH, properties)
-  }
-
-  captureCheckpointCreated(properties: Record<string, unknown>) {
-    this.capture(TelemetryEventName.CHECKPOINT_CREATED, properties)
-  }
-
-  captureCheckpointRestored(properties: Record<string, unknown>) {
-    this.capture(TelemetryEventName.CHECKPOINT_RESTORED, properties)
-  }
-
-  captureCheckpointDiffed(properties: Record<string, unknown>) {
-    this.capture(TelemetryEventName.CHECKPOINT_DIFFED, properties)
-  }
-
-  captureTabShown(properties: Record<string, unknown>) {
-    this.capture(TelemetryEventName.TAB_SHOWN, properties)
-  }
-
-  captureTitleButtonClicked(properties: Record<string, unknown>) {
-    this.capture(TelemetryEventName.TITLE_BUTTON_CLICKED, properties)
-  }
-
-  capturePromptEnhanced(properties: Record<string, unknown>) {
-    this.capture(TelemetryEventName.PROMPT_ENHANCED, properties)
-  }
-
-  captureCodeActionUsed(properties: Record<string, unknown>) {
-    this.capture(TelemetryEventName.CODE_ACTION_USED, properties)
-  }
-
   /**
    * No-op — the CLI server handles PostHog shutdown.
    */

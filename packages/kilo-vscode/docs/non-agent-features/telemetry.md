@@ -111,12 +111,12 @@ All events are defined in `TelemetryEventName` enum (`packages/types/src/telemet
 
 ### 3.1 Task Lifecycle
 
-| Event                  | Properties                          | Capture Method                 |
-| ---------------------- | ----------------------------------- | ------------------------------ |
-| `Task Created`         | `taskId`                            | `captureTaskCreated()`         |
-| `Task Reopened`        | `taskId`                            | `captureTaskRestarted()`       |
-| `Task Completed`       | `taskId`                            | `captureTaskCompleted()`       |
-| `Conversation Message` | `taskId`, `source` (user/assistant) | `captureConversationMessage()` |
+| Event                  | Properties                          | Capture Method                                              |
+| ---------------------- | ----------------------------------- | ----------------------------------------------------------- |
+| `Task Created`         | `taskId`                            | `TelemetryProxy.tryCapture(TelemetryEventName.TASK_CREATED)`         |
+| `Task Reopened`        | `taskId`                            | `TelemetryProxy.tryCapture(TelemetryEventName.TASK_RESTARTED)`       |
+| `Task Completed`       | `taskId`                            | `TelemetryProxy.tryCapture(TelemetryEventName.TASK_COMPLETED)`       |
+| `Conversation Message` | `taskId`, `source` (user/assistant) | `TelemetryProxy.tryCapture(TelemetryEventName.TASK_CONVERSATION_MESSAGE)` |
 
 ### 3.2 LLM & AI
 
@@ -309,7 +309,7 @@ Both have type guards (`isApiProviderError()`, `isConsecutiveMistakeError()`) an
 1. **Use `kilo-telemetry` via CLI proxy** — all PostHog communication goes through the CLI's `POST /telemetry/capture` endpoint. The extension does not include `posthog-node` or `posthog-js` directly.
 2. **Singleton pattern** — single `TelemetryProxy` instance that sends to CLI + logs to console, no pluggable clients
 3. **Properties provider pattern** — `KiloProvider` implements `TelemetryPropertiesProvider` to inject VS Code context into every event
-4. **Typed events** — all event names in an enum, with typed capture methods on the service
+4. **Typed events** — all event names in an enum, callers use `TelemetryProxy.tryCapture(TelemetryEventName.XXX, props)`
 5. **Event filtering** — `TelemetryProxy` can include/exclude specific events before forwarding to CLI
 6. **Property filtering** — privacy controls applied before forwarding to CLI
 7. **Dual opt-in** — respect both IDE-level and extension-level telemetry settings
