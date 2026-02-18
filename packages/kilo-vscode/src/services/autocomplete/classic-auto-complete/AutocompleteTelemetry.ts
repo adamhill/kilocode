@@ -87,7 +87,7 @@ export class AutocompleteTelemetry {
       ...properties,
       autocompleteType: this.autocompleteType,
     }
-    TelemetryProxy.tryCapture(event, props)
+    TelemetryProxy.capture(event, props)
   }
 
   /**

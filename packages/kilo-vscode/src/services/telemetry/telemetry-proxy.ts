@@ -25,7 +25,7 @@ export class TelemetryProxy {
     return (TelemetryProxy.singleton ??= new TelemetryProxy())
   }
 
-  static tryCapture(event: TelemetryEventName, properties?: Record<string, unknown>) {
+  static capture(event: TelemetryEventName, properties?: Record<string, unknown>) {
     TelemetryProxy.getInstance().capture(event, properties)
   }
 

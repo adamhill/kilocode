@@ -395,7 +395,7 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
           await this.handleResetAllSettings()
           break
         case "telemetry":
-          TelemetryProxy.tryCapture(message.event, message.properties)
+          TelemetryProxy.capture(message.event, message.properties)
           break
       }
     })

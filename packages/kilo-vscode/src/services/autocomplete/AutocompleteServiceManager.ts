@@ -133,7 +133,7 @@ export class AutocompleteServiceManager {
       enableSmartInlineTaskKeybinding: false,
     })
 
-    TelemetryProxy.tryCapture(TelemetryEventName.GHOST_SERVICE_DISABLED)
+    TelemetryProxy.capture(TelemetryEventName.GHOST_SERVICE_DISABLED)
 
     await this.load()
   }
@@ -231,7 +231,7 @@ export class AutocompleteServiceManager {
     }
 
     this.taskId = crypto.randomUUID()
-    TelemetryProxy.tryCapture(TelemetryEventName.INLINE_ASSIST_AUTO_TASK, {
+    TelemetryProxy.capture(TelemetryEventName.INLINE_ASSIST_AUTO_TASK, {
       taskId: this.taskId,
     })
 
