@@ -804,7 +804,8 @@ export const dict = {
   "settings.aboutKiloCode.community": "Społeczność i wsparcie",
   "settings.aboutKiloCode.feedback.prefix": "Jeśli masz pytania lub uwagi, śmiało otwórz zgłoszenie na",
   "settings.aboutKiloCode.feedback.or": "lub",
-  "settings.aboutKiloCode.support.prefix": "W sprawach rozliczeń lub konta skontaktuj się z obsługą klienta pod adresem",
+  "settings.aboutKiloCode.support.prefix":
+    "W sprawach rozliczeń lub konta skontaktuj się z obsługą klienta pod adresem",
 
   "settings.agentBehaviour.subtab.modes": "Tryby",
   "settings.agentBehaviour.subtab.agents": "Agents",

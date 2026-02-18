@@ -796,7 +796,8 @@ export const dict = {
   "settings.aboutKiloCode.community": "コミュニティとサポート",
   "settings.aboutKiloCode.feedback.prefix": "ご質問やフィードバックがありましたら、お気軽にissueを作成してください",
   "settings.aboutKiloCode.feedback.or": "または",
-  "settings.aboutKiloCode.support.prefix": "請求やアカウントに関するご質問は、カスタマーサポートまでお問い合わせください",
+  "settings.aboutKiloCode.support.prefix":
+    "請求やアカウントに関するご質問は、カスタマーサポートまでお問い合わせください",
 
   "settings.agentBehaviour.subtab.modes": "モード",
   "settings.agentBehaviour.subtab.agents": "Agents",

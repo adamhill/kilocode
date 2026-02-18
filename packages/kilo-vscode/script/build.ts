@@ -3,12 +3,19 @@ import { $ } from "bun"
 import { join } from "node:path"
 import { existsSync, mkdirSync, rmSync, chmodSync } from "node:fs"
 
-const packageJson = await Bun.file(join(import.meta.dir, "..", "package.json")).json()
+const packageJsonPath = join(import.meta.dir, "..", "package.json")
+const packageJson = await Bun.file(packageJsonPath).json()
 const version = process.env.KILO_VERSION
   ? process.env.KILO_VERSION.replace(/^\d+/, (m) => String(Number(m) + 6))
   : packageJson.version
 
 console.log(`Building VSCode extension version: ${version}`)
+
+if (packageJson.version !== version) {
+  console.log(`Updating package.json version from ${packageJson.version} to ${version}`)
+  packageJson.version = version
+  await Bun.write(packageJsonPath, JSON.stringify(packageJson, null, 2) + "\n")
+}
 
 const cliDistDir = process.env.CLI_DIST_DIR || join(import.meta.dir, "..", "..", "opencode", "dist")
 console.log(`Using CLI dist directory: ${cliDistDir}`)
@@ -73,12 +80,10 @@ for (const config of targets) {
 
   console.log(`  📦 Packaging .vsix for ${config.target}...`)
   const vsixPath = join(outDir, `kilo-vscode-${config.target}.vsix`)
-  await $`vsce package --pre-release --no-dependencies --skip-license --target ${config.target} -o ${vsixPath} ${version}`.env(
-    {
-      ...process.env,
-      npm_config_ignore_scripts: "true",
-    },
-  )
+  await $`vsce package --pre-release --no-dependencies --skip-license --target ${config.target} -o ${vsixPath}`.env({
+    ...process.env,
+    npm_config_ignore_scripts: "true",
+  })
   console.log(`  ✅ Created ${vsixPath}`)
 }
 

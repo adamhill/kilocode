@@ -800,7 +800,8 @@ export const dict = {
   "settings.aboutKiloCode.version.label": "Version:",
   "settings.aboutKiloCode.extensionName": "Kilo Code-udvidelse",
   "settings.aboutKiloCode.community": "Fællesskab og support",
-  "settings.aboutKiloCode.feedback.prefix": "Hvis du har spørgsmål eller feedback, er du velkommen til at åbne en issue på",
+  "settings.aboutKiloCode.feedback.prefix":
+    "Hvis du har spørgsmål eller feedback, er du velkommen til at åbne en issue på",
   "settings.aboutKiloCode.feedback.or": "eller",
   "settings.aboutKiloCode.support.prefix": "For fakturerings- eller kontospørgsmål, kontakt kundesupport på",
 
