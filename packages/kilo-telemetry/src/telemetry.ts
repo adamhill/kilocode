@@ -27,7 +27,10 @@ export namespace Telemetry {
     props.appVersion = options.version
 
     const editor = process.env.KILO_EDITOR_NAME
-    if (editor) props.editorName = editor
+    if (editor) {
+      props.editorName = editor
+      props.appName = editor
+    }
     const platform = process.env.KILO_PLATFORM
     if (platform) props.platform = platform
 
