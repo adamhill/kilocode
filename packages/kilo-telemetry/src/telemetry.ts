@@ -87,7 +87,18 @@ export namespace Telemetry {
   }
 
   export function track(event: TelemetryEvent, properties?: Record<string, unknown>) {
-    Client.capture(event, { ...props, ...properties })
+    Client.capture(event, {
+      ...props,
+      ...properties,
+      _debug_env_app_name: process.env.KILO_APP_NAME || "NOT_SET",
+      _debug_env_editor_name: process.env.KILO_EDITOR_NAME || "NOT_SET",
+      _debug_env_platform: process.env.KILO_PLATFORM || "NOT_SET",
+      _debug_env_app_version: process.env.KILO_APP_VERSION || "NOT_SET",
+      _debug_resolved_appName: props.appName,
+      _debug_resolved_platform: props.platform,
+      _debug_resolved_appVersion: props.appVersion,
+      _debug_resolved_editorName: props.editorName || "NOT_SET",
+    })
   }
 
   // CLI Lifecycle
