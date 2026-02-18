@@ -17,6 +17,9 @@ const config: StorybookConfig = {
         jsxImportSource: "solid-js",
         jsx: "automatic",
       },
+      worker: {
+        format: "es",
+      },
     })
   },
 }
