@@ -1,6 +1,12 @@
 import * as vscode from "vscode"
 import { z } from "zod"
-import { type HttpClient, type SessionInfo, type SSEEvent, type KiloConnectionService } from "./services/cli-backend"
+import {
+  type HttpClient,
+  type SessionInfo,
+  type SSEEvent,
+  type KiloConnectionService,
+  type KilocodeNotification,
+} from "./services/cli-backend"
 import { handleChatCompletionRequest } from "./services/autocomplete/chat-autocomplete/handleChatCompletionRequest"
 import { handleChatCompletionAccepted } from "./services/autocomplete/chat-autocomplete/handleChatCompletionAccepted"
 import { buildWebviewHtml } from "./utils"
@@ -21,6 +27,8 @@ export class KiloProvider implements vscode.WebviewViewProvider {
   private cachedAgentsMessage: unknown = null
   /** Cached configLoaded payload so requestConfig can be served before httpClient is ready */
   private cachedConfigMessage: unknown = null
+  /** Cached notificationsLoaded payload */
+  private cachedNotificationsMessage: unknown = null
 
   private trackedSessionIds: Set<string> = new Set()
   /** Per-session directory overrides (e.g., worktree paths registered by AgentManagerProvider). */
@@ -36,6 +44,7 @@ export class KiloProvider implements vscode.WebviewViewProvider {
   constructor(
     private readonly extensionUri: vscode.Uri,
     private readonly connectionService: KiloConnectionService,
+    private readonly extensionContext?: vscode.ExtensionContext,
   ) {}
 
   /**
@@ -383,6 +392,12 @@ export class KiloProvider implements vscode.WebviewViewProvider {
         case "requestNotificationSettings":
           this.sendNotificationSettings()
           break
+        case "requestNotifications":
+          await this.fetchAndSendNotifications()
+          break
+        case "dismissNotification":
+          await this.handleDismissNotification(message.notificationId)
+          break
         case "resetAllSettings":
           await this.handleResetAllSettings()
           break
@@ -469,6 +484,7 @@ export class KiloProvider implements vscode.WebviewViewProvider {
       await this.fetchAndSendProviders()
       await this.fetchAndSendAgents()
       await this.fetchAndSendConfig()
+      await this.fetchAndSendNotifications()
       this.sendNotificationSettings()
 
       console.log("[Kilo New] KiloProvider: ✅ initializeConnection completed successfully")
@@ -834,6 +850,41 @@ export class KiloProvider implements vscode.WebviewViewProvider {
     } catch (error) {
       console.error("[Kilo New] KiloProvider: Failed to fetch config:", error)
     }
+  }
+
+  /**
+   * Fetch Kilo news/notifications and send to webview.
+   * Uses the cached message pattern so the webview gets data immediately on refresh.
+   */
+  private async fetchAndSendNotifications(): Promise<void> {
+    if (!this.httpClient) {
+      if (this.cachedNotificationsMessage) {
+        this.postMessage(this.cachedNotificationsMessage)
+      }
+      return
+    }
+
+    try {
+      const notifications = await this.httpClient.getNotifications()
+      const dismissedIds = this.extensionContext?.globalState.get<string[]>("kilo.dismissedNotificationIds", []) ?? []
+      const message = { type: "notificationsLoaded", notifications, dismissedIds }
+      this.cachedNotificationsMessage = message
+      this.postMessage(message)
+    } catch (error) {
+      console.error("[Kilo New] KiloProvider: Failed to fetch notifications:", error)
+    }
+  }
+
+  /**
+   * Persist a dismissed notification ID in globalState and push updated lists to webview.
+   */
+  private async handleDismissNotification(notificationId: string): Promise<void> {
+    if (!this.extensionContext) return
+    const existing = this.extensionContext.globalState.get<string[]>("kilo.dismissedNotificationIds", [])
+    if (!existing.includes(notificationId)) {
+      await this.extensionContext.globalState.update("kilo.dismissedNotificationIds", [...existing, notificationId])
+    }
+    await this.fetchAndSendNotifications()
   }
 
   /**

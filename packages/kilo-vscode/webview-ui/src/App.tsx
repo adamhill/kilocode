@@ -18,6 +18,7 @@ import { SessionProvider, useSession } from "./context/session"
 import { LanguageProvider } from "./context/language"
 import { ChatView } from "./components/chat"
 import SessionList from "./components/history/SessionList"
+import { NotificationsProvider } from "./context/notifications"
 import type { Message as SDKMessage, Part as SDKPart } from "@kilocode/sdk/v2"
 import "./styles/chat.css"
 
@@ -178,11 +179,13 @@ const App: Component = () => {
                   <CodeComponentProvider component={Code}>
                     <ProviderProvider>
                       <ConfigProvider>
-                        <SessionProvider>
-                          <DataBridge>
-                            <AppContent />
-                          </DataBridge>
-                        </SessionProvider>
+                        <NotificationsProvider>
+                          <SessionProvider>
+                            <DataBridge>
+                              <AppContent />
+                            </DataBridge>
+                          </SessionProvider>
+                        </NotificationsProvider>
                       </ConfigProvider>
                     </ProviderProvider>
                   </CodeComponentProvider>
