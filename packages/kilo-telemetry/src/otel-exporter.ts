@@ -41,12 +41,19 @@ export class PostHogSpanExporter implements SpanExporter {
   private appName: string
   private appVersion: string
   private platform: string
+  private editorName?: string
+  private vscodeVersion?: string
 
-  constructor(client: PostHog, options: { appName: string; appVersion: string; platform: string }) {
+  constructor(
+    client: PostHog,
+    options: { appName: string; appVersion: string; platform: string; editorName?: string; vscodeVersion?: string },
+  ) {
     this.client = client
     this.appName = options.appName
     this.appVersion = options.appVersion
     this.platform = options.platform
+    this.editorName = options.editorName
+    this.vscodeVersion = options.vscodeVersion
   }
 
   setEnabled(value: boolean) {
@@ -84,11 +91,8 @@ export class PostHogSpanExporter implements SpanExporter {
       appName: this.appName,
       appVersion: this.appVersion,
       platform: this.platform,
-      _debug_otel_appName: this.appName,
-      _debug_otel_platform: this.platform,
-      _debug_otel_appVersion: this.appVersion,
-      _debug_env_app_name: process.env.KILO_APP_NAME || "NOT_SET",
-      _debug_env_platform: process.env.KILO_PLATFORM || "NOT_SET",
+      ...(this.editorName && { editorName: this.editorName }),
+      ...(this.vscodeVersion && { vscodeVersion: this.vscodeVersion }),
       $ai_trace_id: span.spanContext().traceId,
       $ai_span_id: span.spanContext().spanId,
       $ai_span_name: name,

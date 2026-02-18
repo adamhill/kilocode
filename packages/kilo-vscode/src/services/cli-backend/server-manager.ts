@@ -72,6 +72,7 @@ export class ServerManager {
           KILO_PLATFORM: "vscode",
           KILO_MACHINE_ID: vscode.env.machineId,
           KILO_APP_VERSION: this.context.extension.packageJSON.version,
+          KILO_VSCODE_VERSION: vscode.version,
         },
         stdio: ["ignore", "pipe", "pipe"],
       })

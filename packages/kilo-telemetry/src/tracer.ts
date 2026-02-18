@@ -16,6 +16,8 @@ export namespace TracerSetup {
     enabled: boolean
     appName: string
     platform: string
+    editorName?: string
+    vscodeVersion?: string
   }): Tracer {
     if (tracer) return tracer
 
@@ -28,6 +30,8 @@ export namespace TracerSetup {
       appName: options.appName,
       appVersion: options.version,
       platform: options.platform,
+      editorName: options.editorName,
+      vscodeVersion: options.vscodeVersion,
     })
     exporter.setEnabled(options.enabled)
 

@@ -9,6 +9,7 @@ export interface TelemetryProperties {
   appVersion: string
   platform: string
   editorName?: string
+  vscodeVersion?: string
 }
 
 export namespace Telemetry {
@@ -34,6 +35,8 @@ export namespace Telemetry {
     if (platform) props.platform = platform
     const version = process.env.KILO_APP_VERSION
     if (version) props.appVersion = version
+    const vscodeVersion = process.env.KILO_VSCODE_VERSION
+    if (vscodeVersion) props.vscodeVersion = vscodeVersion
 
     Client.init()
 
@@ -42,7 +45,14 @@ export namespace Telemetry {
     Client.setEnabled(enabled)
 
     // Initialize OpenTelemetry tracer for AI SDK spans
-    TracerSetup.init({ version: props.appVersion, enabled, appName: props.appName, platform: props.platform })
+    TracerSetup.init({
+      version: props.appVersion,
+      enabled,
+      appName: props.appName,
+      platform: props.platform,
+      editorName: props.editorName,
+      vscodeVersion: props.vscodeVersion,
+    })
 
     await Identity.getMachineId()
 
@@ -87,18 +97,7 @@ export namespace Telemetry {
   }
 
   export function track(event: TelemetryEvent, properties?: Record<string, unknown>) {
-    Client.capture(event, {
-      ...props,
-      ...properties,
-      _debug_env_app_name: process.env.KILO_APP_NAME || "NOT_SET",
-      _debug_env_editor_name: process.env.KILO_EDITOR_NAME || "NOT_SET",
-      _debug_env_platform: process.env.KILO_PLATFORM || "NOT_SET",
-      _debug_env_app_version: process.env.KILO_APP_VERSION || "NOT_SET",
-      _debug_resolved_appName: props.appName,
-      _debug_resolved_platform: props.platform,
-      _debug_resolved_appVersion: props.appVersion,
-      _debug_resolved_editorName: props.editorName || "NOT_SET",
-    })
+    Client.capture(event, { ...props, ...properties })
   }
 
   // CLI Lifecycle
