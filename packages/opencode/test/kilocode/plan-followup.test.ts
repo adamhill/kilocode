@@ -330,7 +330,7 @@ describe("plan follow-up", () => {
     })
   })
 
-  test("ask - returns break when aborted", async () => {
+  test("ask - returns break when already aborted", async () => {
     await using tmp = await tmpdir({ git: true })
     await Instance.provide({
       directory: tmp.path,
@@ -345,6 +345,30 @@ describe("plan follow-up", () => {
         })
 
         expect(result).toBe("break")
+      },
+    })
+  })
+
+  test("ask - returns break when aborted while question is pending", async () => {
+    await using tmp = await tmpdir({ git: true })
+    await Instance.provide({
+      directory: tmp.path,
+      fn: async () => {
+        const abort = new AbortController()
+        const seeded = await seed({ text: "1. Step one\n2. Step two" })
+        const pending = PlanFollowup.ask({
+          sessionID: seeded.sessionID,
+          messages: seeded.messages,
+          abort: abort.signal,
+        })
+
+        const list = await Question.list()
+        expect(list).toHaveLength(1)
+
+        abort.abort()
+
+        await expect(pending).resolves.toBe("break")
+        expect(await Question.list()).toHaveLength(0)
       },
     })
   })

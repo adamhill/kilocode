@@ -121,7 +121,7 @@ export namespace PlanFollowup {
     const user = latest.find(isUser)?.info
     if (!user?.model) return "break"
 
-    const answers = await Question.ask({
+    const questionPromise = Question.ask({
       sessionID: input.sessionID,
       questions: [
         {
@@ -140,10 +140,23 @@ export namespace PlanFollowup {
           ],
         },
       ],
-    }).catch((error) => {
-      if (error instanceof Question.RejectedError) return undefined
-      throw error
     })
+
+    const listener = () =>
+      Question.list().then((qs) => {
+        const match = qs.find((q) => q.sessionID === input.sessionID)
+        if (match) Question.reject(match.id)
+      })
+    input.abort.addEventListener("abort", listener, { once: true })
+
+    const answers = await questionPromise
+      .catch((error) => {
+        if (error instanceof Question.RejectedError) return undefined
+        throw error
+      })
+      .finally(() => {
+        input.abort.removeEventListener("abort", listener)
+      })
     if (!answers) return "break"
 
     const answer = answers[0]?.[0]?.trim()
