@@ -3768,6 +3768,12 @@
                                   },
                                   "required": ["input", "output"]
                                 },
+                                "recommended": {
+                                  "type": "boolean"
+                                },
+                                "recommendedIndex": {
+                                  "type": "number"
+                                },
                                 "experimental": {
                                   "type": "boolean"
                                 },
@@ -9812,6 +9818,12 @@
                   },
                   "required": ["input", "output"]
                 },
+                "recommended": {
+                  "type": "boolean"
+                },
+                "recommendedIndex": {
+                  "type": "number"
+                },
                 "experimental": {
                   "type": "boolean"
                 },
@@ -10795,6 +10807,12 @@
               },
               "additionalProperties": {}
             }
+          },
+          "recommended": {
+            "type": "boolean"
+          },
+          "recommendedIndex": {
+            "type": "number"
           }
         },
         "required": [
