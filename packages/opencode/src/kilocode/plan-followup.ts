@@ -6,14 +6,6 @@ import { Session } from "@/session"
 import { MessageV2 } from "@/session/message-v2"
 import { Log } from "@/util/log"
 
-function isUser(item: MessageV2.WithParts): item is MessageV2.WithParts & { info: MessageV2.User } {
-  return item.info.role === "user"
-}
-
-function isAssistant(item: MessageV2.WithParts): item is MessageV2.WithParts & { info: MessageV2.Assistant } {
-  return item.info.role === "assistant"
-}
-
 function toText(item: MessageV2.WithParts): string {
   return item.parts
     .filter((part): part is MessageV2.TextPart => part.type === "text")
@@ -82,6 +74,9 @@ export function extractContext(messages: MessageV2.WithParts[]): string {
 export namespace PlanFollowup {
   const log = Log.create({ service: "plan.followup" })
 
+  export const ANSWER_NEW_SESSION = "Start new session"
+  export const ANSWER_CONTINUE = "Continue here"
+
   async function inject(input: { sessionID: string; agent: string; model: MessageV2.User["model"]; text: string }) {
     const msg: MessageV2.User = {
       id: Identifier.ascending("message"),
@@ -104,24 +99,8 @@ export namespace PlanFollowup {
     } satisfies MessageV2.TextPart)
   }
 
-  export async function ask(input: {
-    sessionID: string
-    messages: MessageV2.WithParts[]
-    abort: AbortSignal
-  }): Promise<"continue" | "break"> {
-    if (input.abort.aborted) return "break"
-
-    const latest = input.messages.slice().reverse()
-    const assistant = latest.find(isAssistant)
-    if (!assistant) return "break"
-
-    const plan = toText(assistant)
-    if (!plan) return "break"
-
-    const user = latest.find(isUser)?.info
-    if (!user?.model) return "break"
-
-    const questionPromise = Question.ask({
+  function prompt(input: { sessionID: string; abort: AbortSignal }) {
+    const promise = Question.ask({
       sessionID: input.sessionID,
       questions: [
         {
@@ -130,11 +109,11 @@ export namespace PlanFollowup {
           custom: true,
           options: [
             {
-              label: "Start new session",
+              label: ANSWER_NEW_SESSION,
               description: "Implement in a fresh session with a clean context",
             },
             {
-              label: "Continue here",
+              label: ANSWER_CONTINUE,
               description: "Implement the plan in this session",
             },
           ],
@@ -149,7 +128,7 @@ export namespace PlanFollowup {
       })
     input.abort.addEventListener("abort", listener, { once: true })
 
-    const answers = await questionPromise
+    return promise
       .catch((error) => {
         if (error instanceof Question.RejectedError) return undefined
         throw error
@@ -157,30 +136,54 @@ export namespace PlanFollowup {
       .finally(() => {
         input.abort.removeEventListener("abort", listener)
       })
+  }
+
+  async function startNew(input: { plan: string; messages: MessageV2.WithParts[]; model: MessageV2.User["model"] }) {
+    const context = extractContext(input.messages)
+    const next = await Session.create({})
+    await inject({
+      sessionID: next.id,
+      agent: "code",
+      model: input.model,
+      text: `Implement the following plan:\n\n${input.plan}${context ? `\n${context}` : ""}`,
+    })
+    await Bus.publish(TuiEvent.SessionSelect, { sessionID: next.id })
+    void import("@/session/prompt")
+      .then((item) => item.SessionPrompt.loop({ sessionID: next.id }))
+      .catch((error) => {
+        log.error("failed to start follow-up session", { sessionID: next.id, error })
+      })
+  }
+
+  export async function ask(input: {
+    sessionID: string
+    messages: MessageV2.WithParts[]
+    abort: AbortSignal
+  }): Promise<"continue" | "break"> {
+    if (input.abort.aborted) return "break"
+
+    const latest = input.messages.slice().reverse()
+    const assistant = latest.find((msg) => msg.info.role === "assistant")
+    if (!assistant) return "break"
+
+    const plan = toText(assistant)
+    if (!plan) return "break"
+
+    const user = latest.find((msg) => msg.info.role === "user")?.info
+    if (!user || user.role !== "user" || !user.model) return "break"
+
+    const answers = await prompt({ sessionID: input.sessionID, abort: input.abort })
     if (!answers) return "break"
 
     const answer = answers[0]?.[0]?.trim()
     if (!answer) return "break"
 
-    if (answer === "Start new session") {
-      const context = extractContext(input.messages)
-      const next = await Session.create({})
-      await inject({
-        sessionID: next.id,
-        agent: "code",
-        model: user.model,
-        text: `Implement the following plan:\n\n${plan}${context ? `\n\nContext:\n\n${context}` : ""}`,
-      })
-      await Bus.publish(TuiEvent.SessionSelect, { sessionID: next.id })
-      void import("@/session/prompt")
-        .then((item) => item.SessionPrompt.loop({ sessionID: next.id }))
-        .catch((error) => {
-          log.error("failed to start follow-up session", { sessionID: next.id, error })
-        })
+    if (answer === ANSWER_NEW_SESSION) {
+      await startNew({ plan, messages: input.messages, model: user.model })
       return "break"
     }
 
-    if (answer === "Continue here") {
+    if (answer === ANSWER_CONTINUE) {
       await inject({
         sessionID: input.sessionID,
         agent: "code",
