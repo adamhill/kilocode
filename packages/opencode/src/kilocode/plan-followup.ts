@@ -156,7 +156,7 @@ export namespace PlanFollowup {
         sessionID: next.id,
         agent: "code",
         model: user.model,
-        text: `Implement the following plan:\n\n${plan}\n\nContext:\n\n${context}`,
+        text: `Implement the following plan:\n\n${plan}${context ? `\n\nContext:\n\n${context}` : ""}`,
       })
       await Bus.publish(TuiEvent.SessionSelect, { sessionID: next.id })
       void import("@/session/prompt")
