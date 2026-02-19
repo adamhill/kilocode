@@ -76,10 +76,7 @@ describe("commit-message.git-context", () => {
     })
 
     test("filters lock files in subdirectories", async () => {
-      setGitOutput(
-        "diff --name-status --cached",
-        "M\tpackages/api/package-lock.json\nM\tpackages/api/src/index.ts",
-      )
+      setGitOutput("diff --name-status --cached", "M\tpackages/api/package-lock.json\nM\tpackages/api/src/index.ts")
       setGitOutput("diff --cached -- packages/api/package-lock.json", "+lock stuff")
       setGitOutput("diff --cached -- packages/api/src/index.ts", "+code")
 
@@ -232,10 +229,7 @@ describe("commit-message.git-context", () => {
   describe("binary file detection", () => {
     test("detects 'Binary files' in diff output", async () => {
       setGitOutput("diff --name-status --cached", "M\tassets/logo.png")
-      setGitOutput(
-        "diff --cached -- assets/logo.png",
-        "Binary files a/assets/logo.png and b/assets/logo.png differ",
-      )
+      setGitOutput("diff --cached -- assets/logo.png", "Binary files a/assets/logo.png and b/assets/logo.png differ")
 
       const ctx = await getGitContext("/repo")
 

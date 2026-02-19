@@ -6,9 +6,7 @@ import type { GitContext } from "../types"
 let mockGitContext: GitContext = {
   branch: "main",
   recentCommits: ["abc1234 initial commit"],
-  files: [
-    { status: "modified" as const, path: "src/index.ts", diff: "+console.log('hello')" },
-  ],
+  files: [{ status: "modified" as const, path: "src/index.ts", diff: "+console.log('hello')" }],
 }
 
 mock.module("../git-context", () => ({
@@ -58,9 +56,7 @@ describe("commit-message.generate", () => {
     mockGitContext = {
       branch: "main",
       recentCommits: ["abc1234 initial commit"],
-      files: [
-        { status: "modified" as const, path: "src/index.ts", diff: "+console.log('hello')" },
-      ],
+      files: [{ status: "modified" as const, path: "src/index.ts", diff: "+console.log('hello')" }],
     }
     mockStreamText = "feat(src): add hello world logging"
   })
