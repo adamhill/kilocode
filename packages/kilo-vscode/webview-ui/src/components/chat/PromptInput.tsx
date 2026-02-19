@@ -207,6 +207,7 @@ export const PromptInput: Component = () => {
     }
     if (e.key === "Escape" && isBusy()) {
       e.preventDefault()
+      e.stopPropagation()
       session.abort()
       return
     }
