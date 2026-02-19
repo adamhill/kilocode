@@ -24,8 +24,8 @@ export class HttpClient {
 
   constructor(config: ServerConfig) {
     this.baseUrl = config.baseUrl
-    // Auth header format: Basic base64("opencode:password")
-    // NOTE: The CLI server expects a non-empty username ("opencode"). Using an empty username
+    // Auth header format: Basic base64("kilo:password")
+    // NOTE: The CLI server expects a non-empty username ("kilo"). Using an empty username
     // (":password") results in 401 for both REST and SSE endpoints.
     this.authHeader = `Basic ${Buffer.from(`${this.authUsername}:${config.password}`).toString("base64")}`
 
@@ -476,6 +476,22 @@ export class HttpClient {
   async findFiles(query: string, directory: string): Promise<string[]> {
     const params = new URLSearchParams({ query, dirs: "false", limit: "10" })
     return this.request<string[]>("GET", `/find/file?${params.toString()}`, undefined, { directory })
+  }
+
+  // ============================================
+  // Commit Message Methods
+  // ============================================
+
+  /**
+   * Generate a commit message for the current diff in the given directory.
+   */
+  async generateCommitMessage(path: string, selectedFiles?: string[], previousMessage?: string): Promise<string> {
+    const result = await this.request<{ message: string }>("POST", "/commit-message", {
+      path,
+      selectedFiles,
+      previousMessage,
+    })
+    return result.message
   }
 
   // ============================================
