@@ -293,7 +293,7 @@ Please provide:
 3. Expected output and behavior
 ```
 
-### TERMINAL_GENERATE _(Kilo-specific addition)_
+### TERMINAL*GENERATE *(Kilo-specific addition)\_
 
 **Variables:** `userInput`, `operatingSystem`, `currentDirectory`, `shell`
 
@@ -367,7 +367,7 @@ Example summary structure:
 Output only the summary of the conversation so far, without any additional commentary or explanation.
 ```
 
-### COMMIT_MESSAGE _(Kilo-specific addition, tracked separately in [git-commit-message-generation.md](git-commit-message-generation.md))_
+### COMMIT*MESSAGE *(Kilo-specific addition, tracked separately in [git-commit-message-generation.md](git-commit-message-generation.md))\_
 
 **Variables:** `customInstructions`, `gitContext`
 
