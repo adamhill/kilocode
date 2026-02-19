@@ -2,7 +2,7 @@ import { describe, expect, spyOn, test } from "bun:test"
 import { Bus } from "../../src/bus"
 import { TuiEvent } from "../../src/cli/cmd/tui/event"
 import { Identifier } from "../../src/id/id"
-import { PlanFollowup } from "../../src/kilocode/plan-followup"
+import { extractContext, PlanFollowup } from "../../src/kilocode/plan-followup"
 import { Instance } from "../../src/project/instance"
 import { Question } from "../../src/question"
 import { Session } from "../../src/session"
@@ -18,7 +18,10 @@ const model = {
   modelID: "gpt-4",
 }
 
-async function seed(input: { text: string }) {
+async function seed(input: {
+  text: string
+  tools?: Array<{ tool: string; input: Record<string, unknown>; output: string }>
+}) {
   const session = await Session.create({})
   const user = await Session.updateMessage({
     id: Identifier.ascending("message"),
@@ -76,6 +79,25 @@ async function seed(input: { text: string }) {
     text: input.text,
   })
 
+  for (const t of input.tools ?? []) {
+    await Session.updatePart({
+      id: Identifier.ascending("part"),
+      messageID: assistant.id,
+      sessionID: session.id,
+      type: "tool",
+      callID: Identifier.ascending("tool"),
+      tool: t.tool,
+      state: {
+        status: "completed",
+        input: t.input,
+        output: t.output,
+        title: t.tool,
+        metadata: {},
+        time: { start: Date.now(), end: Date.now() },
+      },
+    } satisfies MessageV2.ToolPart)
+  }
+
   const messages = await Session.messages({ sessionID: session.id })
   return {
     sessionID: session.id,
@@ -85,7 +107,10 @@ async function seed(input: { text: string }) {
 
 async function latestUser(sessionID: string) {
   const messages = await Session.messages({ sessionID })
-  return messages.slice().reverse().find((item) => item.info.role === "user")
+  return messages
+    .slice()
+    .reverse()
+    .find((item) => item.info.role === "user")
 }
 
 async function sessions() {
@@ -222,7 +247,21 @@ describe("plan follow-up", () => {
             loop.mockRestore()
           },
         }
-        const seeded = await seed({ text: "1. Add API\n2. Add tests" })
+        const seeded = await seed({
+          text: "1. Add API\n2. Add tests",
+          tools: [
+            {
+              tool: "task",
+              input: { prompt: "explore the codebase", subagent_type: "explore" },
+              output: "Found src/api.ts with REST endpoints and src/db.ts with database layer",
+            },
+            {
+              tool: "read",
+              input: { filePath: "/project/src/api.ts", offset: 1, limit: 50 },
+              output: "file content here",
+            },
+          ],
+        })
         const before = await sessions()
         const created = [] as string[]
         const unsub = Bus.subscribe(TuiEvent.SessionSelect, (event) => {
@@ -263,6 +302,9 @@ describe("plan follow-up", () => {
         if (!part || part.type !== "text") throw new Error("expected text part")
         expect(part.text).toContain("Implement the following plan:")
         expect(part.text).toContain("1. Add API\n2. Add tests")
+        expect(part.text).toContain("## Context from planning research")
+        expect(part.text).toContain("Found src/api.ts with REST endpoints")
+        expect(part.text).toContain("- /project/src/api.ts (lines 1-50)")
         expect(part.synthetic).toBe(true)
 
         SessionPrompt.cancel(newSessionID)
@@ -326,6 +368,248 @@ describe("plan follow-up", () => {
 
         await expect(pending).resolves.toBe("break")
         expect((await Session.messages({ sessionID: seeded.sessionID })).length).toBe(2)
+      },
+    })
+  })
+
+  test("extractContext - returns empty string with no tool results", async () => {
+    await using tmp = await tmpdir({ git: true })
+    await Instance.provide({
+      directory: tmp.path,
+      fn: async () => {
+        const seeded = await seed({ text: "1. Build\n2. Test" })
+        expect(extractContext(seeded.messages)).toBe("")
+      },
+    })
+  })
+
+  test("extractContext - includes task outputs and read paths", async () => {
+    await using tmp = await tmpdir({ git: true })
+    await Instance.provide({
+      directory: tmp.path,
+      fn: async () => {
+        const seeded = await seed({
+          text: "Plan text",
+          tools: [
+            {
+              tool: "task",
+              input: { prompt: "explore", subagent_type: "explore" },
+              output: "The auth module lives in src/auth/",
+            },
+            {
+              tool: "read",
+              input: { filePath: "/project/src/auth/login.ts" },
+              output: "file content",
+            },
+            {
+              tool: "read",
+              input: { filePath: "/project/src/auth/session.ts", offset: 10, limit: 20 },
+              output: "file content",
+            },
+          ],
+        })
+        const context = extractContext(seeded.messages)
+        expect(context).toContain("## Context from planning research")
+        expect(context).toContain("### Explored")
+        expect(context).toContain("The auth module lives in src/auth/")
+        expect(context).toContain("### Files read")
+        expect(context).toContain("- /project/src/auth/login.ts")
+        expect(context).toContain("- /project/src/auth/session.ts (lines 10-29)")
+      },
+    })
+  })
+
+  test("extractContext - filters empty and whitespace-only task outputs", async () => {
+    await using tmp = await tmpdir({ git: true })
+    await Instance.provide({
+      directory: tmp.path,
+      fn: async () => {
+        const seeded = await seed({
+          text: "Plan text",
+          tools: [
+            {
+              tool: "task",
+              input: { prompt: "explore", subagent_type: "explore" },
+              output: "",
+            },
+            {
+              tool: "task",
+              input: { prompt: "explore more", subagent_type: "explore" },
+              output: "   ",
+            },
+          ],
+        })
+        expect(extractContext(seeded.messages)).toBe("")
+      },
+    })
+  })
+
+  test("extractContext - deduplicates file reads", async () => {
+    await using tmp = await tmpdir({ git: true })
+    await Instance.provide({
+      directory: tmp.path,
+      fn: async () => {
+        const seeded = await seed({
+          text: "Plan text",
+          tools: [
+            {
+              tool: "read",
+              input: { filePath: "/project/src/api.ts" },
+              output: "content",
+            },
+            {
+              tool: "read",
+              input: { filePath: "/project/src/api.ts" },
+              output: "content again",
+            },
+            {
+              tool: "read",
+              input: { filePath: "/project/src/api.ts", offset: 10, limit: 20 },
+              output: "different range",
+            },
+          ],
+        })
+        const context = extractContext(seeded.messages)
+        const matches = context.match(/- \/project\/src\/api\.ts\b/g)
+        expect(matches).toHaveLength(2)
+      },
+    })
+  })
+
+  test("extractContext - includes only explored section when no reads", async () => {
+    await using tmp = await tmpdir({ git: true })
+    await Instance.provide({
+      directory: tmp.path,
+      fn: async () => {
+        const seeded = await seed({
+          text: "Plan text",
+          tools: [
+            {
+              tool: "task",
+              input: { prompt: "explore", subagent_type: "explore" },
+              output: "Found important patterns",
+            },
+          ],
+        })
+        const context = extractContext(seeded.messages)
+        expect(context).toContain("### Explored")
+        expect(context).toContain("Found important patterns")
+        expect(context).not.toContain("### Files read")
+      },
+    })
+  })
+
+  test("extractContext - includes only files section when no tasks", async () => {
+    await using tmp = await tmpdir({ git: true })
+    await Instance.provide({
+      directory: tmp.path,
+      fn: async () => {
+        const seeded = await seed({
+          text: "Plan text",
+          tools: [
+            {
+              tool: "read",
+              input: { filePath: "/project/src/index.ts" },
+              output: "content",
+            },
+          ],
+        })
+        const context = extractContext(seeded.messages)
+        expect(context).not.toContain("### Explored")
+        expect(context).toContain("### Files read")
+        expect(context).toContain("- /project/src/index.ts")
+      },
+    })
+  })
+
+  test("extractContext - ignores non-task non-read tools", async () => {
+    await using tmp = await tmpdir({ git: true })
+    await Instance.provide({
+      directory: tmp.path,
+      fn: async () => {
+        const seeded = await seed({
+          text: "Plan text",
+          tools: [
+            {
+              tool: "grep",
+              input: { pattern: "foo", path: "/project" },
+              output: "Found 5 matches",
+            },
+            {
+              tool: "bash",
+              input: { command: "ls" },
+              output: "file1.ts\nfile2.ts",
+            },
+          ],
+        })
+        expect(extractContext(seeded.messages)).toBe("")
+      },
+    })
+  })
+
+  test("extractContext - strips task_id prefix and task_result tags", async () => {
+    await using tmp = await tmpdir({ git: true })
+    await Instance.provide({
+      directory: tmp.path,
+      fn: async () => {
+        const seeded = await seed({
+          text: "Plan text",
+          tools: [
+            {
+              tool: "task",
+              input: { prompt: "explore", subagent_type: "explore" },
+              output:
+                "task_id: ses_abc123 (for resuming)\n\n<task_result>\nThe auth module is in src/auth/\n</task_result>",
+            },
+          ],
+        })
+        const context = extractContext(seeded.messages)
+        expect(context).toContain("The auth module is in src/auth/")
+        expect(context).not.toContain("task_id:")
+        expect(context).not.toContain("<task_result>")
+      },
+    })
+  })
+
+  test("extractContext - shows first N lines for limit-only reads", async () => {
+    await using tmp = await tmpdir({ git: true })
+    await Instance.provide({
+      directory: tmp.path,
+      fn: async () => {
+        const seeded = await seed({
+          text: "Plan text",
+          tools: [
+            {
+              tool: "read",
+              input: { filePath: "/project/src/config.ts", limit: 50 },
+              output: "content",
+            },
+          ],
+        })
+        const context = extractContext(seeded.messages)
+        expect(context).toContain("- /project/src/config.ts (first 50 lines)")
+      },
+    })
+  })
+
+  test("extractContext - truncates at 10000 chars", async () => {
+    await using tmp = await tmpdir({ git: true })
+    await Instance.provide({
+      directory: tmp.path,
+      fn: async () => {
+        const seeded = await seed({
+          text: "Plan text",
+          tools: [
+            {
+              tool: "task",
+              input: { prompt: "explore", subagent_type: "explore" },
+              output: "x".repeat(12_000),
+            },
+          ],
+        })
+        const context = extractContext(seeded.messages)
+        expect(context.length).toBeLessThanOrEqual(10_000)
+        expect(context).toEndWith("[context truncated]")
       },
     })
   })
