@@ -4258,6 +4258,48 @@ export type TelemetryCaptureResponses = {
 
 export type TelemetryCaptureResponse = TelemetryCaptureResponses[keyof TelemetryCaptureResponses]
 
+export type CommitMessageGenerateData = {
+  body?: {
+    /**
+     * Workspace/repo path
+     */
+    path: string
+    /**
+     * Optional subset of files to include
+     */
+    selectedFiles?: Array<string>
+    /**
+     * Previously generated message — triggers regeneration with a different result
+     */
+    previousMessage?: string
+  }
+  path?: never
+  query?: {
+    directory?: string
+  }
+  url: "/commit-message"
+}
+
+export type CommitMessageGenerateErrors = {
+  /**
+   * Bad request
+   */
+  400: BadRequestError
+}
+
+export type CommitMessageGenerateError = CommitMessageGenerateErrors[keyof CommitMessageGenerateErrors]
+
+export type CommitMessageGenerateResponses = {
+  /**
+   * Generated commit message
+   */
+  200: {
+    message: string
+  }
+}
+
+export type CommitMessageGenerateResponse = CommitMessageGenerateResponses[keyof CommitMessageGenerateResponses]
+
 export type KiloProfileData = {
   body?: never
   path?: never
