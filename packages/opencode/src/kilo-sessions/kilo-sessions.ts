@@ -26,7 +26,7 @@ export namespace KiloSessions {
   const tokenKey = "kilo-sessions:token"
   const orgKey = "kilo-sessions:org"
   const clientKey = "kilo-sessions:client"
-  const gitUrlKey = "kilo-sessions:git-url"
+  const gitUrlKeyPrefix = "kilo-sessions:git-url:"
 
   const ttlMs = 10_000
 
@@ -35,7 +35,7 @@ export namespace KiloSessions {
     clearInFlightCache(tokenValidKey)
     clearInFlightCache(clientKey)
     clearInFlightCache(orgKey)
-    clearInFlightCache(gitUrlKey)
+    clearInFlightCache(gitUrlKeyPrefix + Instance.worktree)
   }
 
   async function authValid(token: string) {
@@ -393,7 +393,7 @@ export namespace KiloSessions {
   }
 
   async function getGitUrl(): Promise<string | undefined> {
-    return withInFlightCache(gitUrlKey, ttlMs, async () => {
+    return withInFlightCache(gitUrlKeyPrefix + Instance.worktree, ttlMs, async () => {
       const repo = simpleGit(Instance.worktree)
       const remotes = await repo.getRemotes(true).catch(() => [])
       if (remotes.length === 0) return undefined
