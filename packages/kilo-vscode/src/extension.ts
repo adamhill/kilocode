@@ -1,13 +1,16 @@
 import * as vscode from "vscode"
 import { KiloProvider } from "./KiloProvider"
-import { AgentManagerProvider } from "./AgentManagerProvider"
+import { AgentManagerProvider } from "./agent-manager/AgentManagerProvider"
 import { EXTENSION_DISPLAY_NAME } from "./constants"
 import { KiloConnectionService } from "./services/cli-backend"
 import { registerAutocompleteProvider } from "./services/autocomplete"
 import { BrowserAutomationService } from "./services/browser-automation"
+import { TelemetryProxy } from "./services/telemetry"
 
 export function activate(context: vscode.ExtensionContext) {
   console.log("Kilo Code extension is now active")
+
+  const telemetry = TelemetryProxy.getInstance()
 
   // Create shared connection service (one server for all webviews)
   const connectionService = new KiloConnectionService(context)
@@ -16,10 +19,14 @@ export function activate(context: vscode.ExtensionContext) {
   const browserAutomationService = new BrowserAutomationService(connectionService)
   browserAutomationService.syncWithSettings()
 
-  // Re-register browser automation MCP server on CLI backend reconnect
+  // Re-register browser automation MCP server on CLI backend reconnect and configure telemetry
   const unsubscribeStateChange = connectionService.onStateChange((state) => {
     if (state === "connected") {
       browserAutomationService.reregisterIfEnabled()
+      const config = connectionService.getServerConfig()
+      if (config) {
+        telemetry.configure(config.baseUrl, config.password)
+      }
     }
   })
 
@@ -35,7 +42,7 @@ export function activate(context: vscode.ExtensionContext) {
   )
 
   // Create Agent Manager provider for editor panel
-  const agentManagerProvider = new AgentManagerProvider(context.extensionUri)
+  const agentManagerProvider = new AgentManagerProvider(context.extensionUri, connectionService)
   context.subscriptions.push(agentManagerProvider)
 
   // Register toolbar button command handlers
@@ -61,6 +68,12 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand("kilo-code.new.openInTab", () => {
       return openKiloInNewTab(context, connectionService)
     }),
+    vscode.commands.registerCommand("kilo-code.new.agentManager.previousSession", () => {
+      agentManagerProvider.postMessage({ type: "action", action: "sessionPrevious" })
+    }),
+    vscode.commands.registerCommand("kilo-code.new.agentManager.nextSession", () => {
+      agentManagerProvider.postMessage({ type: "action", action: "sessionNext" })
+    }),
   )
 
   // Register autocomplete provider
@@ -77,7 +90,9 @@ export function activate(context: vscode.ExtensionContext) {
   })
 }
 
-export function deactivate() {}
+export function deactivate() {
+  TelemetryProxy.getInstance().shutdown()
+}
 
 async function openKiloInNewTab(context: vscode.ExtensionContext, connectionService: KiloConnectionService) {
   const lastCol = Math.max(...vscode.window.visibleTextEditors.map((e) => e.viewColumn || 0), 0)

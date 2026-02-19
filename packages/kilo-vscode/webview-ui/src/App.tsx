@@ -45,33 +45,33 @@ const DummyView: Component<{ title: string }> = (props) => {
 /**
  * Bridge our session store to the DataProvider's expected Data shape.
  */
-const DataBridge: Component<{ children: any }> = (props) => {
+export const DataBridge: Component<{ children: any }> = (props) => {
   const session = useSession()
 
-  const data = createMemo(() => ({
-    session: session.sessions().map((s) => ({ ...s, id: s.id, role: "user" as const })),
-    session_status: {} as Record<string, any>,
-    session_diff: {} as Record<string, any[]>,
-    message: {
-      [session.currentSessionID() ?? ""]: session.messages() as unknown as SDKMessage[],
-    },
-    part: Object.fromEntries(
-      session
-        .messages()
-        .map((msg) => [msg.id, session.getParts(msg.id) as unknown as SDKPart[]])
-        .filter(([, parts]) => (parts as SDKPart[]).length > 0),
-    ),
-    permission: {
-      [session.currentSessionID() ?? ""]: session.permissions() as unknown as any[],
-    },
-  }))
+  const data = createMemo(() => {
+    const id = session.currentSessionID()
+    const msgs = session.allMessages()
+    const parts = session.allParts()
+    return {
+      session: session.sessions().map((s) => ({ ...s, id: s.id, role: "user" as const })) as unknown as any[],
+      session_status: {} as Record<string, any>,
+      session_diff: {} as Record<string, any[]>,
+      message: msgs as unknown as Record<string, SDKMessage[]>,
+      part: parts as unknown as Record<string, SDKPart[]>,
+      permission: id ? { [id]: session.permissions() as unknown as any[] } : {},
+    }
+  })
 
   const respond = (input: { sessionID: string; permissionID: string; response: "once" | "always" | "reject" }) => {
     session.respondToPermission(input.permissionID, input.response)
   }
 
+  const sync = (sessionID: string) => {
+    session.syncSession(sessionID)
+  }
+
   return (
-    <DataProvider data={data()} directory="" onPermissionRespond={respond}>
+    <DataProvider data={data()} directory="" onPermissionRespond={respond} onSyncSession={sync}>
       {props.children}
     </DataProvider>
   )
@@ -81,7 +81,7 @@ const DataBridge: Component<{ children: any }> = (props) => {
  * Wraps children in LanguageProvider, passing server-side language info.
  * Must be below ServerProvider in the hierarchy.
  */
-const LanguageBridge: Component<{ children: any }> = (props) => {
+export const LanguageBridge: Component<{ children: any }> = (props) => {
   const server = useServer()
   return (
     <LanguageProvider vscodeLanguage={server.vscodeLanguage} languageOverride={server.languageOverride}>

@@ -305,6 +305,7 @@ export interface Config {
 export interface ReadyMessage {
   type: "ready"
   serverInfo?: ServerInfo
+  extensionVersion?: string
   vscodeLanguage?: string
   languageOverride?: string
 }
@@ -445,6 +446,13 @@ export interface ChatCompletionResultMessage {
   requestId: string
 }
 
+export interface FileSearchResultMessage {
+  type: "fileSearchResult"
+  paths: string[]
+  dir: string
+  requestId: string
+}
+
 export interface QuestionRequestMessage {
   type: "questionRequest"
   question: QuestionRequest
@@ -493,6 +501,31 @@ export interface NotificationSettingsLoadedMessage {
   }
 }
 
+// Agent Manager worktree session metadata
+export interface AgentManagerSessionMetaMessage {
+  type: "agentManager.sessionMeta"
+  sessionId: string
+  mode: import("../context/worktree-mode").SessionMode
+  branch?: string
+  path?: string
+  parentBranch?: string
+}
+
+// Agent Manager repo info (current branch of the main workspace)
+export interface AgentManagerRepoInfoMessage {
+  type: "agentManager.repoInfo"
+  branch: string
+}
+
+// Agent Manager worktree setup progress
+export interface AgentManagerWorktreeSetupMessage {
+  type: "agentManager.worktreeSetup"
+  status: "creating" | "starting" | "ready" | "error"
+  message: string
+  sessionId?: string
+  branch?: string
+}
+
 export type ExtensionMessage =
   | ReadyMessage
   | ConnectionStateMessage
@@ -518,6 +551,7 @@ export type ExtensionMessage =
   | AgentsLoadedMessage
   | AutocompleteSettingsLoadedMessage
   | ChatCompletionResultMessage
+  | FileSearchResultMessage
   | QuestionRequestMessage
   | QuestionResolvedMessage
   | QuestionErrorMessage
@@ -525,6 +559,9 @@ export type ExtensionMessage =
   | ConfigLoadedMessage
   | ConfigUpdatedMessage
   | NotificationSettingsLoadedMessage
+  | AgentManagerSessionMetaMessage
+  | AgentManagerRepoInfoMessage
+  | AgentManagerWorktreeSetupMessage
 
 // ============================================
 // Messages FROM webview TO extension
@@ -662,6 +699,12 @@ export interface RequestChatCompletionMessage {
   requestId: string
 }
 
+export interface RequestFileSearchMessage {
+  type: "requestFileSearch"
+  query: string
+  requestId: string
+}
+
 export interface ChatCompletionAcceptedMessage {
   type: "chatCompletionAccepted"
   suggestionLength?: number
@@ -687,6 +730,35 @@ export interface UpdateConfigMessage {
 
 export interface RequestNotificationSettingsMessage {
   type: "requestNotificationSettings"
+}
+
+export interface ResetAllSettingsRequest {
+  type: "resetAllSettings"
+}
+
+export interface SyncSessionRequest {
+  type: "syncSession"
+  sessionID: string
+}
+
+// Agent Manager worktree messages
+export interface CreateWorktreeSessionRequest {
+  type: "agentManager.createWorktreeSession"
+  text: string
+  providerID?: string
+  modelID?: string
+  agent?: string
+  files?: FileAttachment[]
+}
+
+export interface TelemetryRequest {
+  type: "telemetry"
+  event: string
+  properties?: Record<string, unknown>
+}
+
+export interface RequestRepoInfoMessage {
+  type: "agentManager.requestRepoInfo"
 }
 
 export type WebviewMessage =
@@ -715,12 +787,18 @@ export type WebviewMessage =
   | RequestAutocompleteSettingsMessage
   | UpdateAutocompleteSettingMessage
   | RequestChatCompletionMessage
+  | RequestFileSearchMessage
   | ChatCompletionAcceptedMessage
   | UpdateSettingRequest
   | RequestBrowserSettingsMessage
   | RequestConfigMessage
   | UpdateConfigMessage
   | RequestNotificationSettingsMessage
+  | ResetAllSettingsRequest
+  | SyncSessionRequest
+  | CreateWorktreeSessionRequest
+  | TelemetryRequest
+  | RequestRepoInfoMessage
 
 // ============================================
 // VS Code API type
