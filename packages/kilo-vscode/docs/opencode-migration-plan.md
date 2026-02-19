@@ -16,11 +16,11 @@ The rebuild has a working foundation:
 - **Prompt input**: send/abort controls with integrated model selector and mode switcher in [`PromptInput.tsx`](../webview-ui/src/components/chat/PromptInput.tsx)
 - **Permissions**: rendered through kilo-ui's DataProvider/permission components — reject/once/always with expandable tool details
 - **Sessions**: create, list, select, load messages via [`session.tsx`](../webview-ui/src/context/session.tsx)
-- **Todo pipeline**: `todo.updated` SSE event handled through KiloProvider → webview store (no rendering UI yet)
-- **Auth**: full device auth flow with QR code, verification code, countdown in [`DeviceAuthCard.tsx`](../webview-ui/src/components/DeviceAuthCard.tsx)
+- **Todo list**: `todo.updated` SSE event → session store → kilo-ui `PART_MAPPING["todowrite"]` renders todo lists with checkboxes
+- **Auth**: full device auth flow with QR code, verification code, countdown in [`DeviceAuthCard.tsx`](../webview-ui/src/components/DeviceAuthCard.tsx); org switching implemented
 - **Profile**: login state, balance, dashboard link, logout in [`ProfileView.tsx`](../webview-ui/src/components/ProfileView.tsx)
-- **Session history**: list with relative dates in [`SessionList.tsx`](../webview-ui/src/components/history/SessionList.tsx)
-- **Settings**: 15-tab sidebar navigation, 2 functional (BrowserTab, LanguageTab), 13 stubs in [`Settings.tsx`](../webview-ui/src/components/Settings.tsx)
+- **Session history**: search, date-grouped list, relative timestamps, rename/delete in [`SessionList.tsx`](../webview-ui/src/components/history/SessionList.tsx)
+- **Settings**: 14-tab settings (Providers, AgentBehaviour, AutoApprove, Browser, Autocomplete, Display, Notifications, Context, Terminal, Prompts, Experimental, Language, AboutKiloCode — all functional; Workflows subtab is a placeholder) in [`Settings.tsx`](../webview-ui/src/components/Settings.tsx)
 - **Message protocol**: 41 message types (22 ExtensionMessage + 19 WebviewMessage) in [`messages.ts`](../webview-ui/src/types/messages.ts)
 - **Build pipeline**: dual esbuild (extension + webview), CLI binary provisioning in [`esbuild.js`](../esbuild.js) and [`prepare-cli-binary.mjs`](../scripts/prepare-cli-binary.mjs)
 - **View title bar button**: ✅ Done — [#181](https://github.com/Kilo-Org/kilo/issues/181)
@@ -31,6 +31,15 @@ The rebuild has a working foundation:
 - **Mode switcher**: Agent/mode selector with descriptions in [`ModeSwitcher.tsx`](../webview-ui/src/components/chat/ModeSwitcher.tsx)
 - **Localization**: Full i18n system with 16 locales, three-layer dict merging, locale auto-detection in [`language.tsx`](../webview-ui/src/context/language.tsx) and [`i18n/`](../webview-ui/src/i18n/)
 - **Context compaction**: summarize endpoint + CompactRequest message + compact button in TaskHeader
+- **Code blocks**: copy buttons, expand/collapse, syntax highlighting via kilo-ui KiloMessage + MarkedProvider + shiki
+- **Diff viewing**: full diff viewer via kilo-ui `Diff`/`DiffChanges` components for file edit/write/patch tools
+- **Command execution**: expandable bash tool output in BasicTool accordion via kilo-ui PART_MAPPING["bash"]
+- **Image handling**: clipboard paste, drag-and-drop, thumbnails in PromptInput, ImagePreview dialog in [`useImageAttachments.ts`](../webview-ui/src/hooks/useImageAttachments.ts)
+- **Autocomplete**: FIM inline completions via `AutocompleteInlineCompletionProvider` with debouncing, LRU cache, tree-sitter context
+- **Agent Manager**: parallel worktree sessions, git worktree lifecycle, WorktreeSelector in [`AgentManagerProvider.ts`](../src/agent-manager/AgentManagerProvider.ts)
+- **Telemetry**: `TelemetryProxy` POSTs to CLI `/telemetry/capture`; webview telemetry forwarded via message protocol
+- **Auto-approval config**: per-tool allow/ask/deny dropdowns for all 16 tools in AutoApproveTab
+- **Provider configuration**: default/small model selection, disabled/enabled provider lists in ProvidersTab
 
 ---
 
