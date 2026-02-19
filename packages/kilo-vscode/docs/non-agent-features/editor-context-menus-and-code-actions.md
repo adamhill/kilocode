@@ -26,12 +26,12 @@ None of these exist yet in the rebuild.
 
 Right-clicking in the editor shows a "Kilo Code" submenu with these commands:
 
-| Command ID       | Label              | Captured Context                                    | Behavior                                          |
-| ---------------- | ------------------ | --------------------------------------------------- | ------------------------------------------------- |
-| `explainCode`    | Explain Code       | File path, selected text, line range                | Starts an agent task with the EXPLAIN prompt       |
-| `fixCode`        | Fix Code           | File path, selected text, line range, diagnostics   | Starts an agent task with the FIX prompt           |
-| `improveCode`    | Improve Code       | File path, selected text, line range                | Starts an agent task with the IMPROVE prompt       |
-| `addToContext`   | Add to Context     | File path, selected text, line range                | Injects formatted code block into chat input (does **not** start a task) |
+| Command ID     | Label          | Captured Context                                  | Behavior                                                                 |
+| -------------- | -------------- | ------------------------------------------------- | ------------------------------------------------------------------------ |
+| `explainCode`  | Explain Code   | File path, selected text, line range              | Starts an agent task with the EXPLAIN prompt                             |
+| `fixCode`      | Fix Code       | File path, selected text, line range, diagnostics | Starts an agent task with the FIX prompt                                 |
+| `improveCode`  | Improve Code   | File path, selected text, line range              | Starts an agent task with the IMPROVE prompt                             |
+| `addToContext` | Add to Context | File path, selected text, line range              | Injects formatted code block into chat input (does **not** start a task) |
 
 All commands use the VS Code editor API to capture the active editor's file path (`document.uri`), current selection (`editor.selection`), and the selected text. `fixCode` additionally captures diagnostics from `vscode.languages.getDiagnostics()` for the selection range.
 
@@ -41,11 +41,11 @@ All commands use the VS Code editor API to capture the active editor's file path
 
 Right-clicking in the terminal shows a "Kilo Code" submenu:
 
-| Command ID                | Label                  | Captured Context                       | Behavior                                           |
-| ------------------------- | ---------------------- | -------------------------------------- | -------------------------------------------------- |
-| `terminalAddToContext`    | Add to Context         | Terminal selection or recent buffer    | Injects terminal output into chat input             |
-| `terminalFixCommand`      | Fix Command            | Last executed command + output         | Starts an agent task with the TERMINAL_FIX prompt   |
-| `terminalExplainCommand`  | Explain Command        | Last executed command + output         | Starts an agent task with the TERMINAL_EXPLAIN prompt |
+| Command ID               | Label           | Captured Context                    | Behavior                                              |
+| ------------------------ | --------------- | ----------------------------------- | ----------------------------------------------------- |
+| `terminalAddToContext`   | Add to Context  | Terminal selection or recent buffer | Injects terminal output into chat input               |
+| `terminalFixCommand`     | Fix Command     | Last executed command + output      | Starts an agent task with the TERMINAL_FIX prompt     |
+| `terminalExplainCommand` | Explain Command | Last executed command + output      | Starts an agent task with the TERMINAL_EXPLAIN prompt |
 
 Terminal context capture uses `vscode.window.activeTerminal` and the terminal selection API.
 
@@ -57,12 +57,12 @@ Terminal context capture uses `vscode.window.activeTerminal` and the terminal se
 
 A `CodeActionProvider` is registered for all languages. When the user clicks the lightbulb or presses the quick fix shortcut:
 
-| Condition                      | Actions shown                                                         |
-| ------------------------------ | --------------------------------------------------------------------- |
-| Always                         | **Add to Kilo Code** → triggers `addToContext`                        |
-| Diagnostics in selection range | **Fix with Kilo Code** → triggers `fixCode`                          |
-| No diagnostics                 | **Explain with Kilo Code** → triggers `explainCode`                   |
-| No diagnostics                 | **Improve with Kilo Code** → triggers `improveCode`                   |
+| Condition                      | Actions shown                                       |
+| ------------------------------ | --------------------------------------------------- |
+| Always                         | **Add to Kilo Code** → triggers `addToContext`      |
+| Diagnostics in selection range | **Fix with Kilo Code** → triggers `fixCode`         |
+| No diagnostics                 | **Explain with Kilo Code** → triggers `explainCode` |
+| No diagnostics                 | **Improve with Kilo Code** → triggers `improveCode` |
 
 Controlled by the `enableCodeActions` extension setting (default: `true`).
 
@@ -70,12 +70,12 @@ Controlled by the `enableCodeActions` extension setting (default: `true`).
 
 ## Keyboard Shortcuts
 
-| Shortcut (Mac / Win+Linux)         | Command                     | Description                    |
-| ---------------------------------- | --------------------------- | ------------------------------ |
-| `Cmd+Shift+A` / `Ctrl+Shift+A`    | Focus chat input            | Opens/focuses the chat panel   |
-| `Cmd+K Cmd+A` / `Ctrl+K Ctrl+A`   | Add selection to context    | Runs `addToContext`            |
-| `Cmd+Shift+G` / `Ctrl+Shift+G`    | Generate terminal command   | Starts TERMINAL_GENERATE task  |
-| `Cmd+Alt+A` / `Ctrl+Alt+A`        | Toggle auto-approve         | Toggles auto-approval setting  |
+| Shortcut (Mac / Win+Linux)      | Command                   | Description                   |
+| ------------------------------- | ------------------------- | ----------------------------- |
+| `Cmd+Shift+A` / `Ctrl+Shift+A`  | Focus chat input          | Opens/focuses the chat panel  |
+| `Cmd+K Cmd+A` / `Ctrl+K Ctrl+A` | Add selection to context  | Runs `addToContext`           |
+| `Cmd+Shift+G` / `Ctrl+Shift+G`  | Generate terminal command | Starts TERMINAL_GENERATE task |
+| `Cmd+Alt+A` / `Ctrl+Alt+A`      | Toggle auto-approve       | Toggles auto-approval setting |
 
 ---
 
@@ -83,17 +83,17 @@ Controlled by the `enableCodeActions` extension setting (default: `true`).
 
 The old extension defined prompt templates in `support-prompt.ts` that format captured context into agent task instructions. Each template is user-customizable via extension settings.
 
-| Template               | Used by                       | Purpose                                                  |
-| ---------------------- | ----------------------------- | -------------------------------------------------------- |
-| `EXPLAIN`              | `explainCode`                 | Ask the agent to explain the selected code               |
-| `FIX`                  | `fixCode`                     | Ask the agent to fix code, including diagnostic details  |
-| `IMPROVE`              | `improveCode`                 | Ask the agent to improve/refactor selected code          |
-| `ADD_TO_CONTEXT`       | `addToContext`                | Format a code block for injection into chat input        |
-| `TERMINAL_ADD_TO_CONTEXT` | `terminalAddToContext`     | Format terminal output for injection into chat input     |
-| `TERMINAL_FIX`         | `terminalFixCommand`          | Ask the agent to fix a failed terminal command           |
-| `TERMINAL_EXPLAIN`     | `terminalExplainCommand`      | Ask the agent to explain a terminal command/output       |
-| `TERMINAL_GENERATE`    | Generate terminal command      | Ask the agent to generate a terminal command             |
-| `COMMIT_MESSAGE`       | SCM integration               | Generate a commit message (tracked separately)           |
+| Template                  | Used by                   | Purpose                                                 |
+| ------------------------- | ------------------------- | ------------------------------------------------------- |
+| `EXPLAIN`                 | `explainCode`             | Ask the agent to explain the selected code              |
+| `FIX`                     | `fixCode`                 | Ask the agent to fix code, including diagnostic details |
+| `IMPROVE`                 | `improveCode`             | Ask the agent to improve/refactor selected code         |
+| `ADD_TO_CONTEXT`          | `addToContext`            | Format a code block for injection into chat input       |
+| `TERMINAL_ADD_TO_CONTEXT` | `terminalAddToContext`    | Format terminal output for injection into chat input    |
+| `TERMINAL_FIX`            | `terminalFixCommand`      | Ask the agent to fix a failed terminal command          |
+| `TERMINAL_EXPLAIN`        | `terminalExplainCommand`  | Ask the agent to explain a terminal command/output      |
+| `TERMINAL_GENERATE`       | Generate terminal command | Ask the agent to generate a terminal command            |
+| `COMMIT_MESSAGE`          | SCM integration           | Generate a commit message (tracked separately)          |
 
 ---
 
@@ -127,6 +127,7 @@ Commands like `addToContext` and `terminalAddToContext` follow a different flow:
 ### `package.json` Contributions
 
 Register in `contributes`:
+
 - `submenus`: Define "Kilo Code" submenus for editor and terminal contexts
 - `menus`: Register commands under `editor/context` and `terminal/context` menu groups
 - `commands`: Register all command IDs with titles and icons
@@ -157,12 +158,14 @@ Register in `contributes`:
 ### Prompt Templates
 
 Need an equivalent template system in the extension. Options:
+
 - Hardcode templates with settings overrides (like the old extension)
 - Delegate prompt construction to the CLI (if it supports parameterized task creation)
 
 ### "Add to Context" Pattern
 
 The webview needs to handle an incoming message that **sets the chat input text** without submitting it. This requires:
+
 - A new message type (e.g., `SetChatInput`) in the extension→webview protocol
 - The `PromptInput` component to accept externally-set text
 
@@ -290,7 +293,7 @@ Please provide:
 3. Expected output and behavior
 ```
 
-### TERMINAL_GENERATE *(Kilo-specific addition)*
+### TERMINAL_GENERATE _(Kilo-specific addition)_
 
 **Variables:** `userInput`, `operatingSystem`, `currentDirectory`, `shell`
 
@@ -364,7 +367,7 @@ Example summary structure:
 Output only the summary of the conversation so far, without any additional commentary or explanation.
 ```
 
-### COMMIT_MESSAGE *(Kilo-specific addition, tracked separately in [git-commit-message-generation.md](git-commit-message-generation.md))*
+### COMMIT_MESSAGE _(Kilo-specific addition, tracked separately in [git-commit-message-generation.md](git-commit-message-generation.md))_
 
 **Variables:** `customInstructions`, `gitContext`
 
