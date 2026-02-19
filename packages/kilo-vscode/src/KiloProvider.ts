@@ -316,6 +316,11 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
             vscode.env.openExternal(vscode.Uri.parse(message.url))
           }
           break
+        case "openFile":
+          if (message.filePath) {
+            this.handleOpenFile(message.filePath, message.line, message.column)
+          }
+          break
         case "requestProviders":
           await this.fetchAndSendProviders()
           break
@@ -1199,6 +1204,28 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
     } catch (error) {
       console.error("[Kilo New] KiloProvider: Failed to refresh providers after org switch:", error)
     }
+  }
+
+  /**
+   * Handle openFile request from the webview — open a file in the VS Code editor.
+   */
+  private handleOpenFile(filePath: string, line?: number, column?: number): void {
+    const absolute = /^(?:\/|[a-zA-Z]:[\\/])/.test(filePath)
+    const uri = absolute
+      ? vscode.Uri.file(filePath)
+      : vscode.Uri.joinPath(vscode.Uri.file(this.getWorkspaceDirectory()), filePath)
+    vscode.workspace.openTextDocument(uri).then(
+      (doc) => {
+        const options: vscode.TextDocumentShowOptions = { preview: true }
+        if (line !== undefined && line > 0) {
+          const col = column !== undefined && column > 0 ? column - 1 : 0
+          const pos = new vscode.Position(line - 1, col)
+          options.selection = new vscode.Range(pos, pos)
+        }
+        vscode.window.showTextDocument(doc, options)
+      },
+      (err) => console.error("[Kilo New] KiloProvider: Failed to open file:", uri.fsPath, err),
+    )
   }
 
   /**

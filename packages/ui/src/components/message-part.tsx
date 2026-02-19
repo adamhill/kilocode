@@ -682,11 +682,26 @@ PART_MAPPING["text"] = function TextPartDisplay(props) {
     setTimeout(() => setCopied(false), 2000)
   }
 
+  const handleMarkdownClick = (e: MouseEvent) => {
+    if (!data.openFile) return
+    const target = e.target
+    if (!(target instanceof HTMLElement)) return
+    const link = target.closest(".file-link[data-file-path]")
+    if (!link) return
+    const path = link.getAttribute("data-file-path")
+    if (!path) return
+    const lineAttr = link.getAttribute("data-file-line")
+    const colAttr = link.getAttribute("data-file-col")
+    const line = lineAttr ? parseInt(lineAttr, 10) : undefined
+    const column = colAttr ? parseInt(colAttr, 10) : undefined
+    data.openFile(path, line, column)
+  }
+
   return (
     <Show when={throttledText()}>
       <div data-component="text-part">
         <div data-slot="text-part-body">
-          <Markdown text={throttledText()} cacheKey={part.id} />
+          <Markdown text={throttledText()} cacheKey={part.id} onClick={handleMarkdownClick} />
           <div data-slot="text-part-copy-wrapper">
             <Tooltip
               value={copied() ? i18n.t("ui.message.copied") : i18n.t("ui.message.copy")}
@@ -751,10 +766,17 @@ ToolRegistry.register({
             subtitle: props.input.filePath ? getFilename(props.input.filePath) : "",
             args,
           }}
+          onSubtitleClick={
+            data.openFile && props.input.filePath ? () => data.openFile!(props.input.filePath) : undefined
+          }
         />
         <For each={loaded()}>
           {(filepath) => (
-            <div data-component="tool-loaded-file">
+            <div
+              data-component="tool-loaded-file"
+              classList={{ clickable: !!data.openFile }}
+              onClick={() => data.openFile?.(filepath)}
+            >
               <Icon name="enter" size="small" />
               <span>
                 {i18n.t("ui.tool.loaded")} {relativizeProjectPaths(filepath, data.directory)}
@@ -1106,10 +1128,16 @@ ToolRegistry.register({
 ToolRegistry.register({
   name: "edit",
   render(props) {
+    const data = useData()
     const i18n = useI18n()
     const diffComponent = useDiffComponent()
     const diagnostics = createMemo(() => getDiagnostics(props.metadata.diagnostics, props.input.filePath))
     const filename = () => getFilename(props.input.filePath ?? "")
+    const handleFileClick = (e: MouseEvent) => {
+      if (!data.openFile || !props.input.filePath) return
+      e.stopPropagation()
+      data.openFile(props.input.filePath)
+    }
     return (
       <BasicTool
         {...props}
@@ -1119,11 +1147,23 @@ ToolRegistry.register({
             <div data-slot="message-part-title-area">
               <div data-slot="message-part-title">
                 <span data-slot="message-part-title-text">{i18n.t("ui.messagePart.title.edit")}</span>
-                <span data-slot="message-part-title-filename">{filename()}</span>
+                <span
+                  data-slot="message-part-title-filename"
+                  classList={{ clickable: !!data.openFile }}
+                  onClick={handleFileClick}
+                >
+                  {filename()}
+                </span>
               </div>
               <Show when={props.input.filePath?.includes("/")}>
                 <div data-slot="message-part-path">
-                  <span data-slot="message-part-directory">{getDirectory(props.input.filePath!)}</span>
+                  <span
+                    data-slot="message-part-directory"
+                    classList={{ clickable: !!data.openFile }}
+                    onClick={handleFileClick}
+                  >
+                    {getDirectory(props.input.filePath!)}
+                  </span>
                 </div>
               </Show>
             </div>
@@ -1159,10 +1199,16 @@ ToolRegistry.register({
 ToolRegistry.register({
   name: "write",
   render(props) {
+    const data = useData()
     const i18n = useI18n()
     const codeComponent = useCodeComponent()
     const diagnostics = createMemo(() => getDiagnostics(props.metadata.diagnostics, props.input.filePath))
     const filename = () => getFilename(props.input.filePath ?? "")
+    const handleFileClick = (e: MouseEvent) => {
+      if (!data.openFile || !props.input.filePath) return
+      e.stopPropagation()
+      data.openFile(props.input.filePath)
+    }
     return (
       <BasicTool
         {...props}
@@ -1172,11 +1218,23 @@ ToolRegistry.register({
             <div data-slot="message-part-title-area">
               <div data-slot="message-part-title">
                 <span data-slot="message-part-title-text">{i18n.t("ui.messagePart.title.write")}</span>
-                <span data-slot="message-part-title-filename">{filename()}</span>
+                <span
+                  data-slot="message-part-title-filename"
+                  classList={{ clickable: !!data.openFile }}
+                  onClick={handleFileClick}
+                >
+                  {filename()}
+                </span>
               </div>
               <Show when={props.input.filePath?.includes("/")}>
                 <div data-slot="message-part-path">
-                  <span data-slot="message-part-directory">{getDirectory(props.input.filePath!)}</span>
+                  <span
+                    data-slot="message-part-directory"
+                    classList={{ clickable: !!data.openFile }}
+                    onClick={handleFileClick}
+                  >
+                    {getDirectory(props.input.filePath!)}
+                  </span>
                 </div>
               </Show>
             </div>
@@ -1218,6 +1276,7 @@ interface ApplyPatchFile {
 ToolRegistry.register({
   name: "apply_patch",
   render(props) {
+    const data = useData()
     const i18n = useI18n()
     const diffComponent = useDiffComponent()
     const files = createMemo(() => (props.metadata.files ?? []) as ApplyPatchFile[])
@@ -1265,7 +1324,17 @@ ToolRegistry.register({
                         </span>
                       </Match>
                     </Switch>
-                    <span data-slot="apply-patch-file-path">{file.relativePath}</span>
+                    <span
+                      data-slot="apply-patch-file-path"
+                      classList={{ clickable: !!data.openFile }}
+                      onClick={(e: MouseEvent) => {
+                        if (!data.openFile) return
+                        e.stopPropagation()
+                        data.openFile(file.filePath)
+                      }}
+                    >
+                      {file.relativePath}
+                    </span>
                     <Show when={file.type !== "delete"}>
                       <DiffChanges changes={{ additions: file.additions, deletions: file.deletions }} />
                     </Show>

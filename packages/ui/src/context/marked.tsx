@@ -461,6 +461,24 @@ async function highlightCodeBlocks(html: string): Promise<string> {
 
 export type NativeMarkdownParser = (markdown: string) => Promise<string>
 
+// Matches text that looks like a file path: contains "/" and ends with a file extension,
+// or starts with "./" or "../" or "/". Supports optional :line or :line:col suffix.
+const FILE_PATH_RE =
+  /^((?:\/|\.\.?\/)?(?:[a-zA-Z0-9_@-][a-zA-Z0-9_@./-]*\/)*[a-zA-Z0-9_@.-]+\.[a-zA-Z0-9]+)(?::(\d+)(?::(\d+))?)?$/
+
+function parseFilePath(text: string): { path: string; line?: number; column?: number } | undefined {
+  if (text.includes("://")) return undefined
+  if (text.includes(" ")) return undefined
+  const match = FILE_PATH_RE.exec(text)
+  if (!match) return undefined
+  if (!match[1].includes("/")) return undefined
+  return {
+    path: match[1],
+    line: match[2] ? parseInt(match[2], 10) : undefined,
+    column: match[3] ? parseInt(match[3], 10) : undefined,
+  }
+}
+
 export const { use: useMarked, provider: MarkedProvider } = createSimpleContext({
   name: "Marked",
   init: (props: { nativeParser?: NativeMarkdownParser }) => {
@@ -470,6 +488,15 @@ export const { use: useMarked, provider: MarkedProvider } = createSimpleContext(
           link({ href, title, text }) {
             const titleAttr = title ? ` title="${title}"` : ""
             return `<a href="${href}"${titleAttr} class="external-link" target="_blank" rel="noopener noreferrer">${text}</a>`
+          },
+          codespan({ text }) {
+            const file = parseFilePath(text)
+            if (file) {
+              const lineAttr = file.line ? ` data-file-line="${file.line}"` : ""
+              const colAttr = file.column ? ` data-file-col="${file.column}"` : ""
+              return `<code class="file-link" data-file-path="${file.path}"${lineAttr}${colAttr}>${text}</code>`
+            }
+            return `<code>${text}</code>`
           },
         },
       },

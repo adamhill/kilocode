@@ -651,6 +651,13 @@ export interface OpenExternalRequest {
   url: string
 }
 
+export interface OpenFileRequest {
+  type: "openFile"
+  filePath: string
+  line?: number
+  column?: number
+}
+
 export interface CancelLoginRequest {
   type: "cancelLogin"
 }
@@ -825,6 +832,7 @@ export type WebviewMessage =
   | LogoutRequest
   | RefreshProfileRequest
   | OpenExternalRequest
+  | OpenFileRequest
   | CancelLoginRequest
   | SetOrganizationRequest
   | WebviewReadyRequest
