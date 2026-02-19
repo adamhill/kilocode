@@ -40,12 +40,6 @@ export function registerCommitMessageService(
       return
     }
 
-    const folder = vscode.workspace.workspaceFolders?.[0]
-    if (!folder) {
-      vscode.window.showErrorMessage("No workspace folder found")
-      return
-    }
-
     let client: HttpClient | undefined
     try {
       client = connectionService.getHttpClient()
@@ -53,8 +47,12 @@ export function registerCommitMessageService(
       vscode.window.showErrorMessage("Kilo backend is not connected. Please wait for the connection to establish.")
       return
     }
+    if (!client) {
+      vscode.window.showErrorMessage("Kilo backend is not connected. Please wait for the connection to establish.")
+      return
+    }
 
-    const path = folder.uri.fsPath
+    const path = repository.rootUri.fsPath
 
     const previousMessage = lastWorkspacePath === path ? lastGeneratedMessage : undefined
 

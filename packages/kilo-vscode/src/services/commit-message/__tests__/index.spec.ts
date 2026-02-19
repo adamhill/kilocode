@@ -101,6 +101,8 @@ describe("commit-message service", () => {
 
     it("shows error when no git repository is found", async () => {
       vi.mocked(vscode.extensions.getExtension).mockReturnValue({
+        isActive: true,
+        activate: vi.fn().mockResolvedValue(undefined),
         exports: {
           getAPI: () => ({ repositories: [] }),
         },
@@ -113,22 +115,30 @@ describe("commit-message service", () => {
 
     it("shows error when backend is not connected", async () => {
       vi.mocked(vscode.extensions.getExtension).mockReturnValue({
+        isActive: true,
+        activate: vi.fn().mockResolvedValue(undefined),
         exports: {
           getAPI: () => ({
             repositories: [{ inputBox: { value: "" }, rootUri: { fsPath: "/repo" } }],
           }),
         },
       } as any)
-      vi.mocked(mockConnectionService.getHttpClient as any).mockReturnValue(null)
+      vi.mocked(mockConnectionService.getHttpClient as any).mockImplementation(() => {
+        throw new Error("Not connected")
+      })
 
       await commandCallback()
 
-      expect(vscode.window.showErrorMessage).toHaveBeenCalledWith("Kilo backend is not connected")
+      expect(vscode.window.showErrorMessage).toHaveBeenCalledWith(
+        "Kilo backend is not connected. Please wait for the connection to establish.",
+      )
     })
 
-    it("calls generateCommitMessage on the HTTP client with workspace path", async () => {
+    it("calls generateCommitMessage on the HTTP client with repository root path", async () => {
       const mockInputBox = { value: "" }
       vi.mocked(vscode.extensions.getExtension).mockReturnValue({
+        isActive: true,
+        activate: vi.fn().mockResolvedValue(undefined),
         exports: {
           getAPI: () => ({
             repositories: [{ inputBox: mockInputBox, rootUri: { fsPath: "/repo" } }],
@@ -143,12 +153,14 @@ describe("commit-message service", () => {
 
       await commandCallback()
 
-      expect(mockHttpClient.generateCommitMessage).toHaveBeenCalledWith("/test/workspace")
+      expect(mockHttpClient.generateCommitMessage).toHaveBeenCalledWith("/repo", undefined, undefined)
     })
 
     it("sets the generated message on the repository inputBox", async () => {
       const mockInputBox = { value: "" }
       vi.mocked(vscode.extensions.getExtension).mockReturnValue({
+        isActive: true,
+        activate: vi.fn().mockResolvedValue(undefined),
         exports: {
           getAPI: () => ({
             repositories: [{ inputBox: mockInputBox, rootUri: { fsPath: "/repo" } }],
@@ -168,6 +180,8 @@ describe("commit-message service", () => {
     it("shows progress in SourceControl location", async () => {
       const mockInputBox = { value: "" }
       vi.mocked(vscode.extensions.getExtension).mockReturnValue({
+        isActive: true,
+        activate: vi.fn().mockResolvedValue(undefined),
         exports: {
           getAPI: () => ({
             repositories: [{ inputBox: mockInputBox, rootUri: { fsPath: "/repo" } }],

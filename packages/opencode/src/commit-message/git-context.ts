@@ -134,7 +134,7 @@ function git(args: string[], cwd: string): string {
     stdout: "pipe",
     stderr: "pipe",
   })
-  return result.stdout.toString().trim()
+  return result.stdout.toString().trimEnd()
 }
 
 function parseNameStatus(output: string): Array<{ status: string; path: string }> {

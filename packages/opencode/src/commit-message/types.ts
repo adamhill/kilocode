@@ -22,7 +22,7 @@ export interface GitContext {
 }
 
 export interface FileChange {
-  status: "added" | "modified" | "deleted" | "renamed" | "untracked"
+  status: "added" | "modified" | "deleted" | "renamed"
   path: string
   /** Diff content, or placeholder for binary/untracked files */
   diff: string
