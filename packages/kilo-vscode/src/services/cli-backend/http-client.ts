@@ -45,7 +45,7 @@ export class HttpClient {
     method: string,
     path: string,
     body?: unknown,
-    options?: { directory?: string; allowEmpty?: boolean },
+    options?: { directory?: string; allowEmpty?: boolean; silent?: boolean; signal?: AbortSignal },
   ): Promise<T> {
     const url = `${this.baseUrl}${path}`
 
@@ -62,6 +62,7 @@ export class HttpClient {
       method,
       headers,
       body: body !== undefined ? JSON.stringify(body) : undefined,
+      signal: options?.signal,
     })
 
     // Read the raw response first so we can produce useful errors when JSON is empty/truncated.
@@ -71,12 +72,14 @@ export class HttpClient {
     if (!response.ok) {
       const errorMessage = extractHttpErrorMessage(response.statusText, rawText)
 
-      console.error("[Kilo New] HTTP: ❌ Request failed", {
-        method,
-        path,
-        status: response.status,
-        errorMessage,
-      })
+      if (!options?.silent) {
+        console.error("[Kilo New] HTTP: ❌ Request failed", {
+          method,
+          path,
+          status: response.status,
+          errorMessage,
+        })
+      }
 
       throw new Error(`HTTP ${response.status}: ${errorMessage}`)
     }
@@ -122,9 +125,10 @@ export class HttpClient {
 
   /**
    * Get information about an existing session.
+   * Set silent to suppress error logging (e.g. for expected 404s on cross-worktree sessions).
    */
-  async getSession(sessionId: string, directory: string): Promise<SessionInfo> {
-    return this.request<SessionInfo>("GET", `/session/${sessionId}`, undefined, { directory })
+  async getSession(sessionId: string, directory: string, silent?: boolean): Promise<SessionInfo> {
+    return this.request<SessionInfo>("GET", `/session/${sessionId}`, undefined, { directory, silent })
   }
 
   /**
@@ -227,12 +231,16 @@ export class HttpClient {
   /**
    * Get all messages for a session.
    */
-  async getMessages(sessionId: string, directory: string): Promise<Array<{ info: MessageInfo; parts: MessagePart[] }>> {
+  async getMessages(
+    sessionId: string,
+    directory: string,
+    signal?: AbortSignal,
+  ): Promise<Array<{ info: MessageInfo; parts: MessagePart[] }>> {
     return this.request<Array<{ info: MessageInfo; parts: MessagePart[] }>>(
       "GET",
       `/session/${sessionId}/message`,
       undefined,
-      { directory },
+      { directory, signal },
     )
   }
 
