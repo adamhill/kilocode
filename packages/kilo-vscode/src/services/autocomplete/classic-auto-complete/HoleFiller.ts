@@ -5,6 +5,7 @@ import {
   FillInAtCursorSuggestion,
   ChatCompletionResult,
 } from "../types"
+import { parseAutocompleteResponse as _parseAutocompleteResponse } from "./hole-filler-utils"
 import { getProcessedSnippets } from "./getProcessedSnippets"
 import { formatSnippets } from "../continuedev/core/autocomplete/templating/formatting"
 import { AutocompleteModel, ApiStreamChunk } from "../AutocompleteModel"
@@ -20,24 +21,7 @@ export function parseAutocompleteResponse(
   prefix: string,
   suffix: string,
 ): FillInAtCursorSuggestion {
-  let fimText: string = ""
-
-  // Match content strictly between <COMPLETION> and </COMPLETION> tags
-  const completionMatch = fullResponse.match(/<COMPLETION>([\s\S]*?)<\/COMPLETION>/i)
-
-  if (completionMatch) {
-    // Extract the captured group (content between tags)
-    fimText = completionMatch[1] || ""
-  }
-  // Remove any accidentally captured tag remnants
-  fimText = fimText.replace(/<\/?COMPLETION>/gi, "")
-
-  // Return FillInAtCursorSuggestion with the text (empty string if nothing found)
-  return {
-    text: fimText,
-    prefix,
-    suffix,
-  }
+  return _parseAutocompleteResponse(fullResponse, prefix, suffix)
 }
 
 export class HoleFiller {
