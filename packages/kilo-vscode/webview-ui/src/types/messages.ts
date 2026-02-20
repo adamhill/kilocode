@@ -555,6 +555,7 @@ export interface AgentManagerWorktreeSetupMessage {
   message: string
   sessionId?: string
   branch?: string
+  worktreeId?: string
 }
 
 // Agent Manager worktree state types (mirrored from WorktreeStateManager)
