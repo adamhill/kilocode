@@ -19,10 +19,6 @@ export function getEditorContext(): EditorContext | undefined {
     selectedText: doc.getText(selection),
     startLine: selection.start.line + 1,
     endLine: selection.end.line + 1,
-    diagnostics: vscode.languages.getDiagnostics(doc.uri).filter(
-      (d) => d.range.intersection(selection) !== undefined
-    ),
+    diagnostics: vscode.languages.getDiagnostics(doc.uri).filter((d) => d.range.intersection(selection) !== undefined),
   }
 }
-
-
