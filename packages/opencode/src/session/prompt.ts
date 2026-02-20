@@ -26,7 +26,6 @@ import { ToolRegistry } from "../tool/registry"
 import { MCP } from "../mcp"
 import { LSP } from "../lsp"
 import { ReadTool } from "../tool/read"
-import { ListTool } from "../tool/ls"
 import { FileTime } from "../file/time"
 import { Flag } from "../flag/flag"
 import { ulid } from "ulid"
@@ -46,6 +45,7 @@ import { LLM } from "./llm"
 import { iife } from "@/util/iife"
 import { Shell } from "@/shell/shell"
 import { Truncate } from "@/tool/truncation"
+import { PlanFollowup } from "@/kilocode/plan-followup" // kilocode_change
 
 // @ts-ignore
 globalThis.AI_SDK_LOG_WARNINGS = false
@@ -337,6 +337,12 @@ export namespace SessionPrompt {
         !["tool-calls", "unknown"].includes(lastAssistant.finish) &&
         lastUser.id < lastAssistant.id
       ) {
+        // kilocode_change start - ask follow-up after plan agent completes
+        if (lastUser.agent === "plan" && !abort.aborted && ["cli", "vscode"].includes(Flag.KILO_CLIENT)) {
+          const action = await PlanFollowup.ask({ sessionID, messages: msgs, abort })
+          if (action === "continue") continue
+        }
+        // kilocode_change end
         log.info("exiting loop", { sessionID })
         break
       }
@@ -1221,7 +1227,7 @@ export namespace SessionPrompt {
               }
 
               if (part.mime === "application/x-directory") {
-                const args = { path: filepath }
+                const args = { filePath: filepath }
                 const listCtx: Tool.Context = {
                   sessionID: input.sessionID,
                   abort: new AbortController().signal,
@@ -1232,7 +1238,7 @@ export namespace SessionPrompt {
                   metadata: async () => {},
                   ask: async () => {},
                 }
-                const result = await ListTool.init().then((t) => t.execute(args, listCtx))
+                const result = await ReadTool.init().then((t) => t.execute(args, listCtx))
                 return [
                   {
                     id: Identifier.ascending("part"),
@@ -1240,7 +1246,7 @@ export namespace SessionPrompt {
                     sessionID: input.sessionID,
                     type: "text",
                     synthetic: true,
-                    text: `Called the list tool with the following input: ${JSON.stringify(args)}`,
+                    text: `Called the Read tool with the following input: ${JSON.stringify(args)}`,
                   },
                   {
                     id: Identifier.ascending("part"),
