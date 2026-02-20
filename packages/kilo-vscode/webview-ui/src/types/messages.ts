@@ -841,6 +841,10 @@ export interface RequestRepoInfoMessage {
   type: "agentManager.requestRepoInfo"
 }
 
+export interface RequestStateMessage {
+  type: "agentManager.requestState"
+}
+
 // Configure worktree setup script
 export interface ConfigureSetupScriptRequest {
   type: "agentManager.configureSetupScript"
@@ -902,6 +906,7 @@ export type WebviewMessage =
   | CloseSessionRequest
   | TelemetryRequest
   | RequestRepoInfoMessage
+  | RequestStateMessage
   | ConfigureSetupScriptRequest
   | ShowTerminalRequest
   | SetTabOrderRequest
