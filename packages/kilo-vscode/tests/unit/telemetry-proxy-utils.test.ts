@@ -8,21 +8,13 @@ describe("buildTelemetryPayload", () => {
   })
 
   it("merges provider properties with event properties", () => {
-    const result = buildTelemetryPayload(
-      "test.event",
-      { eventProp: "value" },
-      { providerProp: "providerValue" },
-    )
+    const result = buildTelemetryPayload("test.event", { eventProp: "value" }, { providerProp: "providerValue" })
     expect(result.properties.eventProp).toBe("value")
     expect(result.properties.providerProp).toBe("providerValue")
   })
 
   it("event properties override provider properties", () => {
-    const result = buildTelemetryPayload(
-      "test.event",
-      { shared: "from-event" },
-      { shared: "from-provider" },
-    )
+    const result = buildTelemetryPayload("test.event", { shared: "from-event" }, { shared: "from-provider" })
     expect(result.properties.shared).toBe("from-event")
   })
 
