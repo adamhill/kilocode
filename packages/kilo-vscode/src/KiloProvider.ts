@@ -11,6 +11,13 @@ import { handleChatCompletionRequest } from "./services/autocomplete/chat-autoco
 import { handleChatCompletionAccepted } from "./services/autocomplete/chat-autocomplete/handleChatCompletionAccepted"
 import { buildWebviewHtml } from "./utils"
 import { TelemetryProxy, type TelemetryPropertiesProvider } from "./services/telemetry"
+import {
+  sessionToWebview,
+  normalizeProviders,
+  filterVisibleAgents,
+  buildSettingPath,
+  mapSSEEventToWebviewMessage,
+} from "./kilo-provider-utils"
 
 export class KiloProvider implements vscode.WebviewViewProvider, TelemetryPropertiesProvider {
   public static readonly viewType = "kilo-code.new.sidebarView"
@@ -521,16 +528,8 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
     }
   }
 
-  /**
-   * Convert SessionInfo to webview format.
-   */
   private sessionToWebview(session: SessionInfo) {
-    return {
-      id: session.id,
-      title: session.title,
-      createdAt: new Date(session.time.created).toISOString(),
-      updatedAt: new Date(session.time.updated).toISOString(),
-    }
+    return sessionToWebview(session)
   }
 
   /**
@@ -802,11 +801,7 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
       const workspaceDir = this.getWorkspaceDirectory()
       const response = await this.httpClient.listProviders(workspaceDir)
 
-      // Re-key providers from numeric indices to provider.id
-      const normalized: typeof response.all = {}
-      for (const provider of Object.values(response.all)) {
-        normalized[provider.id] = provider
-      }
+      const normalized = normalizeProviders(response.all)
 
       const config = vscode.workspace.getConfiguration("kilo-code.new.model")
       const providerID = config.get<string>("providerID", "kilo")
@@ -841,11 +836,7 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
       const workspaceDir = this.getWorkspaceDirectory()
       const agents = await this.httpClient.listAgents(workspaceDir)
 
-      // Filter to only visible primary/all modes (not subagents, not hidden)
-      const visible = agents.filter((a) => a.mode !== "subagent" && !a.hidden)
-
-      // Find default agent: first one in list (CLI sorts default first)
-      const defaultAgent = visible.length > 0 ? visible[0].name : "code"
+      const { visible, defaultAgent } = filterVisibleAgents(agents)
 
       const message = {
         type: "agentsLoaded",
@@ -1312,9 +1303,7 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
    * The key uses dot notation relative to `kilo-code.new` (e.g. "browserAutomation.enabled").
    */
   private async handleUpdateSetting(key: string, value: unknown): Promise<void> {
-    const parts = key.split(".")
-    const section = parts.slice(0, -1).join(".")
-    const leaf = parts[parts.length - 1]
+    const { section, leaf } = buildSettingPath(key)
     const config = vscode.workspace.getConfiguration(`kilo-code.new${section ? `.${section}` : ""}`)
     await config.update(leaf, value, vscode.ConfigurationTarget.Global)
   }
@@ -1398,124 +1387,18 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
     }
 
     // Forward relevant events to webview
-    switch (event.type) {
-      case "message.part.updated": {
-        // The part contains the full part data including messageID, delta is optional text delta
-        const part = event.properties.part as { messageID?: string; sessionID?: string }
-        const messageID = part.messageID || ""
+    // Side effects that must happen before the webview message is sent
+    if (event.type === "session.created" && !this.currentSession) {
+      this.currentSession = event.properties.info
+      this.trackedSessionIds.add(event.properties.info.id)
+    }
+    if (event.type === "session.updated" && this.currentSession?.id === event.properties.info.id) {
+      this.currentSession = event.properties.info
+    }
 
-        const resolvedSessionID = sessionID
-        if (!resolvedSessionID) {
-          return
-        }
-        this.postMessage({
-          type: "partUpdated",
-          sessionID: resolvedSessionID,
-          messageID,
-          part: event.properties.part,
-          delta: event.properties.delta ? { type: "text-delta", textDelta: event.properties.delta } : undefined,
-        })
-        break
-      }
-
-      case "message.updated":
-        // Message info updated — forward cost/tokens for assistant messages
-        this.postMessage({
-          type: "messageCreated",
-          message: {
-            id: event.properties.info.id,
-            sessionID: event.properties.info.sessionID,
-            role: event.properties.info.role,
-            createdAt: new Date(event.properties.info.time.created).toISOString(),
-            cost: event.properties.info.cost,
-            tokens: event.properties.info.tokens,
-          },
-        })
-        break
-
-      case "session.status": {
-        const info = event.properties.status
-        this.postMessage({
-          type: "sessionStatus",
-          sessionID: event.properties.sessionID,
-          status: info.type,
-          ...(info.type === "retry" ? { attempt: info.attempt, message: info.message, next: info.next } : {}),
-        })
-        break
-      }
-
-      case "permission.asked":
-        this.postMessage({
-          type: "permissionRequest",
-          permission: {
-            id: event.properties.id,
-            sessionID: event.properties.sessionID,
-            toolName: event.properties.permission,
-            patterns: event.properties.patterns ?? [],
-            args: event.properties.metadata,
-            message: `Permission required: ${event.properties.permission}`,
-            tool: event.properties.tool,
-          },
-        })
-        break
-
-      case "todo.updated":
-        this.postMessage({
-          type: "todoUpdated",
-          sessionID: event.properties.sessionID,
-          items: event.properties.items,
-        })
-        break
-
-      case "question.asked":
-        this.postMessage({
-          type: "questionRequest",
-          question: {
-            id: event.properties.id,
-            sessionID: event.properties.sessionID,
-            questions: event.properties.questions,
-            tool: event.properties.tool,
-          },
-        })
-        break
-
-      case "question.replied":
-        this.postMessage({
-          type: "questionResolved",
-          requestID: event.properties.requestID,
-        })
-        break
-
-      case "question.rejected":
-        this.postMessage({
-          type: "questionResolved",
-          requestID: event.properties.requestID,
-        })
-        break
-
-      case "session.created":
-        // Store session if we don't have one yet
-        if (!this.currentSession) {
-          this.currentSession = event.properties.info
-          this.trackedSessionIds.add(event.properties.info.id)
-        }
-        // Notify webview
-        this.postMessage({
-          type: "sessionCreated",
-          session: this.sessionToWebview(event.properties.info),
-        })
-        break
-
-      case "session.updated":
-        // Keep local state in sync (e.g. title generation)
-        if (this.currentSession?.id === event.properties.info.id) {
-          this.currentSession = event.properties.info
-        }
-        this.postMessage({
-          type: "sessionUpdated",
-          session: this.sessionToWebview(event.properties.info),
-        })
-        break
+    const msg = mapSSEEventToWebviewMessage(event, sessionID)
+    if (msg) {
+      this.postMessage(msg)
     }
   }
 
