@@ -314,6 +314,18 @@ export const PromptInput: Component = () => {
         <div class="prompt-input-hint-selectors">
           <ModeSwitcher />
           <ModelSelector />
+          <Show when={session.variantList().length > 0}>
+            <Tooltip value={language.t("command.model.variant.cycle")} placement="top">
+              <Button
+                variant="ghost"
+                size="small"
+                onClick={() => session.cycleVariant()}
+                aria-label={language.t("command.model.variant.cycle")}
+              >
+                {session.currentVariant() ?? language.t("common.default")}
+              </Button>
+            </Tooltip>
+          </Show>
         </div>
         <div class="prompt-input-hint-actions">
           <Show

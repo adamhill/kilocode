@@ -285,6 +285,7 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
             message.providerID,
             message.modelID,
             message.agent,
+            message.variant,
             files,
           )
           break
@@ -439,6 +440,23 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
         case "telemetry":
           TelemetryProxy.capture(message.event, message.properties)
           break
+        case "persistVariant": {
+          const stored =
+            this.extensionContext?.globalState.get<Record<string, string | undefined>>("variantSelections") ?? {}
+          if (message.value === undefined) {
+            delete stored[message.key]
+          } else {
+            stored[message.key] = message.value
+          }
+          await this.extensionContext?.globalState.update("variantSelections", stored)
+          break
+        }
+        case "requestVariants": {
+          const variants =
+            this.extensionContext?.globalState.get<Record<string, string | undefined>>("variantSelections") ?? {}
+          this.postMessage({ type: "variantsLoaded", variants })
+          break
+        }
       }
     })
   }
@@ -1002,6 +1020,7 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
     providerID?: string,
     modelID?: string,
     agent?: string,
+    variant?: string,
     files?: Array<{ mime: string; url: string }>,
   ): Promise<void> {
     if (!this.httpClient) {
@@ -1057,6 +1076,7 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
         providerID,
         modelID,
         agent,
+        variant,
       })
     } catch (error) {
       console.error("[Kilo New] KiloProvider: Failed to send message:", error)

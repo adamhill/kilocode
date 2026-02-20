@@ -48,6 +48,7 @@ interface SessionStore {
   todos: Record<string, TodoItem[]> // sessionID -> todos
   modelSelections: Record<string, ModelSelection> // sessionID -> model
   agentSelections: Record<string, string> // sessionID -> agent name
+  variantSelections: Record<string, string | undefined> // "providerID/modelID" -> variant name
 }
 
 interface SessionContextValue {
@@ -104,6 +105,11 @@ interface SessionContextValue {
   getSessionModel: (sessionID: string) => ModelSelection | null
   setSessionModel: (sessionID: string, providerID: string, modelID: string) => void
   setSessionAgent: (sessionID: string, name: string) => void
+
+  // Thinking variant for the selected model
+  variantList: () => string[]
+  currentVariant: () => string | undefined
+  cycleVariant: () => void
 
   // Actions
   sendMessage: (text: string, providerID?: string, modelID?: string, files?: FileAttachment[]) => void
@@ -177,6 +183,7 @@ export const SessionProvider: ParentComponent = (props) => {
     todos: {},
     modelSelections: {},
     agentSelections: {},
+    variantSelections: {},
   })
 
   // Keep pending selection in sync with provider default until the user
@@ -267,6 +274,56 @@ export const SessionProvider: ParentComponent = (props) => {
     unsubAgents()
     clearInterval(agentRetryTimer)
   })
+
+  // Variant (thinking effort) selection — keyed by "providerID/modelID"
+  const variantKey = (sel: ModelSelection) => `${sel.providerID}/${sel.modelID}`
+
+  const variantList = () => {
+    const sel = selected()
+    if (!sel) return []
+    const model = provider.findModel(sel)
+    if (!model?.variants) return []
+    return Object.keys(model.variants)
+  }
+
+  const currentVariant = () => {
+    const sel = selected()
+    if (!sel) return undefined
+    const key = variantKey(sel)
+    const stored = store.variantSelections[key]
+    const list = variantList()
+    if (stored && list.includes(stored)) return stored
+    return undefined
+  }
+
+  const cycleVariant = () => {
+    const sel = selected()
+    if (!sel) return
+    const list = variantList()
+    if (list.length === 0) return
+    const key = variantKey(sel)
+    const current = store.variantSelections[key]
+    const next = (() => {
+      if (!current || !list.includes(current)) return list[0]
+      const idx = list.indexOf(current)
+      if (idx === list.length - 1) return undefined
+      return list[idx + 1]
+    })()
+    setStore("variantSelections", key, next)
+    vscode.postMessage({ type: "persistVariant", key, value: next })
+  }
+
+  // Load persisted variants from extension globalState
+  const unsubVariants = vscode.onMessage((message: ExtensionMessage) => {
+    if (message.type !== "variantsLoaded") return
+    for (const [k, v] of Object.entries(message.variants)) {
+      setStore("variantSelections", k, v)
+    }
+  })
+
+  vscode.postMessage({ type: "requestVariants" })
+
+  onCleanup(unsubVariants)
 
   // Handle messages from extension
   onMount(() => {
@@ -631,6 +688,7 @@ export const SessionProvider: ParentComponent = (props) => {
       providerID,
       modelID,
       agent,
+      variant: currentVariant(),
       files,
     })
   }
@@ -866,6 +924,9 @@ export const SessionProvider: ParentComponent = (props) => {
     },
     allMessages,
     allParts,
+    variantList,
+    currentVariant,
+    cycleVariant,
     sendMessage,
     abort,
     compact,
