@@ -99,6 +99,7 @@ export const ChatView: Component<ChatViewProps> = (props) => {
                       {language.t("ui.permission.allowOnce")}
                     </Button>
                   </div>
+                  <p data-slot="permission-hint">{language.t("ui.permission.sessionHint")}</p>
                 </div>
               </div>
             )}
