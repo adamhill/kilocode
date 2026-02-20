@@ -18,9 +18,12 @@ export const ServeCommand = cmd({
     // kilocode_change start - graceful signal shutdown
     const abort = new AbortController()
     const shutdown = async () => {
-      await Instance.disposeAll()
-      await server.stop(true)
-      abort.abort()
+      try {
+        await Instance.disposeAll()
+        await server.stop(true)
+      } finally {
+        abort.abort()
+      }
     }
     process.on("SIGTERM", shutdown)
     process.on("SIGINT", shutdown)
