@@ -1,9 +1,13 @@
+import { Agent } from "@/agent/agent"
 import { Bus } from "@/bus"
 import { TuiEvent } from "@/cli/cmd/tui/event"
 import { Identifier } from "@/id/id"
+import { Provider } from "@/provider/provider"
 import { Question } from "@/question"
 import { Session } from "@/session"
+import { LLM } from "@/session/llm"
 import { MessageV2 } from "@/session/message-v2"
+import { Todo } from "@/session/todo"
 import { Log } from "@/util/log"
 
 function toText(item: MessageV2.WithParts): string {
@@ -14,61 +18,90 @@ function toText(item: MessageV2.WithParts): string {
     .trim()
 }
 
-const CONTEXT_LIMIT = 10_000
+const HANDOVER_PROMPT = `You are summarizing a planning session to hand off to an implementation session.
 
-function isTool(part: MessageV2.Part): part is MessageV2.ToolPart & { state: MessageV2.ToolStateCompleted } {
-  return part.type === "tool" && part.state.status === "completed"
+The plan itself will be provided separately — do NOT repeat it. Instead, focus on information discovered during planning that would help the implementing agent but is NOT already in the plan text.
+
+Produce a concise summary using this template:
+---
+## Discoveries
+
+[Key findings from code exploration — architecture patterns, gotchas, edge cases, relevant existing code that the plan references but doesn't fully explain]
+
+## Relevant Files
+
+[Structured list of files/directories that were read or discussed, with brief notes on what's relevant in each]
+
+## Implementation Notes
+
+[Any important context: conventions to follow, potential pitfalls, dependencies between steps, things the implementing agent should watch out for]
+---
+
+If there is nothing useful to add beyond what the plan already says, respond with an empty string.
+Keep the summary concise — focus on high-entropy information that would save the implementing agent time.`
+
+export function formatTodos(todos: Todo.Info[]): string {
+  if (!todos.length) return ""
+  const icons: Record<string, string> = {
+    completed: "[x]",
+    in_progress: "[~]",
+    cancelled: "[-]",
+  }
+  return todos.map((t) => `- ${icons[t.status] ?? "[ ]"} ${t.content}`).join("\n")
 }
 
-export function extractContext(messages: MessageV2.WithParts[]): string {
-  const tasks = [] as string[]
-  const files = [] as string[]
-  const seen = new Set<string>()
+export async function generateHandover(input: {
+  messages: MessageV2.WithParts[]
+  model: MessageV2.User["model"]
+  abort?: AbortSignal
+}): Promise<string> {
+  const log = Log.create({ service: "plan.followup" })
+  try {
+    const agent = await Agent.get("compaction")
+    const model = agent?.model
+      ? await Provider.getModel(agent.model.providerID, agent.model.modelID)
+      : await Provider.getModel(input.model.providerID, input.model.modelID)
 
-  for (const msg of messages) {
-    for (const part of msg.parts) {
-      if (!isTool(part)) continue
-      if (part.tool === "task" && part.state.output.trim()) {
-        const match = part.state.output.match(/<task_result>([\s\S]*?)<\/task_result>/)
-        tasks.push(match ? match[1].trim() : part.state.output.trim())
-      }
-      if (part.tool === "read" && part.state.input.filePath) {
-        const path = part.state.input.filePath as string
-        const offset = part.state.input.offset as number | undefined
-        const limit = part.state.input.limit as number | undefined
-        const range =
-          offset !== undefined && limit !== undefined
-            ? ` (lines ${offset}-${offset + limit - 1})`
-            : offset !== undefined
-              ? ` (from line ${offset})`
-              : limit !== undefined
-                ? ` (first ${limit} lines)`
-                : ""
-        const entry = `- ${path}${range}`
-        if (!seen.has(entry)) {
-          seen.add(entry)
-          files.push(entry)
-        }
-      }
+    const sessionID = Identifier.ascending("session")
+    const userMsg: MessageV2.User = {
+      id: Identifier.ascending("message"),
+      sessionID,
+      role: "user",
+      time: { created: Date.now() },
+      agent: "plan",
+      model: input.model,
     }
-  }
 
-  if (!tasks.length && !files.length) return ""
+    const stream = await LLM.stream({
+      agent: agent ?? {
+        name: "compaction",
+        mode: "subagent",
+        permission: [],
+        options: {},
+      },
+      user: userMsg,
+      tools: {},
+      model,
+      small: true,
+      messages: [
+        ...MessageV2.toModelMessages(input.messages, model),
+        {
+          role: "user" as const,
+          content: HANDOVER_PROMPT,
+        },
+      ],
+      abort: input.abort ? AbortSignal.any([input.abort, AbortSignal.timeout(60_000)]) : AbortSignal.timeout(60_000),
+      sessionID,
+      system: [],
+      retries: 1,
+    })
 
-  const sections = [] as string[]
-  if (tasks.length) {
-    sections.push("### Explored\n\n" + tasks.join("\n\n"))
+    const result = await stream.text
+    return result.trim()
+  } catch (error) {
+    log.error("handover generation failed", { error })
+    return ""
   }
-  if (files.length) {
-    sections.push("### Files read\n\n" + files.join("\n"))
-  }
-
-  const full = "\n\n## Context from planning research\n\n" + sections.join("\n\n")
-  if (full.length <= CONTEXT_LIMIT) return full
-  const marker = "\n\n[context truncated]"
-  const cut = full.slice(0, CONTEXT_LIMIT - marker.length)
-  const last = cut.lastIndexOf("\n")
-  return (last > 0 ? cut.slice(0, last) : cut) + marker
 }
 
 export namespace PlanFollowup {
@@ -138,14 +171,35 @@ export namespace PlanFollowup {
       })
   }
 
-  async function startNew(input: { plan: string; messages: MessageV2.WithParts[]; model: MessageV2.User["model"] }) {
-    const context = extractContext(input.messages)
+  async function startNew(input: {
+    sessionID: string
+    plan: string
+    messages: MessageV2.WithParts[]
+    model: MessageV2.User["model"]
+    abort?: AbortSignal
+  }) {
+    const [handover, todos] = await Promise.all([
+      generateHandover({ messages: input.messages, model: input.model, abort: input.abort }),
+      Todo.get(input.sessionID),
+    ])
+
+    const sections = [`Implement the following plan:\n\n${input.plan}`]
+
+    if (handover) {
+      sections.push(`## Handover from Planning Session\n\n${handover}`)
+    }
+
+    const todoList = formatTodos(todos)
+    if (todoList) {
+      sections.push(`## Todo List\n\n${todoList}`)
+    }
+
     const next = await Session.create({})
     await inject({
       sessionID: next.id,
       agent: "code",
       model: input.model,
-      text: `Implement the following plan:\n\n${input.plan}${context ? `\n${context}` : ""}`,
+      text: sections.join("\n\n"),
     })
     await Bus.publish(TuiEvent.SessionSelect, { sessionID: next.id })
     void import("@/session/prompt")
@@ -179,7 +233,7 @@ export namespace PlanFollowup {
     if (!answer) return "break"
 
     if (answer === ANSWER_NEW_SESSION) {
-      await startNew({ plan, messages: input.messages, model: user.model })
+      await startNew({ sessionID: input.sessionID, plan, messages: input.messages, model: user.model, abort: input.abort })
       return "break"
     }
 

@@ -1,13 +1,17 @@
 import { describe, expect, spyOn, test } from "bun:test"
+import { Agent } from "../../src/agent/agent"
 import { Bus } from "../../src/bus"
 import { TuiEvent } from "../../src/cli/cmd/tui/event"
 import { Identifier } from "../../src/id/id"
-import { extractContext, PlanFollowup } from "../../src/kilocode/plan-followup"
+import { formatTodos, generateHandover, PlanFollowup } from "../../src/kilocode/plan-followup"
 import { Instance } from "../../src/project/instance"
+import { Provider } from "../../src/provider/provider"
 import { Question } from "../../src/question"
 import { Session } from "../../src/session"
+import { LLM } from "../../src/session/llm"
 import { MessageV2 } from "../../src/session/message-v2"
 import { SessionPrompt } from "../../src/session/prompt"
+import { Todo } from "../../src/session/todo"
 import { Log } from "../../src/util/log"
 import { tmpdir } from "../fixture/fixture"
 
@@ -122,6 +126,39 @@ async function sessions() {
   return Array.fromAsync(Session.list())
 }
 
+const fakeAgent: Agent.Info = {
+  name: "compaction",
+  mode: "subagent",
+  permission: [],
+  options: {},
+}
+
+const fakeModel = {
+  id: "gpt-4",
+  providerID: "openai",
+  limit: { context: 128000, input: 0 },
+  api: { id: "openai", npm: "@ai-sdk/openai" },
+  capabilities: {},
+} as Provider.Model
+
+function mockHandoverDeps(text: string, opts?: { agent?: Agent.Info | null }) {
+  const agentSpy = spyOn(Agent, "get").mockResolvedValue((opts?.agent === null ? undefined : (opts?.agent ?? fakeAgent)) as any)
+  const modelSpy = spyOn(Provider, "getModel").mockResolvedValue(fakeModel)
+  const llmSpy = spyOn(LLM, "stream").mockResolvedValue({
+    text: Promise.resolve(text),
+  } as any)
+  return {
+    agentSpy,
+    modelSpy,
+    llmSpy,
+    [Symbol.dispose]() {
+      agentSpy.mockRestore()
+      modelSpy.mockRestore()
+      llmSpy.mockRestore()
+    },
+  }
+}
+
 describe("plan follow-up", () => {
   test("ask - returns break when dismissed", () =>
     withInstance(async () => {
@@ -196,7 +233,7 @@ describe("plan follow-up", () => {
       expect(part.synthetic).toBe(true)
     }))
 
-  test("ask - creates a new session on Start new session", () =>
+  test("ask - creates a new session on Start new session with handover and todos", () =>
     withInstance(async () => {
       const loop = spyOn(SessionPrompt, "loop").mockResolvedValue({
         info: {
@@ -229,26 +266,24 @@ describe("plan follow-up", () => {
         },
         parts: [],
       })
-      using _ = {
+      using _mocks = mockHandoverDeps("## Discoveries\n\nFound REST endpoints in src/api.ts\n\n## Relevant Files\n\n- src/api.ts: REST endpoints\n- src/db.ts: Database layer")
+      using _loop = {
         [Symbol.dispose]() {
           loop.mockRestore()
         },
       }
       const seeded = await seed({
         text: "1. Add API\n2. Add tests",
-        tools: [
-          {
-            tool: "task",
-            input: { prompt: "explore the codebase", subagent_type: "explore" },
-            output: "Found src/api.ts with REST endpoints and src/db.ts with database layer",
-          },
-          {
-            tool: "read",
-            input: { filePath: "/project/src/api.ts", offset: 1, limit: 50 },
-            output: "file content here",
-          },
+      })
+
+      await Todo.update({
+        sessionID: seeded.sessionID,
+        todos: [
+          { id: "1", content: "Add API endpoint", status: "completed", priority: "high" },
+          { id: "2", content: "Write tests", status: "pending", priority: "medium" },
         ],
       })
+
       const before = await sessions()
       const created = [] as string[]
       const unsub = Bus.subscribe(TuiEvent.SessionSelect, (event) => {
@@ -275,6 +310,7 @@ describe("plan follow-up", () => {
       expect(added).toHaveLength(1)
       expect(created).toHaveLength(1)
       expect(loop).toHaveBeenCalledTimes(1)
+      expect(_mocks.llmSpy).toHaveBeenCalledTimes(1)
 
       const newSessionID = created[0]
       expect(added[0].id).toBe(newSessionID)
@@ -289,12 +325,77 @@ describe("plan follow-up", () => {
       if (!part || part.type !== "text") throw new Error("expected text part")
       expect(part.text).toContain("Implement the following plan:")
       expect(part.text).toContain("1. Add API\n2. Add tests")
-      expect(part.text).toContain("## Context from planning research")
-      expect(part.text).toContain("Found src/api.ts with REST endpoints")
-      expect(part.text).toContain("- /project/src/api.ts (lines 1-50)")
+      expect(part.text).toContain("## Handover from Planning Session")
+      expect(part.text).toContain("Found REST endpoints in src/api.ts")
+      expect(part.text).toContain("## Todo List")
+      expect(part.text).toContain("[x] Add API endpoint")
+      expect(part.text).toContain("[ ] Write tests")
       expect(part.synthetic).toBe(true)
 
       SessionPrompt.cancel(newSessionID)
+    }))
+
+  test("ask - new session omits handover section when LLM returns empty", () =>
+    withInstance(async () => {
+      const loop = spyOn(SessionPrompt, "loop").mockResolvedValue({
+        info: {
+          id: "msg_test",
+          role: "assistant",
+          sessionID: "ses_test",
+          time: { created: Date.now() },
+          parentID: "msg_parent",
+          modelID: "test",
+          providerID: "test",
+          mode: "code",
+          agent: "code",
+          path: { cwd: "/tmp", root: "/tmp" },
+          cost: 0,
+          tokens: {
+            total: 0,
+            input: 0,
+            output: 0,
+            reasoning: 0,
+            cache: { read: 0, write: 0 },
+          },
+        },
+        parts: [],
+      })
+      using _mocks = mockHandoverDeps("")
+      using _loop = {
+        [Symbol.dispose]() {
+          loop.mockRestore()
+        },
+      }
+      const seeded = await seed({ text: "1. Add API\n2. Add tests" })
+      const created = [] as string[]
+      const unsub = Bus.subscribe(TuiEvent.SessionSelect, (event) => {
+        created.push(event.properties.sessionID)
+      })
+
+      const pending = PlanFollowup.ask({
+        sessionID: seeded.sessionID,
+        messages: seeded.messages,
+        abort: AbortSignal.any([]),
+      })
+
+      await Question.reply({
+        requestID: (await Question.list())[0].id,
+        answers: [[PlanFollowup.ANSWER_NEW_SESSION]],
+      })
+
+      await expect(pending).resolves.toBe("break")
+      unsub()
+
+      const messages = await Session.messages({ sessionID: created[0] })
+      const user = messages.find((item) => item.info.role === "user")
+      if (!user || user.info.role !== "user") throw new Error("expected user message")
+      const part = user.parts.find((item) => item.type === "text")
+      if (!part || part.type !== "text") throw new Error("expected text part")
+      expect(part.text).toContain("Implement the following plan:")
+      expect(part.text).not.toContain("## Handover from Planning Session")
+      expect(part.text).not.toContain("## Todo List")
+
+      SessionPrompt.cancel(created[0])
     }))
 
   test("ask - returns break when assistant text is empty", () =>
@@ -361,195 +462,79 @@ describe("plan follow-up", () => {
       expect((await Session.messages({ sessionID: seeded.sessionID })).length).toBe(2)
     }))
 
-  test("extractContext - returns empty string with no tool results", () =>
+  test("formatTodos - returns empty string for no todos", () => {
+    expect(formatTodos([])).toBe("")
+  })
+
+  test("formatTodos - formats todos with status icons", () => {
+    const todos: Todo.Info[] = [
+      { id: "1", content: "Set up project", status: "completed", priority: "high" },
+      { id: "2", content: "Write code", status: "in_progress", priority: "high" },
+      { id: "3", content: "Add tests", status: "pending", priority: "medium" },
+      { id: "4", content: "Dropped task", status: "cancelled", priority: "low" },
+    ]
+    const result = formatTodos(todos)
+    expect(result).toBe(
+      "- [x] Set up project\n- [~] Write code\n- [ ] Add tests\n- [-] Dropped task",
+    )
+  })
+
+  test("generateHandover - returns empty string on LLM.stream failure", () =>
     withInstance(async () => {
+      const agentSpy = spyOn(Agent, "get").mockResolvedValue(fakeAgent)
+      const modelSpy = spyOn(Provider, "getModel").mockResolvedValue(fakeModel)
+      const llmSpy = spyOn(LLM, "stream").mockRejectedValue(new Error("provider unavailable"))
+      using _ = {
+        [Symbol.dispose]() {
+          agentSpy.mockRestore()
+          modelSpy.mockRestore()
+          llmSpy.mockRestore()
+        },
+      }
       const seeded = await seed({ text: "1. Build\n2. Test" })
-      expect(extractContext(seeded.messages)).toBe("")
+      const result = await generateHandover({ messages: seeded.messages, model })
+      expect(result).toBe("")
     }))
 
-  test("extractContext - includes task outputs and read paths", () =>
+  test("generateHandover - returns empty string on stream.text rejection", () =>
     withInstance(async () => {
-      const seeded = await seed({
-        text: "Plan text",
-        tools: [
-          {
-            tool: "task",
-            input: { prompt: "explore", subagent_type: "explore" },
-            output: "The auth module lives in src/auth/",
-          },
-          {
-            tool: "read",
-            input: { filePath: "/project/src/auth/login.ts" },
-            output: "file content",
-          },
-          {
-            tool: "read",
-            input: { filePath: "/project/src/auth/session.ts", offset: 10, limit: 20 },
-            output: "file content",
-          },
-        ],
+      const agentSpy = spyOn(Agent, "get").mockResolvedValue(fakeAgent)
+      const modelSpy = spyOn(Provider, "getModel").mockResolvedValue(fakeModel)
+      const textPromise = new Promise<string>((_, reject) => {
+        setTimeout(() => reject(new Error("stream aborted")), 0)
       })
-      const context = extractContext(seeded.messages)
-      expect(context).toContain("## Context from planning research")
-      expect(context).toContain("### Explored")
-      expect(context).toContain("The auth module lives in src/auth/")
-      expect(context).toContain("### Files read")
-      expect(context).toContain("- /project/src/auth/login.ts")
-      expect(context).toContain("- /project/src/auth/session.ts (lines 10-29)")
+      textPromise.catch(() => {})
+      const llmSpy = spyOn(LLM, "stream").mockResolvedValue({
+        text: textPromise,
+      } as any)
+      using _ = {
+        [Symbol.dispose]() {
+          agentSpy.mockRestore()
+          modelSpy.mockRestore()
+          llmSpy.mockRestore()
+        },
+      }
+      const seeded = await seed({ text: "1. Build\n2. Test" })
+      const result = await generateHandover({ messages: seeded.messages, model })
+      expect(result).toBe("")
     }))
 
-  test("extractContext - filters empty and whitespace-only task outputs", () =>
+  test("generateHandover - uses fallback agent when compaction agent is not configured", () =>
     withInstance(async () => {
-      const seeded = await seed({
-        text: "Plan text",
-        tools: [
-          {
-            tool: "task",
-            input: { prompt: "explore", subagent_type: "explore" },
-            output: "",
-          },
-          {
-            tool: "task",
-            input: { prompt: "explore more", subagent_type: "explore" },
-            output: "   ",
-          },
-        ],
-      })
-      expect(extractContext(seeded.messages)).toBe("")
+      using mocks = mockHandoverDeps("## Discoveries\n\nFallback works", { agent: null })
+      const seeded = await seed({ text: "1. Build\n2. Test" })
+      const result = await generateHandover({ messages: seeded.messages, model })
+      expect(result).toBe("## Discoveries\n\nFallback works")
+      expect(mocks.agentSpy).toHaveBeenCalledWith("compaction")
+      expect(mocks.llmSpy).toHaveBeenCalledTimes(1)
     }))
 
-  test("extractContext - deduplicates file reads", () =>
+  test("generateHandover - returns LLM output on success", () =>
     withInstance(async () => {
-      const seeded = await seed({
-        text: "Plan text",
-        tools: [
-          {
-            tool: "read",
-            input: { filePath: "/project/src/api.ts" },
-            output: "content",
-          },
-          {
-            tool: "read",
-            input: { filePath: "/project/src/api.ts" },
-            output: "content again",
-          },
-          {
-            tool: "read",
-            input: { filePath: "/project/src/api.ts", offset: 10, limit: 20 },
-            output: "different range",
-          },
-        ],
-      })
-      const context = extractContext(seeded.messages)
-      const matches = context.match(/- \/project\/src\/api\.ts\b/g)
-      expect(matches).toHaveLength(2)
-    }))
-
-  test("extractContext - includes only explored section when no reads", () =>
-    withInstance(async () => {
-      const seeded = await seed({
-        text: "Plan text",
-        tools: [
-          {
-            tool: "task",
-            input: { prompt: "explore", subagent_type: "explore" },
-            output: "Found important patterns",
-          },
-        ],
-      })
-      const context = extractContext(seeded.messages)
-      expect(context).toContain("### Explored")
-      expect(context).toContain("Found important patterns")
-      expect(context).not.toContain("### Files read")
-    }))
-
-  test("extractContext - includes only files section when no tasks", () =>
-    withInstance(async () => {
-      const seeded = await seed({
-        text: "Plan text",
-        tools: [
-          {
-            tool: "read",
-            input: { filePath: "/project/src/index.ts" },
-            output: "content",
-          },
-        ],
-      })
-      const context = extractContext(seeded.messages)
-      expect(context).not.toContain("### Explored")
-      expect(context).toContain("### Files read")
-      expect(context).toContain("- /project/src/index.ts")
-    }))
-
-  test("extractContext - ignores non-task non-read tools", () =>
-    withInstance(async () => {
-      const seeded = await seed({
-        text: "Plan text",
-        tools: [
-          {
-            tool: "grep",
-            input: { pattern: "foo", path: "/project" },
-            output: "Found 5 matches",
-          },
-          {
-            tool: "bash",
-            input: { command: "ls" },
-            output: "file1.ts\nfile2.ts",
-          },
-        ],
-      })
-      expect(extractContext(seeded.messages)).toBe("")
-    }))
-
-  test("extractContext - strips task_id prefix and task_result tags", () =>
-    withInstance(async () => {
-      const seeded = await seed({
-        text: "Plan text",
-        tools: [
-          {
-            tool: "task",
-            input: { prompt: "explore", subagent_type: "explore" },
-            output:
-              "task_id: ses_abc123 (for resuming)\n\n<task_result>\nThe auth module is in src/auth/\n</task_result>",
-          },
-        ],
-      })
-      const context = extractContext(seeded.messages)
-      expect(context).toContain("The auth module is in src/auth/")
-      expect(context).not.toContain("task_id:")
-      expect(context).not.toContain("<task_result>")
-    }))
-
-  test("extractContext - shows first N lines for limit-only reads", () =>
-    withInstance(async () => {
-      const seeded = await seed({
-        text: "Plan text",
-        tools: [
-          {
-            tool: "read",
-            input: { filePath: "/project/src/config.ts", limit: 50 },
-            output: "content",
-          },
-        ],
-      })
-      const context = extractContext(seeded.messages)
-      expect(context).toContain("- /project/src/config.ts (first 50 lines)")
-    }))
-
-  test("extractContext - truncates at 10000 chars", () =>
-    withInstance(async () => {
-      const seeded = await seed({
-        text: "Plan text",
-        tools: [
-          {
-            tool: "task",
-            input: { prompt: "explore", subagent_type: "explore" },
-            output: "x".repeat(12_000),
-          },
-        ],
-      })
-      const context = extractContext(seeded.messages)
-      expect(context.length).toBeLessThanOrEqual(10_000)
-      expect(context).toEndWith("[context truncated]")
+      using mocks = mockHandoverDeps("## Discoveries\n\nKey finding here")
+      const seeded = await seed({ text: "1. Build\n2. Test" })
+      const result = await generateHandover({ messages: seeded.messages, model })
+      expect(result).toBe("## Discoveries\n\nKey finding here")
+      expect(mocks.llmSpy).toHaveBeenCalledTimes(1)
     }))
 })
