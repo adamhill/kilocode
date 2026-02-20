@@ -128,7 +128,7 @@ describe("postprocessAutocompleteSuggestion", () => {
       suffix: "\n}",
       model: "codestral",
     })
-    expect(typeof result === "string" || result === undefined).toBe(true)
+    expect(result).toBe("  return x + y;")
   })
 
   it("returns undefined for empty suggestion", () => {

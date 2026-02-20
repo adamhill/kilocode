@@ -35,17 +35,16 @@ describe("humanFormatSessionCost", () => {
 })
 
 describe("formatTime", () => {
-  it("returns a string for a valid timestamp", () => {
+  it("contains at least two colon-separated time components", () => {
     const result = formatTime(Date.now())
-    expect(typeof result).toBe("string")
-    expect(result.length).toBeGreaterThan(0)
+    expect(result).toMatch(/\d+:\d+/)
   })
 
-  it("includes time components (hours, minutes, seconds are present)", () => {
+  it("formats a known timestamp with correct hour and minute", () => {
     const ts = new Date("2024-01-15T14:30:45").getTime()
     const result = formatTime(ts)
-    expect(typeof result).toBe("string")
-    expect(result.length).toBeGreaterThan(0)
+    expect(result).toMatch(/30/)
+    expect(result).toMatch(/45/)
   })
 
   it("produces different output for different timestamps", () => {
