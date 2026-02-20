@@ -86,9 +86,7 @@ describe("buildChatPrefix", () => {
   })
 
   it("uses last segment of file path as filename", () => {
-    const editors = [
-      { filePath: "/deep/path/to/myfile.ts", languageId: "typescript", visibleRanges: [] },
-    ]
+    const editors = [{ filePath: "/deep/path/to/myfile.ts", languageId: "typescript", visibleRanges: [] }]
     const result = buildChatPrefix("q", editors)
     expect(result).toContain("myfile.ts")
     expect(result).not.toContain("deep/path")
