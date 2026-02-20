@@ -17,6 +17,8 @@ import type {
   AgentManagerWorktreeSetupMessage,
   AgentManagerStateMessage,
   AgentManagerKeybindingsMessage,
+  AgentManagerMultiVersionProgressMessage,
+  AgentManagerSendInitialMessage,
   WorktreeState,
   ManagedSessionState,
   SessionInfo,
@@ -26,6 +28,7 @@ import type { DragEvent } from "@thisbeyond/solid-dnd"
 import { ThemeProvider } from "@kilocode/kilo-ui/theme"
 import { DialogProvider, useDialog } from "@kilocode/kilo-ui/context/dialog"
 import { Dialog } from "@kilocode/kilo-ui/dialog"
+import { DropdownMenu } from "@kilocode/kilo-ui/dropdown-menu"
 import { MarkedProvider } from "@kilocode/kilo-ui/context/marked"
 import { CodeComponentProvider } from "@kilocode/kilo-ui/context/code"
 import { DiffComponentProvider } from "@kilocode/kilo-ui/context/diff"
@@ -37,9 +40,8 @@ import { Icon } from "@kilocode/kilo-ui/icon"
 import { Button } from "@kilocode/kilo-ui/button"
 import { IconButton } from "@kilocode/kilo-ui/icon-button"
 import { Spinner } from "@kilocode/kilo-ui/spinner"
-import { TooltipKeybind } from "@kilocode/kilo-ui/tooltip"
+import { Tooltip, TooltipKeybind } from "@kilocode/kilo-ui/tooltip"
 import { HoverCard } from "@kilocode/kilo-ui/hover-card"
-import { DropdownMenu } from "@kilocode/kilo-ui/dropdown-menu"
 import { VSCodeProvider, useVSCode } from "../src/context/vscode"
 import { ServerProvider } from "../src/context/server"
 import { ProviderProvider } from "../src/context/provider"
@@ -47,6 +49,8 @@ import { ConfigProvider } from "../src/context/config"
 import { SessionProvider, useSession } from "../src/context/session"
 import { WorktreeModeProvider } from "../src/context/worktree-mode"
 import { ChatView } from "../src/components/chat"
+import { ModelSelectorBase } from "../src/components/chat/ModelSelector"
+import { ModeSwitcherBase } from "../src/components/chat/ModeSwitcher"
 import { LanguageBridge, DataBridge } from "../src/App"
 import { formatRelativeDate } from "../src/utils/date"
 import { validateLocalSession, nextSelectionAfterDelete, adjacentHint, LOCAL } from "./navigate"
@@ -229,6 +233,7 @@ const AgentManagerContent: Component = () => {
   const [selection, setSelection] = createSignal<SidebarSelection>(LOCAL)
   const [repoBranch, setRepoBranch] = createSignal<string | undefined>()
   const [deletingWorktrees, setDeletingWorktrees] = createSignal<Set<string>>(new Set())
+  const [loadingWorktrees, setLoadingWorktrees] = createSignal<Set<string>>(new Set())
   const [worktreesLoaded, setWorktreesLoaded] = createSignal(false)
   const [sessionsLoaded, setSessionsLoaded] = createSignal(false)
 
@@ -373,6 +378,60 @@ const AgentManagerContent: Component = () => {
     const ids = new Set(managed.map((ms) => ms.id))
     const sessions = session.sessions().filter((s) => ids.has(s.id))
     return firstOrderedTitle(sessions, worktreeTabOrder()[wt.id], wt.branch)
+  }
+
+  /** Worktrees sorted so that grouped items are always adjacent, ordered by creation time. */
+  const sortedWorktrees = createMemo(() => {
+    const all = worktrees()
+    if (all.length === 0) return []
+
+    // Collect grouped worktrees by groupId
+    const grouped = new Map<string, WorktreeState[]>()
+    for (const wt of all) {
+      if (!wt.groupId) continue
+      const list = grouped.get(wt.groupId) ?? []
+      list.push(wt)
+      grouped.set(wt.groupId, list)
+    }
+
+    // Build output: interleave groups at the position of their earliest member
+    const result: WorktreeState[] = []
+    const placed = new Set<string>()
+    for (const wt of all) {
+      if (placed.has(wt.id)) continue
+      if (wt.groupId) {
+        if (placed.has(wt.groupId)) continue
+        placed.add(wt.groupId)
+        const group = grouped.get(wt.groupId) ?? []
+        for (const g of group) {
+          result.push(g)
+          placed.add(g.id)
+        }
+      } else {
+        result.push(wt)
+        placed.add(wt.id)
+      }
+    }
+    return result
+  })
+
+  /** Check if this worktree is part of a group. */
+  const isGrouped = (wt: WorktreeState) => !!wt.groupId
+
+  /** Check if this is the first item in its group. */
+  const isGroupStart = (wt: WorktreeState, idx: number) => {
+    if (!wt.groupId) return false
+    const list = sortedWorktrees()
+    if (idx === 0) return true
+    return list[idx - 1]?.groupId !== wt.groupId
+  }
+
+  /** Check if this is the last item in its group. */
+  const isGroupEnd = (wt: WorktreeState, idx: number) => {
+    if (!wt.groupId) return false
+    const list = sortedWorktrees()
+    if (idx === list.length - 1) return true
+    return list[idx + 1]?.groupId !== wt.groupId
   }
 
   const scrollIntoView = (el: HTMLElement) => {
@@ -586,6 +645,69 @@ const AgentManagerContent: Component = () => {
           return next.size === prev.size ? prev : next
         })
       }
+
+      // When a multi-version progress update arrives, mark newly created worktrees as loading
+      if ((msg as { type: string }).type === "agentManager.multiVersionProgress") {
+        const ev = msg as unknown as AgentManagerMultiVersionProgressMessage
+        if (ev.status === "done" && ev.groupId) {
+          // Clear loading state for all worktrees in this group
+          setLoadingWorktrees((prev) => {
+            const next = new Set(prev)
+            for (const wt of worktrees()) {
+              if (wt.groupId === ev.groupId) next.delete(wt.id)
+            }
+            return next
+          })
+        }
+      }
+
+      // When state updates arrive, mark new grouped worktrees as loading
+      // (they were just created and haven't received their prompt yet)
+      if (msg.type === "agentManager.worktreeSetup") {
+        const ev = msg as AgentManagerWorktreeSetupMessage
+        if (ev.status === "ready" && ev.sessionId) {
+          const ms = managedSessions().find((s) => s.id === ev.sessionId)
+          const wt = ms?.worktreeId ? worktrees().find((w) => w.id === ms.worktreeId) : undefined
+          if (wt?.groupId) {
+            setLoadingWorktrees((prev) => new Set([...prev, wt.id]))
+          }
+        }
+      }
+
+      // Handle initial message send for multi-version sessions.
+      // The extension creates the worktrees/sessions, then asks the webview
+      // to send the prompt through the normal KiloProvider sendMessage path.
+      // Once the message is sent, clear the loading state for that worktree.
+      if ((msg as { type: string }).type === "agentManager.sendInitialMessage") {
+        const ev = msg as unknown as AgentManagerSendInitialMessage
+
+        // Set model and agent selections for this session so the UI reflects them
+        if (ev.providerID && ev.modelID) {
+          session.setSessionModel(ev.sessionId, ev.providerID, ev.modelID)
+        }
+        if (ev.agent) {
+          session.setSessionAgent(ev.sessionId, ev.agent)
+        }
+
+        vscode.postMessage({
+          type: "sendMessage",
+          text: ev.text,
+          sessionID: ev.sessionId,
+          providerID: ev.providerID,
+          modelID: ev.modelID,
+          agent: ev.agent,
+          files: ev.files,
+        })
+        // Clear loading state — use worktreeId from the message directly
+        // to avoid race condition where managedSessions() hasn't updated yet
+        if (ev.worktreeId) {
+          setLoadingWorktrees((prev) => {
+            const next = new Set(prev)
+            next.delete(ev.worktreeId)
+            return next
+          })
+        }
+      }
     })
 
     onCleanup(() => {
@@ -647,6 +769,11 @@ const AgentManagerContent: Component = () => {
 
   const handleCreateWorktree = () => {
     vscode.postMessage({ type: "agentManager.createWorktree" })
+  }
+
+  // Advanced worktree dialog — opens a full dialog with prompt, versions, model, mode
+  const showAdvancedWorktreeDialog = () => {
+    dialog.show(() => <NewWorktreeDialog onClose={() => dialog.close()} />)
   }
 
   const confirmDeleteWorktree = (worktreeId: string) => {
@@ -898,15 +1025,32 @@ const AgentManagerContent: Component = () => {
                   </DropdownMenu.Content>
                 </DropdownMenu.Portal>
               </DropdownMenu>
-              <TooltipKeybind title="New worktree" keybind={kb().newWorktree ?? ""} placement="bottom">
+              <div class="am-split-button">
                 <IconButton
                   icon="plus"
                   size="small"
                   variant="ghost"
-                  label="New worktree"
+                  label="New Worktree"
                   onClick={handleCreateWorktree}
                 />
-              </TooltipKeybind>
+                <DropdownMenu gutter={4} placement="bottom-end">
+                  <DropdownMenu.Trigger class="am-split-arrow" aria-label="Advanced worktree options">
+                    <Icon name="chevron-down" size="small" />
+                  </DropdownMenu.Trigger>
+                  <DropdownMenu.Portal>
+                    <DropdownMenu.Content class="am-split-menu">
+                      <DropdownMenu.Item onSelect={handleCreateWorktree}>
+                        <DropdownMenu.ItemLabel>New Worktree</DropdownMenu.ItemLabel>
+                      </DropdownMenu.Item>
+                      <DropdownMenu.Separator />
+                      <DropdownMenu.Item onSelect={showAdvancedWorktreeDialog}>
+                        <Icon name="layers" size="small" />
+                        <DropdownMenu.ItemLabel>New with Versions...</DropdownMenu.ItemLabel>
+                      </DropdownMenu.Item>
+                    </DropdownMenu.Content>
+                  </DropdownMenu.Portal>
+                </DropdownMenu>
+              </div>
             </div>
           </div>
           <div class="am-worktree-list">
@@ -925,86 +1069,104 @@ const AgentManagerContent: Component = () => {
                 const [hoveredWt, setHoveredWt] = createSignal<string | null>(null)
                 const [overClose, setOverClose] = createSignal(false)
                 return (
-                  <For each={worktrees()}>
-                    {(wt, wtIdx) => {
+                  <For each={sortedWorktrees()}>
+                    {(wt, idx) => {
+                      const grouped = () => isGrouped(wt)
+                      const start = () => isGroupStart(wt, idx())
+                      const end = () => isGroupEnd(wt, idx())
+                      const busy = () => deletingWorktrees().has(wt.id) || loadingWorktrees().has(wt.id)
+                      const groupSize = () => {
+                        if (!wt.groupId) return 0
+                        return sortedWorktrees().filter((w) => w.groupId === wt.groupId).length
+                      }
                       const sessions = createMemo(() => managedSessions().filter((ms) => ms.worktreeId === wt.id))
                       const navHint = () => {
                         const flat = [
                           LOCAL as string,
-                          ...worktrees().map((w) => w.id),
+                          ...sortedWorktrees().map((w) => w.id),
                           ...unassignedSessions().map((s) => s.id),
                         ]
                         const active = selection() ?? session.currentSessionID() ?? ""
                         return adjacentHint(wt.id, active, flat, kb().previousSession ?? "", kb().nextSession ?? "")
                       }
                       return (
-                        <HoverCard
-                          openDelay={100}
-                          closeDelay={100}
-                          placement="right-start"
-                          gutter={8}
-                          open={hoveredWt() === wt.id && !overClose()}
-                          onOpenChange={(open) => setHoveredWt(open ? wt.id : null)}
-                          trigger={
-                            <div
-                              class={`am-worktree-item ${selection() === wt.id ? "am-worktree-item-active" : ""}`}
-                              data-sidebar-id={wt.id}
-                              onClick={() => selectWorktree(wt.id)}
-                            >
-                              <Icon name="branch" size="small" />
-                              <span class="am-worktree-branch">{worktreeLabel(wt)}</span>
-                              <Show
-                                when={!deletingWorktrees().has(wt.id)}
-                                fallback={<Spinner class="am-worktree-spinner" />}
+                        <>
+                          <Show when={start()}>
+                            <div class="am-wt-group-header">
+                              <Icon name="layers" size="small" />
+                              <span class="am-wt-group-label">{groupSize()} versions</span>
+                            </div>
+                          </Show>
+                          <HoverCard
+                            openDelay={100}
+                            closeDelay={100}
+                            placement="right-start"
+                            gutter={8}
+                            open={hoveredWt() === wt.id && !overClose()}
+                            onOpenChange={(open) => setHoveredWt(open ? wt.id : null)}
+                            trigger={
+                              <div
+                                class="am-worktree-item"
+                                classList={{
+                                  "am-worktree-item-active": selection() === wt.id,
+                                  "am-wt-grouped": grouped(),
+                                  "am-wt-group-end": end(),
+                                }}
+                                data-sidebar-id={wt.id}
+                                onClick={() => selectWorktree(wt.id)}
                               >
-                                <div
-                                  class="am-worktree-close"
-                                  onMouseEnter={() => setOverClose(true)}
-                                  onMouseLeave={() => setOverClose(false)}
-                                >
-                                  <TooltipKeybind
-                                    title="Delete worktree"
-                                    keybind={kb().closeWorktree ?? ""}
-                                    placement="top"
+                                <Icon name="branch" size="small" />
+                                <span class="am-worktree-branch">{worktreeLabel(wt)}</span>
+                                <Show when={!busy()} fallback={<Spinner class="am-worktree-spinner" />}>
+                                  <div
+                                    class="am-worktree-close"
+                                    onMouseEnter={() => setOverClose(true)}
+                                    onMouseLeave={() => setOverClose(false)}
                                   >
-                                    <IconButton
-                                      icon="close-small"
-                                      size="small"
-                                      variant="ghost"
-                                      label="Delete worktree"
-                                      onClick={(e: MouseEvent) => handleDeleteWorktree(wt.id, e)}
-                                    />
-                                  </TooltipKeybind>
+                                    <TooltipKeybind
+                                      title="Delete worktree"
+                                      keybind={kb().closeWorktree ?? ""}
+                                      placement="top"
+                                    >
+                                      <IconButton
+                                        icon="close-small"
+                                        size="small"
+                                        variant="ghost"
+                                        label="Delete worktree"
+                                        onClick={(e: MouseEvent) => handleDeleteWorktree(wt.id, e)}
+                                      />
+                                    </TooltipKeybind>
+                                  </div>
+                                </Show>
+                              </div>
+                            }
+                          >
+                            <div class="am-hover-card">
+                              <div class="am-hover-card-header">
+                                <div>
+                                  <div class="am-hover-card-label">BRANCH</div>
+                                  <div class="am-hover-card-branch">{wt.branch}</div>
+                                  <div class="am-hover-card-meta">{formatRelativeDate(wt.createdAt)}</div>
+                                </div>
+                                <Show when={navHint()}>
+                                  <span class="am-hover-card-keybind">{navHint()}</span>
+                                </Show>
+                              </div>
+                              <Show when={wt.parentBranch}>
+                                <div class="am-hover-card-divider" />
+                                <div class="am-hover-card-row">
+                                  <span class="am-hover-card-row-label">Base</span>
+                                  <span class="am-hover-card-row-value">{wt.parentBranch}</span>
                                 </div>
                               </Show>
-                            </div>
-                          }
-                        >
-                          <div class="am-hover-card">
-                            <div class="am-hover-card-header">
-                              <div>
-                                <div class="am-hover-card-label">BRANCH</div>
-                                <div class="am-hover-card-branch">{wt.branch}</div>
-                                <div class="am-hover-card-meta">{formatRelativeDate(wt.createdAt)}</div>
-                              </div>
-                              <Show when={navHint()}>
-                                <span class="am-hover-card-keybind">{navHint()}</span>
-                              </Show>
-                            </div>
-                            <Show when={wt.parentBranch}>
                               <div class="am-hover-card-divider" />
                               <div class="am-hover-card-row">
-                                <span class="am-hover-card-row-label">Base</span>
-                                <span class="am-hover-card-row-value">{wt.parentBranch}</span>
+                                <span class="am-hover-card-row-label">Sessions</span>
+                                <span class="am-hover-card-row-value">{sessions().length}</span>
                               </div>
-                            </Show>
-                            <div class="am-hover-card-divider" />
-                            <div class="am-hover-card-row">
-                              <span class="am-hover-card-row-label">Sessions</span>
-                              <span class="am-hover-card-row-value">{sessions().length}</span>
                             </div>
-                          </div>
-                        </HoverCard>
+                          </HoverCard>
+                        </>
                       )
                     }}
                   </For>
@@ -1244,6 +1406,148 @@ const AgentManagerContent: Component = () => {
         </Show>
       </div>
     </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// Advanced "New Worktree" dialog — prompt, versions, model, mode
+// ---------------------------------------------------------------------------
+
+type VersionCount = 1 | 2 | 3 | 4
+const VERSION_OPTIONS: VersionCount[] = [1, 2, 3, 4]
+
+const NewWorktreeDialog: Component<{ onClose: () => void }> = (props) => {
+  const vscode = useVSCode()
+  const session = useSession()
+
+  const [prompt, setPrompt] = createSignal("")
+  const [versions, setVersions] = createSignal<VersionCount>(2)
+  const [model, setModel] = createSignal<{ providerID: string; modelID: string } | null>(null)
+  const [agent, setAgent] = createSignal(session.selectedAgent())
+  const [starting, setStarting] = createSignal(false)
+
+  let textareaRef: HTMLTextAreaElement | undefined
+
+  onMount(() => {
+    requestAnimationFrame(() => {
+      if (!textareaRef) return
+      textareaRef.focus()
+      textareaRef.select()
+    })
+  })
+
+  const canSubmit = () => prompt().trim().length > 0 && !starting()
+
+  const handleSubmit = () => {
+    const text = prompt().trim()
+    if (!text || starting()) return
+    setStarting(true)
+
+    const count = versions()
+    const sel = model()
+    const defaultAgent = session.agents()[0]?.name
+    const selectedAgent = agent() !== defaultAgent ? agent() : undefined
+    vscode.postMessage({
+      type: "agentManager.createMultiVersion",
+      text,
+      versions: count,
+      providerID: sel?.providerID,
+      modelID: sel?.modelID,
+      agent: selectedAgent,
+    })
+
+    props.onClose()
+  }
+
+  const handleKeyDown = (e: KeyboardEvent) => {
+    if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+      e.preventDefault()
+      handleSubmit()
+    }
+  }
+
+  const adjustHeight = () => {
+    if (!textareaRef) return
+    textareaRef.style.height = "auto"
+    textareaRef.style.height = `${Math.min(textareaRef.scrollHeight, 200)}px`
+  }
+
+  return (
+    <Dialog title="New Worktree" fit>
+      <div class="am-nv-dialog" onKeyDown={handleKeyDown}>
+        {/* Prompt input — reuses the same CSS as the sidebar chat input */}
+        <div class="prompt-input-container">
+          <div class="prompt-input-wrapper">
+            <div class="prompt-input-ghost-wrapper">
+              <textarea
+                ref={textareaRef}
+                class="prompt-input"
+                placeholder={`Type a message (${isMac ? "\u2318" : "Ctrl+"}Enter to send)`}
+                value={prompt()}
+                onInput={(e) => {
+                  setPrompt(e.currentTarget.value)
+                  adjustHeight()
+                }}
+                rows={3}
+              />
+            </div>
+          </div>
+          <div class="prompt-input-hint">
+            <div class="prompt-input-hint-selectors">
+              <ModelSelectorBase
+                value={model()}
+                onSelect={(pid, mid) => setModel(pid && mid ? { providerID: pid, modelID: mid } : null)}
+                placement="top-start"
+                allowClear
+                clearLabel="Default"
+              />
+              <Show when={session.agents().length > 1}>
+                <ModeSwitcherBase agents={session.agents()} value={agent()} onSelect={setAgent} />
+              </Show>
+            </div>
+            <div class="prompt-input-hint-actions">
+              <Tooltip value={`${isMac ? "\u2318" : "Ctrl+"}Enter`} placement="top">
+                <Button variant="primary" size="small" onClick={handleSubmit} disabled={!canSubmit()}>
+                  <Show
+                    when={!starting()}
+                    fallback={
+                      <>
+                        <Spinner class="am-nv-spinner" />
+                        <span>Creating...</span>
+                      </>
+                    }
+                  >
+                    <svg data-slot="icon-svg" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                      <path d="M1.5 1.5L14.5 8L1.5 14.5V9L10 8L1.5 7V1.5Z" />
+                    </svg>
+                  </Show>
+                </Button>
+              </Tooltip>
+            </div>
+          </div>
+        </div>
+
+        {/* Version selector + info */}
+        <div class="am-nv-version-bar">
+          <span class="am-nv-config-label">Versions</span>
+          <div class="am-nv-pills">
+            {VERSION_OPTIONS.map((count) => (
+              <button
+                class="am-nv-pill"
+                classList={{ "am-nv-pill-active": versions() === count }}
+                onClick={() => setVersions(count)}
+                type="button"
+              >
+                {count}
+              </button>
+            ))}
+          </div>
+          <Show when={versions() > 1}>
+            <span class="am-nv-version-hint">{versions()} worktrees will run in parallel</span>
+          </Show>
+        </div>
+      </div>
+    </Dialog>
   )
 }
 

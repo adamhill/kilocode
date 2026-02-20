@@ -543,6 +543,8 @@ export interface WorktreeState {
   path: string
   parentBranch: string
   createdAt: string
+  /** Shared identifier for worktrees created together via multi-version mode. */
+  groupId?: string
 }
 
 export interface ManagedSessionState {
@@ -571,6 +573,27 @@ export interface AgentManagerStateMessage {
 export interface AgentManagerKeybindingsMessage {
   type: "agentManager.keybindings"
   bindings: Record<string, string>
+}
+
+// Multi-version creation progress (extension → webview)
+export interface AgentManagerMultiVersionProgressMessage {
+  type: "agentManager.multiVersionProgress"
+  status: "creating" | "done"
+  total: number
+  completed: number
+  groupId?: string
+}
+
+// Request webview to send initial prompt to a newly created session (extension → webview)
+export interface AgentManagerSendInitialMessage {
+  type: "agentManager.sendInitialMessage"
+  sessionId: string
+  worktreeId: string
+  text: string
+  providerID?: string
+  modelID?: string
+  agent?: string
+  files?: Array<{ mime: string; url: string }>
 }
 
 export type ExtensionMessage =
@@ -612,6 +635,8 @@ export type ExtensionMessage =
   | AgentManagerSessionAddedMessage
   | AgentManagerStateMessage
   | AgentManagerKeybindingsMessage
+  | AgentManagerMultiVersionProgressMessage
+  | AgentManagerSendInitialMessage
   | SetChatBoxMessage
   | TriggerTaskMessage
 
@@ -857,6 +882,18 @@ export interface ShowTerminalRequest {
   sessionId: string
 }
 
+// Create multiple worktree sessions for the same prompt (multi-version mode)
+export interface CreateMultiVersionRequest {
+  type: "agentManager.createMultiVersion"
+  text: string
+  versions: number
+  providerID?: string
+  modelID?: string
+  agent?: string
+  files?: FileAttachment[]
+  baseBranch?: string
+}
+
 // Persist tab order for a context (worktree ID or "local")
 export interface SetTabOrderRequest {
   type: "agentManager.setTabOrder"
@@ -916,6 +953,7 @@ export type WebviewMessage =
   | RequestStateMessage
   | ConfigureSetupScriptRequest
   | ShowTerminalRequest
+  | CreateMultiVersionRequest
   | SetTabOrderRequest
   | SetSessionsCollapsedRequest
 
