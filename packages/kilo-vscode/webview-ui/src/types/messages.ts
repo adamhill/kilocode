@@ -563,6 +563,7 @@ export interface AgentManagerStateMessage {
   type: "agentManager.state"
   worktrees: WorktreeState[]
   sessions: ManagedSessionState[]
+  tabOrder?: Record<string, string[]>
 }
 
 export type ExtensionMessage =
@@ -833,10 +834,22 @@ export interface RequestRepoInfoMessage {
   type: "agentManager.requestRepoInfo"
 }
 
+// Configure worktree setup script
+export interface ConfigureSetupScriptRequest {
+  type: "agentManager.configureSetupScript"
+}
+
 // Show terminal for a session
 export interface ShowTerminalRequest {
   type: "agentManager.showTerminal"
   sessionId: string
+}
+
+// Persist tab order for a context (worktree ID or "local")
+export interface SetTabOrderRequest {
+  type: "agentManager.setTabOrder"
+  key: string
+  order: string[]
 }
 
 export type WebviewMessage =
@@ -882,7 +895,9 @@ export type WebviewMessage =
   | CloseSessionRequest
   | TelemetryRequest
   | RequestRepoInfoMessage
+  | ConfigureSetupScriptRequest
   | ShowTerminalRequest
+  | SetTabOrderRequest
 
 // ============================================
 // VS Code API type
