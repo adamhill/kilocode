@@ -37,6 +37,7 @@ import type {
   ExtensionMessage,
   FileAttachment,
 } from "../types/messages"
+import { removeSessionPermissions, upsertPermission } from "./permission-queue"
 
 // Derive human-readable status from the last streaming part
 function computeStatus(
@@ -163,13 +164,22 @@ export const SessionProvider: ParentComponent = (props) => {
   // Current session ID
   const [currentSessionID, setCurrentSessionID] = createSignal<string | undefined>()
 
-  // Session status — store full info object, derive simple string for compat
-  const [statusInfo, setStatusInfo] = createSignal<SessionStatusInfo>({ type: "idle" })
-  const status = () => statusInfo().type as SessionStatus
-  const [loading, setLoading] = createSignal(false)
+  // Per-session status map — keyed by sessionID
+  const [statusMap, setStatusMap] = createStore<Record<string, SessionStatusInfo>>({})
+  const [busySinceMap, setBusySinceMap] = createStore<Record<string, number>>({})
 
-  // Track when the agent started working
-  const [busySince, setBusySince] = createSignal<number | undefined>()
+  // Derived accessors for the current session (backwards compatible)
+  const statusInfo = () => {
+    const id = currentSessionID()
+    return id ? (statusMap[id] ?? { type: "idle" }) : { type: "idle" }
+  }
+  const status = () => statusInfo().type as SessionStatus
+  const busySince = () => {
+    const id = currentSessionID()
+    return id ? busySinceMap[id] : undefined
+  }
+
+  const [loading, setLoading] = createSignal(false)
 
   // Pending permissions
   const [permissions, setPermissions] = createSignal<PermissionRequest[]>([])
@@ -479,24 +489,27 @@ export const SessionProvider: ParentComponent = (props) => {
     message?: string,
     next?: number,
   ) {
-    if (sessionID !== currentSessionID()) return
-    const prev = statusInfo()
+    const prev = statusMap[sessionID] ?? { type: "idle" }
     const info: SessionStatusInfo =
       newStatus === "retry"
         ? { type: "retry", attempt: attempt ?? 0, message: message ?? "", next: next ?? 0 }
         : { type: newStatus }
-    setStatusInfo(info)
+    setStatusMap(sessionID, info)
     // Track busy start time
     if (prev.type === "idle" && newStatus !== "idle") {
-      setBusySince(Date.now())
+      setBusySinceMap(sessionID, Date.now())
     }
     if (newStatus === "idle") {
-      setBusySince(undefined)
+      setBusySinceMap(
+        produce((map) => {
+          delete map[sessionID]
+        }),
+      )
     }
   }
 
   function handlePermissionRequest(permission: PermissionRequest) {
-    setPermissions((prev) => [...prev, permission])
+    setPermissions((prev) => upsertPermission(prev, permission))
   }
 
   function handleQuestionRequest(question: QuestionRequest) {
@@ -591,10 +604,19 @@ export const SessionProvider: ParentComponent = (props) => {
           return next
         })
       }
+      setPermissions((prev) => removeSessionPermissions(prev, sessionID))
+      setStatusMap(
+        produce((map) => {
+          delete map[sessionID]
+        }),
+      )
+      setBusySinceMap(
+        produce((map) => {
+          delete map[sessionID]
+        }),
+      )
       if (currentSessionID() === sessionID) {
         setCurrentSessionID(undefined)
-        setStatusInfo({ type: "idle" })
-        setBusySince(undefined)
         setLoading(false)
       }
     })
@@ -734,8 +756,6 @@ export const SessionProvider: ParentComponent = (props) => {
 
   function clearCurrentSession() {
     setCurrentSessionID(undefined)
-    setStatusInfo({ type: "idle" })
-    setBusySince(undefined)
     setLoading(false)
     setPermissions([])
     setQuestions([])
@@ -760,8 +780,6 @@ export const SessionProvider: ParentComponent = (props) => {
       return
     }
     setCurrentSessionID(id)
-    setStatusInfo({ type: "idle" })
-    setBusySince(undefined)
     setLoading(true)
     vscode.postMessage({ type: "loadMessages", sessionID: id })
   }

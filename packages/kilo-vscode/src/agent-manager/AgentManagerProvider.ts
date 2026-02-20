@@ -4,6 +4,10 @@ import { KiloProvider } from "../KiloProvider"
 import { buildWebviewHtml } from "../utils"
 import { WorktreeManager, type CreateWorktreeResult } from "./WorktreeManager"
 import { WorktreeStateManager } from "./WorktreeStateManager"
+import { SetupScriptService } from "./SetupScriptService"
+import { SetupScriptRunner } from "./SetupScriptRunner"
+import { SessionTerminalManager } from "./SessionTerminalManager"
+import { formatKeybinding } from "./format-keybinding"
 
 /**
  * AgentManagerProvider opens the Agent Manager panel.
@@ -21,12 +25,18 @@ export class AgentManagerProvider implements vscode.Disposable {
   private outputChannel: vscode.OutputChannel
   private worktrees: WorktreeManager | undefined
   private state: WorktreeStateManager | undefined
+  private setupScript: SetupScriptService | undefined
+  private terminalManager: SessionTerminalManager
+  private stateReady: Promise<void> | undefined
 
   constructor(
     private readonly extensionUri: vscode.Uri,
     private readonly connectionService: KiloConnectionService,
   ) {
     this.outputChannel = vscode.window.createOutputChannel("Kilo Agent Manager")
+    this.terminalManager = new SessionTerminalManager((msg) =>
+      this.outputChannel.appendLine(`[SessionTerminal] ${msg}`),
+    )
   }
 
   private log(...args: unknown[]) {
@@ -65,8 +75,9 @@ export class AgentManagerProvider implements vscode.Disposable {
       onBeforeMessage: (msg) => this.onMessage(msg),
     })
 
-    void this.initializeState()
+    this.stateReady = this.initializeState()
     void this.sendRepoInfo()
+    this.sendKeybindings()
 
     this.panel.onDidDispose(() => {
       this.log("Panel disposed")
@@ -124,9 +135,35 @@ export class AgentManagerProvider implements vscode.Disposable {
       return this.onAddSessionToWorktree(msg.worktreeId)
     if (type === "agentManager.closeSession" && typeof msg.sessionId === "string")
       return this.onCloseSession(msg.sessionId)
+    if (type === "agentManager.configureSetupScript") {
+      void this.configureSetupScript()
+      return null
+    }
+    if (type === "agentManager.showTerminal" && typeof msg.sessionId === "string") {
+      this.terminalManager.showTerminal(msg.sessionId, this.state)
+      return null
+    }
     if (type === "agentManager.requestRepoInfo") {
       void this.sendRepoInfo()
       return null
+    }
+    if (type === "agentManager.requestState") {
+      void this.stateReady
+        ?.then(() => this.pushState())
+        .catch((err) => {
+          this.log("initializeState failed, pushing partial state:", err)
+          this.pushState()
+        })
+      return null
+    }
+    if (type === "agentManager.setTabOrder" && typeof msg.key === "string" && Array.isArray(msg.order)) {
+      this.state?.setTabOrder(msg.key as string, msg.order as string[])
+      return null
+    }
+
+    // When switching sessions, show existing terminal if one is open
+    if (type === "loadMessages" && typeof msg.sessionID === "string") {
+      this.terminalManager.showExisting(msg.sessionID)
     }
 
     // After clearSession, re-register worktree sessions so SSE events keep flowing
@@ -154,7 +191,11 @@ export class AgentManagerProvider implements vscode.Disposable {
     const manager = this.getWorktreeManager()
     const state = this.getStateManager()
     if (!manager || !state) {
-      this.postToWebview({ type: "agentManager.worktreeSetup", status: "error", message: "No workspace folder open" })
+      this.postToWebview({
+        type: "agentManager.worktreeSetup",
+        status: "error",
+        message: "Open a folder that contains a git repository to use worktrees",
+      })
       return null
     }
 
@@ -164,11 +205,11 @@ export class AgentManagerProvider implements vscode.Disposable {
     try {
       result = await manager.createWorktree({ prompt: "kilo" })
     } catch (error) {
-      const err = error instanceof Error ? error.message : String(error)
+      const msg = error instanceof Error ? error.message : String(error)
       this.postToWebview({
         type: "agentManager.worktreeSetup",
         status: "error",
-        message: `Failed to create worktree: ${err}`,
+        message: msg,
       })
       return null
     }
@@ -240,6 +281,9 @@ export class AgentManagerProvider implements vscode.Disposable {
     const created = await this.createWorktreeOnDisk()
     if (!created) return null
 
+    // Run setup script for new worktree (blocks until complete, shows in overlay)
+    await this.runSetupScriptForWorktree(created.result.path, created.result.branch)
+
     const session = await this.createSessionInWorktree(created.result.path, created.result.branch)
     if (!session) {
       const state = this.getStateManager()
@@ -289,6 +333,9 @@ export class AgentManagerProvider implements vscode.Disposable {
     const created = await this.createWorktreeOnDisk()
     if (!created) return null
 
+    // Run setup script for new worktree (blocks until complete, shows in overlay)
+    await this.runSetupScriptForWorktree(created.result.path, created.result.branch)
+
     const state = this.getStateManager()!
     if (!state.getSession(sessionId)) {
       state.addSession(sessionId, created.worktree.id)
@@ -308,11 +355,7 @@ export class AgentManagerProvider implements vscode.Disposable {
     try {
       client = this.connectionService.getHttpClient()
     } catch {
-      this.postToWebview({
-        type: "agentManager.worktreeSetup",
-        status: "error",
-        message: "Not connected to CLI backend",
-      })
+      this.postToWebview({ type: "error", message: "Not connected to CLI backend" })
       return null
     }
 
@@ -338,11 +381,9 @@ export class AgentManagerProvider implements vscode.Disposable {
     this.registerWorktreeSession(session.id, worktree.path)
     this.pushState()
     this.postToWebview({
-      type: "agentManager.worktreeSetup",
-      status: "ready",
-      message: "Session created",
+      type: "agentManager.sessionAdded",
       sessionId: session.id,
-      branch: worktree.branch,
+      worktreeId,
     })
 
     if (this.provider) {
@@ -362,6 +403,64 @@ export class AgentManagerProvider implements vscode.Disposable {
     this.pushState()
     this.log(`Closed session ${sessionId}`)
     return null
+  }
+
+  // ---------------------------------------------------------------------------
+  // Keybindings
+  // ---------------------------------------------------------------------------
+
+  private sendKeybindings(): void {
+    const ext = vscode.extensions.getExtension("kilocode.kilo-code")
+    const keybindings: Array<{ command: string; key?: string; mac?: string }> =
+      ext?.packageJSON?.contributes?.keybindings ?? []
+
+    const mac = process.platform === "darwin"
+    const prefix = "kilo-code.new.agentManager."
+    const bindings: Record<string, string> = {}
+    for (const kb of keybindings) {
+      if (!kb.command.startsWith(prefix)) continue
+      const action = kb.command.slice(prefix.length)
+      const raw = mac ? (kb.mac ?? kb.key) : kb.key
+      if (raw) bindings[action] = formatKeybinding(raw, mac)
+    }
+
+    this.postToWebview({ type: "agentManager.keybindings", bindings })
+  }
+
+  // ---------------------------------------------------------------------------
+  // Setup script
+  // ---------------------------------------------------------------------------
+
+  /** Open the worktree setup script in the editor for user configuration. */
+  private async configureSetupScript(): Promise<void> {
+    const service = this.getSetupScriptService()
+    if (!service) return
+    try {
+      await service.openInEditor()
+    } catch (error) {
+      this.log(`Failed to open setup script: ${error}`)
+    }
+  }
+
+  /** Run the worktree setup script if configured. Blocks until complete. Shows progress in overlay. */
+  private async runSetupScriptForWorktree(worktreePath: string, branch?: string): Promise<void> {
+    const root = this.getWorkspaceRoot()
+    if (!root) return
+    try {
+      const service = this.getSetupScriptService()
+      if (!service || !service.hasScript()) return
+      this.postToWebview({
+        type: "agentManager.worktreeSetup",
+        status: "creating",
+        message: "Running setup script...",
+        branch,
+      })
+      const runner = new SetupScriptRunner(this.outputChannel, service)
+      await runner.runIfConfigured({ worktreePath, repoPath: root })
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : String(error)
+      this.outputChannel.appendLine(`[AgentManager] Setup script error: ${msg}`)
+    }
   }
 
   // ---------------------------------------------------------------------------
@@ -396,6 +495,7 @@ export class AgentManagerProvider implements vscode.Disposable {
       type: "agentManager.state",
       worktrees: state.getWorktrees(),
       sessions: state.getSessions(),
+      tabOrder: state.getTabOrder(),
     })
   }
 
@@ -431,6 +531,17 @@ export class AgentManagerProvider implements vscode.Disposable {
     return this.state
   }
 
+  private getSetupScriptService(): SetupScriptService | undefined {
+    if (this.setupScript) return this.setupScript
+    const root = this.getWorkspaceRoot()
+    if (!root) {
+      this.log("getSetupScriptService: no workspace folder available")
+      return undefined
+    }
+    this.setupScript = new SetupScriptService(root)
+    return this.setupScript
+  }
+
   // ---------------------------------------------------------------------------
   // Helpers
   // ---------------------------------------------------------------------------
@@ -449,11 +560,29 @@ export class AgentManagerProvider implements vscode.Disposable {
     })
   }
 
+  /**
+   * Show terminal for the currently active session (triggered by keyboard shortcut).
+   * Posts an action to the webview which will respond with the session ID.
+   */
+  public showTerminalForCurrentSession(): void {
+    this.postToWebview({ type: "action", action: "showTerminal" })
+  }
+
+  /**
+   * Reveal the Agent Manager panel and focus the prompt input.
+   * Used for the keyboard shortcut to switch back from terminal.
+   */
+  public focusPanel(): void {
+    if (!this.panel) return
+    this.panel.reveal(vscode.ViewColumn.One, false)
+  }
+
   public postMessage(message: unknown): void {
     this.panel?.webview.postMessage(message)
   }
 
   public dispose(): void {
+    this.terminalManager.dispose()
     this.provider?.dispose()
     this.panel?.dispose()
     this.outputChannel.dispose()

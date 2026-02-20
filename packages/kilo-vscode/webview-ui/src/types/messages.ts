@@ -401,6 +401,16 @@ export interface ActionMessage {
   action: string
 }
 
+export interface SetChatBoxMessage {
+  type: "setChatBoxMessage"
+  text: string
+}
+
+export interface TriggerTaskMessage {
+  type: "triggerTask"
+  text: string
+}
+
 export interface ProfileDataMessage {
   type: "profileData"
   data: ProfileData | null
@@ -561,11 +571,25 @@ export interface ManagedSessionState {
   createdAt: string
 }
 
+// Agent Manager session added to an existing worktree (no setup overlay needed)
+export interface AgentManagerSessionAddedMessage {
+  type: "agentManager.sessionAdded"
+  sessionId: string
+  worktreeId: string
+}
+
 // Full state push from extension to webview
 export interface AgentManagerStateMessage {
   type: "agentManager.state"
   worktrees: WorktreeState[]
   sessions: ManagedSessionState[]
+  tabOrder?: Record<string, string[]>
+}
+
+// Resolved keybindings for agent manager actions
+export interface AgentManagerKeybindingsMessage {
+  type: "agentManager.keybindings"
+  bindings: Record<string, string>
 }
 
 export type ExtensionMessage =
@@ -605,7 +629,11 @@ export type ExtensionMessage =
   | AgentManagerSessionMetaMessage
   | AgentManagerRepoInfoMessage
   | AgentManagerWorktreeSetupMessage
+  | AgentManagerSessionAddedMessage
   | AgentManagerStateMessage
+  | AgentManagerKeybindingsMessage
+  | SetChatBoxMessage
+  | TriggerTaskMessage
 
 // ============================================
 // Messages FROM webview TO extension
@@ -843,6 +871,28 @@ export interface RequestRepoInfoMessage {
   type: "agentManager.requestRepoInfo"
 }
 
+export interface RequestStateMessage {
+  type: "agentManager.requestState"
+}
+
+// Configure worktree setup script
+export interface ConfigureSetupScriptRequest {
+  type: "agentManager.configureSetupScript"
+}
+
+// Show terminal for a session
+export interface ShowTerminalRequest {
+  type: "agentManager.showTerminal"
+  sessionId: string
+}
+
+// Persist tab order for a context (worktree ID or "local")
+export interface SetTabOrderRequest {
+  type: "agentManager.setTabOrder"
+  key: string
+  order: string[]
+}
+
 export type WebviewMessage =
   | SendMessageRequest
   | AbortRequest
@@ -888,6 +938,10 @@ export type WebviewMessage =
   | CloseSessionRequest
   | TelemetryRequest
   | RequestRepoInfoMessage
+  | RequestStateMessage
+  | ConfigureSetupScriptRequest
+  | ShowTerminalRequest
+  | SetTabOrderRequest
 
 // ============================================
 // VS Code API type
