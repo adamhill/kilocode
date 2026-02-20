@@ -35,6 +35,7 @@ import { Button } from "@kilocode/kilo-ui/button"
 import { IconButton } from "@kilocode/kilo-ui/icon-button"
 import { Spinner } from "@kilocode/kilo-ui/spinner"
 import { Tooltip } from "@kilocode/kilo-ui/tooltip"
+import { DropdownMenu } from "@kilocode/kilo-ui/dropdown-menu"
 import { VSCodeProvider, useVSCode } from "../src/context/vscode"
 import { ServerProvider } from "../src/context/server"
 import { ProviderProvider } from "../src/context/provider"
@@ -480,6 +481,10 @@ const AgentManagerContent: Component = () => {
     }
   })
 
+  const handleConfigureSetupScript = () => {
+    vscode.postMessage({ type: "agentManager.configureSetupScript" })
+  }
+
   const handleCreateWorktree = () => {
     vscode.postMessage({ type: "agentManager.createWorktree" })
   }
@@ -665,7 +670,31 @@ const AgentManagerContent: Component = () => {
         <div class="am-section">
           <div class="am-section-header">
             <span class="am-section-label">WORKTREES</span>
-            <IconButton icon="plus" size="small" variant="ghost" label="New Worktree" onClick={handleCreateWorktree} />
+            <div class="am-section-actions">
+              <DropdownMenu>
+                <DropdownMenu.Trigger
+                  as={IconButton}
+                  icon="settings-gear"
+                  size="small"
+                  variant="ghost"
+                  label="Worktree settings"
+                />
+                <DropdownMenu.Portal>
+                  <DropdownMenu.Content>
+                    <DropdownMenu.Item onSelect={handleConfigureSetupScript}>
+                      <DropdownMenu.ItemLabel>Worktree Setup Script</DropdownMenu.ItemLabel>
+                    </DropdownMenu.Item>
+                  </DropdownMenu.Content>
+                </DropdownMenu.Portal>
+              </DropdownMenu>
+              <IconButton
+                icon="plus"
+                size="small"
+                variant="ghost"
+                label="New Worktree"
+                onClick={handleCreateWorktree}
+              />
+            </div>
           </div>
           <div class="am-worktree-list">
             <For each={worktrees()}>

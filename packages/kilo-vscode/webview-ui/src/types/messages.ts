@@ -833,6 +833,11 @@ export interface RequestRepoInfoMessage {
   type: "agentManager.requestRepoInfo"
 }
 
+// Configure worktree setup script
+export interface ConfigureSetupScriptRequest {
+  type: "agentManager.configureSetupScript"
+}
+
 // Show terminal for a session
 export interface ShowTerminalRequest {
   type: "agentManager.showTerminal"
@@ -882,6 +887,7 @@ export type WebviewMessage =
   | CloseSessionRequest
   | TelemetryRequest
   | RequestRepoInfoMessage
+  | ConfigureSetupScriptRequest
   | ShowTerminalRequest
 
 // ============================================

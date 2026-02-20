@@ -109,6 +109,12 @@
   color: var(--text-weak);
 }
 
+.am-section-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
 /* Worktree list */
 
 .am-worktree-list {
