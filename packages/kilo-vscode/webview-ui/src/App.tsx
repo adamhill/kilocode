@@ -10,7 +10,7 @@ import { DataProvider } from "@kilocode/kilo-ui/context/data"
 import { Toast } from "@kilocode/kilo-ui/toast"
 import Settings from "./components/Settings"
 import ProfileView from "./components/ProfileView"
-import { VSCodeProvider } from "./context/vscode"
+import { VSCodeProvider, useVSCode } from "./context/vscode"
 import { ServerProvider, useServer } from "./context/server"
 import { ProviderProvider } from "./context/provider"
 import { ConfigProvider } from "./context/config"
@@ -48,6 +48,7 @@ const DummyView: Component<{ title: string }> = (props) => {
  */
 export const DataBridge: Component<{ children: any }> = (props) => {
   const session = useSession()
+  const vscode = useVSCode()
 
   const data = createMemo(() => {
     const id = session.currentSessionID()
@@ -77,8 +78,12 @@ export const DataBridge: Component<{ children: any }> = (props) => {
     session.syncSession(sessionID)
   }
 
+  const open = (filePath: string, line?: number, column?: number) => {
+    vscode.postMessage({ type: "openFile", filePath, line, column })
+  }
+
   return (
-    <DataProvider data={data()} directory="" onPermissionRespond={respond} onSyncSession={sync}>
+    <DataProvider data={data()} directory="" onPermissionRespond={respond} onSyncSession={sync} onOpenFile={open}>
       {props.children}
     </DataProvider>
   )
