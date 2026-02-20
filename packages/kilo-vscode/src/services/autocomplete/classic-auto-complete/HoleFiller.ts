@@ -184,8 +184,7 @@ Return the COMPLETION tags`
     const usageInfo = await model.generateResponse(systemPrompt, userPrompt, onChunk)
 
     // Extract just the text from the response - prefix/suffix are handled by the caller
-    const completionMatch = response.match(/<COMPLETION>([\s\S]*?)<\/COMPLETION>/i)
-    const suggestionText = completionMatch ? (completionMatch[1] || "").replace(/<\/?COMPLETION>/gi, "") : ""
+    const { text: suggestionText } = _parseAutocompleteResponse(response, "", "")
 
     const fillInAtCursorSuggestion = processSuggestion(suggestionText)
 
