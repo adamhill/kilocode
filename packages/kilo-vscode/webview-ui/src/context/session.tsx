@@ -109,7 +109,7 @@ interface SessionContextValue {
   // Thinking variant for the selected model
   variantList: () => string[]
   currentVariant: () => string | undefined
-  cycleVariant: () => void
+  selectVariant: (value: string | undefined) => void
 
   // Actions
   sendMessage: (text: string, providerID?: string, modelID?: string, files?: FileAttachment[]) => void
@@ -296,21 +296,12 @@ export const SessionProvider: ParentComponent = (props) => {
     return undefined
   }
 
-  const cycleVariant = () => {
+  const selectVariant = (value: string | undefined) => {
     const sel = selected()
     if (!sel) return
-    const list = variantList()
-    if (list.length === 0) return
     const key = variantKey(sel)
-    const current = store.variantSelections[key]
-    const next = (() => {
-      if (!current || !list.includes(current)) return list[0]
-      const idx = list.indexOf(current)
-      if (idx === list.length - 1) return undefined
-      return list[idx + 1]
-    })()
-    setStore("variantSelections", key, next)
-    vscode.postMessage({ type: "persistVariant", key, value: next })
+    setStore("variantSelections", key, value)
+    vscode.postMessage({ type: "persistVariant", key, value })
   }
 
   // Load persisted variants from extension globalState
@@ -926,7 +917,7 @@ export const SessionProvider: ParentComponent = (props) => {
     allParts,
     variantList,
     currentVariant,
-    cycleVariant,
+    selectVariant,
     sendMessage,
     abort,
     compact,
