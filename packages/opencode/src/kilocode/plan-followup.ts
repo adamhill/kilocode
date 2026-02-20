@@ -110,7 +110,13 @@ export namespace PlanFollowup {
   export const ANSWER_NEW_SESSION = "Start new session"
   export const ANSWER_CONTINUE = "Continue here"
 
-  async function inject(input: { sessionID: string; agent: string; model: MessageV2.User["model"]; text: string }) {
+  async function inject(input: {
+    sessionID: string
+    agent: string
+    model: MessageV2.User["model"]
+    text: string
+    synthetic?: boolean
+  }) {
     const msg: MessageV2.User = {
       id: Identifier.ascending("message"),
       sessionID: input.sessionID,
@@ -128,7 +134,7 @@ export namespace PlanFollowup {
       sessionID: input.sessionID,
       type: "text",
       text: input.text,
-      synthetic: true,
+      synthetic: input.synthetic ?? true,
     } satisfies MessageV2.TextPart)
   }
 
@@ -200,7 +206,11 @@ export namespace PlanFollowup {
       agent: "code",
       model: input.model,
       text: sections.join("\n\n"),
+      synthetic: false,
     })
+    if (todos.length) {
+      await Todo.update({ sessionID: next.id, todos })
+    }
     await Bus.publish(TuiEvent.SessionSelect, { sessionID: next.id })
     void import("@/session/prompt")
       .then((item) => item.SessionPrompt.loop({ sessionID: next.id }))
@@ -233,7 +243,13 @@ export namespace PlanFollowup {
     if (!answer) return "break"
 
     if (answer === ANSWER_NEW_SESSION) {
-      await startNew({ sessionID: input.sessionID, plan, messages: input.messages, model: user.model, abort: input.abort })
+      await startNew({
+        sessionID: input.sessionID,
+        plan,
+        messages: input.messages,
+        model: user.model,
+        abort: input.abort,
+      })
       return "break"
     }
 

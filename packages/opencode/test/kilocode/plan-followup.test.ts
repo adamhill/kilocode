@@ -142,7 +142,9 @@ const fakeModel = {
 } as Provider.Model
 
 function mockHandoverDeps(text: string, opts?: { agent?: Agent.Info | null }) {
-  const agentSpy = spyOn(Agent, "get").mockResolvedValue((opts?.agent === null ? undefined : (opts?.agent ?? fakeAgent)) as any)
+  const agentSpy = spyOn(Agent, "get").mockResolvedValue(
+    (opts?.agent === null ? undefined : (opts?.agent ?? fakeAgent)) as any,
+  )
   const modelSpy = spyOn(Provider, "getModel").mockResolvedValue(fakeModel)
   const llmSpy = spyOn(LLM, "stream").mockResolvedValue({
     text: Promise.resolve(text),
@@ -266,7 +268,9 @@ describe("plan follow-up", () => {
         },
         parts: [],
       })
-      using _mocks = mockHandoverDeps("## Discoveries\n\nFound REST endpoints in src/api.ts\n\n## Relevant Files\n\n- src/api.ts: REST endpoints\n- src/db.ts: Database layer")
+      using _mocks = mockHandoverDeps(
+        "## Discoveries\n\nFound REST endpoints in src/api.ts\n\n## Relevant Files\n\n- src/api.ts: REST endpoints\n- src/db.ts: Database layer",
+      )
       using _loop = {
         [Symbol.dispose]() {
           loop.mockRestore()
@@ -330,7 +334,12 @@ describe("plan follow-up", () => {
       expect(part.text).toContain("## Todo List")
       expect(part.text).toContain("[x] Add API endpoint")
       expect(part.text).toContain("[ ] Write tests")
-      expect(part.synthetic).toBe(true)
+      expect(part.synthetic).toBe(false)
+
+      const newTodos = await Todo.get(newSessionID)
+      expect(newTodos).toHaveLength(2)
+      expect(newTodos).toContainEqual({ id: "1", content: "Add API endpoint", status: "completed", priority: "high" })
+      expect(newTodos).toContainEqual({ id: "2", content: "Write tests", status: "pending", priority: "medium" })
 
       SessionPrompt.cancel(newSessionID)
     }))
@@ -474,9 +483,7 @@ describe("plan follow-up", () => {
       { id: "4", content: "Dropped task", status: "cancelled", priority: "low" },
     ]
     const result = formatTodos(todos)
-    expect(result).toBe(
-      "- [x] Set up project\n- [~] Write code\n- [ ] Add tests\n- [-] Dropped task",
-    )
+    expect(result).toBe("- [x] Set up project\n- [~] Write code\n- [ ] Add tests\n- [-] Dropped task")
   })
 
   test("generateHandover - returns empty string on LLM.stream failure", () =>
