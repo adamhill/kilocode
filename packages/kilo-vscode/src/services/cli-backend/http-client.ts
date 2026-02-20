@@ -330,7 +330,8 @@ export class HttpClient {
   async getNotifications(): Promise<KilocodeNotification[]> {
     try {
       return await this.request<KilocodeNotification[]>("GET", "/kilo/notifications")
-    } catch {
+    } catch (err) {
+      console.warn("[Kilo] Failed to fetch notifications:", err)
       return []
     }
   }
