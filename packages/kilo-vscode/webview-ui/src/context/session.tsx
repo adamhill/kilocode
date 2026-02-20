@@ -109,7 +109,7 @@ interface SessionContextValue {
   // Thinking variant for the selected model
   variantList: () => string[]
   currentVariant: () => string | undefined
-  selectVariant: (value: string | undefined) => void
+  selectVariant: (value: string) => void
 
   // Actions
   sendMessage: (text: string, providerID?: string, modelID?: string, files?: FileAttachment[]) => void
@@ -289,14 +289,13 @@ export const SessionProvider: ParentComponent = (props) => {
   const currentVariant = () => {
     const sel = selected()
     if (!sel) return undefined
-    const key = variantKey(sel)
-    const stored = store.variantSelections[key]
     const list = variantList()
-    if (stored && list.includes(stored)) return stored
-    return undefined
+    if (list.length === 0) return undefined
+    const stored = store.variantSelections[variantKey(sel)]
+    return stored && list.includes(stored) ? stored : list[0]
   }
 
-  const selectVariant = (value: string | undefined) => {
+  const selectVariant = (value: string) => {
     const sel = selected()
     if (!sel) return
     const key = variantKey(sel)

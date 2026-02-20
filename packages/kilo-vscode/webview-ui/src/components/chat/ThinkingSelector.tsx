@@ -8,24 +8,22 @@ import { Component, createSignal, For, Show } from "solid-js"
 import { Popover } from "@kilocode/kilo-ui/popover"
 import { Button } from "@kilocode/kilo-ui/button"
 import { useSession } from "../../context/session"
-import { useLanguage } from "../../context/language"
 
 export const ThinkingSelector: Component = () => {
   const session = useSession()
-  const language = useLanguage()
   const [open, setOpen] = createSignal(false)
 
   const variants = () => session.variantList()
   const current = () => session.currentVariant()
 
-  function pick(value: string | undefined) {
+  function pick(value: string) {
     session.selectVariant(value)
     setOpen(false)
   }
 
   const triggerLabel = () => {
     const v = current()
-    return v ? v.charAt(0).toUpperCase() + v.slice(1) : language.t("common.default")
+    return v ? v.charAt(0).toUpperCase() + v.slice(1) : ""
   }
 
   return (
@@ -46,16 +44,6 @@ export const ThinkingSelector: Component = () => {
         }
       >
         <div class="thinking-selector-list" role="listbox">
-          <div
-            class={`thinking-selector-item${!current() ? " selected" : ""}`}
-            role="option"
-            aria-selected={!current()}
-            onClick={() => pick(undefined)}
-          >
-            <span class="thinking-selector-item-name" style={{ "font-style": "italic" }}>
-              {language.t("common.default")}
-            </span>
-          </div>
           <For each={variants()}>
             {(v) => (
               <div
