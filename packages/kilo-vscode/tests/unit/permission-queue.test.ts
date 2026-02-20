@@ -1,8 +1,5 @@
 import { describe, it, expect } from "bun:test"
-import {
-  upsertPermission,
-  removeSessionPermissions,
-} from "../../webview-ui/src/context/permission-queue"
+import { upsertPermission, removeSessionPermissions } from "../../webview-ui/src/context/permission-queue"
 import type { PermissionRequest } from "../../webview-ui/src/types/messages"
 
 function perm(id: string, sessionID: string): PermissionRequest {
