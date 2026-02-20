@@ -1,12 +1,7 @@
 import { createEffect, createSignal, onCleanup } from "solid-js"
 import type { Accessor } from "solid-js"
 import type { FileAttachment, WebviewMessage, ExtensionMessage } from "../types/messages"
-import {
-  AT_PATTERN,
-  syncMentionedPaths as _syncMentionedPaths,
-  buildTextAfterMentionSelect,
-  buildFileAttachments,
-} from "./file-mention-utils"
+import { AT_PATTERN, syncMentionedPaths as _syncMentionedPaths, buildFileAttachments } from "./file-mention-utils"
 
 const FILE_SEARCH_DEBOUNCE_MS = 150
 
