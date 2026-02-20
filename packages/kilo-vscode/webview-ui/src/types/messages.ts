@@ -215,6 +215,8 @@ export interface ProviderModel {
   latest?: boolean
   // Actual shape returned by the server (Provider.Model)
   limit?: { context: number; input?: number; output: number }
+  variants?: Record<string, Record<string, unknown>>
+  capabilities?: { reasoning: boolean }
 }
 
 export interface Provider {
@@ -607,6 +609,12 @@ export interface AgentManagerMultiVersionProgressMessage {
   groupId?: string
 }
 
+// Stored variant selections loaded from extension globalState (extension → webview)
+export interface VariantsLoadedMessage {
+  type: "variantsLoaded"
+  variants: Record<string, string>
+}
+
 // Request webview to send initial prompt to a newly created session (extension → webview)
 export interface AgentManagerSendInitialMessage {
   type: "agentManager.sendInitialMessage"
@@ -663,6 +671,7 @@ export type ExtensionMessage =
   | AgentManagerSendInitialMessage
   | SetChatBoxMessage
   | TriggerTaskMessage
+  | VariantsLoadedMessage
 
 // ============================================
 // Messages FROM webview TO extension
@@ -680,6 +689,7 @@ export interface SendMessageRequest {
   providerID?: string
   modelID?: string
   agent?: string
+  variant?: string
   files?: FileAttachment[]
 }
 
@@ -947,6 +957,18 @@ export interface SetSessionsCollapsedRequest {
   collapsed: boolean
 }
 
+// Variant persistence (webview → extension)
+export interface PersistVariantRequest {
+  type: "persistVariant"
+  key: string
+  value: string
+}
+
+// Request stored variants from extension (webview → extension)
+export interface RequestVariantsMessage {
+  type: "requestVariants"
+}
+
 export type WebviewMessage =
   | SendMessageRequest
   | AbortRequest
@@ -999,6 +1021,8 @@ export type WebviewMessage =
   | CreateMultiVersionRequest
   | SetTabOrderRequest
   | SetSessionsCollapsedRequest
+  | PersistVariantRequest
+  | RequestVariantsMessage
 
 // ============================================
 // VS Code API type

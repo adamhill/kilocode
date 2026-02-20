@@ -214,7 +214,7 @@ export class HttpClient {
     sessionId: string,
     parts: Array<{ type: "text"; text: string } | { type: "file"; mime: string; url: string }>,
     directory: string,
-    options?: { providerID?: string; modelID?: string; agent?: string },
+    options?: { providerID?: string; modelID?: string; agent?: string; variant?: string },
   ): Promise<void> {
     const body: Record<string, unknown> = { parts }
     if (options?.providerID && options?.modelID) {
@@ -223,6 +223,9 @@ export class HttpClient {
     }
     if (options?.agent) {
       body.agent = options.agent
+    }
+    if (options?.variant) {
+      body.variant = options.variant
     }
 
     await this.request<void>("POST", `/session/${sessionId}/message`, body, { directory, allowEmpty: true })

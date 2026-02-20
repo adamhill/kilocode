@@ -13,6 +13,7 @@ import { useLanguage } from "../../context/language"
 import { useVSCode } from "../../context/vscode"
 import { ModelSelector } from "./ModelSelector"
 import { ModeSwitcher } from "./ModeSwitcher"
+import { ThinkingSelector } from "./ThinkingSelector"
 import { useFileMention } from "../../hooks/useFileMention"
 import { useImageAttachments } from "../../hooks/useImageAttachments"
 import { fileName, dirName, buildHighlightSegments } from "./prompt-input-utils"
@@ -314,6 +315,7 @@ export const PromptInput: Component = () => {
         <div class="prompt-input-hint-selectors">
           <ModeSwitcher />
           <ModelSelector />
+          <ThinkingSelector />
         </div>
         <div class="prompt-input-hint-actions">
           <Show
