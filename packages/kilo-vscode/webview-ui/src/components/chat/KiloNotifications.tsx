@@ -13,7 +13,7 @@ export const KiloNotifications: Component = () => {
   const items = filteredNotifications
   const total = () => items().length
   const safeIndex = () => Math.min(index(), Math.max(0, total() - 1))
-  const current = createMemo(() => items()[safeIndex()])
+  const current = createMemo(() => (total() === 0 ? undefined : items()[safeIndex()]))
 
   const prev = () => setIndex((i) => (i - 1 + total()) % total())
   const next = () => setIndex((i) => (i + 1) % total())
