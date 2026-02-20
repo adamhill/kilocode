@@ -659,6 +659,7 @@ PART_MAPPING["tool"] = function ToolPartDisplay(props) {
               {i18n.t("ui.permission.allowOnce")}
             </Button>
           </div>
+          <p data-slot="permission-hint">{i18n.t("ui.permission.sessionHint")}</p>
         </div>
       </Show>
       <Show when={showQuestion() && questionRequest()}>{(request) => <QuestionPrompt request={request()} />}</Show>
@@ -1064,6 +1065,7 @@ ToolRegistry.register({
                     {i18n.t("ui.permission.allowOnce")}
                   </Button>
                 </div>
+                <p data-slot="permission-hint">{i18n.t("ui.permission.sessionHint")}</p>
               </div>
             </>
           </Match>
