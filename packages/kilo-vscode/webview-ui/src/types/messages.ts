@@ -612,7 +612,7 @@ export interface AgentManagerMultiVersionProgressMessage {
 // Stored variant selections loaded from extension globalState (extension → webview)
 export interface VariantsLoadedMessage {
   type: "variantsLoaded"
-  variants: Record<string, string | undefined>
+  variants: Record<string, string>
 }
 
 // Request webview to send initial prompt to a newly created session (extension → webview)
@@ -961,7 +961,7 @@ export interface SetSessionsCollapsedRequest {
 export interface PersistVariantRequest {
   type: "persistVariant"
   key: string
-  value: string | undefined
+  value: string
 }
 
 // Request stored variants from extension (webview → extension)

@@ -48,7 +48,7 @@ interface SessionStore {
   todos: Record<string, TodoItem[]> // sessionID -> todos
   modelSelections: Record<string, ModelSelection> // sessionID -> model
   agentSelections: Record<string, string> // sessionID -> agent name
-  variantSelections: Record<string, string | undefined> // "providerID/modelID" -> variant name
+  variantSelections: Record<string, string> // "providerID/modelID" -> variant name
 }
 
 interface SessionContextValue {

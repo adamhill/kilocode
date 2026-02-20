@@ -441,19 +441,13 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
           TelemetryProxy.capture(message.event, message.properties)
           break
         case "persistVariant": {
-          const stored =
-            this.extensionContext?.globalState.get<Record<string, string | undefined>>("variantSelections") ?? {}
-          if (message.value === undefined) {
-            delete stored[message.key]
-          } else {
-            stored[message.key] = message.value
-          }
+          const stored = this.extensionContext?.globalState.get<Record<string, string>>("variantSelections") ?? {}
+          stored[message.key] = message.value
           await this.extensionContext?.globalState.update("variantSelections", stored)
           break
         }
         case "requestVariants": {
-          const variants =
-            this.extensionContext?.globalState.get<Record<string, string | undefined>>("variantSelections") ?? {}
+          const variants = this.extensionContext?.globalState.get<Record<string, string>>("variantSelections") ?? {}
           this.postMessage({ type: "variantsLoaded", variants })
           break
         }
