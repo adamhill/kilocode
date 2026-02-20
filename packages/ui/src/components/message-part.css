@@ -34,7 +34,7 @@
     overflow: hidden;
     background: var(--surface-weak);
     border: 1px solid var(--border-weak-base);
-    cursor: pointer;
+    cursor: pointer; /* kilocode_change */
     transition: border-color 0.15s ease;
 
     &:hover {
@@ -276,6 +276,7 @@
   [data-slot="message-part-title-filename"] {
     /* No text-transform - preserve original filename casing */
 
+    /* kilocode_change start */
     &.clickable {
       cursor: pointer;
       transition: color 0.15s ease;
@@ -285,6 +286,7 @@
         color: var(--text-base);
       }
     }
+    /* kilocode_change end */
   }
 
   [data-slot="message-part-path"] {
@@ -301,6 +303,7 @@
     direction: rtl;
     text-align: left;
 
+    /* kilocode_change start */
     &.clickable {
       cursor: pointer;
       transition: color 0.15s ease;
@@ -310,6 +313,7 @@
         color: var(--text-base);
       }
     }
+    /* kilocode_change end */
   }
 
   [data-slot="message-part-filename"] {
@@ -819,6 +823,7 @@
     white-space: nowrap;
     flex-grow: 1;
 
+    /* kilocode_change start */
     &.clickable {
       cursor: pointer;
       transition: color 0.15s ease;
@@ -828,6 +833,7 @@
         color: var(--text-base);
       }
     }
+    /* kilocode_change end */
   }
 
   [data-slot="apply-patch-deletion-count"] {
@@ -865,6 +871,7 @@
     color: var(--icon-weak);
   }
 
+  /* kilocode_change start */
   &.clickable {
     cursor: pointer;
     transition: color 0.15s ease;
@@ -873,4 +880,5 @@
       color: var(--text-base);
     }
   }
+  /* kilocode_change end */
 }
