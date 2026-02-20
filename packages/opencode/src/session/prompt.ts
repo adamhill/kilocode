@@ -338,11 +338,7 @@ export namespace SessionPrompt {
         lastUser.id < lastAssistant.id
       ) {
         // kilocode_change start - ask follow-up after plan agent completes
-        if (
-          lastUser.agent === "plan" &&
-          !abort.aborted &&
-          ["cli", "vscode"].includes(Flag.KILO_CLIENT)
-        ) {
+        if (lastUser.agent === "plan" && !abort.aborted && ["cli", "vscode"].includes(Flag.KILO_CLIENT)) {
           const action = await PlanFollowup.ask({ sessionID, messages: msgs, abort })
           if (action === "continue") continue
         }
