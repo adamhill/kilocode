@@ -905,7 +905,12 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
 
     try {
       const notifications = await this.httpClient.getNotifications()
-      const dismissedIds = this.extensionContext?.globalState.get<string[]>("kilo.dismissedNotificationIds", []) ?? []
+      const existing = this.extensionContext?.globalState.get<string[]>("kilo.dismissedNotificationIds", []) ?? []
+      const active = new Set(notifications.map((n) => n.id))
+      const dismissedIds = existing.filter((id) => active.has(id))
+      if (dismissedIds.length !== existing.length) {
+        await this.extensionContext?.globalState.update("kilo.dismissedNotificationIds", dismissedIds)
+      }
       const message = { type: "notificationsLoaded", notifications, dismissedIds }
       this.cachedNotificationsMessage = message
       this.postMessage(message)
