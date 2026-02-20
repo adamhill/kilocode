@@ -52,7 +52,8 @@ export function parseSSEDataLine(line: string): SSEChunkResult | null {
       result.cost = parsed.cost
     }
     return result
-  } catch {
+  } catch (err) {
+    console.warn("[Kilo New] Failed to parse SSE data line", { err, line })
     return null
   }
 }
