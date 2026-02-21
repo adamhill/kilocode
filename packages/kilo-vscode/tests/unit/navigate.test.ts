@@ -1,5 +1,5 @@
 import { describe, it, expect } from "bun:test"
-import { resolveNavigation, validateLocalSession } from "../../webview-ui/agent-manager/navigate"
+import { resolveNavigation, validateLocalSession, adjacentHint, LOCAL } from "../../webview-ui/agent-manager/navigate"
 
 const ids = ["a", "b", "c", "d"]
 
@@ -24,7 +24,7 @@ describe("resolveNavigation", () => {
 
   describe("from first session", () => {
     it("up → local", () => {
-      expect(resolveNavigation("up", "a", ids)).toEqual({ action: "local" })
+      expect(resolveNavigation("up", "a", ids)).toEqual({ action: LOCAL })
     })
 
     it("down → selects second session", () => {
@@ -68,7 +68,7 @@ describe("resolveNavigation", () => {
     })
 
     it("up from only session → local", () => {
-      expect(resolveNavigation("up", "x", ["x"])).toEqual({ action: "local" })
+      expect(resolveNavigation("up", "x", ["x"])).toEqual({ action: LOCAL })
     })
 
     it("down from only session → none", () => {
@@ -95,20 +95,20 @@ describe("resolveNavigation", () => {
       expect(trail).toEqual(["s1", "s2", "s3"])
 
       // Navigate back up through all sessions to local
-      const upTrail: (string | "local")[] = []
+      const upTrail: (string | typeof LOCAL)[] = []
       for (let i = 0; i < 4; i++) {
         const result = resolveNavigation("up", current, sessions)
         if (result.action === "select") {
           current = result.id
           upTrail.push(current)
-        } else if (result.action === "local") {
+        } else if (result.action === LOCAL) {
           current = undefined
-          upTrail.push("local")
+          upTrail.push(LOCAL)
         } else {
           break
         }
       }
-      expect(upTrail).toEqual(["s2", "s1", "local"])
+      expect(upTrail).toEqual(["s2", "s1", LOCAL])
     })
   })
 })
@@ -132,5 +132,51 @@ describe("validateLocalSession", () => {
 
   it("returns undefined when both are empty/undefined", () => {
     expect(validateLocalSession(undefined, [])).toBeUndefined()
+  })
+})
+
+describe("adjacentHint", () => {
+  const flat = [LOCAL, "wt1", "wt2", "wt3", "s1"]
+
+  it("returns prev hint when item is directly above active", () => {
+    expect(adjacentHint("wt1", "wt2", flat, "⌘↑", "⌘↓")).toBe("⌘↑")
+  })
+
+  it("returns next hint when item is directly below active", () => {
+    expect(adjacentHint("wt3", "wt2", flat, "⌘↑", "⌘↓")).toBe("⌘↓")
+  })
+
+  it("returns empty string for the active item itself", () => {
+    expect(adjacentHint("wt2", "wt2", flat, "⌘↑", "⌘↓")).toBe("")
+  })
+
+  it("returns empty string for non-adjacent items", () => {
+    expect(adjacentHint("wt1", "wt3", flat, "⌘↑", "⌘↓")).toBe("")
+    expect(adjacentHint("s1", "wt1", flat, "⌘↑", "⌘↓")).toBe("")
+  })
+
+  it("returns empty string when active is undefined", () => {
+    expect(adjacentHint("wt1", undefined, flat, "⌘↑", "⌘↓")).toBe("")
+  })
+
+  it("returns empty string when active is not in list", () => {
+    expect(adjacentHint("wt1", "unknown", flat, "⌘↑", "⌘↓")).toBe("")
+  })
+
+  it("returns empty string when item is not in list", () => {
+    expect(adjacentHint("unknown", "wt2", flat, "⌘↑", "⌘↓")).toBe("")
+  })
+
+  it("works at boundaries — first item with LOCAL active", () => {
+    expect(adjacentHint("wt1", LOCAL, flat, "⌘↑", "⌘↓")).toBe("⌘↓")
+  })
+
+  it("works at boundaries — LOCAL with first item active", () => {
+    expect(adjacentHint(LOCAL, "wt1", flat, "⌘↑", "⌘↓")).toBe("⌘↑")
+  })
+
+  it("works with single-item list", () => {
+    expect(adjacentHint("a", "b", ["a", "b"], "prev", "next")).toBe("prev")
+    expect(adjacentHint("b", "a", ["a", "b"], "prev", "next")).toBe("next")
   })
 })
