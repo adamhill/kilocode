@@ -15,6 +15,7 @@ accept = [
 ]
 
 exclude = [
+  '\.png$',
   'https://synthetic.new/user-settings/api',
   'https://platform.slack-edge.com/img/add_to_slack.png',
   'https://console.groq.com/pages/models',
