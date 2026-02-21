@@ -3,6 +3,7 @@
   "displayName": "Kilo Code",
   "description": "Kilo Code AI Agent & Autocomplete",
   "version": "7.0.25",
+  "icon": "assets/icons/logo-outline-black.png",
   "publisher": "kilocode",
   "repository": {
     "type": "git",
