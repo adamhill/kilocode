@@ -23,5 +23,6 @@ exclude = [
   '^https?://(api|console)\.mistral\.ai',
   '^https?://(app|console)\.requesty\.ai',
   '^https?://(cloud|console)\.google\.ai',
-  'https://opencode.ai/pages/config'
+  'https://opencode.ai/pages/config',
+  '^localhost:3000/'
 ]

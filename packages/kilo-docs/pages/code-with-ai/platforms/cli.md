@@ -167,7 +167,7 @@ Review your code locally before pushing — catch issues early without waiting f
 Configuration is managed through:
 
 - `/connect` command for provider setup (interactive)
-- Config files in **`~/.config/kilo/`**: the CLI (Kilo CLI 1.0 from [Kilo-Org/kilo](https://github.com/Kilo-Org/kilo)) merges `config.json`, `opencode.json`, and `opencode.jsonc`. Use **`opencode.json`** (or `opencode.jsonc`) for provider, model, permission, and **MCP** settings. Restart the CLI after editing. See [Using MCP in the CLI](/automate/mcp/using-in-cli) for MCP config format.
+- Config files in **`~/.config/kilo/`**: the CLI (Kilo CLI 1.0 from [Kilo-Org/kilo](https://github.com/Kilo-Org/kilo)) merges `config.json`, `opencode.json`, and `opencode.jsonc`. Use **`opencode.json`** (or `opencode.jsonc`) for provider, model, permission, and **MCP** settings. Restart the CLI after editing. See [Using MCP in the CLI](/docs/automate/mcp/using-in-cli) for MCP config format.
 - `kilo auth` for credential management
 
 ## Slash Commands
@@ -344,20 +344,6 @@ Use `{env:VARIABLE_NAME}` syntax in config files to reference environment variab
 ```
 
 For full details on all configuration options including compaction, file watchers, plugins, and experimental features, see the [OpenCode Config documentation](https://opencode.ai/docs/config).
-
-## Config reference for providers
-
-Kilo gives you the ability to bring your own keys for a number of model providers and AI gateways, like OpenRouter and Vercel AI Gateway. Each provider has unique configuration options and some let you set environment variables.
-
-You can reference the [Provider Configuration Guide](https://github.com/Kilo-Org/kilocode/blob/main/cli/docs/PROVIDER_CONFIGURATION.md) for examples (same config format; for Kilo CLI 1.0 the file is `~/.config/kilo/opencode.json`). You can also run:
-
-`kilo config`
-
-to complete configuration with an interactive workflow on the command line.
-
-{% callout type="tip" %}
-You can also use the `/config` slash command during an interactive session, which is equivalent to running `kilocode config`.
-{% /callout %}
 
 ## Interactive Mode
 
