@@ -48,7 +48,7 @@ Enterprise features for large organizations:
 
 Understand how your team is using AI:
 
-- [**Overview**](/docs/collaborate/adoption-dashboard//overview) — AI Adoption Score introduction
+- [**Overview**](/docs/collaborate/adoption-dashboard/overview) — AI Adoption Score introduction
 - [**For Team Leads**](/docs/collaborate/adoption-dashboard//for-team-leads) — Using adoption metrics
 - [**Improving Your Score**](/docs/collaborate/adoption-dashboard//improving-your-score) — Tips to boost adoption
 - [**Understanding Your Score**](/docs/collaborate/adoption-dashboard//understanding-your-score) — How the score is calculated
