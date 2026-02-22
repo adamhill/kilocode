@@ -250,7 +250,7 @@ export namespace ProviderTransform {
           isFirstToolCall = false
           continue
         }
-        if (part.type == "tool-call") {
+        if (part.type === "tool-call") {
           // this is a duplicate entry
           delete part.providerOptions?.openrouter?.reasoning_details
         }
