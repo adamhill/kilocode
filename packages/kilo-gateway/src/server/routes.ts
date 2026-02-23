@@ -8,6 +8,7 @@
 
 import { fetchProfile, fetchBalance } from "../api/profile.js"
 import { fetchKilocodeNotifications, KilocodeNotificationSchema } from "../api/notifications.js"
+import { fetchCloudSessions, type CloudSession } from "../api/sessions.js"
 import { KILO_API_BASE, HEADER_FEATURE } from "../api/constants.js" // kilocode_change - added HEADER_FEATURE
 import { buildKiloHeaders } from "../headers.js" // kilocode_change
 
@@ -279,6 +280,55 @@ export function createKiloRoutes(deps: KiloRoutesDeps) {
         })
 
         return c.json(notifications)
+      },
+    )
+    .get(
+      "/cloud-sessions",
+      describeRoute({
+        summary: "Get cloud sessions",
+        description: "Fetch cloud CLI sessions from Kilo API",
+        operationId: "kilo.cloudSessions",
+        responses: {
+          200: {
+            description: "Cloud sessions list",
+            content: {
+              "application/json": {
+                schema: resolver(
+                  z.object({
+                    cliSessions: z.array(
+                      z.object({
+                        session_id: z.string(),
+                        title: z.string().nullable(),
+                        cloud_agent_session_id: z.string().nullable(),
+                        created_at: z.string(),
+                        updated_at: z.string(),
+                        version: z.number(),
+                      }),
+                    ),
+                    nextCursor: z.string().nullable(),
+                  }),
+                ),
+              },
+            },
+          },
+          ...errors(400, 401),
+        },
+      }),
+      async (c: any) => {
+        const auth = await Auth.get("kilo")
+        if (!auth) return c.json({ error: "Not authenticated with Kilo Gateway" }, 401)
+
+        const token = auth.type === "api" ? auth.key : auth.type === "oauth" ? auth.access : undefined
+        if (!token) return c.json({ error: "No valid token found" }, 401)
+
+        const query = c.req.query()
+        const params: Record<string, unknown> = {}
+        if (query.cursor !== undefined) params.cursor = query.cursor
+        if (query.limit !== undefined) params.limit = Number(query.limit)
+        if (query.gitUrl !== undefined) params.gitUrl = query.gitUrl
+
+        const result = await fetchCloudSessions(token, params as { cursor?: string; limit?: number; gitUrl?: string })
+        return c.json(result)
       },
     )
 }
