@@ -6,6 +6,7 @@
  * This factory function accepts OpenCode dependencies to create Kilo-specific routes
  */
 
+import { randomBytes } from "crypto"
 import { fetchProfile, fetchBalance } from "../api/profile.js"
 import { fetchKilocodeNotifications, KilocodeNotificationSchema } from "../api/notifications.js"
 import { KILO_API_BASE, HEADER_FEATURE } from "../api/constants.js" // kilocode_change - added HEADER_FEATURE
@@ -28,6 +29,8 @@ interface KiloRoutesDeps {
   errors: Errors
   Auth: Auth
   z: Z
+  Storage: any
+  Instance: any
 }
 
 /**
@@ -53,8 +56,20 @@ interface KiloRoutesDeps {
  * })
  * ```
  */
+function generateId(prefix: string, descending: boolean): string {
+  const chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+  const bytes = randomBytes(14)
+  let rand = ""
+  for (let i = 0; i < 14; i++) rand += chars[bytes[i] % 62]
+  let now = BigInt(Date.now()) * BigInt(0x1000) + BigInt(1)
+  if (descending) now = ~now
+  const buf = Buffer.alloc(6)
+  for (let i = 0; i < 6; i++) buf[i] = Number((now >> BigInt(40 - 8 * i)) & BigInt(0xff))
+  return prefix + "_" + buf.toString("hex") + rand
+}
+
 export function createKiloRoutes(deps: KiloRoutesDeps) {
-  const { Hono, describeRoute, validator, resolver, errors, Auth, z } = deps
+  const { Hono, describeRoute, validator, resolver, errors, Auth, z, Storage, Instance } = deps
 
   const Organization = z.object({
     id: z.string(),
@@ -320,6 +335,85 @@ export function createKiloRoutes(deps: KiloRoutesDeps) {
 
         const data = await response.json()
         return c.json(data)
+      },
+    )
+    .post(
+      "/cloud/session/import",
+      describeRoute({
+        summary: "Import session from cloud",
+        description: "Download a cloud-synced session and write it to local storage with fresh IDs.",
+        operationId: "kilo.cloud.session.import",
+        responses: {
+          200: {
+            description: "Imported session info",
+            content: {
+              "application/json": {
+                schema: resolver(z.unknown()),
+              },
+            },
+          },
+          ...errors(400, 401, 404),
+        },
+      }),
+      validator(
+        "json",
+        z.object({
+          sessionId: z.string(),
+        }),
+      ),
+      async (c: any) => {
+        const { sessionId } = c.req.valid("json")
+
+        const auth = await Auth.get("kilo")
+        if (!auth) return c.json({ error: "Not authenticated with Kilo" }, 401)
+        const token = auth.type === "api" ? auth.key : auth.type === "oauth" ? auth.access : undefined
+        if (!token) return c.json({ error: "No valid token found" }, 401)
+
+        const base = process.env.KILO_SESSION_INGEST_URL ?? "https://ingest.kilosessions.ai"
+        const response = await fetch(`${base}/api/session/${sessionId}/export`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            ...buildKiloHeaders(),
+          },
+        })
+
+        if (response.status === 404) return c.json({ error: "Session not found in cloud" }, 404)
+        if (!response.ok) {
+          const text = await response.text()
+          console.error("[Kilo Gateway] cloud/session/import: export failed", {
+            status: response.status,
+            body: text.slice(0, 500),
+          })
+          return c.json({ error: `Import failed: ${response.status}` }, response.status as any)
+        }
+
+        const data = (await response.json()) as any
+        if (!data?.info?.id) return c.json({ error: "Invalid export data" }, 400)
+
+        const localSessionID = generateId("ses", true)
+        const msgMap = new Map<string, string>()
+        const projectID = Instance.project.id
+
+        data.info.id = localSessionID
+        data.info.projectID = projectID
+        await Storage.write(["session", projectID, localSessionID], data.info)
+
+        for (const msg of data.messages ?? []) {
+          const msgID = generateId("msg", false)
+          msgMap.set(msg.info.id, msgID)
+          msg.info.id = msgID
+          msg.info.sessionID = localSessionID
+          if (msg.info.parentID) msg.info.parentID = msgMap.get(msg.info.parentID) ?? msg.info.parentID
+          await Storage.write(["message", localSessionID, msgID], msg.info)
+          for (const part of msg.parts ?? []) {
+            part.id = generateId("prt", false)
+            part.messageID = msgID
+            part.sessionID = localSessionID
+            await Storage.write(["part", msgID, part.id], part)
+          }
+        }
+
+        return c.json(data.info)
       },
     )
     .get(

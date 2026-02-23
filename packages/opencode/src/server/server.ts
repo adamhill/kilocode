@@ -31,6 +31,7 @@ import { ExperimentalRoutes } from "./routes/experimental"
 import { TelemetryRoutes } from "./routes/telemetry" // kilocode_change
 import { ProviderRoutes } from "./routes/provider"
 import { createKiloRoutes } from "@kilocode/kilo-gateway" // kilocode_change
+import { Storage } from "../storage/storage" // kilocode_change
 import { lazy } from "../util/lazy"
 import { InstanceBootstrap } from "../project/bootstrap"
 import { NotFoundError } from "../storage/db"
@@ -248,6 +249,8 @@ export namespace Server {
             errors,
             Auth,
             z,
+            Storage, // kilocode_change
+            Instance, // kilocode_change
           }),
         )
         // kilocode_change end
