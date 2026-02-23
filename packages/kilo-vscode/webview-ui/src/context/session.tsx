@@ -711,6 +711,7 @@ export const SessionProvider: ParentComponent = (props) => {
         }),
       )
     })
+    vscode.postMessage({ type: "loadMessages", sessionID: session.id })
   }
 
   // Actions
