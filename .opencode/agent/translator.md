@@ -359,6 +359,7 @@ opencode serve --hostname 0.0.0.0 --port 4096
 opencode serve [--port <number>] [--hostname <string>] [--cors <origin>]
 opencode session [command]
 opencode session list
+opencode session delete <sessionID>
 opencode stats
 opencode uninstall
 opencode upgrade
@@ -565,7 +566,7 @@ NODE_ENV
 NODE_EXTRA_CA_CERTS
 NPM_AUTH_TOKEN
 OC_ALLOW_WAYLAND
-OPENCODE_API_KEY
+KILO_API_KEY
 KILO_AUTH_JSON
 KILO_AUTO_SHARE
 KILO_CLIENT
@@ -598,6 +599,7 @@ KILO_EXPERIMENTAL_MARKDOWN
 KILO_EXPERIMENTAL_OUTPUT_TOKEN_MAX
 KILO_EXPERIMENTAL_OXFMT
 KILO_EXPERIMENTAL_PLAN_MODE
+KILO_ENABLE_QUESTION_TOOL
 KILO_FAKE_VCS
 KILO_GIT_BASH_PATH
 KILO_MODEL
