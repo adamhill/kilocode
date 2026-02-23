@@ -69,7 +69,7 @@ Extend Kilo Auto into four tiers.
 
 **What problem it solves**: The open-weight model landscape moves faster than any other segment — new releases from DeepSeek, Minimax, Moonshot AI, Z.AI, Qwen, and others land every few weeks, leapfrogging each other on benchmarks and real-world coding tasks. Users who want to use open-weight models face frequent research overhead and real-world time to stay on the best one. Auto: Open solves this for them, always routing to the current best open-weight option so they get the cost and transparency benefits without the cognitive burden.
 
-**What it does**: Routes to the best open-weight models (DeepSeek, Moonshot, Minimax etc.) for each task type. May use a blend of paid and free models depending on what's available and the current state of the art. Like Frontier, it can switch models based on task type when the available have sufficient difference in capabilities and cost.
+**What it does**: Routes to the best open-weight models (DeepSeek, Moonshot, Minimax etc.) for each task type. May use a blend of paid and free models depending on what's available and the current state of the art. Like Frontier, it can switch models based on task type when the available models have sufficient difference in capabilities and cost.
 
 **Why it matters**: Open-weight models have gotten remarkably capable and are significantly cheaper than frontier closed models. Auto: Open absorbs model churn and always routes to the current best option. It also appeals to users and organizations that value model transparency and auditability.
 
