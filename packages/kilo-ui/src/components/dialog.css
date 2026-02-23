@@ -20,12 +20,12 @@
   [data-slot="dialog-title"] {
     font-weight: 600;
   }
+}
 
-  &[data-fit] [data-slot="dialog-container"] {
-    justify-content: center;
+[data-component="dialog"][data-fit] [data-slot="dialog-container"] {
+  height: auto;
+}
 
-    [data-slot="dialog-content"] {
-      min-height: 0;
-    }
-  }
+[data-component="dialog"][data-fit] [data-slot="dialog-content"] {
+  min-height: 0;
 }
