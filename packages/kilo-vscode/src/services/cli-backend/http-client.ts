@@ -12,6 +12,7 @@ import type {
   McpConfig,
   Config,
   KilocodeNotification,
+  CloudSessionsResponse,
 } from "./types"
 import { extractHttpErrorMessage, parseSSEDataLine } from "./http-utils"
 
@@ -337,6 +338,28 @@ export class HttpClient {
     } catch (err) {
       console.warn("[Kilo] Failed to fetch notifications:", err)
       return []
+    }
+  }
+
+  /**
+   * Fetch cloud CLI sessions from the Kilo cloud API.
+   * Returns null if not logged in or if the request fails.
+   */
+  async getCloudSessions(params?: {
+    cursor?: string
+    limit?: number
+    gitUrl?: string
+  }): Promise<CloudSessionsResponse | null> {
+    try {
+      const query = new URLSearchParams()
+      if (params?.cursor) query.set("cursor", params.cursor)
+      if (params?.limit) query.set("limit", String(params.limit))
+      if (params?.gitUrl) query.set("gitUrl", params.gitUrl)
+      const qs = query.toString()
+      return await this.request<CloudSessionsResponse>("GET", `/kilo/cloud-sessions${qs ? `?${qs}` : ""}`)
+    } catch (err) {
+      console.warn("[Kilo] Failed to fetch cloud sessions:", err)
+      return null
     }
   }
 
