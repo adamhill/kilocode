@@ -6,6 +6,7 @@
 
 import { Component, For, Show, createSignal, createEffect, createMemo, onCleanup, JSX } from "solid-js"
 import { Spinner } from "@kilocode/kilo-ui/spinner"
+import { Button } from "@kilocode/kilo-ui/button"
 import { useDialog } from "@kilocode/kilo-ui/context/dialog"
 import { useSession } from "../../context/session"
 import { useServer } from "../../context/server"
@@ -184,8 +185,9 @@ export const MessageList: Component<MessageListProps> = (props) => {
                 </For>
               </div>
             </Show>
-            <button
-              class="import-cloud-button"
+            <Button
+              variant="ghost"
+              size="small"
               onClick={() =>
                 dialog.show(() => (
                   <CloudImportDialog
@@ -197,7 +199,7 @@ export const MessageList: Component<MessageListProps> = (props) => {
               }
             >
               {language.t("session.cloud.import")}
-            </button>
+            </Button>
           </div>
         </Show>
         <Show when={!session.loading()}>

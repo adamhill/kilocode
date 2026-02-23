@@ -165,33 +165,6 @@
 }
 
 /* ============================================
-   Import from Cloud Button (empty state)
-   ============================================ */
-
-.import-cloud-button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 6px 12px;
-  border: 1px solid var(--vscode-button-border, var(--vscode-contrastBorder, transparent));
-  border-radius: 4px;
-  background: transparent;
-  color: var(--vscode-descriptionForeground);
-  cursor: pointer;
-  font-family: inherit;
-  font-size: 12px;
-  gap: 6px;
-  transition:
-    background-color 0.15s,
-    color 0.15s;
-}
-
-.import-cloud-button:hover {
-  background: var(--vscode-list-hoverBackground);
-  color: var(--vscode-foreground);
-}
-
-/* ============================================
    Cloud Import Dialog
    ============================================ */
 
