@@ -896,7 +896,9 @@ export const SessionProvider: ParentComponent = (props) => {
       console.warn("[Kilo New] Cannot select cloud session: not connected")
       return
     }
+    const key = `cloud:${cloudSessionId}`
     setCloudPreviewId(cloudSessionId)
+    setCurrentSessionID(key)
     setLoading(true)
     vscode.postMessage({ type: "requestCloudSessionData", sessionId: cloudSessionId })
   }
