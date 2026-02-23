@@ -649,6 +649,22 @@ export interface AgentManagerMultiVersionProgressMessage {
   groupId?: string
 }
 
+// Branch info for branch selector (extension → webview)
+export interface AgentManagerBranchInfo {
+  name: string
+  isLocal: boolean
+  isRemote: boolean
+  lastCommitDate: number
+  isDefault: boolean
+}
+
+// Branch list response (extension → webview)
+export interface AgentManagerBranchesMessage {
+  type: "agentManager.branches"
+  branches: AgentManagerBranchInfo[]
+  defaultBranch: string
+}
+
 // Stored variant selections loaded from extension globalState (extension → webview)
 export interface VariantsLoadedMessage {
   type: "variantsLoaded"
@@ -660,7 +676,7 @@ export interface AgentManagerSendInitialMessage {
   type: "agentManager.sendInitialMessage"
   sessionId: string
   worktreeId: string
-  text: string
+  text?: string
   providerID?: string
   modelID?: string
   agent?: string
@@ -959,6 +975,8 @@ export interface TelemetryRequest {
 // Create a new worktree (with auto-created first session)
 export interface CreateWorktreeRequest {
   type: "agentManager.createWorktree"
+  baseBranch?: string
+  branchName?: string
 }
 
 // Delete a worktree and dissociate its sessions
@@ -1007,13 +1025,14 @@ export interface ShowTerminalRequest {
 // Create multiple worktree sessions for the same prompt (multi-version mode)
 export interface CreateMultiVersionRequest {
   type: "agentManager.createMultiVersion"
-  text: string
+  text?: string
   versions: number
   providerID?: string
   modelID?: string
   agent?: string
   files?: FileAttachment[]
   baseBranch?: string
+  branchName?: string
 }
 
 // Persist tab order for a context (worktree ID or "local")
@@ -1027,6 +1046,11 @@ export interface SetTabOrderRequest {
 export interface SetSessionsCollapsedRequest {
   type: "agentManager.setSessionsCollapsed"
   collapsed: boolean
+}
+
+// Request branch list for base branch selector
+export interface RequestBranchesMessage {
+  type: "agentManager.requestBranches"
 }
 
 // Variant persistence (webview → extension)
@@ -1099,6 +1123,7 @@ export type WebviewMessage =
   | RequestVariantsMessage
   | RequestCloudSessionDataMessage
   | ImportAndSendMessage
+  | RequestBranchesMessage
 
 // ============================================
 // VS Code API type

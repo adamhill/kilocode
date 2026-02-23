@@ -14,6 +14,7 @@ import type {
   KilocodeNotification,
   CloudSessionsResponse,
   CloudSessionData,
+  EditorContext,
 } from "./types"
 import { extractHttpErrorMessage, parseSSEDataLine } from "./http-utils"
 
@@ -120,9 +121,12 @@ export class HttpClient {
 
   /**
    * Create a new session in the specified directory.
+   * Optionally pass a platform identifier for backend tracking attribution.
    */
-  async createSession(directory: string): Promise<SessionInfo> {
-    return this.request<SessionInfo>("POST", "/session", {}, { directory })
+  async createSession(directory: string, options?: { platform?: string }): Promise<SessionInfo> {
+    return this.request<SessionInfo>("POST", "/session", options?.platform ? { platform: options.platform } : {}, {
+      directory,
+    })
   }
 
   /**
@@ -216,7 +220,13 @@ export class HttpClient {
     sessionId: string,
     parts: Array<{ type: "text"; text: string } | { type: "file"; mime: string; url: string }>,
     directory: string,
-    options?: { providerID?: string; modelID?: string; agent?: string; variant?: string },
+    options?: {
+      providerID?: string
+      modelID?: string
+      agent?: string
+      variant?: string
+      editorContext?: EditorContext
+    },
   ): Promise<void> {
     const body: Record<string, unknown> = { parts }
     if (options?.providerID && options?.modelID) {
@@ -228,6 +238,9 @@ export class HttpClient {
     }
     if (options?.variant) {
       body.variant = options.variant
+    }
+    if (options?.editorContext) {
+      body.editorContext = options.editorContext
     }
 
     await this.request<void>("POST", `/session/${sessionId}/message`, body, { directory, allowEmpty: true })
