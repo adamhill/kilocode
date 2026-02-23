@@ -57,7 +57,7 @@ Extend Kilo Auto into four tiers.
 
 **What it does**: Automatically maps to the best available free model(s) for each mode. As free model availability changes due to promotional periods, the mapping updates transparently. Users always get the best free option without having to track which models are currently available.
 
-**Why it matters**: This solves removes a potentially intimidating choice for free users, and sets them up for a good experience. "Auto: Free" is selected by default (or it's selected for them by default when unauthenticated) and start coding immediately. When a free model promotion ends, they don't get an prompt to pick a new model — the routing silently falls back to the next best option.
+**Why it matters**: This removes a potentially intimidating choice for free users, and sets them up for a good experience. "Auto: Free" is selected by default (or it's selected for them by default when unauthenticated) and start coding immediately. When a free model promotion ends, they don't get a prompt to pick a new model — the routing silently falls back to the next best option.
 
 **Pricing**: Free. No credits required.
 
