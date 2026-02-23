@@ -432,6 +432,14 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
         case "requestNotifications":
           await this.fetchAndSendNotifications()
           break
+        case "requestCloudSessions":
+          await this.handleRequestCloudSessions(message)
+          break
+        case "requestGitRemoteUrl":
+          void this.getGitRemoteUrl().then((url) => {
+            this.postMessage({ type: "gitRemoteUrlLoaded", gitUrl: url ?? null })
+          })
+          break
         case "dismissNotification":
           await this.handleDismissNotification(message.notificationId)
           break
@@ -949,6 +957,44 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
       this.postMessage(message)
     } catch (error) {
       console.error("[Kilo New] KiloProvider: Failed to fetch notifications:", error)
+    }
+  }
+
+  /**
+   * Handle cloud sessions request from webview.
+   * Fetches sessions from the Kilo cloud API and sends them back.
+   */
+  private async handleRequestCloudSessions(message: {
+    cursor?: string
+    limit?: number
+    gitUrl?: string
+  }): Promise<void> {
+    if (!this.httpClient) {
+      this.postMessage({
+        type: "error",
+        message: "Not connected to CLI backend",
+      })
+      return
+    }
+
+    try {
+      const result = await this.httpClient.getCloudSessions({
+        cursor: message.cursor,
+        limit: message.limit,
+        gitUrl: message.gitUrl,
+      })
+
+      this.postMessage({
+        type: "cloudSessionsLoaded",
+        sessions: result?.cliSessions ?? [],
+        nextCursor: result?.nextCursor ?? null,
+      })
+    } catch (error) {
+      console.error("[Kilo New] KiloProvider: Failed to fetch cloud sessions:", error)
+      this.postMessage({
+        type: "error",
+        message: error instanceof Error ? error.message : "Failed to fetch cloud sessions",
+      })
     }
   }
 
@@ -1504,6 +1550,26 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
     void this.webview.postMessage(message).then(undefined, (error) => {
       console.error("[Kilo New] KiloProvider: ❌ postMessage failed", error)
     })
+  }
+
+  /**
+   * Get the git remote URL for the current workspace using VS Code's built-in Git API.
+   * Returns undefined if not in a git repo or no remotes are configured.
+   */
+  private async getGitRemoteUrl(): Promise<string | undefined> {
+    try {
+      const extension = vscode.extensions.getExtension("vscode.git")
+      if (!extension) return undefined
+      const api = extension.isActive ? extension.exports?.getAPI(1) : (await extension.activate())?.getAPI(1)
+      if (!api) return undefined
+      const repo = api.repositories?.[0]
+      if (!repo) return undefined
+      const remote = repo.state?.remotes?.find((r: { name: string }) => r.name === "origin")
+      return remote?.fetchUrl ?? remote?.pushUrl
+    } catch (error) {
+      console.warn("[Kilo New] KiloProvider: Failed to get git remote URL:", error)
+      return undefined
+    }
   }
 
   /**
