@@ -1052,7 +1052,7 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
       sessionID: m.info.sessionID,
       role: m.info.role as "user" | "assistant",
       parts: m.parts,
-      createdAt: new Date(m.info.time.created).toISOString(),
+      createdAt: m.info.time?.created ? new Date(m.info.time.created).toISOString() : new Date().toISOString(),
       cost: m.info.cost,
       tokens: m.info.tokens,
     }))
@@ -1132,12 +1132,21 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
 
     parts.push({ type: "text", text })
 
-    await this.httpClient.sendMessage(session.id, parts, workspaceDir, {
-      providerID,
-      modelID,
-      agent,
-      variant,
-    })
+    try {
+      await this.httpClient.sendMessage(session.id, parts, workspaceDir, {
+        providerID,
+        modelID,
+        agent,
+        variant,
+      })
+    } catch (err) {
+      console.error("[Kilo New] Failed to send message after cloud import:", err)
+      this.postMessage({
+        type: "error",
+        message: err instanceof Error ? err.message : "Failed to send message after import",
+        sessionID: session.id,
+      })
+    }
   }
 
   /**

@@ -62,12 +62,13 @@ interface KiloRoutesDeps {
  * })
  * ```
  */
+let counter = 0
 function generateId(prefix: string, descending: boolean): string {
   const chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
   const bytes = randomBytes(14)
   let rand = ""
   for (let i = 0; i < 14; i++) rand += chars[bytes[i] % 62]
-  let now = BigInt(Date.now()) * BigInt(0x1000) + BigInt(1)
+  let now = BigInt(Date.now()) * BigInt(0x1000) + BigInt(counter++)
   if (descending) now = ~now
   const buf = Buffer.alloc(6)
   for (let i = 0; i < 6; i++) buf[i] = Number((now >> BigInt(40 - 8 * i)) & BigInt(0xff))
@@ -422,7 +423,7 @@ export function createKiloRoutes(deps: KiloRoutesDeps) {
         data.info.directory = data.info.directory || Instance.directory || "."
         data.info.version = data.info.version || "2"
 
-        Database.use((db: any) => {
+        Database.transaction((db: any) => {
           db.insert(SessionTable).values(SessionToRow(data.info)).onConflictDoNothing().run()
 
           for (const msg of data.messages ?? []) {

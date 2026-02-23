@@ -661,6 +661,7 @@ export const SessionProvider: ParentComponent = (props) => {
   }
 
   function handleCloudSessionDataLoaded(cloudSessionId: string, title: string, messages: Message[]) {
+    if (cloudPreviewId() !== cloudSessionId) return
     const key = `cloud:${cloudSessionId}`
     batch(() => {
       setStore("sessions", key, {
@@ -701,6 +702,15 @@ export const SessionProvider: ParentComponent = (props) => {
       setCloudPreviewId(null)
       setCurrentSessionID(session.id)
 
+      const msgIds = cloudMessages.map((m) => m.id)
+      setStore(
+        "parts",
+        produce((parts) => {
+          for (const id of msgIds) {
+            delete parts[id]
+          }
+        }),
+      )
       setStore(
         "sessions",
         produce((sessions) => {
