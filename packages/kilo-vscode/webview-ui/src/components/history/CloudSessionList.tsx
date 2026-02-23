@@ -62,15 +62,20 @@ const CloudSessionList: Component<CloudSessionListProps> = (props) => {
   const [repoOnly, setRepoOnly] = createSignal(true)
   const [initialized, setInitialized] = createSignal(false)
 
+  let loadGen = 0
+  let activeGen = 0
+
   const unsub = vscode.onMessage((message: ExtensionMessage) => {
     if (message.type === "cloudSessionsLoaded") {
+      if (activeGen !== loadGen) return
       const incoming = message.sessions.map(toDisplay)
-      if (nextCursor() && incoming.length > 0) {
+      const cursor = nextCursor()
+      if (cursor && incoming.length > 0) {
         setSessions((prev) => {
           const seen = new Set(prev.map((s) => s.id))
           return [...prev, ...incoming.filter((s) => !seen.has(s.id))]
         })
-      } else if (!nextCursor()) {
+      } else if (!cursor) {
         setSessions(incoming)
       }
       setNextCursor(message.nextCursor)
@@ -91,6 +96,8 @@ const CloudSessionList: Component<CloudSessionListProps> = (props) => {
   createEffect(() => {
     if (!initialized()) return
     const url = repoOnly() ? gitUrl() : undefined
+    loadGen++
+    activeGen = loadGen
     setLoading(true)
     setSessions([])
     setNextCursor(null)
@@ -105,6 +112,7 @@ const CloudSessionList: Component<CloudSessionListProps> = (props) => {
     const cursor = nextCursor()
     if (!cursor || loading()) return
     const url = repoOnly() ? gitUrl() : undefined
+    activeGen = loadGen
     setLoading(true)
     vscode.postMessage({
       type: "requestCloudSessions",

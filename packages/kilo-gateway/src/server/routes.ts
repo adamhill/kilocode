@@ -338,7 +338,7 @@ export function createKiloRoutes(deps: KiloRoutesDeps) {
           ...errors(401, 404),
         },
       }),
-      validator("param", z.object({ id: z.string() })),
+      validator("param", z.object({ id: z.string().uuid() })),
       async (c: any) => {
         const auth = await Auth.get("kilo")
         if (!auth) return c.json({ error: "Not authenticated with Kilo Gateway" }, 401)
@@ -382,7 +382,7 @@ export function createKiloRoutes(deps: KiloRoutesDeps) {
       validator(
         "json",
         z.object({
-          sessionId: z.string(),
+          sessionId: z.string().uuid(),
         }),
       ),
       async (c: any) => {
@@ -418,13 +418,22 @@ export function createKiloRoutes(deps: KiloRoutesDeps) {
         const msgMap = new Map<string, string>()
         const projectID = Instance.project.id
 
+        const now = Date.now()
+        const time = {
+          created: data.info.time?.created ?? now,
+          updated: data.info.time?.updated ?? now,
+          ...(data.info.time?.compacting !== undefined && { compacting: data.info.time.compacting }),
+          ...(data.info.time?.archived !== undefined && { archived: data.info.time.archived }),
+        }
+
         const info = {
           ...data.info,
           id: localSessionID,
           projectID,
-          slug: data.info.slug || "imported",
-          directory: data.info.directory || Instance.directory || ".",
-          version: data.info.version || "2",
+          slug: data.info.slug ?? "imported",
+          directory: data.info.directory ?? Instance.directory ?? ".",
+          version: data.info.version ?? 2,
+          time,
         }
 
         Database.transaction((db) => {
@@ -545,7 +554,7 @@ export function createKiloRoutes(deps: KiloRoutesDeps) {
               status: response.status,
               body: text.slice(0, 500),
             })
-            return c.json({ error: `Cloud sessions fetch failed: ${response.status} ${text}` }, response.status as any)
+            return c.json({ error: `Cloud sessions fetch failed: ${response.status}` }, response.status as any)
           }
 
           const raw = await response.text()
@@ -558,8 +567,18 @@ export function createKiloRoutes(deps: KiloRoutesDeps) {
             session_id: s.session_id,
             title: s.title ?? null,
             cloud_agent_session_id: s.cloud_agent_session_id ?? null,
-            created_at: typeof s.created_at === "string" ? s.created_at : new Date(s.created_at).toISOString(),
-            updated_at: typeof s.updated_at === "string" ? s.updated_at : new Date(s.updated_at).toISOString(),
+            created_at:
+              typeof s.created_at === "string"
+                ? s.created_at
+                : s.created_at
+                  ? new Date(s.created_at).toISOString()
+                  : new Date().toISOString(),
+            updated_at:
+              typeof s.updated_at === "string"
+                ? s.updated_at
+                : s.updated_at
+                  ? new Date(s.updated_at).toISOString()
+                  : new Date().toISOString(),
             version: s.version ?? 0,
           }))
 

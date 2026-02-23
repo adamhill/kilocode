@@ -1037,32 +1037,43 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
       return
     }
 
-    const data = await this.httpClient.getCloudSession(sessionId)
-    if (!data) {
+    try {
+      const data = await this.httpClient.getCloudSession(sessionId)
+      if (!data) {
+        this.postMessage({
+          type: "cloudSessionImportFailed",
+          cloudSessionId: sessionId,
+          error: "Failed to fetch cloud session",
+        })
+        return
+      }
+
+      const messages = (data.messages ?? [])
+        .filter((m) => m.info)
+        .map((m) => ({
+          id: m.info.id,
+          sessionID: m.info.sessionID,
+          role: m.info.role as "user" | "assistant",
+          parts: m.parts,
+          createdAt: m.info.time?.created ? new Date(m.info.time.created).toISOString() : new Date().toISOString(),
+          cost: m.info.cost,
+          tokens: m.info.tokens,
+        }))
+
+      this.postMessage({
+        type: "cloudSessionDataLoaded",
+        cloudSessionId: sessionId,
+        title: data.info.title ?? "Untitled",
+        messages,
+      })
+    } catch (err) {
+      console.error("[Kilo New] Failed to load cloud session data:", err)
       this.postMessage({
         type: "cloudSessionImportFailed",
         cloudSessionId: sessionId,
-        error: "Failed to fetch cloud session",
+        error: err instanceof Error ? err.message : "Failed to load cloud session",
       })
-      return
     }
-
-    const messages = (data.messages ?? []).map((m) => ({
-      id: m.info.id,
-      sessionID: m.info.sessionID,
-      role: m.info.role as "user" | "assistant",
-      parts: m.parts,
-      createdAt: m.info.time?.created ? new Date(m.info.time.created).toISOString() : new Date().toISOString(),
-      cost: m.info.cost,
-      tokens: m.info.tokens,
-    }))
-
-    this.postMessage({
-      type: "cloudSessionDataLoaded",
-      cloudSessionId: sessionId,
-      title: data.info.title ?? "Untitled",
-      messages,
-    })
   }
 
   /**

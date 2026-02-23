@@ -21,6 +21,7 @@ import { useVSCode } from "./vscode"
 import { useServer } from "./server"
 import { useProvider } from "./provider"
 import { useLanguage } from "./language"
+import { showToast } from "@kilocode/kilo-ui/toast"
 import type {
   SessionInfo,
   Message,
@@ -395,6 +396,7 @@ export const SessionProvider: ParentComponent = (props) => {
         case "cloudSessionImportFailed":
           setCloudPreviewId(null)
           setLoading(false)
+          showToast({ variant: "error", title: "Failed to import cloud session", description: message.error })
           console.error("[Kilo New] Cloud session import failed:", message.error)
           break
       }
