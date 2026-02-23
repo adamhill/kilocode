@@ -492,30 +492,22 @@ export namespace ProviderTransform {
       // https://v5.ai-sdk.dev/providers/ai-sdk-providers/anthropic
       case "@ai-sdk/google-vertex/anthropic":
         // https://v5.ai-sdk.dev/providers/ai-sdk-providers/google-vertex#anthropic-provider
-        // kilocode_change start
-        // TODO: Enable when @ai-sdk/anthropic supports thinking.type: "adaptive"
-        const ADAPTIVE_THINKING_ENABLED_ANTHROPIC = false
-        if (ADAPTIVE_THINKING_ENABLED_ANTHROPIC && id.includes("claude-opus-4-6")) {
-          return {
-            low: {
-              thinking: { type: "adaptive" },
-              output_config: { effort: "low" },
-            },
-            medium: {
-              thinking: { type: "adaptive" },
-              output_config: { effort: "medium" },
-            },
-            high: {
-              thinking: { type: "adaptive" },
-              output_config: { effort: "high" },
-            },
-            max: {
-              thinking: { type: "adaptive" },
-              output_config: { effort: "max" },
-            },
-          }
+
+        if (model.api.id.includes("opus-4-6") || model.api.id.includes("opus-4.6")) {
+          const efforts = ["low", "medium", "high", "max"]
+          return Object.fromEntries(
+            efforts.map((effort) => [
+              effort,
+              {
+                thinking: {
+                  type: "adaptive",
+                },
+                effort,
+              },
+            ]),
+          )
         }
-        // kilocode_change end
+
         return {
           high: {
             thinking: {
@@ -533,6 +525,20 @@ export namespace ProviderTransform {
 
       case "@ai-sdk/amazon-bedrock":
         // https://v5.ai-sdk.dev/providers/ai-sdk-providers/amazon-bedrock
+        if (model.api.id.includes("opus-4-6") || model.api.id.includes("opus-4.6")) {
+          const efforts = ["low", "medium", "high", "max"]
+          return Object.fromEntries(
+            efforts.map((effort) => [
+              effort,
+              {
+                reasoningConfig: {
+                  type: "adaptive",
+                  maxReasoningEffort: effort,
+                },
+              },
+            ]),
+          )
+        }
         // For Anthropic models on Bedrock, use reasoningConfig with budgetTokens
         if (model.api.id.includes("anthropic")) {
           return {
