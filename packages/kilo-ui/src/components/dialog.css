@@ -26,4 +26,5 @@
 
 [data-component="dialog"][data-fit] [data-slot="dialog-content"] {
   min-height: 0;
+  align-self: center;
 }
