@@ -29,8 +29,12 @@ interface KiloRoutesDeps {
   errors: Errors
   Auth: Auth
   z: Z
-  Storage: any
+  Database: any
   Instance: any
+  SessionTable: any
+  MessageTable: any
+  PartTable: any
+  SessionToRow: (info: any) => any
 }
 
 /**
@@ -69,7 +73,21 @@ function generateId(prefix: string, descending: boolean): string {
 }
 
 export function createKiloRoutes(deps: KiloRoutesDeps) {
-  const { Hono, describeRoute, validator, resolver, errors, Auth, z, Storage, Instance } = deps
+  const {
+    Hono,
+    describeRoute,
+    validator,
+    resolver,
+    errors,
+    Auth,
+    z,
+    Database,
+    Instance,
+    SessionTable,
+    MessageTable,
+    PartTable,
+    SessionToRow,
+  } = deps
 
   const Organization = z.object({
     id: z.string(),
@@ -396,22 +414,48 @@ export function createKiloRoutes(deps: KiloRoutesDeps) {
 
         data.info.id = localSessionID
         data.info.projectID = projectID
-        await Storage.write(["session", projectID, localSessionID], data.info)
+        data.info.slug = data.info.slug || "imported"
+        data.info.directory = data.info.directory || Instance.directory || "."
+        data.info.version = data.info.version || "2"
 
-        for (const msg of data.messages ?? []) {
-          const msgID = generateId("msg", false)
-          msgMap.set(msg.info.id, msgID)
-          msg.info.id = msgID
-          msg.info.sessionID = localSessionID
-          if (msg.info.parentID) msg.info.parentID = msgMap.get(msg.info.parentID) ?? msg.info.parentID
-          await Storage.write(["message", localSessionID, msgID], msg.info)
-          for (const part of msg.parts ?? []) {
-            part.id = generateId("prt", false)
-            part.messageID = msgID
-            part.sessionID = localSessionID
-            await Storage.write(["part", msgID, part.id], part)
+        Database.use((db: any) => {
+          db.insert(SessionTable).values(SessionToRow(data.info)).onConflictDoNothing().run()
+
+          for (const msg of data.messages ?? []) {
+            const msgID = generateId("msg", false)
+            msgMap.set(msg.info.id, msgID)
+            msg.info.id = msgID
+            msg.info.sessionID = localSessionID
+            if (msg.info.parentID) msg.info.parentID = msgMap.get(msg.info.parentID) ?? msg.info.parentID
+
+            db.insert(MessageTable)
+              .values({
+                id: msgID,
+                session_id: localSessionID,
+                time_created: msg.info.time?.created ?? Date.now(),
+                data: msg.info,
+              })
+              .onConflictDoNothing()
+              .run()
+
+            for (const part of msg.parts ?? []) {
+              const partID = generateId("prt", false)
+              part.id = partID
+              part.messageID = msgID
+              part.sessionID = localSessionID
+
+              db.insert(PartTable)
+                .values({
+                  id: partID,
+                  message_id: msgID,
+                  session_id: localSessionID,
+                  data: part,
+                })
+                .onConflictDoNothing()
+                .run()
+            }
           }
-        }
+        })
 
         return c.json(data.info)
       },
