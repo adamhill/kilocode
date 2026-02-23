@@ -336,3 +336,18 @@ export interface Config {
   layout?: "auto" | "stretch"
   experimental?: ExperimentalConfig
 }
+
+// Cloud session from the Kilo cloud API (cli_sessions_v2)
+export interface CloudSessionInfo {
+  session_id: string
+  title: string | null
+  cloud_agent_session_id: string | null
+  created_at: string
+  updated_at: string
+  version: number
+}
+
+export interface CloudSessionsResponse {
+  cliSessions: CloudSessionInfo[]
+  nextCursor: string | null
+}
