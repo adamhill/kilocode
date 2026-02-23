@@ -1361,6 +1361,9 @@
                   },
                   "permission": {
                     "$ref": "#/components/schemas/PermissionRuleset"
+                  },
+                  "platform": {
+                    "type": "string"
                   }
                 }
               }
@@ -2429,6 +2432,32 @@
                   "variant": {
                     "type": "string"
                   },
+                  "editorContext": {
+                    "type": "object",
+                    "properties": {
+                      "visibleFiles": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "openTabs": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "activeFile": {
+                        "type": "string"
+                      },
+                      "shell": {
+                        "type": "string"
+                      },
+                      "timezone": {
+                        "type": "string"
+                      }
+                    }
+                  },
                   "parts": {
                     "type": "array",
                     "items": {
@@ -2807,6 +2836,32 @@
                   },
                   "variant": {
                     "type": "string"
+                  },
+                  "editorContext": {
+                    "type": "object",
+                    "properties": {
+                      "visibleFiles": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "openTabs": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "activeFile": {
+                        "type": "string"
+                      },
+                      "shell": {
+                        "type": "string"
+                      },
+                      "timezone": {
+                        "type": "string"
+                      }
+                    }
                   },
                   "parts": {
                     "type": "array",
@@ -4641,6 +4696,27 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "in": "query",
+            "name": "gitUrl",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "summary": "Get cloud sessions",
@@ -4671,16 +4747,6 @@
                               }
                             ]
                           },
-                          "cloud_agent_session_id": {
-                            "anyOf": [
-                              {
-                                "type": "string"
-                              },
-                              {
-                                "type": "null"
-                              }
-                            ]
-                          },
                           "created_at": {
                             "type": "string"
                           },
@@ -4691,14 +4757,7 @@
                             "type": "number"
                           }
                         },
-                        "required": [
-                          "session_id",
-                          "title",
-                          "cloud_agent_session_id",
-                          "created_at",
-                          "updated_at",
-                          "version"
-                        ]
+                        "required": ["session_id", "title", "created_at", "updated_at", "version"]
                       }
                     },
                     "nextCursor": {
@@ -6909,6 +6968,32 @@
           },
           "variant": {
             "type": "string"
+          },
+          "editorContext": {
+            "type": "object",
+            "properties": {
+              "visibleFiles": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "openTabs": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "activeFile": {
+                "type": "string"
+              },
+              "shell": {
+                "type": "string"
+              },
+              "timezone": {
+                "type": "string"
+              }
+            }
           }
         },
         "required": ["id", "sessionID", "role", "time", "agent", "model"]

@@ -437,7 +437,7 @@ export function createKiloRoutes(deps: KiloRoutesDeps) {
             id: localSessionID,
             projectID,
             slug: data.info.slug,
-            directory: data.info.directory ?? Instance.directory,
+            directory: data.info.directory,
             version: data.info.version,
             time,
           }
@@ -511,7 +511,6 @@ export function createKiloRoutes(deps: KiloRoutesDeps) {
                       z.object({
                         session_id: z.string(),
                         title: z.string().nullable(),
-                        cloud_agent_session_id: z.string().nullable(),
                         created_at: z.string(),
                         updated_at: z.string(),
                         version: z.number(),
@@ -582,7 +581,6 @@ export function createKiloRoutes(deps: KiloRoutesDeps) {
           const sessions = (result.cliSessions ?? []).map((s: any) => ({
             session_id: s.session_id,
             title: s.title ?? null,
-            cloud_agent_session_id: s.cloud_agent_session_id ?? null,
             created_at:
               typeof s.created_at === "string"
                 ? s.created_at

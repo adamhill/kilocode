@@ -992,6 +992,7 @@ export class Session extends HeyApiClient {
       parentID?: string
       title?: string
       permission?: PermissionRuleset
+      platform?: string
     },
     options?: Options<never, ThrowOnError>,
   ) {
@@ -1004,6 +1005,7 @@ export class Session extends HeyApiClient {
             { in: "body", key: "parentID" },
             { in: "body", key: "title" },
             { in: "body", key: "permission" },
+            { in: "body", key: "platform" },
           ],
         },
       ],
@@ -2493,10 +2495,25 @@ export class Kilo extends HeyApiClient {
   public cloudSessions<ThrowOnError extends boolean = false>(
     parameters?: {
       directory?: string
+      cursor?: string
+      limit?: number
+      gitUrl?: string
     },
     options?: Options<never, ThrowOnError>,
   ) {
-    const params = buildClientParams([parameters], [{ args: [{ in: "query", key: "directory" }] }])
+    const params = buildClientParams(
+      [parameters],
+      [
+        {
+          args: [
+            { in: "query", key: "directory" },
+            { in: "query", key: "cursor" },
+            { in: "query", key: "limit" },
+            { in: "query", key: "gitUrl" },
+          ],
+        },
+      ],
+    )
     return (options?.client ?? this.client).get<KiloCloudSessionsResponses, KiloCloudSessionsErrors, ThrowOnError>({
       url: "/kilo/cloud-sessions",
       ...options,

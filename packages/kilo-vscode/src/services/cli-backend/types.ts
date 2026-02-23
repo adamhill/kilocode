@@ -341,7 +341,6 @@ export interface Config {
 export interface CloudSessionInfo {
   session_id: string
   title: string | null
-  cloud_agent_session_id: string | null
   created_at: string
   updated_at: string
   version: number

@@ -2972,6 +2972,7 @@ export type SessionCreateData = {
     parentID?: string
     title?: string
     permission?: PermissionRuleset
+    platform?: string
   }
   path?: never
   query?: {
@@ -4528,6 +4529,9 @@ export type KiloCloudSessionsData = {
   path?: never
   query?: {
     directory?: string
+    cursor?: string
+    limit?: number
+    gitUrl?: string
   }
   url: "/kilo/cloud-sessions"
 }
@@ -4549,7 +4553,6 @@ export type KiloCloudSessionsResponses = {
     cliSessions: Array<{
       session_id: string
       title: string | null
-      cloud_agent_session_id: string | null
       created_at: string
       updated_at: string
       version: number

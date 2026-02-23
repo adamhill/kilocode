@@ -6,10 +6,15 @@ import { useDialog } from "@kilocode/kilo-ui/context/dialog"
 import { useLanguage } from "../../context/language"
 
 const UUID_RE = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i
+const SES_RE = /ses_[A-Za-z0-9]+/
 
 function extractSessionId(raw: string): string | null {
-  const match = raw.trim().match(UUID_RE)
-  return match ? match[0] : null
+  const trimmed = raw.trim()
+  const ses = trimmed.match(SES_RE)
+  if (ses) return ses[0]
+  const uuid = trimmed.match(UUID_RE)
+  if (uuid) return uuid[0]
+  return null
 }
 
 interface CloudImportDialogProps {
