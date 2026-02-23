@@ -14,7 +14,7 @@
  * - OpenCode -> Kilo (product name in user-visible text)
  * - opencode upgrade -> kilo upgrade (CLI commands)
  * - npx opencode -> npx kilo (CLI invocation)
- * - anomalyco/opencode -> Kilo-Org/kilo (GitHub repo)
+ * - anomalyco/opencode -> Kilo-Org/kilocode (GitHub repo)
  *
  * Preserved (not replaced):
  * - opencode.json (actual config filename)

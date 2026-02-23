@@ -3,7 +3,7 @@
  * Transform script files with GitHub API references
  *
  * This script handles script files that contain GitHub API references
- * by transforming them from anomalyco/opencode to Kilo-Org/kilo.
+ * by transforming them from anomalyco/opencode to Kilo-Org/kilocode.
  */
 
 import { $ } from "bun"
