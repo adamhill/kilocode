@@ -682,6 +682,7 @@ export const SessionProvider: ParentComponent = (props) => {
 
   function handleCloudSessionImported(cloudSessionId: string, session: SessionInfo) {
     const cloudKey = `cloud:${cloudSessionId}`
+    const cloudMessages = store.messages[cloudKey] ?? []
     batch(() => {
       setStore("sessions", session.id, session)
 
@@ -694,9 +695,11 @@ export const SessionProvider: ParentComponent = (props) => {
         setStore("agentSelections", session.id, pendingAgent)
       }
 
+      // Carry over cloud messages so there's no loading flash
+      setStore("messages", session.id, cloudMessages)
+
       setCloudPreviewId(null)
       setCurrentSessionID(session.id)
-      setLoading(true)
 
       setStore(
         "sessions",
@@ -711,6 +714,8 @@ export const SessionProvider: ParentComponent = (props) => {
         }),
       )
     })
+    // Load real messages in the background (picks up server-assigned IDs
+    // and the new user message once the send completes via SSE)
     vscode.postMessage({ type: "loadMessages", sessionID: session.id })
   }
 
