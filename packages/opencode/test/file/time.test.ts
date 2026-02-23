@@ -157,14 +157,14 @@ describe("file/time", () => {
         directory: tmp.path,
         fn: async () => {
           const { Flag } = await import("../../src/flag/flag")
-          const original = Flag.OPENCODE_DISABLE_FILETIME_CHECK
-          ;(Flag as { OPENCODE_DISABLE_FILETIME_CHECK: boolean }).OPENCODE_DISABLE_FILETIME_CHECK = true
+          const original = Flag.KILO_DISABLE_FILETIME_CHECK
+          ;(Flag as { KILO_DISABLE_FILETIME_CHECK: boolean }).KILO_DISABLE_FILETIME_CHECK = true
 
           try {
             // Should not throw even though file wasn't read
             await FileTime.assert(sessionID, filepath)
           } finally {
-            ;(Flag as { OPENCODE_DISABLE_FILETIME_CHECK: boolean }).OPENCODE_DISABLE_FILETIME_CHECK = original
+            ;(Flag as { KILO_DISABLE_FILETIME_CHECK: boolean }).KILO_DISABLE_FILETIME_CHECK = original
           }
         },
       })
