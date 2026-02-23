@@ -218,12 +218,12 @@
         },
         {
           "command": "kilo-code.new.historyButtonClicked",
-          "group": "navigation@3",
+          "group": "navigation@4",
           "when": "view == kilo-code.new.sidebarView"
         },
         {
           "command": "kilo-code.new.cloudHistoryButtonClicked",
-          "group": "navigation@4",
+          "group": "navigation@3",
           "when": "view == kilo-code.new.sidebarView"
         },
         {
