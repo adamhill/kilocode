@@ -703,8 +703,9 @@ export function SessionTurn(
                                   })()}
                                 </span>
                                 <Show when={isRetryFreeUsageLimitError()}>
+                                  {/* kilocode_change */}
                                   <a
-                                    href="https://opencode.ai/zen"
+                                    href="https://app.kilo.ai/profile"
                                     target="_blank"
                                     class="retry-error-link"
                                     rel="noopener noreferrer"
