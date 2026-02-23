@@ -222,13 +222,13 @@
           "when": "view == kilo-code.new.sidebarView"
         },
         {
-          "command": "kilo-code.new.historyButtonClicked",
-          "group": "navigation@4",
+          "command": "kilo-code.new.cloudHistoryButtonClicked",
+          "group": "navigation@3",
           "when": "view == kilo-code.new.sidebarView"
         },
         {
-          "command": "kilo-code.new.cloudHistoryButtonClicked",
-          "group": "navigation@3",
+          "command": "kilo-code.new.historyButtonClicked",
+          "group": "navigation@4",
           "when": "view == kilo-code.new.sidebarView"
         },
         {
