@@ -5,19 +5,21 @@
   background-color: rgba(0, 0, 0, 0.5);
 }
 
-[data-component="dialog"] [data-slot="dialog-content"] {
-  border-radius: 2px;
-  max-width: 512px;
-  background-color: var(--background-base);
-  border: 1px solid var(--border-weak-base);
-}
+[data-component="dialog"] {
+  [data-slot="dialog-content"] {
+    border-radius: 2px;
+    max-width: 512px;
+    background-color: var(--background-base);
+    border: 1px solid var(--border-weak-base);
+  }
 
-[data-component="dialog"] [data-slot="dialog-header"] {
-  font-size: 14px;
-}
+  [data-slot="dialog-header"] {
+    font-size: 14px;
+  }
 
-[data-component="dialog"] [data-slot="dialog-title"] {
-  font-weight: 600;
+  [data-slot="dialog-title"] {
+    font-weight: 600;
+  }
 }
 
 [data-component="dialog"][data-fit] [data-slot="dialog-container"] {

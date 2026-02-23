@@ -443,7 +443,7 @@ export function createKiloRoutes(deps: KiloRoutesDeps) {
             .run()
 
           const messages = Array.isArray(data.messages) ? data.messages : []
-          for (const msg of messages) {
+          for (const msg of messages.filter((m: any) => m.info)) {
             const msgID = Identifier.ascending("message")
             msgMap.set(msg.info.id, msgID)
             msg.info.id = msgID
