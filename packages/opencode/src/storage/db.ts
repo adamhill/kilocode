@@ -13,7 +13,7 @@ import path from "path"
 import { readFileSync, readdirSync } from "fs"
 import * as schema from "./schema"
 
-declare const OPENCODE_MIGRATIONS: { sql: string; timestamp: number }[] | undefined
+declare const KILO_MIGRATIONS: { sql: string; timestamp: number }[] | undefined
 
 export const NotFoundError = NamedError.create(
   "NotFoundError",
@@ -79,13 +79,13 @@ export namespace Database {
 
     // Apply schema migrations
     const entries =
-      typeof OPENCODE_MIGRATIONS !== "undefined"
-        ? OPENCODE_MIGRATIONS
+      typeof KILO_MIGRATIONS !== "undefined"
+        ? KILO_MIGRATIONS
         : migrations(path.join(import.meta.dirname, "../../migration"))
     if (entries.length > 0) {
       log.info("applying migrations", {
         count: entries.length,
-        mode: typeof OPENCODE_MIGRATIONS !== "undefined" ? "bundled" : "dev",
+        mode: typeof KILO_MIGRATIONS !== "undefined" ? "bundled" : "dev",
       })
       migrate(db, entries)
     }
