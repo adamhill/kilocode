@@ -1,7 +1,7 @@
 ---
 mode: primary
 hidden: true
-model: opencode/minimax-m2.5
+model: kilo/minimax/minimax-m2.5
 color: "#44BA81"
 tools:
   "*": false
