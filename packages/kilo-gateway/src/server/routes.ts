@@ -43,7 +43,7 @@ interface KiloRoutesDeps {
   SessionTable: object
   MessageTable: object
   PartTable: object
-  SessionToRow: (info: Record<string, unknown>) => Record<string, unknown>
+  SessionToRow: (info: any) => Record<string, unknown>
   Bus: { publish(event: { type: string; properties: unknown }, payload: unknown): void | Promise<unknown> }
   SessionCreatedEvent: { type: string; properties: unknown }
   Identifier: {
@@ -526,6 +526,14 @@ export function createKiloRoutes(deps: KiloRoutesDeps) {
           ...errors(400, 401),
         },
       }),
+      validator(
+        "query",
+        z.object({
+          cursor: z.string().optional(),
+          limit: z.coerce.number().optional(),
+          gitUrl: z.string().optional(),
+        }),
+      ),
       async (c: any) => {
         try {
           const auth = await Auth.get("kilo")
@@ -534,13 +542,11 @@ export function createKiloRoutes(deps: KiloRoutesDeps) {
           const token = auth.type === "api" ? auth.key : auth.type === "oauth" ? auth.access : undefined
           if (!token) return c.json({ error: "No valid token found" }, 401)
 
-          const cursor = c.req.query("cursor")
-          const limit = c.req.query("limit")
-          const gitUrl = c.req.query("gitUrl")
+          const { cursor, limit, gitUrl } = c.req.valid("query")
 
           const input: Record<string, unknown> = {}
           if (cursor) input.cursor = cursor
-          if (limit) input.limit = Number(limit)
+          if (limit) input.limit = limit
           if (gitUrl) input.gitUrl = gitUrl
 
           const params = new URLSearchParams({
@@ -595,7 +601,7 @@ export function createKiloRoutes(deps: KiloRoutesDeps) {
           return c.json({ cliSessions: sessions, nextCursor: result.nextCursor ?? null })
         } catch (err: any) {
           console.error("[Kilo Gateway] cloud-sessions: unhandled error", err?.message ?? err)
-          return c.json({ error: err?.message ?? "Unknown error" }, 500)
+          return c.json({ error: "Internal error" }, 500)
         }
       },
     )
