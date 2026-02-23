@@ -1,8 +1,8 @@
 # Toggle Thinking
 
-**GitHub Issue:** [#172](https://github.com/Kilo-Org/kilo/issues/172)
+**GitHub Issue:** [#172](https://github.com/Kilo-Org/kilocode/issues/172)
 **Priority:** P2
-**Status:** 🔨 Partial (linked [PR #127](https://github.com/Kilo-Org/kilo/pull/127))
+**Status:** 🔨 Partial (linked [PR #127](https://github.com/Kilo-Org/kilocode/pull/127))
 
 ## Description
 

@@ -1,6 +1,6 @@
 # Repository Initialization
 
-**GitHub Issue:** [#174](https://github.com/Kilo-Org/kilo/issues/174)
+**GitHub Issue:** [#174](https://github.com/Kilo-Org/kilocode/issues/174)
 **Priority:** P3
 **Status:** ❌ Not started
 
