@@ -165,68 +165,6 @@
 }
 
 /* ============================================
-   Cloud Import Dialog
-   ============================================ */
-
-.cloud-import-dialog {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 0 24px 12px 24px;
-}
-
-.cloud-import-input {
-  width: 100%;
-  padding: 6px 8px;
-  background: var(--vscode-input-background);
-  color: var(--vscode-input-foreground);
-  border: 1px solid var(--vscode-input-border, transparent);
-  border-radius: 4px;
-  font-family: inherit;
-  font-size: 13px;
-  box-sizing: border-box;
-}
-
-.cloud-import-input:focus {
-  outline: none;
-  border-color: var(--vscode-focusBorder);
-}
-
-.cloud-import-error {
-  font-size: 12px;
-  color: var(--vscode-errorForeground);
-}
-
-.cloud-import-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-}
-
-.scroll-to-bottom-button {
-  position: absolute;
-  bottom: 12px;
-  right: 12px;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: var(--vscode-button-background);
-  color: var(--vscode-button-foreground);
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-  transition: background-color 0.2s;
-}
-
-.scroll-to-bottom-button:hover {
-  background: var(--vscode-button-hoverBackground);
-}
-
-/* ============================================
    Prompt Input
    ============================================ */
 
