@@ -77,7 +77,7 @@ Extend Kilo Auto into four tiers.
 
 ### Auto: Small (internal)
 
-**Who it's for**: Not user-facing. Used internally by Kilo cleints for lightweight background tasks.
+**Who it's for**: Not user-facing. Used internally by Kilo clients for lightweight background tasks.
 
 **What problem it solves**: Kilo uses small models behind the scenes for tasks like generating session titles, commit messages, and conversation summaries. Today, the small model is configurable by the end user by defaults to a paid frontier model. If a free user doesn't have access to that model, the task falls back to the user's main (large) model — wasting credits and adding latency for a task that should be instant and cheap. Auto: Small makes background tasks reliably work for all users regardless of their payment status.
 
