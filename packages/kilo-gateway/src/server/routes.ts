@@ -430,9 +430,9 @@ export function createKiloRoutes(deps: KiloRoutesDeps) {
           ...data.info,
           id: localSessionID,
           projectID,
-          slug: data.info.slug ?? "imported",
-          directory: data.info.directory ?? Instance.directory ?? ".",
-          version: data.info.version ?? 2,
+          slug: data.info.slug,
+          directory: data.info.directory ?? Instance.directory,
+          version: data.info.version,
           time,
         }
 
