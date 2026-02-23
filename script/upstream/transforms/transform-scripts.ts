@@ -33,12 +33,12 @@ const SCRIPT_REPLACEMENTS: ScriptReplacement[] = [
   // GitHub API URLs
   {
     pattern: /api\.github\.com\/repos\/anomalyco\/opencode/g,
-    replacement: "api.github.com/repos/Kilo-Org/kilo",
+    replacement: "api.github.com/repos/Kilo-Org/kilocode",
     description: "GitHub API URL",
   },
   {
     pattern: /\/repos\/anomalyco\/opencode/g,
-    replacement: "/repos/Kilo-Org/kilo",
+    replacement: "/repos/Kilo-Org/kilocode",
     description: "GitHub repos path",
   },
 
@@ -57,7 +57,7 @@ const SCRIPT_REPLACEMENTS: ScriptReplacement[] = [
   },
   {
     pattern: /anomalyco\/opencode/g,
-    replacement: "Kilo-Org/kilo",
+    replacement: "Kilo-Org/kilocode",
     description: "GitHub repo reference",
   },
 

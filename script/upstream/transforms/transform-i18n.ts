@@ -56,7 +56,7 @@ const I18N_REPLACEMENTS: StringReplacement[] = [
   },
   {
     pattern: /anomalyco\/opencode/g,
-    replacement: "Kilo-Org/kilo",
+    replacement: "Kilo-Org/kilocode",
     description: "GitHub repo reference",
   },
 
