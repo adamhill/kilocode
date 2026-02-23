@@ -146,7 +146,7 @@ jobs:
           KILO_ORG_ID: ${{ secrets.KILO_ORG_ID }}
           # kilocode_change end
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          OPENCODE_PERMISSION: |
+          KILO_PERMISSION: |
             {
               "bash": {
                 "*": "deny",
