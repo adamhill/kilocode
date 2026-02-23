@@ -45,7 +45,7 @@ const SCRIPT_REPLACEMENTS: ScriptReplacement[] = [
   // gh CLI commands
   {
     pattern: /gh api "\/repos\/anomalyco\/opencode/g,
-    replacement: 'gh api "/repos/Kilo-Org/kilo',
+    replacement: 'gh api "/repos/Kilo-Org/kilocode',
     description: "gh api command",
   },
 
