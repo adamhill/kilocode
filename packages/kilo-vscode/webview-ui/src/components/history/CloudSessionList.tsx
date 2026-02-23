@@ -7,6 +7,7 @@
 import { Component, createSignal, createEffect, onMount, onCleanup, Show } from "solid-js"
 import { List } from "@kilocode/kilo-ui/list"
 import { Button } from "@kilocode/kilo-ui/button"
+import { Checkbox } from "@kilocode/kilo-ui/checkbox"
 import { useVSCode } from "../../context/vscode"
 import { useLanguage } from "../../context/language"
 import { formatRelativeDate } from "../../utils/date"
@@ -116,10 +117,9 @@ const CloudSessionList: Component<CloudSessionListProps> = (props) => {
   return (
     <div class="session-list cloud-session-list">
       <div class="cloud-session-filters">
-        <label class="cloud-session-checkbox">
-          <input type="checkbox" checked={repoOnly()} onChange={(e) => setRepoOnly(e.currentTarget.checked)} />
-          <span>{language.t("session.cloud.repoOnly") ?? "Only this repository"}</span>
-        </label>
+        <Checkbox checked={repoOnly()} onChange={setRepoOnly}>
+          {language.t("session.cloud.repoOnly") ?? "Only this repository"}
+        </Checkbox>
       </div>
       <List<DisplaySession>
         items={sessions()}

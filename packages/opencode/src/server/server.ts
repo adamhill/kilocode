@@ -33,6 +33,7 @@ import { ProviderRoutes } from "./routes/provider"
 import { createKiloRoutes } from "@kilocode/kilo-gateway" // kilocode_change
 import { Database } from "../storage/db" // kilocode_change
 import { Session } from "../session" // kilocode_change
+import { Identifier } from "../id/id" // kilocode_change
 import { SessionTable, MessageTable, PartTable } from "../session/session.sql" // kilocode_change
 import { lazy } from "../util/lazy"
 import { InstanceBootstrap } from "../project/bootstrap"
@@ -259,6 +260,7 @@ export namespace Server {
             SessionToRow: Session.toRow, // kilocode_change
             Bus, // kilocode_change
             SessionCreatedEvent: Session.Event.Created, // kilocode_change
+            Identifier, // kilocode_change
           }),
         )
         // kilocode_change end

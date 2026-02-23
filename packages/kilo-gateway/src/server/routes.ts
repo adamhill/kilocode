@@ -6,7 +6,6 @@
  * This factory function accepts OpenCode dependencies to create Kilo-specific routes
  */
 
-import { randomBytes } from "crypto"
 import { fetchProfile, fetchBalance } from "../api/profile.js"
 import { fetchKilocodeNotifications, KilocodeNotificationSchema } from "../api/notifications.js"
 import { KILO_API_BASE, HEADER_FEATURE } from "../api/constants.js" // kilocode_change - added HEADER_FEATURE
@@ -21,6 +20,10 @@ type Errors = any
 type Auth = any
 type Z = any
 
+interface DrizzleDb {
+  insert(table: object): { values(data: object): { onConflictDoNothing(): { run(): void } } }
+}
+
 interface KiloRoutesDeps {
   Hono: new () => Hono
   describeRoute: DescribeRoute
@@ -29,14 +32,24 @@ interface KiloRoutesDeps {
   errors: Errors
   Auth: Auth
   z: Z
-  Database: any
-  Instance: any
-  SessionTable: any
-  MessageTable: any
-  PartTable: any
-  SessionToRow: (info: any) => any
-  Bus: { publish: (event: any, payload: any) => void }
-  SessionCreatedEvent: any
+  Database: {
+    transaction<T>(callback: (db: DrizzleDb) => T): T
+    effect(fn: () => void | Promise<unknown>): void
+  }
+  Instance: {
+    readonly directory: string
+    readonly project: { readonly id: string }
+  }
+  SessionTable: object
+  MessageTable: object
+  PartTable: object
+  SessionToRow: (info: Record<string, unknown>) => Record<string, unknown>
+  Bus: { publish(event: { type: string; properties: unknown }, payload: unknown): void | Promise<unknown> }
+  SessionCreatedEvent: { type: string; properties: unknown }
+  Identifier: {
+    ascending(prefix: "session" | "message" | "part", given?: string): string
+    descending(prefix: "session" | "message" | "part", given?: string): string
+  }
 }
 
 /**
@@ -62,19 +75,6 @@ interface KiloRoutesDeps {
  * })
  * ```
  */
-let counter = 0
-function generateId(prefix: string, descending: boolean): string {
-  const chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
-  const bytes = randomBytes(14)
-  let rand = ""
-  for (let i = 0; i < 14; i++) rand += chars[bytes[i] % 62]
-  let now = BigInt(Date.now()) * BigInt(0x1000) + BigInt(counter++)
-  if (descending) now = ~now
-  const buf = Buffer.alloc(6)
-  for (let i = 0; i < 6; i++) buf[i] = Number((now >> BigInt(40 - 8 * i)) & BigInt(0xff))
-  return prefix + "_" + buf.toString("hex") + rand
-}
-
 export function createKiloRoutes(deps: KiloRoutesDeps) {
   const {
     Hono,
@@ -92,6 +92,7 @@ export function createKiloRoutes(deps: KiloRoutesDeps) {
     SessionToRow,
     Bus,
     SessionCreatedEvent,
+    Identifier,
   } = deps
 
   const Organization = z.object({
@@ -413,21 +414,28 @@ export function createKiloRoutes(deps: KiloRoutesDeps) {
         const data = (await response.json()) as any
         if (!data?.info?.id) return c.json({ error: "Invalid export data" }, 400)
 
-        const localSessionID = generateId("ses", true)
+        const localSessionID = Identifier.descending("session")
         const msgMap = new Map<string, string>()
         const projectID = Instance.project.id
 
-        data.info.id = localSessionID
-        data.info.projectID = projectID
-        data.info.slug = data.info.slug || "imported"
-        data.info.directory = data.info.directory || Instance.directory || "."
-        data.info.version = data.info.version || "2"
+        const info = {
+          ...data.info,
+          id: localSessionID,
+          projectID,
+          slug: data.info.slug || "imported",
+          directory: data.info.directory || Instance.directory || ".",
+          version: data.info.version || "2",
+        }
 
-        Database.transaction((db: any) => {
-          db.insert(SessionTable).values(SessionToRow(data.info)).onConflictDoNothing().run()
+        Database.transaction((db) => {
+          db.insert(SessionTable)
+            .values(SessionToRow(info as Record<string, unknown>))
+            .onConflictDoNothing()
+            .run()
 
-          for (const msg of data.messages ?? []) {
-            const msgID = generateId("msg", false)
+          const messages = Array.isArray(data.messages) ? data.messages : []
+          for (const msg of messages) {
+            const msgID = Identifier.ascending("message")
             msgMap.set(msg.info.id, msgID)
             msg.info.id = msgID
             msg.info.sessionID = localSessionID
@@ -444,7 +452,7 @@ export function createKiloRoutes(deps: KiloRoutesDeps) {
               .run()
 
             for (const part of msg.parts ?? []) {
-              const partID = generateId("prt", false)
+              const partID = Identifier.ascending("part")
               part.id = partID
               part.messageID = msgID
               part.sessionID = localSessionID
@@ -461,10 +469,10 @@ export function createKiloRoutes(deps: KiloRoutesDeps) {
             }
           }
 
-          Database.effect(() => Bus.publish(SessionCreatedEvent, { info: data.info }))
+          Database.effect(() => Bus.publish(SessionCreatedEvent, { info }))
         })
 
-        return c.json(data.info)
+        return c.json(info)
       },
     )
     .get(
