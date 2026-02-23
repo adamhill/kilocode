@@ -171,7 +171,12 @@ const AppContent: Component = () => {
           <SessionList onSelectSession={handleSelectSession} />
         </Match>
         <Match when={currentView() === "cloudHistory"}>
-          <CloudSessionList />
+          <CloudSessionList
+            onSelectSession={(cloudSessionId) => {
+              session.selectCloudSession(cloudSessionId)
+              setCurrentView("newTask")
+            }}
+          />
         </Match>
         <Match when={currentView() === "profile"}>
           <ProfileView
