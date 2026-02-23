@@ -694,6 +694,11 @@ export const dict = {
   "session.search.placeholder": "세션 검색...",
   "session.empty": "아직 세션이 없습니다. +를 클릭하여 새 대화를 시작하세요.",
   "session.cloud.repoOnly": "이 저장소만",
+  "session.cloud.import": "Import from cloud",
+  "session.cloud.import.title": "Import from cloud",
+  "session.cloud.import.placeholder": "Session ID, URL, or kilo import command",
+  "session.cloud.import.button": "Import",
+  "session.cloud.import.invalid": "Invalid session ID format",
 
   "workspace.new": "새 작업 공간",
   "workspace.type.local": "로컬",

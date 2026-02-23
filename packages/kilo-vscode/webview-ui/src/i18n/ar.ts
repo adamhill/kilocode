@@ -689,6 +689,11 @@ export const dict = {
   "session.search.placeholder": "البحث في الجلسات...",
   "session.empty": "لا توجد جلسات بعد. انقر + لبدء محادثة جديدة.",
   "session.cloud.repoOnly": "هذا المستودع فقط",
+  "session.cloud.import": "Import from cloud",
+  "session.cloud.import.title": "Import from cloud",
+  "session.cloud.import.placeholder": "Session ID, URL, or kilo import command",
+  "session.cloud.import.button": "Import",
+  "session.cloud.import.invalid": "Invalid session ID format",
 
   "workspace.new": "مساحة عمل جديدة",
   "workspace.type.local": "محلي",

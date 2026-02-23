@@ -690,6 +690,11 @@ export const dict = {
   "session.search.placeholder": "搜索会话...",
   "session.empty": "暂无会话。点击 + 开始新的对话。",
   "session.cloud.repoOnly": "仅此仓库",
+  "session.cloud.import": "Import from cloud",
+  "session.cloud.import.title": "Import from cloud",
+  "session.cloud.import.placeholder": "Session ID, URL, or kilo import command",
+  "session.cloud.import.button": "Import",
+  "session.cloud.import.invalid": "Invalid session ID format",
 
   "workspace.new": "新建工作区",
   "workspace.type.local": "本地",

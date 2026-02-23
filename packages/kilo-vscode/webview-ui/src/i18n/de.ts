@@ -701,6 +701,11 @@ export const dict = {
   "session.search.placeholder": "Sitzungen suchen...",
   "session.empty": "Noch keine Sitzungen. Klicke + um eine neue Unterhaltung zu starten.",
   "session.cloud.repoOnly": "Nur dieses Repository",
+  "session.cloud.import": "Import from cloud",
+  "session.cloud.import.title": "Import from cloud",
+  "session.cloud.import.placeholder": "Session ID, URL, or kilo import command",
+  "session.cloud.import.button": "Import",
+  "session.cloud.import.invalid": "Invalid session ID format",
 
   "workspace.new": "Neuer Arbeitsbereich",
   "workspace.type.local": "lokal",

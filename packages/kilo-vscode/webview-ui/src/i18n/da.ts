@@ -695,6 +695,11 @@ export const dict = {
   "session.search.placeholder": "Søg sessioner...",
   "session.empty": "Ingen sessioner endnu. Klik + for at starte en ny samtale.",
   "session.cloud.repoOnly": "Kun dette repository",
+  "session.cloud.import": "Import from cloud",
+  "session.cloud.import.title": "Import from cloud",
+  "session.cloud.import.placeholder": "Session ID, URL, or kilo import command",
+  "session.cloud.import.button": "Import",
+  "session.cloud.import.invalid": "Invalid session ID format",
 
   "workspace.new": "Nyt arbejdsområde",
   "workspace.type.local": "lokal",

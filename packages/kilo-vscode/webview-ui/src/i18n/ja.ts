@@ -689,6 +689,11 @@ export const dict = {
   "session.search.placeholder": "セッションを検索...",
   "session.empty": "セッションがありません。+ をクリックして新しい会話を始めましょう。",
   "session.cloud.repoOnly": "このリポジトリのみ",
+  "session.cloud.import": "Import from cloud",
+  "session.cloud.import.title": "Import from cloud",
+  "session.cloud.import.placeholder": "Session ID, URL, or kilo import command",
+  "session.cloud.import.button": "Import",
+  "session.cloud.import.invalid": "Invalid session ID format",
 
   "workspace.new": "新しいワークスペース",
   "workspace.type.local": "ローカル",

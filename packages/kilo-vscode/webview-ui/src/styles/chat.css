@@ -164,6 +164,72 @@
   flex-shrink: 0;
 }
 
+/* ============================================
+   Import from Cloud Button (empty state)
+   ============================================ */
+
+.import-cloud-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 12px;
+  border: 1px solid var(--vscode-button-border, var(--vscode-contrastBorder, transparent));
+  border-radius: 4px;
+  background: transparent;
+  color: var(--vscode-descriptionForeground);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 12px;
+  gap: 6px;
+  transition:
+    background-color 0.15s,
+    color 0.15s;
+}
+
+.import-cloud-button:hover {
+  background: var(--vscode-list-hoverBackground);
+  color: var(--vscode-foreground);
+}
+
+/* ============================================
+   Cloud Import Dialog
+   ============================================ */
+
+.cloud-import-dialog {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 320px;
+}
+
+.cloud-import-input {
+  width: 100%;
+  padding: 6px 8px;
+  background: var(--vscode-input-background);
+  color: var(--vscode-input-foreground);
+  border: 1px solid var(--vscode-input-border, transparent);
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 13px;
+  box-sizing: border-box;
+}
+
+.cloud-import-input:focus {
+  outline: none;
+  border-color: var(--vscode-focusBorder);
+}
+
+.cloud-import-error {
+  font-size: 12px;
+  color: var(--vscode-errorForeground);
+}
+
+.cloud-import-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
 .scroll-to-bottom-button {
   position: absolute;
   bottom: 12px;
