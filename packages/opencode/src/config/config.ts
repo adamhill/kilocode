@@ -50,11 +50,11 @@ export namespace Config {
   function getManagedConfigDir(): string {
     switch (process.platform) {
       case "darwin":
-        return "/Library/Application Support/opencode"
+        return "/Library/Application Support/kilo" // kilocode_change
       case "win32":
-        return path.join(process.env.ProgramData || "C:\\ProgramData", "opencode")
+        return path.join(process.env.ProgramData || "C:\\ProgramData", "kilo") // kilocode_change
       default:
-        return "/etc/opencode"
+        return "/etc/kilo" // kilocode_change
     }
   }
 
@@ -215,7 +215,9 @@ export namespace Config {
 
     // Project config overrides global and remote config.
     if (!Flag.KILO_DISABLE_PROJECT_CONFIG) {
-      for (const file of ["opencode.jsonc", "opencode.json"]) {
+      // kilocode_change start
+      for (const file of ["kilo.jsonc", "kilo.json", "opencode.jsonc", "opencode.json"]) {
+        // kilocode_change end
         const found = await Filesystem.findUp(file, Instance.directory, Instance.worktree)
         for (const resolved of found.toReversed()) {
           result = merge(result, await loadFile(resolved))
@@ -233,7 +235,7 @@ export namespace Config {
       ...(!Flag.KILO_DISABLE_PROJECT_CONFIG
         ? await Array.fromAsync(
             Filesystem.up({
-              targets: [".opencode"],
+              targets: [".kilo", ".opencode"], // kilocode_change
               start: Instance.directory,
               stop: Instance.worktree,
             }),
@@ -242,7 +244,7 @@ export namespace Config {
       // Always scan ~/.opencode/ (user home directory)
       ...(await Array.fromAsync(
         Filesystem.up({
-          targets: [".opencode"],
+          targets: [".kilo", ".opencode"], // kilocode_change
           start: Global.Path.home,
           stop: Global.Path.home,
         }),
@@ -258,8 +260,10 @@ export namespace Config {
     const deps = []
 
     for (const dir of unique(directories)) {
-      if (dir.endsWith(".opencode") || dir === Flag.KILO_CONFIG_DIR) {
-        for (const file of ["opencode.jsonc", "opencode.json"]) {
+      // kilocode_change start
+      if (dir.endsWith(".kilo") || dir.endsWith(".opencode") || dir === Flag.KILO_CONFIG_DIR) {
+        for (const file of ["kilo.jsonc", "kilo.json", "opencode.jsonc", "opencode.json"]) {
+          // kilocode_change end
           log.debug(`loading config from ${path.join(dir, file)}`)
           result = merge(result, await loadFile(path.join(dir, file)))
           // to satisfy the type checker
@@ -299,7 +303,9 @@ export namespace Config {
     // which would fail on system directories requiring elevated permissions
     // This way it only loads config file and not skills/plugins/commands
     if (existsSync(managedConfigDir)) {
-      for (const file of ["opencode.jsonc", "opencode.json"]) {
+      // kilocode_change start
+      for (const file of ["kilo.jsonc", "kilo.json", "opencode.jsonc", "opencode.json"]) {
+        // kilocode_change end
         result = merge(result, await loadFile(path.join(managedConfigDir, file)))
       }
     }
@@ -470,7 +476,14 @@ export namespace Config {
       })
       if (!md) continue
 
-      const patterns = ["/.opencode/command/", "/.opencode/commands/", "/command/", "/commands/"]
+      const patterns = [
+        "/.kilo/command/",
+        "/.kilo/commands/",
+        "/.opencode/command/",
+        "/.opencode/commands/",
+        "/command/",
+        "/commands/",
+      ]
       const file = rel(item, patterns) ?? path.basename(item)
       const name = trim(file)
 
@@ -509,7 +522,16 @@ export namespace Config {
       })
       if (!md) continue
 
-      const patterns = ["/.opencode/agent/", "/.opencode/agents/", "/agent/", "/agents/"]
+      // kilocode_change start
+      const patterns = [
+        "/.kilo/agent/",
+        "/.kilo/agents/",
+        "/.opencode/agent/",
+        "/.opencode/agents/",
+        "/agent/",
+        "/agents/",
+      ]
+      // kilocode_change end
       const file = rel(item, patterns) ?? path.basename(item)
       const agentName = trim(file)
 
@@ -1317,6 +1339,10 @@ export namespace Config {
     let result: Info = pipe(
       {},
       mergeDeep(await loadFile(path.join(Global.Path.config, "config.json"))),
+      // kilocode_change start
+      mergeDeep(await loadFile(path.join(Global.Path.config, "kilo.json"))),
+      mergeDeep(await loadFile(path.join(Global.Path.config, "kilo.jsonc"))),
+      // kilocode_change end
       mergeDeep(await loadFile(path.join(Global.Path.config, "opencode.json"))),
       mergeDeep(await loadFile(path.join(Global.Path.config, "opencode.jsonc"))),
     )
@@ -1487,7 +1513,9 @@ export namespace Config {
   }
 
   function globalConfigFile() {
-    const candidates = ["opencode.jsonc", "opencode.json", "config.json"].map((file) =>
+    // kilocode_change start
+    const candidates = ["kilo.jsonc", "kilo.json", "opencode.jsonc", "opencode.json", "config.json"].map((file) =>
+      // kilocode_change end
       path.join(Global.Path.config, file),
     )
     for (const file of candidates) {
