@@ -25,6 +25,7 @@ export const NotFoundError = NamedError.create(
 const log = Log.create({ service: "db" })
 
 export namespace Database {
+  export const Path = path.join(Global.Path.data, "kilo.db")
   type Schema = typeof schema
   export type Transaction = SQLiteTransaction<"sync", void, Schema>
 
