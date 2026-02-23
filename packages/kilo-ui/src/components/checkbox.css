@@ -23,7 +23,5 @@
   [data-slot="checkbox-checkbox-label"] {
     font-size: 13px;
     line-height: normal;
-    padding-inline-start: 10px;
-    margin-inline-end: 10px;
   }
 }
