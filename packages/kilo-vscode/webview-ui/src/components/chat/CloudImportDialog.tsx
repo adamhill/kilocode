@@ -33,7 +33,7 @@ export const CloudImportDialog: Component<CloudImportDialogProps> = (props) => {
   }
 
   return (
-    <Dialog title={language.t("session.cloud.import.title")}>
+    <Dialog title={language.t("session.cloud.import.title")} fit>
       <div class="dialog-confirm-body">
         <TextField
           autofocus
