@@ -886,6 +886,10 @@ export const SessionProvider: ParentComponent = (props) => {
       console.warn("[Kilo New] Cannot select session: not connected")
       return
     }
+    if (id.startsWith("cloud:")) {
+      console.warn("[Kilo New] Cannot select cloud preview session via selectSession")
+      return
+    }
     setCurrentSessionID(id)
     setLoading(true)
     vscode.postMessage({ type: "loadMessages", sessionID: id })
@@ -948,7 +952,9 @@ export const SessionProvider: ParentComponent = (props) => {
   }
 
   const sessions = createMemo(() =>
-    Object.values(store.sessions).sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()),
+    Object.values(store.sessions)
+      .filter((s) => !s.id.startsWith("cloud:"))
+      .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()),
   )
 
   const totalCost = createMemo(() => calcTotalCost(messages()))
