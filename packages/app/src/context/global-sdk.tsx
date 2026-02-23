@@ -1,4 +1,4 @@
-import { createOpencodeClient, type Event } from "@opencode-ai/sdk/v2/client"
+import { createOpencodeClient, type Event } from "@kilocode/sdk/v2/client"
 import { createSimpleContext } from "@opencode-ai/ui/context"
 import { createGlobalEmitter } from "@solid-primitives/event-bus"
 import { batch, onCleanup } from "solid-js"
@@ -12,7 +12,7 @@ export const { use: useGlobalSDK, provider: GlobalSDKProvider } = createSimpleCo
     const platform = usePlatform()
     const abort = new AbortController()
 
-    const password = typeof window === "undefined" ? undefined : window.__OPENCODE__?.serverPassword
+    const password = typeof window === "undefined" ? undefined : window.__KILO__?.serverPassword
 
     const auth = (() => {
       if (!password) return
