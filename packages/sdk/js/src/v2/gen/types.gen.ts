@@ -2972,6 +2972,7 @@ export type SessionCreateData = {
     parentID?: string
     title?: string
     permission?: PermissionRuleset
+    platform?: string
   }
   path?: never
   query?: {
