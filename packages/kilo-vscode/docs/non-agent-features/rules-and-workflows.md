@@ -1,6 +1,5 @@
 # Rules & Workflows
 
-**GitHub Issue:** [#173](https://github.com/Kilo-Org/kilocode/issues/173)
 **Priority:** P3
 **Status:** ❌ Not started
 
