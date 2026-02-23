@@ -95,6 +95,7 @@ const CloudSessionList: Component<CloudSessionListProps> = (props) => {
     setNextCursor(null)
     vscode.postMessage({
       type: "requestCloudSessions",
+      limit: 50,
       gitUrl: url ?? undefined,
     })
   })
@@ -107,6 +108,7 @@ const CloudSessionList: Component<CloudSessionListProps> = (props) => {
     vscode.postMessage({
       type: "requestCloudSessions",
       cursor,
+      limit: 50,
       gitUrl: url ?? undefined,
     })
   }
