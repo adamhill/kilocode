@@ -9,6 +9,7 @@ import {
   type KilocodeNotification,
 } from "./services/cli-backend"
 import type { EditorContext } from "./services/cli-backend/types"
+import { FileIgnoreController } from "./services/autocomplete/shims/FileIgnoreController"
 import { handleChatCompletionRequest } from "./services/autocomplete/chat-autocomplete/handleChatCompletionRequest"
 import { handleChatCompletionAccepted } from "./services/autocomplete/chat-autocomplete/handleChatCompletionAccepted"
 import { buildWebviewHtml } from "./utils"
@@ -49,6 +50,10 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
   private unsubscribeState: (() => void) | null = null
   private unsubscribeNotificationDismiss: (() => void) | null = null
   private webviewMessageDisposable: vscode.Disposable | null = null
+
+  /** Lazily initialized ignore controller for .kilocodeignore filtering */
+  private ignoreController: FileIgnoreController | null = null
+  private ignoreControllerDir: string | null = null
 
   /** Optional interceptor called before the standard message handler.
    *  Return null to consume the message, or return a (possibly transformed) message. */
@@ -1076,7 +1081,7 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
 
       parts.push({ type: "text", text })
 
-      const editorContext = this.gatherEditorContext()
+      const editorContext = await this.gatherEditorContext()
 
       await this.httpClient.sendMessage(targetSessionID, parts, workspaceDir, {
         providerID,
@@ -1514,8 +1519,25 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
   /**
    * Gather VS Code editor context to send alongside messages to the CLI backend.
    */
-  private gatherEditorContext(): EditorContext {
+  /**
+   * Get or create a FileIgnoreController for the current workspace directory.
+   * Reinitializes if the workspace directory has changed.
+   */
+  private async getIgnoreController(workspaceDir: string): Promise<FileIgnoreController> {
+    if (this.ignoreController && this.ignoreControllerDir === workspaceDir) {
+      return this.ignoreController
+    }
+    const controller = new FileIgnoreController(workspaceDir)
+    await controller.initialize()
+    this.ignoreController = controller
+    this.ignoreControllerDir = workspaceDir
+    return controller
+  }
+
+  private async gatherEditorContext(): Promise<EditorContext> {
     const workspaceDir = this.getWorkspaceDirectory()
+    const controller = await this.getIgnoreController(workspaceDir)
+
     const toRelative = (fsPath: string): string | undefined => {
       if (!workspaceDir) {
         return undefined
@@ -1527,12 +1549,12 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
       return relative
     }
 
-    // Visible files (capped to avoid bloating context)
+    // Visible files (capped to avoid bloating context, filtered through .kilocodeignore)
     const visibleFiles = vscode.window.visibleTextEditors
       .map((e) => e.document.uri)
       .filter((uri) => uri.scheme === "file")
       .map((uri) => toRelative(uri.fsPath))
-      .filter((p): p is string => p !== undefined)
+      .filter((p): p is string => p !== undefined && controller.validateAccess(path.resolve(workspaceDir, p)))
       .slice(0, 200)
 
     // Open tabs — use instanceof TabInputText to exclude notebooks, diffs, custom editors
@@ -1543,7 +1565,7 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
           const uri = tab.input.uri
           if (uri.scheme === "file") {
             const rel = toRelative(uri.fsPath)
-            if (rel) {
+            if (rel && controller.validateAccess(uri.fsPath)) {
               openTabSet.add(rel)
             }
           }
@@ -1552,10 +1574,12 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
     }
     const openTabs = [...openTabSet].slice(0, 20)
 
-    // Active file
+    // Active file (also filtered through .kilocodeignore)
     const activeEditor = vscode.window.activeTextEditor
-    const activeFile =
+    const activeRel =
       activeEditor?.document.uri.scheme === "file" ? toRelative(activeEditor.document.uri.fsPath) : undefined
+    const activeFile =
+      activeRel && controller.validateAccess(activeEditor!.document.uri.fsPath) ? activeRel : undefined
 
     // Shell
     const shell = vscode.env.shell || undefined
@@ -1610,5 +1634,6 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
     this.webviewMessageDisposable?.dispose()
     this.trackedSessionIds.clear()
     this.sessionDirectories.clear()
+    this.ignoreController?.dispose()
   }
 }
