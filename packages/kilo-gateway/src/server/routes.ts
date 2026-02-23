@@ -348,7 +348,9 @@ export function createKiloRoutes(deps: KiloRoutesDeps) {
 
           const { id } = c.req.valid("param")
           const base = process.env.KILO_SESSION_INGEST_URL ?? "https://ingest.kilosessions.ai"
-          const response = await fetch(`${base}/api/session/${id}/export`, {
+          const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)
+          const url = isUuid ? `${base}/session/${id}` : `${base}/api/session/${id}/export`
+          const response = await fetch(url, {
             headers: {
               Authorization: `Bearer ${token}`,
               ...buildKiloHeaders(),
@@ -400,7 +402,9 @@ export function createKiloRoutes(deps: KiloRoutesDeps) {
           if (!token) return c.json({ error: "No valid token found" }, 401)
 
           const base = process.env.KILO_SESSION_INGEST_URL ?? "https://ingest.kilosessions.ai"
-          const response = await fetch(`${base}/api/session/${sessionId}/export`, {
+          const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(sessionId)
+          const exportUrl = isUuid ? `${base}/session/${sessionId}` : `${base}/api/session/${sessionId}/export`
+          const response = await fetch(exportUrl, {
             headers: {
               Authorization: `Bearer ${token}`,
               ...buildKiloHeaders(),
