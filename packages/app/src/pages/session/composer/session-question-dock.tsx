@@ -8,7 +8,12 @@ import type { QuestionAnswer, QuestionRequest } from "@kilocode/sdk/v2"
 import { useLanguage } from "@/context/language"
 import { useSDK } from "@/context/sdk"
 
-export const SessionQuestionDock: Component<{ request: QuestionRequest }> = (props) => {
+// kilocode_change start - add onModeAction prop for mode-switching support
+export const SessionQuestionDock: Component<{
+  request: QuestionRequest
+  onModeAction?: (input: { mode: string; text: string; description?: string }) => void
+}> = (props) => {
+  // kilocode_change end
   const sdk = useSDK()
   const language = useLanguage()
 
@@ -141,10 +146,31 @@ export const SessionQuestionDock: Component<{ request: QuestionRequest }> = (pro
   const submit = () => void reply(questions().map((_, i) => store.answers[i] ?? []))
 
   const pick = (answer: string, custom: boolean = false) => {
+    // kilocode_change start - find option to check for mode
+    // Custom answers won't match a predefined option, so mode switching is intentionally skipped
+    const option = options().find((o) => o.label === answer)
+    // kilocode_change end
+
+    setStore("editing", false)
+
     setStore("answers", store.tab, [answer])
     if (custom) setStore("custom", store.tab, answer)
     if (!custom) setStore("customOn", store.tab, false)
-    setStore("editing", false)
+
+    // kilocode_change start - trigger mode switch after question reply completes
+    if (!multi()) {
+      const pending = reply([[answer]])
+      if (option?.mode && props.onModeAction) {
+        const action = props.onModeAction
+        const mode = option.mode
+        const description = option.description
+        pending?.then(() => action({ mode, text: answer, description }), fail).catch(fail)
+      } else {
+        pending?.catch(fail)
+      }
+      return
+    }
+    // kilocode_change end
   }
 
   const toggle = (answer: string) => {
