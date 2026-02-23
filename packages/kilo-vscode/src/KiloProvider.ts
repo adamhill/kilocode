@@ -440,6 +440,31 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
             this.postMessage({ type: "gitRemoteUrlLoaded", gitUrl: url ?? null })
           })
           break
+        case "requestCloudSessionData":
+          void this.handleRequestCloudSessionData(message.sessionId)
+          break
+        case "importAndSend": {
+          const files = z
+            .array(
+              z.object({
+                mime: z.string(),
+                url: z.string().refine((u) => u.startsWith("file://") || u.startsWith("data:")),
+              }),
+            )
+            .optional()
+            .catch(undefined)
+            .parse(message.files)
+          void this.handleImportAndSend(
+            message.cloudSessionId,
+            message.text,
+            message.providerID,
+            message.modelID,
+            message.agent,
+            message.variant,
+            files,
+          )
+          break
+        }
         case "dismissNotification":
           await this.handleDismissNotification(message.notificationId)
           break
@@ -996,6 +1021,123 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
         message: error instanceof Error ? error.message : "Failed to fetch cloud sessions",
       })
     }
+  }
+
+  /**
+   * Fetch full cloud session data for read-only preview.
+   * Transforms the export data into webview message format and sends it back.
+   */
+  private async handleRequestCloudSessionData(sessionId: string): Promise<void> {
+    if (!this.httpClient) {
+      this.postMessage({
+        type: "cloudSessionImportFailed",
+        cloudSessionId: sessionId,
+        error: "Not connected to CLI backend",
+      })
+      return
+    }
+
+    const data = await this.httpClient.getCloudSession(sessionId)
+    if (!data) {
+      this.postMessage({
+        type: "cloudSessionImportFailed",
+        cloudSessionId: sessionId,
+        error: "Failed to fetch cloud session",
+      })
+      return
+    }
+
+    const messages = (data.messages ?? []).map((m) => ({
+      id: m.info.id,
+      sessionID: m.info.sessionID,
+      role: m.info.role as "user" | "assistant",
+      parts: m.parts,
+      createdAt: new Date(m.info.time.created).toISOString(),
+      cost: m.info.cost,
+      tokens: m.info.tokens,
+    }))
+
+    this.postMessage({
+      type: "cloudSessionDataLoaded",
+      cloudSessionId: sessionId,
+      title: data.info.title ?? "Untitled",
+      messages,
+    })
+  }
+
+  /**
+   * Import a cloud session to local storage, then send a new message on it.
+   * This is the "clone on first message" flow — the cloud session becomes a
+   * local session only when the user decides to continue it.
+   */
+  private async handleImportAndSend(
+    cloudSessionId: string,
+    text: string,
+    providerID?: string,
+    modelID?: string,
+    agent?: string,
+    variant?: string,
+    files?: Array<{ mime: string; url: string }>,
+  ): Promise<void> {
+    if (!this.httpClient) {
+      this.postMessage({
+        type: "cloudSessionImportFailed",
+        cloudSessionId,
+        error: "Not connected to CLI backend",
+      })
+      return
+    }
+
+    const workspaceDir = this.getWorkspaceDirectory()
+
+    // Step 1: Import the cloud session with fresh IDs
+    const session = await this.httpClient.importCloudSession(cloudSessionId, workspaceDir)
+    if (!session) {
+      this.postMessage({
+        type: "cloudSessionImportFailed",
+        cloudSessionId,
+        error: "Failed to import session from cloud",
+      })
+      return
+    }
+
+    // Track the new local session
+    this.currentSession = session
+    this.trackedSessionIds.add(session.id)
+
+    // Notify webview of the import success
+    this.postMessage({
+      type: "cloudSessionImported",
+      cloudSessionId,
+      session: this.sessionToWebview(session),
+    })
+
+    // Step 2: Send the user's message on the new local session
+    const parts: Array<{ type: "text"; text: string } | { type: "file"; mime: string; url: string }> = []
+
+    const editor = vscode.window.activeTextEditor
+    if (editor && editor.document.uri.scheme === "file") {
+      const url = editor.document.uri.toString()
+      const already = files?.some((f) => f.url === url)
+      if (!already) {
+        parts.push({ type: "file", mime: "text/plain", url })
+      }
+    }
+
+    if (files) {
+      for (const f of files) {
+        parts.push({ type: "file", mime: f.mime, url: f.url })
+      }
+    }
+
+    parts.push({ type: "text", text })
+
+    await this.httpClient.sendMessage(session.id, parts, workspaceDir, {
+      providerID,
+      modelID,
+      agent,
+      variant,
+    })
   }
 
   /**

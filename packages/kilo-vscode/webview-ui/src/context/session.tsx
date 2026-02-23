@@ -125,6 +125,10 @@ interface SessionContextValue {
   deleteSession: (id: string) => void
   renameSession: (id: string, title: string) => void
   syncSession: (sessionID: string) => void
+
+  // Cloud session preview
+  cloudPreviewId: Accessor<string | null>
+  selectCloudSession: (cloudSessionId: string) => void
 }
 
 const SessionContext = createContext<SessionContextValue>()
@@ -174,6 +178,9 @@ export const SessionProvider: ParentComponent = (props) => {
 
   // Pending agent selection for before a session exists (mirrors pendingModelSelection)
   const [pendingAgentSelection, setPendingAgentSelection] = createSignal<string | null>(null)
+
+  // Cloud session preview state
+  const [cloudPreviewId, setCloudPreviewId] = createSignal<string | null>(null)
 
   // Store for sessions, messages, parts, todos, modelSelections, agentSelections
   const [store, setStore] = createStore<SessionStore>({
@@ -375,6 +382,20 @@ export const SessionProvider: ParentComponent = (props) => {
           // Only clear loading if the error is for the current session
           // (or has no sessionID for backwards compatibility)
           if (!message.sessionID || message.sessionID === currentSessionID()) setLoading(false)
+          break
+
+        case "cloudSessionDataLoaded":
+          handleCloudSessionDataLoaded(message.cloudSessionId, message.title, message.messages)
+          break
+
+        case "cloudSessionImported":
+          handleCloudSessionImported(message.cloudSessionId, message.session)
+          break
+
+        case "cloudSessionImportFailed":
+          setCloudPreviewId(null)
+          setLoading(false)
+          console.error("[Kilo New] Cloud session import failed:", message.error)
           break
       }
     })
@@ -639,6 +660,65 @@ export const SessionProvider: ParentComponent = (props) => {
     })
   }
 
+  function handleCloudSessionDataLoaded(cloudSessionId: string, title: string, messages: Message[]) {
+    const key = `cloud:${cloudSessionId}`
+    batch(() => {
+      setStore("sessions", key, {
+        id: key,
+        title,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      })
+      setStore("messages", key, messages)
+      for (const msg of messages) {
+        if (msg.parts && msg.parts.length > 0) {
+          setStore("parts", msg.id, msg.parts)
+        }
+      }
+      setCurrentSessionID(key)
+      setLoading(false)
+    })
+  }
+
+  function handleCloudSessionImported(cloudSessionId: string, session: SessionInfo) {
+    const cloudKey = `cloud:${cloudSessionId}`
+    const cloudMessages = store.messages[cloudKey] ?? []
+    batch(() => {
+      setStore("sessions", session.id, session)
+
+      const pending = pendingModelSelection()
+      if (pending && !store.modelSelections[session.id]) {
+        setStore("modelSelections", session.id, pending)
+      }
+      const pendingAgent = pendingAgentSelection()
+      if (pendingAgent && !store.agentSelections[session.id]) {
+        setStore("agentSelections", session.id, pendingAgent)
+      }
+
+      // Carry over cloud messages so there's no loading flash
+      setStore("messages", session.id, cloudMessages)
+
+      setCloudPreviewId(null)
+      setCurrentSessionID(session.id)
+
+      setStore(
+        "sessions",
+        produce((sessions) => {
+          delete sessions[cloudKey]
+        }),
+      )
+      setStore(
+        "messages",
+        produce((messages) => {
+          delete messages[cloudKey]
+        }),
+      )
+    })
+    // Load real messages in the background (picks up server-assigned IDs
+    // and the new user message once the send completes via SSE)
+    vscode.postMessage({ type: "loadMessages", sessionID: session.id })
+  }
+
   // Actions
   function selectAgent(name: string) {
     const id = currentSessionID()
@@ -655,7 +735,22 @@ export const SessionProvider: ParentComponent = (props) => {
       return
     }
 
-    // Phase 4: optimistic user message
+    const preview = cloudPreviewId()
+    if (preview) {
+      const agent = selectedAgentName() !== defaultAgent() ? selectedAgentName() : undefined
+      vscode.postMessage({
+        type: "importAndSend",
+        cloudSessionId: preview,
+        text,
+        providerID,
+        modelID,
+        agent,
+        variant: currentVariant(),
+        files,
+      })
+      return
+    }
+
     const sid = currentSessionID()
     if (sid) {
       const tempId = `optimistic-${crypto.randomUUID()}`
@@ -797,9 +892,25 @@ export const SessionProvider: ParentComponent = (props) => {
       console.warn("[Kilo New] Cannot select session: not connected")
       return
     }
+    if (id.startsWith("cloud:")) {
+      console.warn("[Kilo New] Cannot select cloud preview session via selectSession")
+      return
+    }
     setCurrentSessionID(id)
     setLoading(true)
     vscode.postMessage({ type: "loadMessages", sessionID: id })
+  }
+
+  function selectCloudSession(cloudSessionId: string) {
+    if (!server.isConnected()) {
+      console.warn("[Kilo New] Cannot select cloud session: not connected")
+      return
+    }
+    const key = `cloud:${cloudSessionId}`
+    setCloudPreviewId(cloudSessionId)
+    setCurrentSessionID(key)
+    setLoading(true)
+    vscode.postMessage({ type: "requestCloudSessionData", sessionId: cloudSessionId })
   }
 
   function deleteSession(id: string) {
@@ -847,7 +958,9 @@ export const SessionProvider: ParentComponent = (props) => {
   }
 
   const sessions = createMemo(() =>
-    Object.values(store.sessions).sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()),
+    Object.values(store.sessions)
+      .filter((s) => !s.id.startsWith("cloud:"))
+      .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()),
   )
 
   const totalCost = createMemo(() => calcTotalCost(messages()))
@@ -930,6 +1043,8 @@ export const SessionProvider: ParentComponent = (props) => {
     deleteSession,
     renameSession,
     syncSession,
+    cloudPreviewId,
+    selectCloudSession,
   }
 
   return <SessionContext.Provider value={value}>{props.children}</SessionContext.Provider>

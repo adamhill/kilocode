@@ -418,6 +418,25 @@ export interface GitRemoteUrlLoadedMessage {
   gitUrl: string | null
 }
 
+export interface CloudSessionDataLoadedMessage {
+  type: "cloudSessionDataLoaded"
+  cloudSessionId: string
+  title: string
+  messages: Message[]
+}
+
+export interface CloudSessionImportedMessage {
+  type: "cloudSessionImported"
+  cloudSessionId: string
+  session: SessionInfo
+}
+
+export interface CloudSessionImportFailedMessage {
+  type: "cloudSessionImportFailed"
+  cloudSessionId: string
+  error: string
+}
+
 export interface ActionMessage {
   type: "action"
   action: string
@@ -695,6 +714,9 @@ export type ExtensionMessage =
   | SetChatBoxMessage
   | TriggerTaskMessage
   | VariantsLoadedMessage
+  | CloudSessionDataLoadedMessage
+  | CloudSessionImportedMessage
+  | CloudSessionImportFailedMessage
 
 // ============================================
 // Messages FROM webview TO extension
@@ -754,6 +776,22 @@ export interface RequestCloudSessionsMessage {
 
 export interface RequestGitRemoteUrlMessage {
   type: "requestGitRemoteUrl"
+}
+
+export interface RequestCloudSessionDataMessage {
+  type: "requestCloudSessionData"
+  sessionId: string
+}
+
+export interface ImportAndSendMessage {
+  type: "importAndSend"
+  cloudSessionId: string
+  text: string
+  providerID?: string
+  modelID?: string
+  agent?: string
+  variant?: string
+  files?: FileAttachment[]
 }
 
 export interface LoginRequest {
@@ -1059,6 +1097,8 @@ export type WebviewMessage =
   | SetSessionsCollapsedRequest
   | PersistVariantRequest
   | RequestVariantsMessage
+  | RequestCloudSessionDataMessage
+  | ImportAndSendMessage
 
 // ============================================
 // VS Code API type
