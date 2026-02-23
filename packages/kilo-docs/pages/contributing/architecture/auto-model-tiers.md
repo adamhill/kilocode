@@ -9,7 +9,7 @@ description: "Extending Kilo Auto to a family of smart model tiers that match us
 
 Today, Kilo Auto (`kilo/auto`) solves a real problem: users shouldn't have to know which AI model is best for planning versus coding. It picks the right model for the task automatically.
 
-But it only solves that problem for one audience — users willing to pay for frontier models. Everyone else is left navigating a long, intimidating model list where the "best" free or open-weight option changes monthly. This is a siyrce of friction for new free users and cost-conscious teams.
+But it only solves that problem for one audience — users willing to pay for frontier models. Everyone else is left navigating a long, intimidating model list where the "best" free or open-weight option changes monthly. This is a source of friction for new free users and cost-conscious teams.
 
 This spec proposes extending Kilo Auto into a family of tiers so that every user — regardless of budget, preference, or expertise — gets the same "just works" auto experience.
 
