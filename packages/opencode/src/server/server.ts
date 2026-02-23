@@ -257,6 +257,8 @@ export namespace Server {
             MessageTable, // kilocode_change
             PartTable, // kilocode_change
             SessionToRow: Session.toRow, // kilocode_change
+            Bus, // kilocode_change
+            SessionCreatedEvent: Session.Event.Created, // kilocode_change
           }),
         )
         // kilocode_change end

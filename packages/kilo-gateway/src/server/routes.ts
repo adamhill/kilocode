@@ -35,6 +35,8 @@ interface KiloRoutesDeps {
   MessageTable: any
   PartTable: any
   SessionToRow: (info: any) => any
+  Bus: { publish: (event: any, payload: any) => void }
+  SessionCreatedEvent: any
 }
 
 /**
@@ -87,6 +89,8 @@ export function createKiloRoutes(deps: KiloRoutesDeps) {
     MessageTable,
     PartTable,
     SessionToRow,
+    Bus,
+    SessionCreatedEvent,
   } = deps
 
   const Organization = z.object({
@@ -455,6 +459,8 @@ export function createKiloRoutes(deps: KiloRoutesDeps) {
                 .run()
             }
           }
+
+          Database.effect(() => Bus.publish(SessionCreatedEvent, { info: data.info }))
         })
 
         return c.json(data.info)
