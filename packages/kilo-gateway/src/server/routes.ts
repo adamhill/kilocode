@@ -431,7 +431,7 @@ export function createKiloRoutes(deps: KiloRoutesDeps) {
           const now = Date.now()
           const time = {
             created: data.info.time?.created ?? now,
-            updated: data.info.time?.updated ?? now,
+            updated: now,
             ...(data.info.time?.compacting !== undefined && { compacting: data.info.time.compacting }),
             ...(data.info.time?.archived !== undefined && { archived: data.info.time.archived }),
           }
