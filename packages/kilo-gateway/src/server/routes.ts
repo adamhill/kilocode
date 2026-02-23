@@ -340,25 +340,30 @@ export function createKiloRoutes(deps: KiloRoutesDeps) {
       }),
       validator("param", z.object({ id: z.string().uuid() })),
       async (c: any) => {
-        const auth = await Auth.get("kilo")
-        if (!auth) return c.json({ error: "Not authenticated with Kilo Gateway" }, 401)
-        const token = auth.type === "api" ? auth.key : auth.type === "oauth" ? auth.access : undefined
-        if (!token) return c.json({ error: "No valid token found" }, 401)
+        try {
+          const auth = await Auth.get("kilo")
+          if (!auth) return c.json({ error: "Not authenticated with Kilo Gateway" }, 401)
+          const token = auth.type === "api" ? auth.key : auth.type === "oauth" ? auth.access : undefined
+          if (!token) return c.json({ error: "No valid token found" }, 401)
 
-        const { id } = c.req.valid("param")
-        const base = process.env.KILO_SESSION_INGEST_URL || "https://ingest.kilosessions.ai"
-        const response = await fetch(`${base}/api/session/${id}/export`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            ...buildKiloHeaders(),
-          },
-        })
+          const { id } = c.req.valid("param")
+          const base = process.env.KILO_SESSION_INGEST_URL ?? "https://ingest.kilosessions.ai"
+          const response = await fetch(`${base}/api/session/${id}/export`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              ...buildKiloHeaders(),
+            },
+          })
 
-        if (response.status === 404) return c.json({ error: "Session not found" }, 404)
-        if (!response.ok) return c.json({ error: "Failed to fetch session" }, response.status)
+          if (response.status === 404) return c.json({ error: "Session not found" }, 404)
+          if (!response.ok) return c.json({ error: "Failed to fetch session" }, response.status)
 
-        const data = await response.json()
-        return c.json(data)
+          const data = await response.json()
+          return c.json(data)
+        } catch (err: any) {
+          console.error("[Kilo Gateway] cloud/session/get: unhandled error", err?.message ?? err)
+          return c.json({ error: "Internal error" }, 500)
+        }
       },
     )
     .post(
@@ -386,102 +391,107 @@ export function createKiloRoutes(deps: KiloRoutesDeps) {
         }),
       ),
       async (c: any) => {
-        const { sessionId } = c.req.valid("json")
+        try {
+          const { sessionId } = c.req.valid("json")
 
-        const auth = await Auth.get("kilo")
-        if (!auth) return c.json({ error: "Not authenticated with Kilo" }, 401)
-        const token = auth.type === "api" ? auth.key : auth.type === "oauth" ? auth.access : undefined
-        if (!token) return c.json({ error: "No valid token found" }, 401)
+          const auth = await Auth.get("kilo")
+          if (!auth) return c.json({ error: "Not authenticated with Kilo" }, 401)
+          const token = auth.type === "api" ? auth.key : auth.type === "oauth" ? auth.access : undefined
+          if (!token) return c.json({ error: "No valid token found" }, 401)
 
-        const base = process.env.KILO_SESSION_INGEST_URL ?? "https://ingest.kilosessions.ai"
-        const response = await fetch(`${base}/api/session/${sessionId}/export`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            ...buildKiloHeaders(),
-          },
-        })
-
-        if (response.status === 404) return c.json({ error: "Session not found in cloud" }, 404)
-        if (!response.ok) {
-          const text = await response.text()
-          console.error("[Kilo Gateway] cloud/session/import: export failed", {
-            status: response.status,
-            body: text.slice(0, 500),
+          const base = process.env.KILO_SESSION_INGEST_URL ?? "https://ingest.kilosessions.ai"
+          const response = await fetch(`${base}/api/session/${sessionId}/export`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              ...buildKiloHeaders(),
+            },
           })
-          return c.json({ error: `Import failed: ${response.status}` }, response.status as any)
-        }
 
-        const data = (await response.json()) as any
-        if (!data?.info?.id) return c.json({ error: "Invalid export data" }, 400)
+          if (response.status === 404) return c.json({ error: "Session not found in cloud" }, 404)
+          if (!response.ok) {
+            const text = await response.text()
+            console.error("[Kilo Gateway] cloud/session/import: export failed", {
+              status: response.status,
+              body: text.slice(0, 500),
+            })
+            return c.json({ error: `Import failed: ${response.status}` }, response.status as any)
+          }
 
-        const localSessionID = Identifier.descending("session")
-        const msgMap = new Map<string, string>()
-        const projectID = Instance.project.id
+          const data = (await response.json()) as any
+          if (!data?.info?.id) return c.json({ error: "Invalid export data" }, 400)
 
-        const now = Date.now()
-        const time = {
-          created: data.info.time?.created ?? now,
-          updated: data.info.time?.updated ?? now,
-          ...(data.info.time?.compacting !== undefined && { compacting: data.info.time.compacting }),
-          ...(data.info.time?.archived !== undefined && { archived: data.info.time.archived }),
-        }
+          const localSessionID = Identifier.descending("session")
+          const msgMap = new Map<string, string>()
+          const projectID = Instance.project.id
 
-        const info = {
-          ...data.info,
-          id: localSessionID,
-          projectID,
-          slug: data.info.slug,
-          directory: data.info.directory ?? Instance.directory,
-          version: data.info.version,
-          time,
-        }
+          const now = Date.now()
+          const time = {
+            created: data.info.time?.created ?? now,
+            updated: data.info.time?.updated ?? now,
+            ...(data.info.time?.compacting !== undefined && { compacting: data.info.time.compacting }),
+            ...(data.info.time?.archived !== undefined && { archived: data.info.time.archived }),
+          }
 
-        Database.transaction((db) => {
-          db.insert(SessionTable)
-            .values(SessionToRow(info as Record<string, unknown>))
-            .onConflictDoNothing()
-            .run()
+          const info = {
+            ...data.info,
+            id: localSessionID,
+            projectID,
+            slug: data.info.slug,
+            directory: data.info.directory ?? Instance.directory,
+            version: data.info.version,
+            time,
+          }
 
-          const messages = Array.isArray(data.messages) ? data.messages : []
-          for (const msg of messages.filter((m: any) => m.info)) {
-            const msgID = Identifier.ascending("message")
-            msgMap.set(msg.info.id, msgID)
-            msg.info.id = msgID
-            msg.info.sessionID = localSessionID
-            if (msg.info.parentID) msg.info.parentID = msgMap.get(msg.info.parentID) ?? msg.info.parentID
-
-            db.insert(MessageTable)
-              .values({
-                id: msgID,
-                session_id: localSessionID,
-                time_created: msg.info.time?.created ?? Date.now(),
-                data: msg.info,
-              })
+          Database.transaction((db) => {
+            db.insert(SessionTable)
+              .values(SessionToRow(info as Record<string, unknown>))
               .onConflictDoNothing()
               .run()
 
-            for (const part of msg.parts ?? []) {
-              const partID = Identifier.ascending("part")
-              part.id = partID
-              part.messageID = msgID
-              part.sessionID = localSessionID
+            const messages = Array.isArray(data.messages) ? data.messages : []
+            for (const msg of messages.filter((m: any) => m.info)) {
+              const msgID = Identifier.ascending("message")
+              msgMap.set(msg.info.id, msgID)
+              msg.info.id = msgID
+              msg.info.sessionID = localSessionID
+              if (msg.info.parentID) msg.info.parentID = msgMap.get(msg.info.parentID) ?? msg.info.parentID
 
-              db.insert(PartTable)
+              db.insert(MessageTable)
                 .values({
-                  id: partID,
-                  message_id: msgID,
+                  id: msgID,
                   session_id: localSessionID,
-                  data: part,
+                  time_created: msg.info.time?.created ?? Date.now(),
+                  data: msg.info,
                 })
                 .onConflictDoNothing()
                 .run()
+
+              for (const part of msg.parts ?? []) {
+                const partID = Identifier.ascending("part")
+                part.id = partID
+                part.messageID = msgID
+                part.sessionID = localSessionID
+
+                db.insert(PartTable)
+                  .values({
+                    id: partID,
+                    message_id: msgID,
+                    session_id: localSessionID,
+                    data: part,
+                  })
+                  .onConflictDoNothing()
+                  .run()
+              }
             }
-          }
 
-          Database.effect(() => Bus.publish(SessionCreatedEvent, { info }))
-        })
+            Database.effect(() => Bus.publish(SessionCreatedEvent, { info }))
+          })
 
-        return c.json(info)
+          return c.json(info)
+        } catch (err: any) {
+          console.error("[Kilo Gateway] cloud/session/import: unhandled error", err?.message ?? err)
+          return c.json({ error: "Internal error" }, 500)
+        }
       },
     )
     .get(
