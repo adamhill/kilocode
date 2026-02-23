@@ -36,6 +36,21 @@ export namespace SystemPrompt {
     return [PROMPT_ANTHROPIC_WITHOUT_TODO]
   }
 
+  // kilocode_change start
+  function formatTime(timezone?: string): string[] {
+    const now = new Date()
+    const lines = [`  Current time: ${now.toISOString()}`]
+    if (timezone) {
+      const offset = -now.getTimezoneOffset()
+      const sign = offset >= 0 ? "+" : "-"
+      const hours = Math.floor(Math.abs(offset) / 60)
+      const mins = Math.abs(offset) % 60
+      lines.push(`  User timezone: ${timezone}, UTC${sign}${hours}:${mins.toString().padStart(2, "0")}`)
+    }
+    return lines
+  }
+  // kilocode_change end
+
   export async function environment(
     model: Provider.Model,
     editorContext?: {
@@ -51,13 +66,10 @@ export namespace SystemPrompt {
       `  Working directory: ${Instance.directory}`,
       `  Is directory a git repo: ${project.vcs === "git" ? "yes" : "no"}`,
       `  Platform: ${process.platform}`,
-      `  Today's date: ${new Date().toDateString()}`,
+      ...formatTime(editorContext?.timezone), // kilocode_change
     ]
     if (editorContext?.shell) {
       envLines.push(`  Default shell: ${editorContext.shell}`)
-    }
-    if (editorContext?.timezone) {
-      envLines.push(`  Timezone: ${editorContext.timezone}`)
     }
     if (editorContext?.activeFile) {
       envLines.push(`  Active file: ${editorContext.activeFile}`)
