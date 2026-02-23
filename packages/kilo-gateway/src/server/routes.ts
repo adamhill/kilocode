@@ -8,7 +8,6 @@
 
 import { fetchProfile, fetchBalance } from "../api/profile.js"
 import { fetchKilocodeNotifications, KilocodeNotificationSchema } from "../api/notifications.js"
-import { fetchCloudSessions, type CloudSession } from "../api/sessions.js"
 import { KILO_API_BASE, HEADER_FEATURE } from "../api/constants.js" // kilocode_change - added HEADER_FEATURE
 import { buildKiloHeaders } from "../headers.js" // kilocode_change
 
@@ -321,14 +320,48 @@ export function createKiloRoutes(deps: KiloRoutesDeps) {
         const token = auth.type === "api" ? auth.key : auth.type === "oauth" ? auth.access : undefined
         if (!token) return c.json({ error: "No valid token found" }, 401)
 
-        const query = c.req.query()
-        const params: Record<string, unknown> = {}
-        if (query.cursor !== undefined) params.cursor = query.cursor
-        if (query.limit !== undefined) params.limit = Number(query.limit)
-        if (query.gitUrl !== undefined) params.gitUrl = query.gitUrl
+        const cursor = c.req.query("cursor")
+        const limit = c.req.query("limit")
+        const gitUrl = c.req.query("gitUrl")
 
-        const result = await fetchCloudSessions(token, params as { cursor?: string; limit?: number; gitUrl?: string })
-        return c.json(result)
+        const input: Record<string, unknown> = {}
+        if (cursor) input.cursor = cursor
+        if (limit) input.limit = Number(limit)
+        if (gitUrl) input.gitUrl = gitUrl
+
+        const params = new URLSearchParams({
+          batch: "1",
+          input: JSON.stringify({ "0": input }),
+        })
+
+        const response = await fetch(`${KILO_API_BASE}/api/trpc/cliSessionsV2.list?${params.toString()}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+            ...buildKiloHeaders(),
+          },
+        })
+
+        if (!response.ok) {
+          const text = await response.text()
+          return c.json({ error: `Cloud sessions fetch failed: ${response.status} ${text}` }, response.status as any)
+        }
+
+        const json = await response.json()
+        const data = Array.isArray(json) ? json[0]?.result?.data : null
+        const result = data?.json ?? data
+        if (!result) return c.json({ cliSessions: [], nextCursor: null })
+
+        const sessions = (result.cliSessions ?? []).map((s: any) => ({
+          session_id: s.session_id,
+          title: s.title ?? null,
+          cloud_agent_session_id: s.cloud_agent_session_id ?? null,
+          created_at: typeof s.created_at === "string" ? s.created_at : new Date(s.created_at).toISOString(),
+          updated_at: typeof s.updated_at === "string" ? s.updated_at : new Date(s.updated_at).toISOString(),
+          version: s.version ?? 0,
+        }))
+
+        return c.json({ cliSessions: sessions, nextCursor: result.nextCursor ?? null })
       },
     )
 }
