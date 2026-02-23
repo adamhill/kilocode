@@ -282,6 +282,47 @@ export function createKiloRoutes(deps: KiloRoutesDeps) {
       },
     )
     .get(
+      "/cloud/session/:id",
+      describeRoute({
+        summary: "Get cloud session",
+        description: "Fetch full session data from the Kilo cloud for preview",
+        operationId: "kilo.cloud.session.get",
+        responses: {
+          200: {
+            description: "Cloud session data",
+            content: {
+              "application/json": {
+                schema: resolver(z.unknown()),
+              },
+            },
+          },
+          ...errors(401, 404),
+        },
+      }),
+      validator("param", z.object({ id: z.string() })),
+      async (c: any) => {
+        const auth = await Auth.get("kilo")
+        if (!auth) return c.json({ error: "Not authenticated with Kilo Gateway" }, 401)
+        const token = auth.type === "api" ? auth.key : auth.type === "oauth" ? auth.access : undefined
+        if (!token) return c.json({ error: "No valid token found" }, 401)
+
+        const { id } = c.req.valid("param")
+        const base = process.env.KILO_SESSION_INGEST_URL || "https://ingest.kilosessions.ai"
+        const response = await fetch(`${base}/api/session/${id}/export`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            ...buildKiloHeaders(),
+          },
+        })
+
+        if (response.status === 404) return c.json({ error: "Session not found" }, 404)
+        if (!response.ok) return c.json({ error: "Failed to fetch session" }, response.status)
+
+        const data = await response.json()
+        return c.json(data)
+      },
+    )
+    .get(
       "/cloud-sessions",
       describeRoute({
         summary: "Get cloud sessions",
