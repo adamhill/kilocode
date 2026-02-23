@@ -686,6 +686,7 @@ export const dict = {
   "session.recent": "最近",
   "session.search.placeholder": "搜尋工作階段...",
   "session.empty": "尚無工作階段。點擊 + 開始新的對話。",
+  "session.cloud.repoOnly": "僅此儲存庫",
 
   "workspace.new": "新增工作區",
   "workspace.type.local": "本地",

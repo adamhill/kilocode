@@ -689,6 +689,7 @@ export const dict = {
   "session.recent": "最近",
   "session.search.placeholder": "搜索会话...",
   "session.empty": "暂无会话。点击 + 开始新的对话。",
+  "session.cloud.repoOnly": "仅此仓库",
 
   "workspace.new": "新建工作区",
   "workspace.type.local": "本地",

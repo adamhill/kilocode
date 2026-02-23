@@ -722,6 +722,7 @@ export const dict = {
   "session.recent": "Nedavne",
   "session.search.placeholder": "Pretraži sesije...",
   "session.empty": "Još nema sesija. Kliknite + za početak novog razgovora.",
+  "session.cloud.repoOnly": "Samo ovaj repozitorij",
 
   "workspace.new": "Novi radni prostor",
   "workspace.type.local": "lokalno",

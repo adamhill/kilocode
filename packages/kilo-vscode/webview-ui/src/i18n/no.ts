@@ -697,6 +697,7 @@ export const dict = {
   "session.recent": "Nylige",
   "session.search.placeholder": "Søk i sesjoner...",
   "session.empty": "Ingen sesjoner ennå. Klikk + for å starte en ny samtale.",
+  "session.cloud.repoOnly": "Kun dette repositoriet",
 
   "workspace.new": "Nytt arbeidsområde",
   "workspace.type.local": "lokal",

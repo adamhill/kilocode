@@ -700,6 +700,7 @@ export const dict = {
   "session.recent": "Недавние",
   "session.search.placeholder": "Поиск сессий...",
   "session.empty": "Сессий пока нет. Нажмите + чтобы начать новый разговор.",
+  "session.cloud.repoOnly": "Только этот репозиторий",
 
   "workspace.new": "Новое рабочее пространство",
   "workspace.type.local": "локальное",

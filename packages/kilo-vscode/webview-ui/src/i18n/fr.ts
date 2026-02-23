@@ -704,6 +704,7 @@ export const dict = {
   "session.recent": "Récentes",
   "session.search.placeholder": "Rechercher des sessions...",
   "session.empty": "Aucune session pour l'instant. Cliquez + pour démarrer une nouvelle conversation.",
+  "session.cloud.repoOnly": "Uniquement ce dépôt",
 
   "workspace.new": "Nouvel espace de travail",
   "workspace.type.local": "local",

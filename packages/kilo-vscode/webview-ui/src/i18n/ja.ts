@@ -688,6 +688,7 @@ export const dict = {
   "session.recent": "最近",
   "session.search.placeholder": "セッションを検索...",
   "session.empty": "セッションがありません。+ をクリックして新しい会話を始めましょう。",
+  "session.cloud.repoOnly": "このリポジトリのみ",
 
   "workspace.new": "新しいワークスペース",
   "workspace.type.local": "ローカル",
