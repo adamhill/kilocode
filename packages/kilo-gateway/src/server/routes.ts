@@ -338,7 +338,7 @@ export function createKiloRoutes(deps: KiloRoutesDeps) {
           ...errors(401, 404),
         },
       }),
-      validator("param", z.object({ id: z.string().uuid() })),
+      validator("param", z.object({ id: z.string() })),
       async (c: any) => {
         try {
           const auth = await Auth.get("kilo")
@@ -387,7 +387,7 @@ export function createKiloRoutes(deps: KiloRoutesDeps) {
       validator(
         "json",
         z.object({
-          sessionId: z.string().uuid(),
+          sessionId: z.string(),
         }),
       ),
       async (c: any) => {
