@@ -1062,11 +1062,6 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
       // Build parts array with file context and user text
       const parts: Array<{ type: "text"; text: string } | { type: "file"; mime: string; url: string }> = []
 
-      // NOTE: The active editor filename is now sent via editorContext.activeFile
-      // (as a workspace-relative path, not full content). We no longer inject the
-      // full file content here to avoid the model acting on file contents
-      // when the user hasn't explicitly attached the file.
-
       // Add any explicitly attached files from the webview
       if (files) {
         for (const f of files) {
