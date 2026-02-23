@@ -51,6 +51,7 @@ export namespace SystemPrompt {
   }
   // kilocode_change end
 
+  // kilocode_change start
   export async function environment(
     model: Provider.Model,
     editorContext?: {
@@ -66,7 +67,7 @@ export namespace SystemPrompt {
       `  Working directory: ${Instance.directory}`,
       `  Is directory a git repo: ${project.vcs === "git" ? "yes" : "no"}`,
       `  Platform: ${process.platform}`,
-      ...formatTime(editorContext?.timezone), // kilocode_change
+      ...formatTime(editorContext?.timezone),
     ]
     if (editorContext?.shell) {
       envLines.push(`  Default shell: ${editorContext.shell}`)
@@ -80,6 +81,7 @@ export namespace SystemPrompt {
     if (editorContext?.openTabs?.length) {
       envLines.push(`  Open tabs: ${editorContext.openTabs.join(", ")}`)
     }
+    // kilocode_change end
     return [
       [
         `You are powered by the model named ${model.api.id}. The exact model ID is ${model.providerID}/${model.api.id}`,

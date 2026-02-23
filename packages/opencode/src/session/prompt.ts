@@ -109,6 +109,7 @@ export namespace SessionPrompt {
     format: MessageV2.Format.optional(),
     system: z.string().optional(),
     variant: z.string().optional(),
+    // kilocode_change start
     editorContext: z
       .object({
         visibleFiles: z.array(z.string()).optional(),
@@ -118,6 +119,7 @@ export namespace SessionPrompt {
         timezone: z.string().optional(),
       })
       .optional(),
+    // kilocode_change end
     parts: z.array(
       z.discriminatedUnion("type", [
         MessageV2.TextPart.omit({
@@ -676,7 +678,7 @@ export namespace SessionPrompt {
       await Plugin.trigger("experimental.chat.messages.transform", {}, { messages: sessionMessages })
 
       // Build system prompt, adding structured output instruction if needed
-      const system = [...(await SystemPrompt.environment(model, lastUser.editorContext)), ...(await InstructionPrompt.system())]
+      const system = [...(await SystemPrompt.environment(model, lastUser.editorContext)), ...(await InstructionPrompt.system())] // kilocode_change
       const format = lastUser.format ?? { type: "text" }
       if (format.type === "json_schema") {
         system.push(STRUCTURED_OUTPUT_SYSTEM_PROMPT)
@@ -1003,7 +1005,7 @@ export namespace SessionPrompt {
       system: input.system,
       format: input.format,
       variant,
-      editorContext: input.editorContext,
+      editorContext: input.editorContext, // kilocode_change
     }
     using _ = defer(() => InstructionPrompt.clear(info.id))
 
