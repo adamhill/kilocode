@@ -118,7 +118,7 @@ const cli = yargs(hideBin(process.argv))
 
     Telemetry.trackCliStart()
     // kilocode_change end
-    const marker = path.join(Global.Path.data, "opencode.db")
+    const marker = path.join(Global.Path.data, "kilo.db")
     if (!(await Bun.file(marker).exists())) {
       console.log("Performing one time database migration, may take a few minutes...")
       const tty = process.stdout.isTTY

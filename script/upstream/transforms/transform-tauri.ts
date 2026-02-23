@@ -110,6 +110,12 @@ const TAURI_REPLACEMENTS: TauriReplacement[] = [
 
   // Rust source specific
   {
+    pattern: /opencode\.db/g,
+    replacement: "kilo.db",
+    description: "Database filename",
+    fileTypes: [".rs"],
+  },
+  {
     pattern: /opencode\.settings\.dat/g,
     replacement: "kilo.settings.dat",
     description: "Settings file name",
