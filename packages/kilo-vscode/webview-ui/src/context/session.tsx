@@ -410,7 +410,15 @@ export const SessionProvider: ParentComponent = (props) => {
   function handleSessionCreated(session: SessionInfo) {
     batch(() => {
       setStore("sessions", session.id, session)
-      setStore("messages", session.id, [])
+
+      // Only initialize messages if none exist yet — a cloud session import
+      // (handleCloudSessionImported) may have already populated messages for
+      // this session ID. The SSE session.created event can race with the
+      // cloudSessionImported message, and wiping to [] causes a flash of
+      // the empty/welcome screen.
+      if (!store.messages[session.id]?.length) {
+        setStore("messages", session.id, [])
+      }
 
       // If there's a pending model selection, assign it to this new session.
       // Guard against duplicate sessionCreated events (HTTP response + SSE)
@@ -705,15 +713,12 @@ export const SessionProvider: ParentComponent = (props) => {
       setCloudPreviewId(null)
       setCurrentSessionID(session.id)
 
-      const msgIds = cloudMessages.map((m) => m.id)
-      setStore(
-        "parts",
-        produce((parts) => {
-          for (const id of msgIds) {
-            delete parts[id]
-          }
-        }),
-      )
+      // Clean up synthetic cloud: entries from sessions/messages stores.
+      // NOTE: Do NOT delete cloud parts here — the carried-over messages still
+      // reference cloud message IDs. Deleting their parts causes every <Message>
+      // to render empty (parts().length === 0), creating a visible flash where
+      // only the WorkingIndicator spinner is shown until loadMessages completes.
+      // Stale cloud parts are harmlessly overwritten once messagesLoaded arrives.
       setStore(
         "sessions",
         produce((sessions) => {
