@@ -13,6 +13,7 @@ import type { Provider } from "@/provider/provider"
 
 // kilocode_change start
 import SOUL from "../kilocode/soul.txt"
+import { editorContextEnvLines, type EditorContext } from "../kilocode/editor-context"
 // kilocode_change end
 
 export namespace SystemPrompt {
@@ -37,57 +38,18 @@ export namespace SystemPrompt {
   }
 
   // kilocode_change start
-  function formatTime(timezone?: string): string[] {
-    const now = new Date()
-    const lines = [`  Current time: ${now.toISOString()}`]
-    if (timezone) {
-      const offset = -now.getTimezoneOffset()
-      const sign = offset >= 0 ? "+" : "-"
-      const hours = Math.floor(Math.abs(offset) / 60)
-      const mins = Math.abs(offset) % 60
-      lines.push(`  User timezone: ${timezone}, UTC${sign}${hours}:${mins.toString().padStart(2, "0")}`)
-    }
-    return lines
-  }
-  // kilocode_change end
-
-  // kilocode_change start
-  export async function environment(
-    model: Provider.Model,
-    editorContext?: {
-      visibleFiles?: string[]
-      openTabs?: string[]
-      activeFile?: string
-      shell?: string
-      timezone?: string
-    },
-  ) {
-    const project = Instance.project
-    const envLines = [
-      `  Working directory: ${Instance.directory}`,
-      `  Is directory a git repo: ${project.vcs === "git" ? "yes" : "no"}`,
-      `  Platform: ${process.platform}`,
-      ...formatTime(editorContext?.timezone),
-    ]
-    if (editorContext?.shell) {
-      envLines.push(`  Default shell: ${editorContext.shell}`)
-    }
-    if (editorContext?.activeFile) {
-      envLines.push(`  Active file: ${editorContext.activeFile}`)
-    }
-    if (editorContext?.visibleFiles?.length) {
-      envLines.push(`  Visible files: ${editorContext.visibleFiles.join(", ")}`)
-    }
-    if (editorContext?.openTabs?.length) {
-      envLines.push(`  Open tabs: ${editorContext.openTabs.join(", ")}`)
-    }
+  export async function environment(model: Provider.Model, editorContext?: EditorContext) {
     // kilocode_change end
+    const project = Instance.project
     return [
       [
         `You are powered by the model named ${model.api.id}. The exact model ID is ${model.providerID}/${model.api.id}`,
         `Here is some useful information about the environment you are running in:`,
         `<env>`,
-        ...envLines,
+        `  Working directory: ${Instance.directory}`,
+        `  Is directory a git repo: ${project.vcs === "git" ? "yes" : "no"}`,
+        `  Platform: ${process.platform}`,
+        ...editorContextEnvLines(editorContext), // kilocode_change
         `</env>`,
         `<directories>`,
         `  ${
