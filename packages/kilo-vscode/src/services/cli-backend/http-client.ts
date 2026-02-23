@@ -381,9 +381,9 @@ export class HttpClient {
    * Import a cloud session into local storage with fresh IDs.
    * Returns the imported session info, or null on failure.
    */
-  async importCloudSession(sessionId: string): Promise<SessionInfo | null> {
+  async importCloudSession(sessionId: string, directory: string): Promise<SessionInfo | null> {
     try {
-      return await this.request<SessionInfo>("POST", "/kilo/cloud/session/import", { sessionId })
+      return await this.request<SessionInfo>("POST", "/kilo/cloud/session/import", { sessionId }, { directory })
     } catch (err) {
       console.warn("[Kilo] Failed to import cloud session:", err)
       return null
