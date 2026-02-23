@@ -764,6 +764,40 @@
   white-space: nowrap;
 }
 
+/* Cloud Session List */
+.cloud-session-list {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.cloud-session-filters {
+  flex-shrink: 0;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--vscode-panel-border);
+}
+
+.cloud-session-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--vscode-foreground);
+  cursor: pointer;
+}
+
+.cloud-session-checkbox input[type="checkbox"] {
+  accent-color: var(--vscode-focusBorder);
+}
+
+.cloud-session-load-more {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  padding: 8px;
+}
+
 /* ============================================
    Kilo Notifications
    ============================================ */
