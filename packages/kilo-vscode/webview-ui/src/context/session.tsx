@@ -882,6 +882,7 @@ export const SessionProvider: ParentComponent = (props) => {
 
   function clearCurrentSession() {
     setCurrentSessionID(undefined)
+    setCloudPreviewId(null)
     setLoading(false)
     setPermissions([])
     setQuestions([])
