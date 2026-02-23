@@ -1527,20 +1527,20 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
       return relative
     }
 
-    // Visible files
+    // Visible files (capped to avoid bloating context)
     const visibleFiles = vscode.window.visibleTextEditors
       .map((e) => e.document.uri)
       .filter((uri) => uri.scheme === "file")
       .map((uri) => toRelative(uri.fsPath))
       .filter((p): p is string => p !== undefined)
+      .slice(0, 200)
 
-    // Open tabs (deduplicated)
+    // Open tabs — use instanceof TabInputText to exclude notebooks, diffs, custom editors
     const openTabSet = new Set<string>()
     for (const group of vscode.window.tabGroups.all) {
       for (const tab of group.tabs) {
-        const input = tab.input
-        if (input && typeof input === "object" && "uri" in input) {
-          const uri = (input as { uri: vscode.Uri }).uri
+        if (tab.input instanceof vscode.TabInputText) {
+          const uri = tab.input.uri
           if (uri.scheme === "file") {
             const rel = toRelative(uri.fsPath)
             if (rel) {
@@ -1550,7 +1550,7 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
         }
       }
     }
-    const openTabs = [...openTabSet]
+    const openTabs = [...openTabSet].slice(0, 20)
 
     // Active file
     const activeEditor = vscode.window.activeTextEditor
