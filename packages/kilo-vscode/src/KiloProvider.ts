@@ -524,9 +524,9 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
         (event) => {
           const sessionId = this.connectionService.resolveEventSessionId(event)
 
-          // message.part.updated is always session-scoped; if we can't determine the session, drop it.
+          // message.part.updated and message.part.delta are always session-scoped; drop if session unknown.
           if (!sessionId) {
-            return event.type !== "message.part.updated"
+            return event.type !== "message.part.updated" && event.type !== "message.part.delta"
           }
 
           return this.trackedSessionIds.has(sessionId)
@@ -698,15 +698,10 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
         })
         .catch((err) => console.error("[Kilo New] KiloProvider: Failed to fetch session statuses:", err))
 
-      // Convert to webview format, including cost/tokens for assistant messages
       const messages = messagesData.map((m) => ({
-        id: m.info.id,
-        sessionID: m.info.sessionID,
-        role: m.info.role,
+        ...m.info,
         parts: m.parts,
         createdAt: new Date(m.info.time.created).toISOString(),
-        cost: m.info.cost,
-        tokens: m.info.tokens,
       }))
 
       for (const message of messages) {
@@ -746,13 +741,9 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
       const messagesData = await this.httpClient.getMessages(sessionID, workspaceDir)
 
       const messages = messagesData.map((m) => ({
-        id: m.info.id,
-        sessionID: m.info.sessionID,
-        role: m.info.role,
+        ...m.info,
         parts: m.parts,
         createdAt: new Date(m.info.time.created).toISOString(),
-        cost: m.info.cost,
-        tokens: m.info.tokens,
       }))
 
       for (const message of messages) {
@@ -1655,8 +1646,8 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
 
     // Events without sessionID (server.connected, server.heartbeat) → always forward
     // Events with sessionID → only forward if this webview tracks that session
-    // message.part.updated is always session-scoped; if we can't determine the session, drop it to avoid cross-webview leakage.
-    if (!sessionID && event.type === "message.part.updated") {
+    // message.part.updated and message.part.delta are always session-scoped; drop if session unknown.
+    if (!sessionID && (event.type === "message.part.updated" || event.type === "message.part.delta")) {
       return
     }
     if (sessionID && !this.trackedSessionIds.has(sessionID)) {
