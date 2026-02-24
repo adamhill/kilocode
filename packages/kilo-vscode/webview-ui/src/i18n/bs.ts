@@ -722,6 +722,13 @@ export const dict = {
   "session.recent": "Nedavne",
   "session.search.placeholder": "Pretraži sesije...",
   "session.empty": "Još nema sesija. Kliknite + za početak novog razgovora.",
+  "session.cloud.repoOnly": "Samo ovaj repozitorij",
+  "session.cloud.import": "Uvezi iz oblaka",
+  "session.cloud.import.title": "Uvezi iz oblaka",
+  "session.cloud.import.placeholder": "ID sesije, URL ili kilo import naredba",
+  "session.cloud.import.button": "Uvezi",
+  "session.cloud.import.invalid": "Neispravan format ID-a sesije",
+  "session.cloud.import.failed": "Uvoz sesije iz oblaka nije uspio",
 
   "workspace.new": "Novi radni prostor",
   "workspace.type.local": "lokalno",

@@ -704,6 +704,13 @@ export const dict = {
   "session.recent": "Récentes",
   "session.search.placeholder": "Rechercher des sessions...",
   "session.empty": "Aucune session pour l'instant. Cliquez + pour démarrer une nouvelle conversation.",
+  "session.cloud.repoOnly": "Uniquement ce dépôt",
+  "session.cloud.import": "Importer depuis le cloud",
+  "session.cloud.import.title": "Importer depuis le cloud",
+  "session.cloud.import.placeholder": "ID de session, URL ou commande kilo import",
+  "session.cloud.import.button": "Importer",
+  "session.cloud.import.invalid": "Format d'ID de session invalide",
+  "session.cloud.import.failed": "Échec de l'importation de la session cloud",
 
   "workspace.new": "Nouvel espace de travail",
   "workspace.type.local": "local",

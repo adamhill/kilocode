@@ -688,6 +688,13 @@ export const dict = {
   "session.recent": "الأخيرة",
   "session.search.placeholder": "البحث في الجلسات...",
   "session.empty": "لا توجد جلسات بعد. انقر + لبدء محادثة جديدة.",
+  "session.cloud.repoOnly": "هذا المستودع فقط",
+  "session.cloud.import": "استيراد من السحابة",
+  "session.cloud.import.title": "استيراد من السحابة",
+  "session.cloud.import.placeholder": "معرّف الجلسة أو الرابط أو أمر kilo import",
+  "session.cloud.import.button": "استيراد",
+  "session.cloud.import.invalid": "تنسيق معرّف الجلسة غير صالح",
+  "session.cloud.import.failed": "فشل استيراد جلسة السحابة",
 
   "workspace.new": "مساحة عمل جديدة",
   "workspace.type.local": "محلي",

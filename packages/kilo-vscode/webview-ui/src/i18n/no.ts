@@ -697,6 +697,13 @@ export const dict = {
   "session.recent": "Nylige",
   "session.search.placeholder": "Søk i sesjoner...",
   "session.empty": "Ingen sesjoner ennå. Klikk + for å starte en ny samtale.",
+  "session.cloud.repoOnly": "Kun dette repositoriet",
+  "session.cloud.import": "Importer fra skyen",
+  "session.cloud.import.title": "Importer fra skyen",
+  "session.cloud.import.placeholder": "Økt-ID, URL eller kilo import-kommando",
+  "session.cloud.import.button": "Importer",
+  "session.cloud.import.invalid": "Ugyldig økt-ID-format",
+  "session.cloud.import.failed": "Kunne ikke importere skyøkt",
 
   "workspace.new": "Nytt arbeidsområde",
   "workspace.type.local": "lokal",

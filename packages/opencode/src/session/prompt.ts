@@ -676,7 +676,10 @@ export namespace SessionPrompt {
       await Plugin.trigger("experimental.chat.messages.transform", {}, { messages: sessionMessages })
 
       // Build system prompt, adding structured output instruction if needed
-      const system = [...(await SystemPrompt.environment(model, lastUser.editorContext)), ...(await InstructionPrompt.system())] // kilocode_change
+      const system = [
+        ...(await SystemPrompt.environment(model, lastUser.editorContext)),
+        ...(await InstructionPrompt.system()),
+      ] // kilocode_change
       const format = lastUser.format ?? { type: "text" }
       if (format.type === "json_schema") {
         system.push(STRUCTURED_OUTPUT_SYSTEM_PROMPT)

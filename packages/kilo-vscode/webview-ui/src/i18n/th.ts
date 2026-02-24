@@ -686,6 +686,13 @@ export const dict = {
   "session.recent": "ล่าสุด",
   "session.search.placeholder": "ค้นหาเซสชัน...",
   "session.empty": "ยังไม่มีเซสชัน คลิก + เพื่อเริ่มการสนทนาใหม่",
+  "session.cloud.repoOnly": "เฉพาะรีโพซิทอรีนี้",
+  "session.cloud.import": "นำเข้าจากคลาวด์",
+  "session.cloud.import.title": "นำเข้าจากคลาวด์",
+  "session.cloud.import.placeholder": "ID เซสชัน, URL หรือคำสั่ง kilo import",
+  "session.cloud.import.button": "นำเข้า",
+  "session.cloud.import.invalid": "รูปแบบ ID เซสชันไม่ถูกต้อง",
+  "session.cloud.import.failed": "ไม่สามารถนำเข้าเซสชันคลาวด์ได้",
 
   "workspace.new": "พื้นที่ทำงานใหม่",
   "workspace.type.local": "ในเครื่อง",

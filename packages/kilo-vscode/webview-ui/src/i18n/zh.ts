@@ -689,6 +689,13 @@ export const dict = {
   "session.recent": "最近",
   "session.search.placeholder": "搜索会话...",
   "session.empty": "暂无会话。点击 + 开始新的对话。",
+  "session.cloud.repoOnly": "仅此仓库",
+  "session.cloud.import": "从云端导入",
+  "session.cloud.import.title": "从云端导入",
+  "session.cloud.import.placeholder": "会话 ID、URL 或 kilo import 命令",
+  "session.cloud.import.button": "导入",
+  "session.cloud.import.invalid": "会话 ID 格式无效",
+  "session.cloud.import.failed": "导入云会话失败",
 
   "workspace.new": "新建工作区",
   "workspace.type.local": "本地",

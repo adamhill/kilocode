@@ -696,6 +696,13 @@ export const dict = {
   "session.recent": "Ostatnie",
   "session.search.placeholder": "Szukaj sesji...",
   "session.empty": "Brak sesji. Kliknij + aby rozpocząć nową rozmowę.",
+  "session.cloud.repoOnly": "Tylko to repozytorium",
+  "session.cloud.import": "Importuj z chmury",
+  "session.cloud.import.title": "Importuj z chmury",
+  "session.cloud.import.placeholder": "ID sesji, URL lub polecenie kilo import",
+  "session.cloud.import.button": "Importuj",
+  "session.cloud.import.invalid": "Nieprawidłowy format ID sesji",
+  "session.cloud.import.failed": "Nie udało się zaimportować sesji chmurowej",
 
   "workspace.new": "Nowa przestrzeń robocza",
   "workspace.type.local": "lokalna",

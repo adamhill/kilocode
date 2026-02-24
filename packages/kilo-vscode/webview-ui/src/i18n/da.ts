@@ -694,6 +694,13 @@ export const dict = {
   "session.recent": "Seneste",
   "session.search.placeholder": "Søg sessioner...",
   "session.empty": "Ingen sessioner endnu. Klik + for at starte en ny samtale.",
+  "session.cloud.repoOnly": "Kun dette repository",
+  "session.cloud.import": "Importér fra skyen",
+  "session.cloud.import.title": "Importér fra skyen",
+  "session.cloud.import.placeholder": "Sessions-ID, URL eller kilo import-kommando",
+  "session.cloud.import.button": "Importér",
+  "session.cloud.import.invalid": "Ugyldigt sessions-ID-format",
+  "session.cloud.import.failed": "Kunne ikke importere cloud-session",
 
   "workspace.new": "Nyt arbejdsområde",
   "workspace.type.local": "lokal",

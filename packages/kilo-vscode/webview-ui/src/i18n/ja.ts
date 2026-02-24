@@ -688,6 +688,13 @@ export const dict = {
   "session.recent": "最近",
   "session.search.placeholder": "セッションを検索...",
   "session.empty": "セッションがありません。+ をクリックして新しい会話を始めましょう。",
+  "session.cloud.repoOnly": "このリポジトリのみ",
+  "session.cloud.import": "クラウドからインポート",
+  "session.cloud.import.title": "クラウドからインポート",
+  "session.cloud.import.placeholder": "セッションID、URL、またはkilo importコマンド",
+  "session.cloud.import.button": "インポート",
+  "session.cloud.import.invalid": "セッションIDの形式が無効です",
+  "session.cloud.import.failed": "クラウドセッションのインポートに失敗しました",
 
   "workspace.new": "新しいワークスペース",
   "workspace.type.local": "ローカル",
