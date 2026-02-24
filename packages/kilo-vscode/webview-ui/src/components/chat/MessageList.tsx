@@ -6,11 +6,12 @@
  * Shows recent sessions in the empty state for quick resumption.
  */
 
-import { Component, For, Show, createSignal, createEffect, createMemo, onCleanup, JSX } from "solid-js"
+import { Component, For, Show, createEffect, createMemo, JSX } from "solid-js"
 import { Spinner } from "@kilocode/kilo-ui/spinner"
 import { Button } from "@kilocode/kilo-ui/button"
 import { useDialog } from "@kilocode/kilo-ui/context/dialog"
 import { SessionTurn } from "@kilocode/kilo-ui/session-turn"
+import { createAutoScroll } from "@kilocode/kilo-ui/hooks"
 import { useSession } from "../../context/session"
 import { useServer } from "../../context/server"
 import { useLanguage } from "../../context/language"
@@ -40,45 +41,9 @@ export const MessageList: Component<MessageListProps> = (props) => {
   const language = useLanguage()
   const dialog = useDialog()
 
-  let containerRef: HTMLDivElement | undefined
-  const [isAtBottom, setIsAtBottom] = createSignal(true)
-  const [showScrollButton, setShowScrollButton] = createSignal(false)
-
-  const checkScrollPosition = () => {
-    if (!containerRef) return
-
-    const threshold = 50
-    const atBottom = containerRef.scrollHeight - containerRef.scrollTop - containerRef.clientHeight < threshold
-    setIsAtBottom(atBottom)
-    setShowScrollButton(!atBottom)
-  }
-
-  const scrollToBottom = () => {
-    if (!containerRef) return
-    containerRef.scrollTo({
-      top: containerRef.scrollHeight,
-      behavior: "smooth",
-    })
-  }
-
-  createEffect(() => {
-    const msgs = session.userMessages()
-    if (msgs.length > 0 && isAtBottom()) {
-      requestAnimationFrame(() => {
-        if (containerRef) {
-          containerRef.scrollTop = containerRef.scrollHeight
-        }
-      })
-    }
-  })
-
-  createEffect(() => {
-    if (!containerRef) return
-
-    containerRef.addEventListener("scroll", checkScrollPosition)
-    onCleanup(() => {
-      containerRef?.removeEventListener("scroll", checkScrollPosition)
-    })
+  const autoScroll = createAutoScroll({
+    working: () => session.status() !== "idle",
+    overflowAnchor: "dynamic",
   })
 
   let loaded = false
@@ -102,69 +67,78 @@ export const MessageList: Component<MessageListProps> = (props) => {
 
   return (
     <div class="message-list-container">
-      <div ref={containerRef} class="message-list" role="log" aria-live="polite">
-        <Show when={session.loading()}>
-          <div class="message-list-loading" role="status">
-            <Spinner />
-            <span>{language.t("session.messages.loading")}</span>
-          </div>
-        </Show>
-        <Show when={isEmpty()}>
-          <div class="message-list-empty">
-            <KiloLogo />
-            <p class="kilo-about-text">{language.t("session.messages.welcome")}</p>
-            <Show when={recent().length > 0 && props.onSelectSession}>
-              <div class="recent-sessions">
-                <span class="recent-sessions-label">{language.t("session.recent")}</span>
-                <For each={recent()}>
-                  {(s) => (
-                    <button class="recent-session-item" onClick={() => props.onSelectSession?.(s.id)}>
-                      <span class="recent-session-title">{s.title || language.t("session.untitled")}</span>
-                      <span class="recent-session-date">{formatRelativeDate(s.updatedAt)}</span>
-                    </button>
-                  )}
-                </For>
-              </div>
-            </Show>
-            <Button
-              variant="ghost"
-              size="small"
-              onClick={() =>
-                dialog.show(() => (
-                  <CloudImportDialog
-                    onImport={(id) => {
-                      session.selectCloudSession(id)
-                    }}
-                  />
-                ))
-              }
-            >
-              {language.t("session.cloud.import")}
-            </Button>
-          </div>
-        </Show>
-        <Show when={!session.loading()}>
-          <For each={userMessages()}>
-            {(msg) => (
-              <SessionTurn
-                sessionID={session.currentSessionID() ?? ""}
-                messageID={msg.id}
-                lastUserMessageID={lastUserMessageID()}
-                classes={{
-                  root: "session-turn-root",
-                  content: "session-turn-content",
-                  container: "session-turn-container",
-                }}
-              />
-            )}
-          </For>
-        </Show>
+      <div
+        ref={autoScroll.scrollRef}
+        onScroll={autoScroll.handleScroll}
+        onClick={autoScroll.handleInteraction}
+        class="message-list"
+        role="log"
+        aria-live="polite"
+      >
+        <div ref={autoScroll.contentRef}>
+          <Show when={session.loading()}>
+            <div class="message-list-loading" role="status">
+              <Spinner />
+              <span>{language.t("session.messages.loading")}</span>
+            </div>
+          </Show>
+          <Show when={isEmpty()}>
+            <div class="message-list-empty">
+              <KiloLogo />
+              <p class="kilo-about-text">{language.t("session.messages.welcome")}</p>
+              <Show when={recent().length > 0 && props.onSelectSession}>
+                <div class="recent-sessions">
+                  <span class="recent-sessions-label">{language.t("session.recent")}</span>
+                  <For each={recent()}>
+                    {(s) => (
+                      <button class="recent-session-item" onClick={() => props.onSelectSession?.(s.id)}>
+                        <span class="recent-session-title">{s.title || language.t("session.untitled")}</span>
+                        <span class="recent-session-date">{formatRelativeDate(s.updatedAt)}</span>
+                      </button>
+                    )}
+                  </For>
+                </div>
+              </Show>
+              <Button
+                variant="ghost"
+                size="small"
+                onClick={() =>
+                  dialog.show(() => (
+                    <CloudImportDialog
+                      onImport={(id) => {
+                        session.selectCloudSession(id)
+                      }}
+                    />
+                  ))
+                }
+              >
+                {language.t("session.cloud.import")}
+              </Button>
+            </div>
+          </Show>
+          <Show when={!session.loading()}>
+            <For each={userMessages()}>
+              {(msg) => (
+                <SessionTurn
+                  sessionID={session.currentSessionID() ?? ""}
+                  messageID={msg.id}
+                  lastUserMessageID={lastUserMessageID()}
+                  classes={{
+                    root: "session-turn-root",
+                    content: "session-turn-content",
+                    container: "session-turn-container",
+                  }}
+                />
+              )}
+            </For>
+          </Show>
+        </div>
       </div>
 
-      <Show when={showScrollButton()}>
+      <Show when={autoScroll.userScrolled()}>
         <button
           class="scroll-to-bottom-button"
-          onClick={scrollToBottom}
+          onClick={() => autoScroll.resume()}
           aria-label={language.t("session.messages.scrollToBottom")}
         >
           ↓
