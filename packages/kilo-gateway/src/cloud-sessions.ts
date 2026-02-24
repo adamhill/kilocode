@@ -2,6 +2,10 @@ import { buildKiloHeaders } from "./headers.js"
 
 export const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
+export interface DrizzleDb {
+  insert(table: object): { values(data: object): { onConflictDoNothing(): { run(): void } } }
+}
+
 const INGEST_BASE = process.env.KILO_SESSION_INGEST_URL ?? "https://ingest.kilosessions.ai"
 
 function exportUrl(sessionId: string) {
@@ -49,9 +53,9 @@ export async function fetchCloudSessionForImport(token: string, sessionId: strin
   return { ok: true, data }
 }
 
-interface ImportDeps {
+export interface ImportDeps {
   Database: {
-    transaction<T>(callback: (db: any) => T): T
+    transaction<T>(callback: (db: DrizzleDb) => T): T
     effect(fn: () => void | Promise<unknown>): void
   }
   Instance: {

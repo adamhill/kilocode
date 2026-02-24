@@ -10,7 +10,13 @@ import { fetchProfile, fetchBalance } from "../api/profile.js"
 import { fetchKilocodeNotifications, KilocodeNotificationSchema } from "../api/notifications.js"
 import { KILO_API_BASE, HEADER_FEATURE } from "../api/constants.js" // kilocode_change - added HEADER_FEATURE
 import { buildKiloHeaders } from "../headers.js" // kilocode_change
-import { fetchCloudSession, fetchCloudSessionForImport, importSessionToDb } from "../cloud-sessions.js" // kilocode_change
+import {
+  fetchCloudSession,
+  fetchCloudSessionForImport,
+  importSessionToDb,
+  ImportDeps,
+  DrizzleDb,
+} from "../cloud-sessions.js" // kilocode_change
 
 // Type definitions for OpenCode dependencies (injected at runtime)
 type Hono = any
@@ -21,11 +27,7 @@ type Errors = any
 type Auth = any
 type Z = any
 
-interface DrizzleDb {
-  insert(table: object): { values(data: object): { onConflictDoNothing(): { run(): void } } }
-}
-
-interface KiloRoutesDeps {
+interface KiloRoutesDeps extends ImportDeps {
   Hono: new () => Hono
   describeRoute: DescribeRoute
   validator: Validator
@@ -33,24 +35,6 @@ interface KiloRoutesDeps {
   errors: Errors
   Auth: Auth
   z: Z
-  Database: {
-    transaction<T>(callback: (db: DrizzleDb) => T): T
-    effect(fn: () => void | Promise<unknown>): void
-  }
-  Instance: {
-    readonly directory: string
-    readonly project: { readonly id: string }
-  }
-  SessionTable: object
-  MessageTable: object
-  PartTable: object
-  SessionToRow: (info: any) => Record<string, unknown>
-  Bus: { publish(event: { type: string; properties: unknown }, payload: unknown): void | Promise<unknown> }
-  SessionCreatedEvent: { type: string; properties: unknown }
-  Identifier: {
-    ascending(prefix: "session" | "message" | "part", given?: string): string
-    descending(prefix: "session" | "message" | "part", given?: string): string
-  }
 }
 
 /**
