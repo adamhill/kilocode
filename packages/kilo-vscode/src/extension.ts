@@ -108,7 +108,7 @@ export function activate(context: vscode.ExtensionContext) {
     }),
   )
 
-  // Register URI handler for session imports (vscode://kilocode.kilo-code/s/{sessionId})
+  // Register URI handler for session imports (vscode://kilocode.kilo-code/kilocode/s/{sessionId})
   context.subscriptions.push(
     vscode.window.registerUriHandler({
       async handleUri(uri: vscode.Uri) {
