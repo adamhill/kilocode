@@ -342,6 +342,7 @@ export interface ReadyMessage {
   extensionVersion?: string
   vscodeLanguage?: string
   languageOverride?: string
+  workspaceDirectory?: string
 }
 
 export interface ConnectionStateMessage {

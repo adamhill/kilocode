@@ -18,6 +18,7 @@ interface ServerContextValue {
   startLogin: () => void
   vscodeLanguage: Accessor<string | undefined>
   languageOverride: Accessor<string | undefined>
+  workspaceDirectory: Accessor<string>
 }
 
 const ServerContext = createContext<ServerContextValue>()
@@ -35,6 +36,7 @@ export const ServerProvider: ParentComponent = (props) => {
   const [deviceAuth, setDeviceAuth] = createSignal<DeviceAuthState>(initialDeviceAuth)
   const [vscodeLanguage, setVscodeLanguage] = createSignal<string | undefined>()
   const [languageOverride, setLanguageOverride] = createSignal<string | undefined>()
+  const [workspaceDirectory, setWorkspaceDirectory] = createSignal<string>("")
 
   onMount(() => {
     const unsubscribe = vscode.onMessage((message: ExtensionMessage) => {
@@ -50,6 +52,9 @@ export const ServerProvider: ParentComponent = (props) => {
           }
           if (message.languageOverride) {
             setLanguageOverride(message.languageOverride)
+          }
+          if (message.workspaceDirectory) {
+            setWorkspaceDirectory(message.workspaceDirectory)
           }
           break
 
@@ -126,6 +131,7 @@ export const ServerProvider: ParentComponent = (props) => {
     startLogin,
     vscodeLanguage,
     languageOverride,
+    workspaceDirectory,
   }
 
   return <ServerContext.Provider value={value}>{props.children}</ServerContext.Provider>

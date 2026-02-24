@@ -11,6 +11,20 @@
   }
 }
 
+/* Prevent long title/path from hiding the collapsible expand arrow */
+[data-component="edit-trigger"],
+[data-component="write-trigger"] {
+  [data-slot="message-part-title"] {
+    flex-shrink: 1;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  [data-slot="message-part-title-text"] {
+    flex-shrink: 0;
+  }
+}
+
 html[data-theme="kilo-vscode"] [data-component="bash-output"] {
   background: var(--vscode-terminal-background, var(--vscode-panel-background));
 

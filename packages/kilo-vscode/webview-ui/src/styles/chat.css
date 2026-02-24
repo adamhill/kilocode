@@ -67,6 +67,13 @@
   font-size: 13px;
 }
 
+.message-list-content-empty {
+  display: flex;
+  min-height: 100%;
+  align-items: center;
+  justify-content: center;
+}
+
 .message-list-empty {
   display: flex;
   flex-direction: column;

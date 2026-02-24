@@ -52,6 +52,7 @@ export const DataBridge: Component<{ children: any }> = (props) => {
   const session = useSession()
   const vscode = useVSCode()
   const prov = useProvider()
+  const server = useServer()
 
   const data = createMemo(() => {
     const id = session.currentSessionID()
@@ -96,10 +97,16 @@ export const DataBridge: Component<{ children: any }> = (props) => {
     vscode.postMessage({ type: "openFile", filePath, line, column })
   }
 
+  const directory = () => {
+    const dir = server.workspaceDirectory()
+    if (!dir) return ""
+    return dir.endsWith("/") ? dir : dir + "/"
+  }
+
   return (
     <DataProvider
       data={data()}
-      directory=""
+      directory={directory()}
       onPermissionRespond={respond}
       onQuestionReply={reply}
       onQuestionReject={reject}

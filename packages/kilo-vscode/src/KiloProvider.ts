@@ -127,6 +127,7 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
         extensionVersion: this.extensionVersion,
         vscodeLanguage: vscode.env.language,
         languageOverride: langConfig.get<string>("language"),
+        workspaceDirectory: this.getWorkspaceDirectory(),
       })
     }
 
@@ -576,6 +577,7 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
           extensionVersion: this.extensionVersion,
           vscodeLanguage: vscode.env.language,
           languageOverride: langConfig.get<string>("language"),
+          workspaceDirectory: this.getWorkspaceDirectory(),
         })
       }
 
