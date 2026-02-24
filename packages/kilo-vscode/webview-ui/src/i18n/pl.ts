@@ -702,6 +702,7 @@ export const dict = {
   "session.cloud.import.placeholder": "ID sesji, URL lub polecenie kilo import",
   "session.cloud.import.button": "Importuj",
   "session.cloud.import.invalid": "Nieprawidłowy format ID sesji",
+  "session.cloud.import.failed": "Nie udało się zaimportować sesji chmurowej",
 
   "workspace.new": "Nowa przestrzeń robocza",
   "workspace.type.local": "lokalna",

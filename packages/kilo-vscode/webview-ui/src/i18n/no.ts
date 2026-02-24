@@ -703,6 +703,7 @@ export const dict = {
   "session.cloud.import.placeholder": "Økt-ID, URL eller kilo import-kommando",
   "session.cloud.import.button": "Importer",
   "session.cloud.import.invalid": "Ugyldig økt-ID-format",
+  "session.cloud.import.failed": "Kunne ikke importere skyøkt",
 
   "workspace.new": "Nytt arbeidsområde",
   "workspace.type.local": "lokal",

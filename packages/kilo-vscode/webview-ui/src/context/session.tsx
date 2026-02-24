@@ -397,7 +397,11 @@ export const SessionProvider: ParentComponent = (props) => {
           setCloudPreviewId(null)
           setCurrentSessionID(undefined)
           setLoading(false)
-          showToast({ variant: "error", title: "Failed to import cloud session", description: message.error })
+          showToast({
+            variant: "error",
+            title: language.t("session.cloud.import.failed") ?? "Failed to import cloud session",
+            description: message.error,
+          })
           console.error("[Kilo New] Cloud session import failed:", message.error)
           break
       }

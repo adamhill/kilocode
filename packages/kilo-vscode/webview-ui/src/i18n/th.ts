@@ -692,6 +692,7 @@ export const dict = {
   "session.cloud.import.placeholder": "ID เซสชัน, URL หรือคำสั่ง kilo import",
   "session.cloud.import.button": "นำเข้า",
   "session.cloud.import.invalid": "รูปแบบ ID เซสชันไม่ถูกต้อง",
+  "session.cloud.import.failed": "ไม่สามารถนำเข้าเซสชันคลาวด์ได้",
 
   "workspace.new": "พื้นที่ทำงานใหม่",
   "workspace.type.local": "ในเครื่อง",

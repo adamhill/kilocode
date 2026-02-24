@@ -700,6 +700,7 @@ export const dict = {
   "session.cloud.import.placeholder": "Sessions-ID, URL eller kilo import-kommando",
   "session.cloud.import.button": "Importér",
   "session.cloud.import.invalid": "Ugyldigt sessions-ID-format",
+  "session.cloud.import.failed": "Kunne ikke importere cloud-session",
 
   "workspace.new": "Nyt arbejdsområde",
   "workspace.type.local": "lokal",

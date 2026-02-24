@@ -728,6 +728,7 @@ export const dict = {
   "session.cloud.import.placeholder": "ID sesije, URL ili kilo import naredba",
   "session.cloud.import.button": "Uvezi",
   "session.cloud.import.invalid": "Neispravan format ID-a sesije",
+  "session.cloud.import.failed": "Uvoz sesije iz oblaka nije uspio",
 
   "workspace.new": "Novi radni prostor",
   "workspace.type.local": "lokalno",

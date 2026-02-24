@@ -694,6 +694,7 @@ export const dict = {
   "session.cloud.import.placeholder": "معرّف الجلسة أو الرابط أو أمر kilo import",
   "session.cloud.import.button": "استيراد",
   "session.cloud.import.invalid": "تنسيق معرّف الجلسة غير صالح",
+  "session.cloud.import.failed": "فشل استيراد جلسة السحابة",
 
   "workspace.new": "مساحة عمل جديدة",
   "workspace.type.local": "محلي",
