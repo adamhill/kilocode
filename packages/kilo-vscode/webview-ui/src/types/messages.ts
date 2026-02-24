@@ -649,26 +649,42 @@ export interface AgentManagerMultiVersionProgressMessage {
   groupId?: string
 }
 
-// Branch info for branch selector (extension → webview)
-export interface AgentManagerBranchInfo {
-  name: string
-  isLocal: boolean
-  isRemote: boolean
-  lastCommitDate: number
-  isDefault: boolean
-}
-
-// Branch list response (extension → webview)
-export interface AgentManagerBranchesMessage {
-  type: "agentManager.branches"
-  branches: AgentManagerBranchInfo[]
-  defaultBranch: string
-}
-
 // Stored variant selections loaded from extension globalState (extension → webview)
 export interface VariantsLoadedMessage {
   type: "variantsLoaded"
   variants: Record<string, string>
+}
+
+export interface BranchInfo {
+  name: string
+  isLocal: boolean
+  isRemote: boolean
+  isDefault: boolean
+  lastCommitDate?: string
+}
+
+export interface AgentManagerBranchesMessage {
+  type: "agentManager.branches"
+  branches: BranchInfo[]
+  defaultBranch: string
+}
+
+// Agent Manager Import tab: external worktrees (extension → webview)
+export interface ExternalWorktreeInfo {
+  path: string
+  branch: string
+}
+
+export interface AgentManagerExternalWorktreesMessage {
+  type: "agentManager.externalWorktrees"
+  worktrees: ExternalWorktreeInfo[]
+}
+
+// Agent Manager Import tab: result feedback (extension → webview)
+export interface AgentManagerImportResultMessage {
+  type: "agentManager.importResult"
+  success: boolean
+  message: string
 }
 
 // Request webview to send initial prompt to a newly created session (extension → webview)
@@ -733,6 +749,9 @@ export type ExtensionMessage =
   | CloudSessionDataLoadedMessage
   | CloudSessionImportedMessage
   | CloudSessionImportFailedMessage
+  | AgentManagerBranchesMessage
+  | AgentManagerExternalWorktreesMessage
+  | AgentManagerImportResultMessage
 
 // ============================================
 // Messages FROM webview TO extension
@@ -1048,11 +1067,33 @@ export interface SetSessionsCollapsedRequest {
   collapsed: boolean
 }
 
-// Request branch list for base branch selector
 export interface RequestBranchesMessage {
   type: "agentManager.requestBranches"
 }
 
+export interface RequestExternalWorktreesMessage {
+  type: "agentManager.requestExternalWorktrees"
+}
+
+export interface ImportFromBranchRequest {
+  type: "agentManager.importFromBranch"
+  branch: string
+}
+
+export interface ImportFromPRRequest {
+  type: "agentManager.importFromPR"
+  url: string
+}
+
+export interface ImportExternalWorktreeRequest {
+  type: "agentManager.importExternalWorktree"
+  path: string
+  branch: string
+}
+
+export interface ImportAllExternalWorktreesRequest {
+  type: "agentManager.importAllExternalWorktrees"
+}
 // Variant persistence (webview → extension)
 export interface PersistVariantRequest {
   type: "persistVariant"
@@ -1124,6 +1165,11 @@ export type WebviewMessage =
   | RequestCloudSessionDataMessage
   | ImportAndSendMessage
   | RequestBranchesMessage
+  | RequestExternalWorktreesMessage
+  | ImportFromBranchRequest
+  | ImportFromPRRequest
+  | ImportExternalWorktreeRequest
+  | ImportAllExternalWorktreesRequest
 
 // ============================================
 // VS Code API type
