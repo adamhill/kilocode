@@ -12,7 +12,7 @@ import Settings from "./components/Settings"
 import ProfileView from "./components/ProfileView"
 import { VSCodeProvider, useVSCode } from "./context/vscode"
 import { ServerProvider, useServer } from "./context/server"
-import { ProviderProvider } from "./context/provider"
+import { ProviderProvider, useProvider } from "./context/provider"
 import { ConfigProvider } from "./context/config"
 import { SessionProvider, useSession } from "./context/session"
 import { LanguageProvider } from "./context/language"
@@ -50,10 +50,12 @@ const DummyView: Component<{ title: string }> = (props) => {
 export const DataBridge: Component<{ children: any }> = (props) => {
   const session = useSession()
   const vscode = useVSCode()
+  const prov = useProvider()
 
   const data = createMemo(() => {
     const id = session.currentSessionID()
     const perms = id ? session.permissions().filter((p) => p.sessionID === id) : []
+    const qs = id ? session.questions() : []
     return {
       session: session.sessions().map((s) => ({ ...s, id: s.id, role: "user" as const })) as unknown as any[],
       session_status: {} as Record<string, any>,
@@ -68,6 +70,12 @@ export const DataBridge: Component<{ children: any }> = (props) => {
           )
         : {},
       permission: id ? { [id]: perms as unknown as any[] } : {},
+      question: id ? { [id]: qs as unknown as any[] } : {},
+      provider: {
+        all: Object.values(prov.providers()) as unknown as any[],
+        connected: prov.connected(),
+        default: prov.defaults(),
+      } as unknown as any,
     }
   })
 
@@ -75,8 +83,12 @@ export const DataBridge: Component<{ children: any }> = (props) => {
     session.respondToPermission(input.permissionID, input.response)
   }
 
-  const sync = (sessionID: string) => {
-    session.syncSession(sessionID)
+  const reply = (input: { requestID: string; answers: string[][] }) => {
+    session.replyToQuestion(input.requestID, input.answers)
+  }
+
+  const reject = (input: { requestID: string }) => {
+    session.rejectQuestion(input.requestID)
   }
 
   const open = (filePath: string, line?: number, column?: number) => {
@@ -84,7 +96,14 @@ export const DataBridge: Component<{ children: any }> = (props) => {
   }
 
   return (
-    <DataProvider data={data()} directory="" onPermissionRespond={respond} onSyncSession={sync} onOpenFile={open}>
+    <DataProvider
+      data={data()}
+      directory=""
+      onPermissionRespond={respond}
+      onQuestionReply={reply}
+      onQuestionReject={reject}
+      onOpenFile={open}
+    >
       {props.children}
     </DataProvider>
   )

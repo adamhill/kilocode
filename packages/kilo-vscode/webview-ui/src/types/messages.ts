@@ -92,6 +92,16 @@ export interface Message {
   content?: string
   parts?: Part[]
   createdAt: string
+  time?: { created: number; completed?: number }
+  agent?: string
+  model?: { providerID: string; modelID: string }
+  providerID?: string
+  modelID?: string
+  mode?: string
+  parentID?: string
+  path?: { cwd: string; root: string }
+  error?: { name: string; data?: Record<string, unknown> }
+  summary?: { title?: string; body?: string; diffs?: unknown[] } | boolean
   cost?: number
   tokens?: TokenUsage
 }

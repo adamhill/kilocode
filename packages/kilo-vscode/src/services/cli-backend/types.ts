@@ -35,7 +35,15 @@ export interface MessageInfo {
     created: number
     completed?: number
   }
-  // Present on assistant messages
+  agent?: string
+  providerID?: string
+  modelID?: string
+  model?: { providerID: string; modelID: string }
+  mode?: string
+  parentID?: string
+  path?: { cwd: string; root: string }
+  error?: { name: string; data?: Record<string, unknown> }
+  summary?: { title?: string; body?: string; diffs?: unknown[] } | boolean
   cost?: number
   tokens?: TokenUsage
 }
@@ -76,6 +84,10 @@ export type SSEEvent =
   | { type: "session.idle"; properties: { sessionID: string } }
   | { type: "message.updated"; properties: { info: MessageInfo } }
   | { type: "message.part.updated"; properties: { part: MessagePart; delta?: string } }
+  | {
+      type: "message.part.delta"
+      properties: { sessionID: string; messageID: string; partID: string; field: string; delta: string }
+    }
   | { type: "permission.asked"; properties: PermissionRequest }
   | {
       type: "permission.replied"
