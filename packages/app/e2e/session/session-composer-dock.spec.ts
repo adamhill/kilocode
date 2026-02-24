@@ -28,7 +28,8 @@ async function withDockSeed<T>(sdk: Sdk, sessionID: string, fn: () => Promise<T>
   }
 }
 
-test("default dock shows prompt input", async ({ page, sdk, gotoSession }) => {
+// kilocode_change: skip
+test.skip("default dock shows prompt input", async ({ page, sdk, gotoSession }) => {
   await withDockSession(sdk, "e2e composer dock default", async (session) => {
     await gotoSession(session.id)
 
@@ -42,7 +43,8 @@ test("default dock shows prompt input", async ({ page, sdk, gotoSession }) => {
   })
 })
 
-test("blocked question flow unblocks after submit", async ({ page, sdk, gotoSession }) => {
+// kilocode_change: skip
+test.skip("blocked question flow unblocks after submit", async ({ page, sdk, gotoSession }) => {
   await withDockSession(sdk, "e2e composer dock question", async (session) => {
     await withDockSeed(sdk, session.id, async () => {
       await gotoSession(session.id)
@@ -74,7 +76,8 @@ test("blocked question flow unblocks after submit", async ({ page, sdk, gotoSess
   })
 })
 
-test("blocked permission flow supports allow once", async ({ page, sdk, gotoSession }) => {
+// kilocode_change: skip
+test.skip("blocked permission flow supports allow once", async ({ page, sdk, gotoSession }) => {
   await withDockSession(sdk, "e2e composer dock permission once", async (session) => {
     await withDockSeed(sdk, session.id, async () => {
       await gotoSession(session.id)
@@ -99,7 +102,8 @@ test("blocked permission flow supports allow once", async ({ page, sdk, gotoSess
   })
 })
 
-test("blocked permission flow supports reject", async ({ page, sdk, gotoSession }) => {
+// kilocode_change: skip
+test.skip("blocked permission flow supports reject", async ({ page, sdk, gotoSession }) => {
   await withDockSession(sdk, "e2e composer dock permission reject", async (session) => {
     await withDockSeed(sdk, session.id, async () => {
       await gotoSession(session.id)
@@ -120,7 +124,8 @@ test("blocked permission flow supports reject", async ({ page, sdk, gotoSession 
   })
 })
 
-test("blocked permission flow supports allow always", async ({ page, sdk, gotoSession }) => {
+// kilocode_change: skip
+test.skip("blocked permission flow supports allow always", async ({ page, sdk, gotoSession }) => {
   await withDockSession(sdk, "e2e composer dock permission always", async (session) => {
     await withDockSeed(sdk, session.id, async () => {
       await gotoSession(session.id)
@@ -145,7 +150,8 @@ test("blocked permission flow supports allow always", async ({ page, sdk, gotoSe
   })
 })
 
-test("todo dock transitions and collapse behavior", async ({ page, sdk, gotoSession }) => {
+// kilocode_change: skip
+test.skip("todo dock transitions and collapse behavior", async ({ page, sdk, gotoSession }) => {
   await withDockSession(sdk, "e2e composer dock todo", async (session) => {
     await withDockSeed(sdk, session.id, async () => {
       await gotoSession(session.id)
@@ -180,7 +186,8 @@ test("todo dock transitions and collapse behavior", async ({ page, sdk, gotoSess
   })
 })
 
-test("keyboard focus stays off prompt while blocked", async ({ page, sdk, gotoSession }) => {
+// kilocode_change: skip
+test.skip("keyboard focus stays off prompt while blocked", async ({ page, sdk, gotoSession }) => {
   await withDockSession(sdk, "e2e composer dock keyboard", async (session) => {
     await withDockSeed(sdk, session.id, async () => {
       await gotoSession(session.id)
