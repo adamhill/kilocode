@@ -10,13 +10,8 @@ import { fetchProfile, fetchBalance } from "../api/profile.js"
 import { fetchKilocodeNotifications, KilocodeNotificationSchema } from "../api/notifications.js"
 import { KILO_API_BASE, HEADER_FEATURE } from "../api/constants.js" // kilocode_change - added HEADER_FEATURE
 import { buildKiloHeaders } from "../headers.js" // kilocode_change
-import {
-  fetchCloudSession,
-  fetchCloudSessionForImport,
-  importSessionToDb,
-  ImportDeps,
-  DrizzleDb,
-} from "../cloud-sessions.js" // kilocode_change
+import type { ImportDeps, DrizzleDb } from "../cloud-sessions.js" // kilocode_change
+import { fetchCloudSession, fetchCloudSessionForImport, importSessionToDb } from "../cloud-sessions.js" // kilocode_change
 
 // Type definitions for OpenCode dependencies (injected at runtime)
 type Hono = any
