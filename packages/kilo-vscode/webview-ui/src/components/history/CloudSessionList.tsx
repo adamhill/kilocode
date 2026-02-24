@@ -19,10 +19,12 @@ function dateGroupKey(iso: string): (typeof DATE_GROUP_KEYS)[number] {
   const now = new Date()
   const then = new Date(iso)
 
+  const DAY_MS = 24 * 60 * 60 * 1000
+
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
-  const yesterday = new Date(today.getTime() - 86400000)
-  const weekAgo = new Date(today.getTime() - 7 * 86400000)
-  const monthAgo = new Date(today.getTime() - 30 * 86400000)
+  const yesterday = new Date(today.getTime() - DAY_MS)
+  const weekAgo = new Date(today.getTime() - 7 * DAY_MS)
+  const monthAgo = new Date(today.getTime() - 30 * DAY_MS)
 
   if (then >= today) return DATE_GROUP_KEYS[0]
   if (then >= yesterday) return DATE_GROUP_KEYS[1]
