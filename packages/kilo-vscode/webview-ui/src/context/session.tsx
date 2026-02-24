@@ -714,11 +714,29 @@ export const SessionProvider: ParentComponent = (props) => {
       setCurrentSessionID(session.id)
 
       // Clean up synthetic cloud: entries from sessions/messages stores.
-      // NOTE: Do NOT delete cloud parts here — the carried-over messages still
-      // reference cloud message IDs. Deleting their parts causes every <Message>
-      // to render empty (parts().length === 0), creating a visible flash where
-      // only the WorkingIndicator spinner is shown until loadMessages completes.
-      // Stale cloud parts are harmlessly overwritten once messagesLoaded arrives.
+      //
+      // Why we do NOT delete cloud parts here:
+      //
+      // During preview, parts are stored keyed by the original cloud message IDs
+      // (e.g. store.parts["<cloud-msg-id>"] = [...]). When the import completes
+      // we carry cloudMessages into the new local session (above) so the UI
+      // renders immediately without a loading flash. Those carried-over message
+      // objects still hold their original cloud IDs, so every <Message> component
+      // calls getParts("<cloud-msg-id>") — which means the parts must remain in
+      // the store for now.
+      //
+      // If we deleted them here, every message would temporarily render with no
+      // parts (parts().length === 0), showing only the WorkingIndicator spinner
+      // until the real data arrives.
+      //
+      // Instead, right after this batch we dispatch a "loadMessages" request
+      // (below). When the extension responds with the "messagesLoaded" event,
+      // handleMessagesLoaded() replaces the messages array with server-assigned
+      // IDs and writes new parts keyed by those IDs. The old cloud-keyed part
+      // entries become orphans — no message in the store references them anymore.
+      // They remain in store.parts until the webview reloads or the store is
+      // reset, which is a bounded, one-session-worth amount of data that does
+      // not accumulate over time.
       setStore(
         "sessions",
         produce((sessions) => {
