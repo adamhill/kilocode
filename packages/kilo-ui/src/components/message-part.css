@@ -20,6 +20,10 @@
     overflow: hidden;
   }
 
+  [data-slot="message-part-title-filename"] {
+    margin-right: 8px;
+  }
+
   [data-slot="message-part-title-text"] {
     flex-shrink: 0;
   }
