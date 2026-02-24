@@ -1133,15 +1133,6 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
     // Step 2: Send the user's message on the new local session
     const parts: Array<{ type: "text"; text: string } | { type: "file"; mime: string; url: string }> = []
 
-    const editor = vscode.window.activeTextEditor
-    if (editor && editor.document.uri.scheme === "file") {
-      const url = editor.document.uri.toString()
-      const already = files?.some((f) => f.url === url)
-      if (!already) {
-        parts.push({ type: "file", mime: "text/plain", url })
-      }
-    }
-
     if (files) {
       for (const f of files) {
         parts.push({ type: "file", mime: f.mime, url: f.url })
