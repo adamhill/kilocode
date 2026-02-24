@@ -83,6 +83,15 @@ Extend Kilo Auto into four tiers.
 
 **What it does**: Automatically selects the right small model for lightweight tasks. When credits are available, it uses a fast paid small model (Haiku, GPT Nano, etc.). When no credits are available, it falls back to a capable free small model. Since we can use a free model for this, we can support it for all users and providers.
 
+**Model options for Auto: Small**:
+
+| Model | Cost | Capability | Notes |
+| ----- | ---- | ---------- | ----- |
+| gpt-oss-20b | ~50% cheaper than GPT-5 Nano | Lower — suitable for simple background tasks like titles and summaries | Open-weight, cost-optimized option for high-volume lightweight tasks |
+| GPT-5 Nano | Higher than gpt-oss-20b | Higher — better instruction following and output quality | Preferred when credits are available and task quality matters |
+
+Auto: Small should prefer **gpt-oss-20b** when minimizing cost (e.g., free users, high-volume background tasks) and **GPT-5 Nano** when credits are available and higher output quality is desired.
+
 **Why it matters**: Users never think about background tasks, and they shouldn't have to. Auto: Small ensures these tasks always work, always feel fast, and never waste credits on an expensive model when a cheap one will do.
 
 ## User experience
