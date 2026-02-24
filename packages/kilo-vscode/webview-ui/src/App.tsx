@@ -145,6 +145,11 @@ const AppContent: Component = () => {
         console.log("[Kilo New] App: 🧭 navigate:", message.view)
         setCurrentView(message.view as ViewType)
       }
+      if (message?.type === "openCloudSession" && message.sessionId) {
+        console.log("[Kilo New] App: ☁️ openCloudSession:", message.sessionId)
+        session.selectCloudSession(message.sessionId)
+        setCurrentView("newTask")
+      }
     }
     window.addEventListener("message", handler)
     onCleanup(() => window.removeEventListener("message", handler))
