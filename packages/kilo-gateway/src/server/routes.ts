@@ -10,6 +10,7 @@ import { fetchProfile, fetchBalance } from "../api/profile.js"
 import { fetchKilocodeNotifications, KilocodeNotificationSchema } from "../api/notifications.js"
 import { KILO_API_BASE, HEADER_FEATURE } from "../api/constants.js" // kilocode_change - added HEADER_FEATURE
 import { buildKiloHeaders } from "../headers.js" // kilocode_change
+import { fetchCloudSession, fetchCloudSessionForImport, importSessionToDb } from "../cloud-sessions.js" // kilocode_change
 
 // Type definitions for OpenCode dependencies (injected at runtime)
 type Hono = any
@@ -347,21 +348,9 @@ export function createKiloRoutes(deps: KiloRoutesDeps) {
           if (!token) return c.json({ error: "No valid token found" }, 401)
 
           const { id } = c.req.valid("param")
-          const base = process.env.KILO_SESSION_INGEST_URL ?? "https://ingest.kilosessions.ai"
-          const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)
-          const url = isUuid ? `${base}/session/${id}` : `${base}/api/session/${id}/export`
-          const response = await fetch(url, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              ...buildKiloHeaders(),
-            },
-          })
-
-          if (response.status === 404) return c.json({ error: "Session not found" }, 404)
-          if (!response.ok) return c.json({ error: "Failed to fetch session" }, response.status)
-
-          const data = await response.json()
-          return c.json(data)
+          const result = await fetchCloudSession(token, id)
+          if (!result.ok) return c.json({ error: result.error }, result.status)
+          return c.json(result.data)
         } catch (err: any) {
           console.error("[Kilo Gateway] cloud/session/get: unhandled error", err?.message ?? err)
           return c.json({ error: "Internal error" }, 500)
@@ -401,94 +390,22 @@ export function createKiloRoutes(deps: KiloRoutesDeps) {
           const token = auth.type === "api" ? auth.key : auth.type === "oauth" ? auth.access : undefined
           if (!token) return c.json({ error: "No valid token found" }, 401)
 
-          const base = process.env.KILO_SESSION_INGEST_URL ?? "https://ingest.kilosessions.ai"
-          const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(sessionId)
-          const exportUrl = isUuid ? `${base}/session/${sessionId}` : `${base}/api/session/${sessionId}/export`
-          const response = await fetch(exportUrl, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              ...buildKiloHeaders(),
-            },
-          })
+          const fetched = await fetchCloudSessionForImport(token, sessionId)
+          if (!fetched.ok) return c.json({ error: fetched.error }, fetched.status as any)
 
-          if (response.status === 404) return c.json({ error: "Session not found in cloud" }, 404)
-          if (!response.ok) {
-            const text = await response.text()
-            console.error("[Kilo Gateway] cloud/session/import: export failed", {
-              status: response.status,
-              body: text.slice(0, 500),
-            })
-            return c.json({ error: `Import failed: ${response.status}` }, response.status as any)
-          }
-
-          const data = (await response.json()) as any
+          const data = fetched.data
           if (!data?.info?.id) return c.json({ error: "Invalid export data" }, 400)
 
-          const localSessionID = Identifier.descending("session")
-          const msgMap = new Map<string, string>()
-          const projectID = Instance.project.id
-
-          const now = Date.now()
-          const time = {
-            created: data.info.time?.created ?? now,
-            updated: now,
-            ...(data.info.time?.compacting !== undefined && { compacting: data.info.time.compacting }),
-            ...(data.info.time?.archived !== undefined && { archived: data.info.time.archived }),
-          }
-
-          const info = {
-            ...data.info,
-            id: localSessionID,
-            projectID,
-            slug: data.info.slug,
-            directory: Instance.directory,
-            version: data.info.version,
-            time,
-          }
-
-          Database.transaction((db) => {
-            db.insert(SessionTable)
-              .values(SessionToRow(info as Record<string, unknown>))
-              .onConflictDoNothing()
-              .run()
-
-            const messages = Array.isArray(data.messages) ? data.messages : []
-            for (const msg of messages.filter((m: any) => m.info)) {
-              const msgID = Identifier.ascending("message")
-              msgMap.set(msg.info.id, msgID)
-              msg.info.id = msgID
-              msg.info.sessionID = localSessionID
-              if (msg.info.parentID) msg.info.parentID = msgMap.get(msg.info.parentID) ?? msg.info.parentID
-
-              db.insert(MessageTable)
-                .values({
-                  id: msgID,
-                  session_id: localSessionID,
-                  time_created: msg.info.time?.created ?? Date.now(),
-                  data: msg.info,
-                })
-                .onConflictDoNothing()
-                .run()
-
-              for (const part of msg.parts ?? []) {
-                const partID = Identifier.ascending("part")
-                part.id = partID
-                part.messageID = msgID
-                part.sessionID = localSessionID
-
-                db.insert(PartTable)
-                  .values({
-                    id: partID,
-                    message_id: msgID,
-                    session_id: localSessionID,
-                    data: part,
-                  })
-                  .onConflictDoNothing()
-                  .run()
-              }
-            }
-
-            Database.effect(() => Bus.publish(SessionCreatedEvent, { info }))
+          const info = importSessionToDb(data, {
+            Database,
+            Instance,
+            SessionTable,
+            MessageTable,
+            PartTable,
+            SessionToRow,
+            Bus,
+            SessionCreatedEvent,
+            Identifier,
           })
 
           return c.json(info)
