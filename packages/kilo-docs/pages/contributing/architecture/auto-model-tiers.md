@@ -23,7 +23,7 @@ Today, Kilo Auto handles this for users with a willingness to pay for frontier m
 
 1. **Free users** — They see a list of free models that changes on promotional periods and shifting models. Which one is the best? Which is good for a particular task? They have no way to know without trial and error.
 
-2. **Cost-conscious users** — They want something better than free but cheaper than frontier. Open-weight models like Kimi K2.5 and Deepseek are useful and significantly cheaper, but which one? Which version? The answer changes every few weeks.
+2. **Cost-conscious users** — They want something better than free but cheaper than frontier. Open-weight models like Kimi K2.5 and DeepSeek are useful and significantly cheaper, but which one? Which version? The answer changes every few weeks.
 
 3. **Background tasks** — Kilo uses small models for things like generating session titles and commit messages. Today this is hardcoded to a specific model. If a user runs out of credits, these background tasks fall back to the current large model. This can cause Kilo unnecessary costs and slow responsiveness for the user.
 
@@ -57,7 +57,7 @@ Extend Kilo Auto into four tiers.
 
 **What it does**: Automatically maps to the best available free model(s) for each mode. As free model availability changes due to promotional periods, the mapping updates transparently. Users always get the best free option without having to track which models are currently available.
 
-**Why it matters**: This removes a potentially intimidating choice for free users, and sets them up for a good experience. "Auto: Free" is selected by default (or it's selected for them by default when unauthenticated) and start coding immediately. When a free model promotion ends, they don't get a prompt to pick a new model — the routing silently falls back to the next best option.
+**Why it matters**: This removes a potentially intimidating choice for free users, and sets them up for a good experience. "Auto: Free" is selected by default (or it's selected for them by default when unauthenticated) and they start coding immediately. When a free model promotion ends, they don't get a prompt to pick a new model — the routing silently falls back to the next best option.
 
 **Pricing**: Free. No credits required.
 
