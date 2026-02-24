@@ -111,6 +111,16 @@ export namespace PlanFollowup {
   export const ANSWER_NEW_SESSION = "Start new session"
   export const ANSWER_CONTINUE = "Continue here"
 
+  async function resolvePlan(input: { assistant: MessageV2.WithParts; sessionID: string }) {
+    const text = toText(input.assistant)
+    if (text) return text
+
+    const session = await Session.get(input.sessionID)
+    const file = Bun.file(Session.plan(session))
+    const plan = await file.text().catch(() => "")
+    return plan.trim()
+  }
+
   async function inject(input: {
     sessionID: string
     agent: string
@@ -231,7 +241,7 @@ export namespace PlanFollowup {
     const assistant = latest.find((msg) => msg.info.role === "assistant")
     if (!assistant) return "break"
 
-    const plan = toText(assistant)
+    const plan = await resolvePlan({ assistant, sessionID: input.sessionID })
     if (!plan) return "break"
 
     const user = latest.find((msg) => msg.info.role === "user")?.info

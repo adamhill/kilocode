@@ -211,10 +211,8 @@ export function Session() {
     if (part.state.status !== "completed") return
     if (part.id === lastSwitch) return
 
-    if (part.tool === "plan_exit") {
-      local.agent.set("build")
-      lastSwitch = part.id
-    } else if (part.tool === "plan_enter") {
+    // kilocode_change - plan_exit no longer switches agent; PlanFollowup handles it
+    if (part.tool === "plan_enter") {
       local.agent.set("plan")
       lastSwitch = part.id
     }

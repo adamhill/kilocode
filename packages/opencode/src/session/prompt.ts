@@ -61,6 +61,18 @@ IMPORTANT:
 const STRUCTURED_OUTPUT_SYSTEM_PROMPT = `IMPORTANT: The user has requested structured output. You MUST use the StructuredOutput tool to provide your final response. Do NOT respond with plain text - you MUST call the StructuredOutput tool with your answer formatted according to the schema.`
 
 export namespace SessionPrompt {
+  // kilocode_change start - share follow-up trigger logic with tests
+  export function shouldAskPlanFollowup(input: {
+    assistant: MessageV2.WithParts | undefined
+    abort: AbortSignal
+  }) {
+    if (input.abort.aborted) return false
+    if (!input.assistant) return false
+    if (!["cli", "vscode"].includes(Flag.KILO_CLIENT)) return false
+    return input.assistant.parts.some((p) => p.type === "tool" && p.tool === "plan_exit" && p.state.status === "completed")
+  }
+  // kilocode_change end
+
   const log = Log.create({ service: "session.prompt" })
 
   const state = Instance.state(
@@ -325,12 +337,16 @@ export namespace SessionPrompt {
 
       let lastUser: MessageV2.User | undefined
       let lastAssistant: MessageV2.Assistant | undefined
+      let lastAssistantMsg: MessageV2.WithParts | undefined // kilocode_change - capture full msg for plan_exit detection
       let lastFinished: MessageV2.Assistant | undefined
       let tasks: (MessageV2.CompactionPart | MessageV2.SubtaskPart)[] = []
       for (let i = msgs.length - 1; i >= 0; i--) {
         const msg = msgs[i]
         if (!lastUser && msg.info.role === "user") lastUser = msg.info as MessageV2.User
-        if (!lastAssistant && msg.info.role === "assistant") lastAssistant = msg.info as MessageV2.Assistant
+        if (!lastAssistant && msg.info.role === "assistant") {
+          lastAssistant = msg.info as MessageV2.Assistant
+          lastAssistantMsg = msg // kilocode_change
+        }
         if (!lastFinished && msg.info.role === "assistant" && msg.info.finish)
           lastFinished = msg.info as MessageV2.Assistant
         if (lastUser && lastFinished) break
@@ -346,8 +362,8 @@ export namespace SessionPrompt {
         !["tool-calls", "unknown"].includes(lastAssistant.finish) &&
         lastUser.id < lastAssistant.id
       ) {
-        // kilocode_change start - ask follow-up after plan agent completes
-        if (lastUser.agent === "plan" && !abort.aborted && ["cli", "vscode"].includes(Flag.KILO_CLIENT)) {
+        // kilocode_change start - ask follow-up when plan_exit tool was called
+        if (shouldAskPlanFollowup({ assistant: lastAssistantMsg, abort })) {
           const action = await PlanFollowup.ask({ sessionID, messages: msgs, abort })
           if (action === "continue") continue
         }
@@ -676,7 +692,10 @@ export namespace SessionPrompt {
       await Plugin.trigger("experimental.chat.messages.transform", {}, { messages: sessionMessages })
 
       // Build system prompt, adding structured output instruction if needed
-      const system = [...(await SystemPrompt.environment(model, lastUser.editorContext)), ...(await InstructionPrompt.system())] // kilocode_change
+      const system = [
+        ...(await SystemPrompt.environment(model, lastUser.editorContext)),
+        ...(await InstructionPrompt.system()),
+      ] // kilocode_change
       const format = lastUser.format ?? { type: "text" }
       if (format.type === "json_schema") {
         system.push(STRUCTURED_OUTPUT_SYSTEM_PROMPT)
