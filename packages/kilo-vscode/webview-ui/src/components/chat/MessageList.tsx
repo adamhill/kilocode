@@ -1,6 +1,8 @@
 /**
  * MessageList component
- * Scrollable list of messages with auto-scroll behavior.
+ * Scrollable turn-based message list.
+ * Each user message is rendered as a SessionTurn which handles its assistant replies,
+ * thinking shimmer, tool calls, and diff summary internally.
  * Shows recent sessions in the empty state for quick resumption.
  */
 
@@ -8,52 +10,12 @@ import { Component, For, Show, createSignal, createEffect, createMemo, onCleanup
 import { Spinner } from "@kilocode/kilo-ui/spinner"
 import { Button } from "@kilocode/kilo-ui/button"
 import { useDialog } from "@kilocode/kilo-ui/context/dialog"
+import { SessionTurn } from "@kilocode/kilo-ui/session-turn"
 import { useSession } from "../../context/session"
 import { useServer } from "../../context/server"
 import { useLanguage } from "../../context/language"
 import { formatRelativeDate } from "../../utils/date"
-import { Message } from "./Message"
 import { CloudImportDialog } from "./CloudImportDialog"
-
-/** Inline working/retry indicator shown below messages while the agent is active. */
-const WorkingIndicator: Component = () => {
-  const session = useSession()
-  const language = useLanguage()
-  const [elapsed, setElapsed] = createSignal(0)
-
-  // Tick every second while busy
-  createEffect(() => {
-    const start = session.busySince()
-    if (!start) {
-      setElapsed(0)
-      return
-    }
-    setElapsed(Math.floor((Date.now() - start) / 1000))
-    const timer = setInterval(() => {
-      setElapsed(Math.floor((Date.now() - start) / 1000))
-    }, 1000)
-    onCleanup(() => clearInterval(timer))
-  })
-
-  const info = () => session.statusInfo()
-  const text = () => {
-    const i = info()
-    if (i.type === "retry") return language.t("session.status.retrying", { attempt: i.attempt, message: i.message })
-    return session.statusText() ?? language.t("session.status.working")
-  }
-
-  return (
-    <Show when={info().type !== "idle"}>
-      <div class="working-indicator" role="status">
-        <Spinner />
-        <span class="working-text">{text()}</span>
-        <Show when={elapsed() > 0}>
-          <span class="working-elapsed">{elapsed()}s</span>
-        </Show>
-      </div>
-    </Show>
-  )
-}
 
 const KiloLogo = (): JSX.Element => {
   const iconsBaseUri = (window as { ICONS_BASE_URI?: string }).ICONS_BASE_URI || ""
@@ -82,17 +44,15 @@ export const MessageList: Component<MessageListProps> = (props) => {
   const [isAtBottom, setIsAtBottom] = createSignal(true)
   const [showScrollButton, setShowScrollButton] = createSignal(false)
 
-  // Check if scrolled to bottom
   const checkScrollPosition = () => {
     if (!containerRef) return
 
-    const threshold = 50 // pixels from bottom
+    const threshold = 50
     const atBottom = containerRef.scrollHeight - containerRef.scrollTop - containerRef.clientHeight < threshold
     setIsAtBottom(atBottom)
     setShowScrollButton(!atBottom)
   }
 
-  // Scroll to bottom
   const scrollToBottom = () => {
     if (!containerRef) return
     containerRef.scrollTo({
@@ -101,9 +61,8 @@ export const MessageList: Component<MessageListProps> = (props) => {
     })
   }
 
-  // Auto-scroll when new messages arrive (if already at bottom)
   createEffect(() => {
-    const msgs = session.messages()
+    const msgs = session.userMessages()
     if (msgs.length > 0 && isAtBottom()) {
       requestAnimationFrame(() => {
         if (containerRef) {
@@ -113,22 +72,6 @@ export const MessageList: Component<MessageListProps> = (props) => {
     }
   })
 
-  // Auto-scroll when parts of the last message update (Phase 2)
-  createEffect(() => {
-    const msgs = session.messages()
-    const last = msgs[msgs.length - 1]
-    if (!last) return
-    const parts = session.getParts(last.id)
-    if (parts.length > 0 && isAtBottom()) {
-      requestAnimationFrame(() => {
-        if (containerRef) {
-          containerRef.scrollTop = containerRef.scrollHeight
-        }
-      })
-    }
-  })
-
-  // Set up scroll listener
   createEffect(() => {
     if (!containerRef) return
 
@@ -138,9 +81,6 @@ export const MessageList: Component<MessageListProps> = (props) => {
     })
   })
 
-  // Load sessions once connected so the recent list is available immediately.
-  // Uses createEffect instead of onMount so it retries when connection state changes.
-  // The flag prevents redundant loads (e.g. after deleting all sessions).
   let loaded = false
   createEffect(() => {
     if (!loaded && server.isConnected() && session.sessions().length === 0) {
@@ -149,15 +89,16 @@ export const MessageList: Component<MessageListProps> = (props) => {
     }
   })
 
-  const messages = () => session.messages()
-  const isEmpty = () => messages().length === 0 && !session.loading()
+  const userMessages = () => session.userMessages()
+  const isEmpty = () => userMessages().length === 0 && !session.loading()
 
-  // 3 most recently active sessions
   const recent = createMemo(() =>
     [...session.sessions()]
       .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
       .slice(0, 3),
   )
+
+  const lastUserMessageID = createMemo(() => userMessages().at(-1)?.id)
 
   return (
     <div class="message-list-container">
@@ -203,8 +144,20 @@ export const MessageList: Component<MessageListProps> = (props) => {
           </div>
         </Show>
         <Show when={!session.loading()}>
-          <For each={messages()}>{(message) => <Message message={message} />}</For>
-          <WorkingIndicator />
+          <For each={userMessages()}>
+            {(msg) => (
+              <SessionTurn
+                sessionID={session.currentSessionID() ?? ""}
+                messageID={msg.id}
+                lastUserMessageID={lastUserMessageID()}
+                classes={{
+                  root: "session-turn-root",
+                  content: "session-turn-content",
+                  container: "session-turn-container",
+                }}
+              />
+            )}
+          </For>
         </Show>
       </div>
 
