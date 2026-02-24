@@ -1151,11 +1151,14 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
     parts.push({ type: "text", text })
 
     try {
+      const editorContext = await this.gatherEditorContext()
+
       await this.httpClient.sendMessage(session.id, parts, workspaceDir, {
         providerID,
         modelID,
         agent,
         variant,
+        editorContext,
       })
     } catch (err) {
       console.error("[Kilo New] Failed to send message after cloud import:", err)
