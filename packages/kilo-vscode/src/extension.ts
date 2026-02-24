@@ -111,12 +111,12 @@ export function activate(context: vscode.ExtensionContext) {
   // Register URI handler for session imports (vscode://kilocode.kilo-code/s/{sessionId})
   context.subscriptions.push(
     vscode.window.registerUriHandler({
-      handleUri(uri: vscode.Uri) {
+      async handleUri(uri: vscode.Uri) {
         const match = uri.path.match(/^\/s\/(.+)$/)
         if (!match) return
         const sessionId = match[1]
         console.log("[Kilo New] URI handler: opening cloud session:", sessionId)
-        vscode.commands.executeCommand(`${KiloProvider.viewType}.focus`)
+        await vscode.commands.executeCommand(`${KiloProvider.viewType}.focus`)
         provider.openCloudSession(sessionId)
       },
     }),
