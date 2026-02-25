@@ -62,14 +62,15 @@ const STRUCTURED_OUTPUT_SYSTEM_PROMPT = `IMPORTANT: The user has requested struc
 
 export namespace SessionPrompt {
   // kilocode_change start - share follow-up trigger logic with tests
-  export function shouldAskPlanFollowup(input: {
-    assistant: MessageV2.WithParts | undefined
-    abort: AbortSignal
-  }) {
+  export function shouldAskPlanFollowup(input: { messages: MessageV2.WithParts[]; abort: AbortSignal }) {
     if (input.abort.aborted) return false
-    if (!input.assistant) return false
     if (!["cli", "vscode"].includes(Flag.KILO_CLIENT)) return false
-    return input.assistant.parts.some((p) => p.type === "tool" && p.tool === "plan_exit" && p.state.status === "completed")
+    const lastUserIdx = input.messages.findLastIndex((m) => m.info.role === "user")
+    return input.messages
+      .slice(lastUserIdx + 1)
+      .some((msg) =>
+        msg.parts.some((p) => p.type === "tool" && p.tool === "plan_exit" && p.state.status === "completed"),
+      )
   }
   // kilocode_change end
 
@@ -337,16 +338,12 @@ export namespace SessionPrompt {
 
       let lastUser: MessageV2.User | undefined
       let lastAssistant: MessageV2.Assistant | undefined
-      let lastAssistantMsg: MessageV2.WithParts | undefined // kilocode_change - capture full msg for plan_exit detection
       let lastFinished: MessageV2.Assistant | undefined
       let tasks: (MessageV2.CompactionPart | MessageV2.SubtaskPart)[] = []
       for (let i = msgs.length - 1; i >= 0; i--) {
         const msg = msgs[i]
         if (!lastUser && msg.info.role === "user") lastUser = msg.info as MessageV2.User
-        if (!lastAssistant && msg.info.role === "assistant") {
-          lastAssistant = msg.info as MessageV2.Assistant
-          lastAssistantMsg = msg // kilocode_change
-        }
+        if (!lastAssistant && msg.info.role === "assistant") lastAssistant = msg.info as MessageV2.Assistant
         if (!lastFinished && msg.info.role === "assistant" && msg.info.finish)
           lastFinished = msg.info as MessageV2.Assistant
         if (lastUser && lastFinished) break
@@ -363,7 +360,7 @@ export namespace SessionPrompt {
         lastUser.id < lastAssistant.id
       ) {
         // kilocode_change start - ask follow-up when plan_exit tool was called
-        if (shouldAskPlanFollowup({ assistant: lastAssistantMsg, abort })) {
+        if (shouldAskPlanFollowup({ messages: msgs, abort })) {
           const action = await PlanFollowup.ask({ sessionID, messages: msgs, abort })
           if (action === "continue") continue
         }

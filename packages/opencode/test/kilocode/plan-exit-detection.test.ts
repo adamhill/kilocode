@@ -126,11 +126,7 @@ describe("plan_exit detection", () => {
           },
         ],
       })
-      const assistant = seeded.messages
-        .slice()
-        .reverse()
-        .find((msg) => msg.info.role === "assistant")
-      expect(SessionPrompt.shouldAskPlanFollowup({ assistant, abort: AbortSignal.any([]) })).toBe(true)
+      expect(SessionPrompt.shouldAskPlanFollowup({ messages: seeded.messages, abort: AbortSignal.any([]) })).toBe(true)
 
       const pending = PlanFollowup.ask({
         sessionID: seeded.sessionID,
@@ -190,11 +186,7 @@ describe("plan_exit detection", () => {
       const seeded = await seed({
         text: "Here is a partial plan, I have questions",
       })
-      const assistant = seeded.messages
-        .slice()
-        .reverse()
-        .find((msg) => msg.info.role === "assistant")
-      expect(SessionPrompt.shouldAskPlanFollowup({ assistant, abort: AbortSignal.any([]) })).toBe(false)
+      expect(SessionPrompt.shouldAskPlanFollowup({ messages: seeded.messages, abort: AbortSignal.any([]) })).toBe(false)
       const list = await Question.list()
       expect(list).toHaveLength(0)
     }))
@@ -271,15 +263,95 @@ describe("plan_exit detection", () => {
       expect(toolPart!.type === "tool" && toolPart!.state.status).toBe("error")
 
       // Use the shared predicate — errored plan_exit should not trigger
-      const assistantMsg = messages
-        .slice()
-        .reverse()
-        .find((msg) => msg.info.role === "assistant")
-      expect(SessionPrompt.shouldAskPlanFollowup({ assistant: assistantMsg, abort: AbortSignal.any([]) })).toBe(false)
+      expect(SessionPrompt.shouldAskPlanFollowup({ messages, abort: AbortSignal.any([]) })).toBe(false)
 
       // Confirm no questions were posted
       const list = await Question.list()
       expect(list).toHaveLength(0)
+    }))
+
+  test("plan_exit on earlier assistant message triggers when later message has text only", () =>
+    withInstance(async () => {
+      const session = await Session.create({})
+      // Use explicit timestamps to ensure deterministic message ordering
+      const now = Date.now()
+      const user = await Session.updateMessage({
+        id: Identifier.ascending("message"),
+        role: "user",
+        sessionID: session.id,
+        time: { created: now },
+        agent: "plan",
+        model,
+      })
+      await Session.updatePart({
+        id: Identifier.ascending("part"),
+        messageID: user.id,
+        sessionID: session.id,
+        type: "text",
+        text: "Create a plan",
+      })
+
+      // First assistant message: has plan_exit tool, finish = tool-calls
+      const assistant1: MessageV2.Assistant = {
+        id: Identifier.ascending("message"),
+        role: "assistant",
+        sessionID: session.id,
+        time: { created: now + 1 },
+        parentID: user.id,
+        modelID: model.modelID,
+        providerID: model.providerID,
+        mode: "plan",
+        agent: "plan",
+        path: { cwd: Instance.directory, root: Instance.worktree },
+        cost: 0,
+        tokens: { total: 0, input: 0, output: 0, reasoning: 0, cache: { read: 0, write: 0 } },
+        finish: "tool-calls",
+      }
+      await Session.updateMessage(assistant1)
+      await Session.updatePart({
+        id: Identifier.ascending("part"),
+        messageID: assistant1.id,
+        sessionID: session.id,
+        type: "tool",
+        callID: Identifier.ascending("tool"),
+        tool: "plan_exit",
+        state: {
+          status: "completed",
+          input: {},
+          output: "Plan is ready. Ending planning turn.",
+          title: "plan_exit",
+          metadata: {},
+          time: { start: now + 1, end: now + 1 },
+        },
+      } satisfies MessageV2.ToolPart)
+
+      // Second assistant message: text only, finish = end_turn (this is what lastAssistantMsg would point to)
+      const assistant2: MessageV2.Assistant = {
+        id: Identifier.ascending("message"),
+        role: "assistant",
+        sessionID: session.id,
+        time: { created: now + 2 },
+        parentID: user.id,
+        modelID: model.modelID,
+        providerID: model.providerID,
+        mode: "plan",
+        agent: "plan",
+        path: { cwd: Instance.directory, root: Instance.worktree },
+        cost: 0,
+        tokens: { total: 0, input: 0, output: 0, reasoning: 0, cache: { read: 0, write: 0 } },
+        finish: "end_turn",
+      }
+      await Session.updateMessage(assistant2)
+      await Session.updatePart({
+        id: Identifier.ascending("part"),
+        messageID: assistant2.id,
+        sessionID: session.id,
+        type: "text",
+        text: "The plan is complete. I've called plan_exit.",
+      })
+
+      const messages = await Session.messages({ sessionID: session.id })
+      expect(SessionPrompt.shouldAskPlanFollowup({ messages, abort: AbortSignal.any([]) })).toBe(true)
     }))
 
   test("PlanFollowup.ask falls back to plan file for tool-only plan_exit turns", () =>
@@ -308,6 +380,109 @@ describe("plan_exit detection", () => {
       const question = await waitQuestion(seeded.sessionID)
       expect(question).toBeDefined()
       if (!question) return
+      await Question.reply({
+        requestID: question.id,
+        answers: [[PlanFollowup.ANSWER_CONTINUE]],
+      })
+      await expect(pending).resolves.toBe("continue")
+    }))
+
+  test("PlanFollowup.ask shows prompt when plan text is on earlier assistant and last assistant is empty", () =>
+    withInstance(async () => {
+      const session = await Session.create({})
+      // Use explicit timestamps to ensure deterministic message ordering
+      const now = Date.now()
+      const user = await Session.updateMessage({
+        id: Identifier.ascending("message"),
+        role: "user",
+        sessionID: session.id,
+        time: { created: now },
+        agent: "plan",
+        model,
+      })
+      await Session.updatePart({
+        id: Identifier.ascending("part"),
+        messageID: user.id,
+        sessionID: session.id,
+        type: "text",
+        text: "Create a plan",
+      })
+
+      // First assistant message: has plan text + plan_exit tool
+      const assistant1: MessageV2.Assistant = {
+        id: Identifier.ascending("message"),
+        role: "assistant",
+        sessionID: session.id,
+        time: { created: now + 1 },
+        parentID: user.id,
+        modelID: model.modelID,
+        providerID: model.providerID,
+        mode: "plan",
+        agent: "plan",
+        path: { cwd: Instance.directory, root: Instance.worktree },
+        cost: 0,
+        tokens: { total: 0, input: 0, output: 0, reasoning: 0, cache: { read: 0, write: 0 } },
+        finish: "tool-calls",
+      }
+      await Session.updateMessage(assistant1)
+      await Session.updatePart({
+        id: Identifier.ascending("part"),
+        messageID: assistant1.id,
+        sessionID: session.id,
+        type: "text",
+        text: "Here is the detailed plan:\n\n## Step 1\nDo something\n\n## Step 2\nDo something else",
+      })
+      await Session.updatePart({
+        id: Identifier.ascending("part"),
+        messageID: assistant1.id,
+        sessionID: session.id,
+        type: "tool",
+        callID: Identifier.ascending("tool"),
+        tool: "plan_exit",
+        state: {
+          status: "completed",
+          input: {},
+          output: "Plan is ready. Ending planning turn.",
+          title: "plan_exit",
+          metadata: {},
+          time: { start: now + 1, end: now + 1 },
+        },
+      } satisfies MessageV2.ToolPart)
+
+      // Second assistant message: empty (LLM follow-up after tool result)
+      const assistant2: MessageV2.Assistant = {
+        id: Identifier.ascending("message"),
+        role: "assistant",
+        sessionID: session.id,
+        time: { created: now + 2 },
+        parentID: user.id,
+        modelID: model.modelID,
+        providerID: model.providerID,
+        mode: "plan",
+        agent: "plan",
+        path: { cwd: Instance.directory, root: Instance.worktree },
+        cost: 0,
+        tokens: { total: 0, input: 0, output: 0, reasoning: 0, cache: { read: 0, write: 0 } },
+        finish: "end_turn",
+      }
+      await Session.updateMessage(assistant2)
+
+      const messages = await Session.messages({ sessionID: session.id })
+
+      // shouldAskPlanFollowup should detect plan_exit on the earlier message
+      expect(SessionPrompt.shouldAskPlanFollowup({ messages, abort: AbortSignal.any([]) })).toBe(true)
+
+      // PlanFollowup.ask should find plan text from the earlier assistant and show prompt
+      const pending = PlanFollowup.ask({
+        sessionID: session.id,
+        messages,
+        abort: AbortSignal.any([]),
+      })
+
+      const question = await waitQuestion(session.id)
+      expect(question).toBeDefined()
+      if (!question) return
+      expect(question.questions[0].header).toBe("Implement")
       await Question.reply({
         requestID: question.id,
         answers: [[PlanFollowup.ANSWER_CONTINUE]],
