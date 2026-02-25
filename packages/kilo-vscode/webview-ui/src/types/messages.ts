@@ -702,6 +702,30 @@ export interface AgentManagerImportResultMessage {
   message: string
 }
 
+// Shared FileDiff shape (matches Snapshot.FileDiff from CLI backend)
+export interface WorktreeFileDiff {
+  file: string
+  before: string
+  after: string
+  additions: number
+  deletions: number
+  status?: "added" | "deleted" | "modified"
+}
+
+// Agent Manager: Diff data push (extension → webview)
+export interface AgentManagerWorktreeDiffMessage {
+  type: "agentManager.worktreeDiff"
+  sessionId: string
+  diffs: WorktreeFileDiff[]
+}
+
+// Agent Manager: Diff loading state (extension → webview)
+export interface AgentManagerWorktreeDiffLoadingMessage {
+  type: "agentManager.worktreeDiffLoading"
+  sessionId: string
+  loading: boolean
+}
+
 // Request webview to send initial prompt to a newly created session (extension → webview)
 export interface AgentManagerSendInitialMessage {
   type: "agentManager.sendInitialMessage"
@@ -768,6 +792,8 @@ export type ExtensionMessage =
   | AgentManagerBranchesMessage
   | AgentManagerExternalWorktreesMessage
   | AgentManagerImportResultMessage
+  | AgentManagerWorktreeDiffMessage
+  | AgentManagerWorktreeDiffLoadingMessage
 
 // ============================================
 // Messages FROM webview TO extension
@@ -1064,6 +1090,19 @@ export interface ShowTerminalRequest {
   sessionId: string
 }
 
+/**
+ * Maximum number of parallel worktree versions for multi-version mode.
+ * Keep in sync with MAX_MULTI_VERSIONS in src/agent-manager/constants.ts.
+ */
+export const MAX_MULTI_VERSIONS = 4
+
+// Per-version model allocation for multi-model comparison mode
+export interface ModelAllocation {
+  providerID: string
+  modelID: string
+  count: number
+}
+
 // Create multiple worktree sessions for the same prompt (multi-version mode)
 export interface CreateMultiVersionRequest {
   type: "agentManager.createMultiVersion"
@@ -1075,6 +1114,10 @@ export interface CreateMultiVersionRequest {
   files?: FileAttachment[]
   baseBranch?: string
   branchName?: string
+  // Per-version model allocations for multi-model comparison mode.
+  // When set, each entry expands to `count` versions with that model.
+  // Overrides `versions`, `providerID`, and `modelID`.
+  modelAllocations?: ModelAllocation[]
 }
 
 // Persist tab order for a context (worktree ID or "local")
@@ -1117,6 +1160,24 @@ export interface ImportExternalWorktreeRequest {
 export interface ImportAllExternalWorktreesRequest {
   type: "agentManager.importAllExternalWorktrees"
 }
+
+// Agent Manager: Request one-shot diff fetch (webview → extension)
+export interface RequestWorktreeDiffMessage {
+  type: "agentManager.requestWorktreeDiff"
+  sessionId: string
+}
+
+// Agent Manager: Start polling for live diff updates (webview → extension)
+export interface StartDiffWatchMessage {
+  type: "agentManager.startDiffWatch"
+  sessionId: string
+}
+
+// Agent Manager: Stop polling for diff updates (webview → extension)
+export interface StopDiffWatchMessage {
+  type: "agentManager.stopDiffWatch"
+}
+
 // Variant persistence (webview → extension)
 export interface PersistVariantRequest {
   type: "persistVariant"
@@ -1194,6 +1255,9 @@ export type WebviewMessage =
   | ImportFromPRRequest
   | ImportExternalWorktreeRequest
   | ImportAllExternalWorktreesRequest
+  | RequestWorktreeDiffMessage
+  | StartDiffWatchMessage
+  | StopDiffWatchMessage
 
 // ============================================
 // VS Code API type

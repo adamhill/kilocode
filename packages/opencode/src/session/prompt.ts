@@ -61,6 +61,19 @@ IMPORTANT:
 const STRUCTURED_OUTPUT_SYSTEM_PROMPT = `IMPORTANT: The user has requested structured output. You MUST use the StructuredOutput tool to provide your final response. Do NOT respond with plain text - you MUST call the StructuredOutput tool with your answer formatted according to the schema.`
 
 export namespace SessionPrompt {
+  // kilocode_change start - share follow-up trigger logic with tests
+  export function shouldAskPlanFollowup(input: { messages: MessageV2.WithParts[]; abort: AbortSignal }) {
+    if (input.abort.aborted) return false
+    if (!["cli", "vscode"].includes(Flag.KILO_CLIENT)) return false
+    const lastUserIdx = input.messages.findLastIndex((m) => m.info.role === "user")
+    return input.messages
+      .slice(lastUserIdx + 1)
+      .some((msg) =>
+        msg.parts.some((p) => p.type === "tool" && p.tool === "plan_exit" && p.state.status === "completed"),
+      )
+  }
+  // kilocode_change end
+
   const log = Log.create({ service: "session.prompt" })
 
   const state = Instance.state(
@@ -346,8 +359,8 @@ export namespace SessionPrompt {
         !["tool-calls", "unknown"].includes(lastAssistant.finish) &&
         lastUser.id < lastAssistant.id
       ) {
-        // kilocode_change start - ask follow-up after plan agent completes
-        if (lastUser.agent === "plan" && !abort.aborted && ["cli", "vscode"].includes(Flag.KILO_CLIENT)) {
+        // kilocode_change start - ask follow-up when plan_exit tool was called
+        if (shouldAskPlanFollowup({ messages: msgs, abort })) {
           const action = await PlanFollowup.ask({ sessionID, messages: msgs, abort })
           if (action === "continue") continue
         }
