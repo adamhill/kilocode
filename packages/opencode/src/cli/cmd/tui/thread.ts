@@ -128,11 +128,18 @@ export const TuiThreadCommand = cmd({
         await client.call("reload", undefined)
       })
       // kilocode_change start - graceful shutdown on external signals
-      const shutdown = async () => {
-        await client.call("shutdown", undefined).catch(() => {})
-      }
-      process.on("SIGHUP", shutdown)
-      process.on("SIGTERM", shutdown)
+      // The worker's postMessage for the RPC result may never be delivered
+      // after shutdown because the worker's event loop drains. Send the
+      // shutdown request without awaiting the response, wait for the worker
+      // to exit naturally or force-terminate after a timeout.
+      const terminateWorker = () =>
+        new Promise<void>((resolve) => {
+          worker.addEventListener("close", () => resolve(), { once: true })
+          setTimeout(resolve, 5000)
+          client.call("shutdown", undefined).catch(() => {})
+        }).then(() => worker.terminate())
+      process.on("SIGHUP", terminateWorker)
+      process.on("SIGTERM", terminateWorker)
       // kilocode_change end
 
       const prompt = await iife(async () => {
@@ -178,9 +185,7 @@ export const TuiThreadCommand = cmd({
           prompt,
           fork: args.fork,
         },
-        onExit: async () => {
-          await client.call("shutdown", undefined)
-        },
+        onExit: () => terminateWorker(),
       })
 
       setTimeout(() => {
