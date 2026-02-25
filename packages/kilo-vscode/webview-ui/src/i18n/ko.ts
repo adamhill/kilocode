@@ -1013,6 +1013,10 @@ export const dict = {
   "agentManager.dialog.createWorkspace": "워크스페이스 생성",
   "agentManager.dialog.removeImage": "이미지 제거",
   "agentManager.dialog.advanced": "고급...",
+
+  "agentManager.diff.toggle": "차이점 전환",
+  "agentManager.shortcuts.toggleDiff": "차이점 패널 전환",
+
   "agentManager.import.pullRequest": "Pull Request",
   "agentManager.import.pastePrUrl": "PR URL 붙여넣기...",
   "agentManager.import.open": "열기",
