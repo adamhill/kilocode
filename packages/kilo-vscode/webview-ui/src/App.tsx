@@ -57,7 +57,6 @@ export const DataBridge: Component<{ children: any }> = (props) => {
   const data = createMemo(() => {
     const id = session.currentSessionID()
     const perms = id ? session.permissions().filter((p) => p.sessionID === id) : []
-    const qs = id ? session.questions() : []
     const allParts = session.allParts()
     return {
       session: session.sessions().map((s) => ({ ...s, id: s.id, role: "user" as const })) as unknown as any[],
@@ -72,6 +71,8 @@ export const DataBridge: Component<{ children: any }> = (props) => {
           )
         : {},
       permission: id ? { [id]: perms as unknown as any[] } : {},
+      // Questions are handled directly by QuestionDock via session.questions(),
+      // not through DataProvider. The DataProvider's question field is unused here.
       question: {},
       provider: {
         all: Object.values(prov.providers()) as unknown as any[],
@@ -100,7 +101,7 @@ export const DataBridge: Component<{ children: any }> = (props) => {
   const directory = () => {
     const dir = server.workspaceDirectory()
     if (!dir) return ""
-    return dir.endsWith("/") ? dir : dir + "/"
+    return dir.endsWith("/") || dir.endsWith("\\") ? dir : dir + "/"
   }
 
   return (

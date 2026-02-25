@@ -51,7 +51,7 @@ export const QuestionDock: Component<{ request: QuestionRequest }> = (props) => 
 
   const summary = createMemo(() => {
     const n = Math.min(store.tab + 1, total())
-    return `${n} of ${total()} questions`
+    return language.t("question.summary", { n, total: total() })
   })
 
   const reply = (answers: string[][]) => {
@@ -118,9 +118,7 @@ export const QuestionDock: Component<{ request: QuestionRequest }> = (props) => 
       toggle(opt.label)
       return
     }
-    const answers = [...store.answers]
-    answers[store.tab] = [opt.label]
-    setStore("answers", answers)
+    pick(opt.label)
   }
 
   const handleCustomSubmit = (e: Event) => {
@@ -168,7 +166,7 @@ export const QuestionDock: Component<{ request: QuestionRequest }> = (props) => 
                 <button
                   type="button"
                   data-slot="question-progress-nav"
-                  disabled={store.sending || store.tab >= questions().length - 1}
+                  disabled={store.sending || store.tab >= questions().length}
                   onClick={() => selectTab(store.tab + 1)}
                 >
                   <Icon name="chevron-right" size="small" />
@@ -309,14 +307,27 @@ export const QuestionDock: Component<{ request: QuestionRequest }> = (props) => 
                 {language.t("ui.common.back")}
               </Button>
             </Show>
-            <Button
-              variant={last() ? "primary" : "secondary"}
-              size="small"
-              onClick={last() ? submit : () => selectTab(store.tab + 1)}
-              disabled={store.sending || (store.answers[store.tab]?.length ?? 0) === 0}
+            <Show
+              when={confirm()}
+              fallback={
+                <Button
+                  variant={last() && single() ? "primary" : "secondary"}
+                  size="small"
+                  onClick={last() && single() ? submit : () => selectTab(store.tab + 1)}
+                  disabled={store.sending || (!confirm() && (store.answers[store.tab]?.length ?? 0) === 0)}
+                >
+                  {last() && single()
+                    ? language.t("ui.common.submit")
+                    : last()
+                      ? language.t("common.review")
+                      : language.t("ui.common.next")}
+                </Button>
+              }
             >
-              {last() ? language.t("ui.common.submit") : language.t("ui.common.next")}
-            </Button>
+              <Button variant="primary" size="small" onClick={submit} disabled={store.sending}>
+                {language.t("ui.common.submit")}
+              </Button>
+            </Show>
           </div>
         </div>
       </div>
