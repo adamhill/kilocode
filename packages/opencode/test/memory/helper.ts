@@ -5,6 +5,31 @@ const MB = 1024 * 1024
 export const PROJECT_ROOT = path.join(__dirname, "../..")
 
 /**
+ * Check if a process is alive by sending signal 0.
+ * Returns false if the process has already exited.
+ */
+export function isAlive(pid: number): boolean {
+  try {
+    process.kill(pid, 0)
+    return true
+  } catch {
+    return false
+  }
+}
+
+/**
+ * Send a signal to a process, ignoring errors (e.g. process already exited).
+ */
+function trySendSignal(pid: number, signal: NodeJS.Signals): void {
+  try {
+    process.kill(pid, signal)
+  } catch (err) {
+    // Expected when process already exited before signal delivery
+    console.log(`  signal ${signal} to PID ${pid} failed (likely already exited): ${err}`)
+  }
+}
+
+/**
  * Force GC multiple times and return stable heap usage in MB.
  * Multiple passes + sleeps allow GC to finalize weak refs and sweep.
  */
@@ -79,14 +104,8 @@ export async function snapshotDescendants(rootPid: number): Promise<Set<number>>
 export async function assertNoOrphans(before: Set<number>, after: Set<number>): Promise<void> {
   const orphans = new Set<number>()
   for (const pid of after) {
-    if (!before.has(pid)) {
-      // Verify the process is still running
-      try {
-        process.kill(pid, 0)
-        orphans.add(pid)
-      } catch {
-        // Process already exited
-      }
+    if (!before.has(pid) && isAlive(pid)) {
+      orphans.add(pid)
     }
   }
 
@@ -113,16 +132,10 @@ export async function assertNoOrphans(before: Set<number>, after: Set<number>): 
 
   // Force-kill orphans to prevent cascading test failures
   for (const pid of orphans) {
-    try {
-      process.kill(pid, "SIGKILL")
-    } catch {
-      // Already exited
-    }
+    trySendSignal(pid, "SIGKILL")
   }
 
-  throw new Error(
-    `Found ${orphans.size} orphan process(es):\n${details.map((d) => `  ${d}`).join("\n")}`,
-  )
+  throw new Error(`Found ${orphans.size} orphan process(es):\n${details.map((d) => `  ${d}`).join("\n")}`)
 }
 
 /**
@@ -135,9 +148,7 @@ export async function waitForExit(pids: number[], timeoutMs = 3000): Promise<boo
 
   while (remaining.size > 0 && Date.now() - start < timeoutMs) {
     for (const pid of remaining) {
-      try {
-        process.kill(pid, 0)
-      } catch {
+      if (!isAlive(pid)) {
         remaining.delete(pid)
       }
     }
@@ -154,10 +165,6 @@ export async function waitForExit(pids: number[], timeoutMs = 3000): Promise<boo
  */
 export function forceKillAll(pids: Set<number> | number[]): void {
   for (const pid of pids) {
-    try {
-      process.kill(pid, "SIGKILL")
-    } catch {
-      // Already exited
-    }
+    trySendSignal(pid, "SIGKILL")
   }
 }
