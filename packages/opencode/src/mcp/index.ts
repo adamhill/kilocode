@@ -477,20 +477,23 @@ export namespace MCP {
       const originalClose = transport.close.bind(transport)
       transport.close = async () => {
         const child = (transport as any)._process ?? processes[key]
-        await originalClose()
-        if (child && child.exitCode === null) {
-          // Give SIGTERM (sent by the SDK's close) a moment to take effect
-          await new Promise((resolve) => setTimeout(resolve, SIGTERM_GRACE_MS))
-          if (child.exitCode === null) {
-            log.info("force-killing MCP child process after close", { key, pid: child.pid })
-            try {
-              child.kill("SIGKILL")
-            } catch (err) {
-              log.debug("force-kill failed, process likely already exited", { key, error: err })
+        try {
+          await originalClose()
+          if (child && child.exitCode === null) {
+            // Give SIGTERM (sent by the SDK's close) a moment to take effect
+            await new Promise((resolve) => setTimeout(resolve, SIGTERM_GRACE_MS))
+            if (child.exitCode === null) {
+              log.info("force-killing MCP child process after close", { key, pid: child.pid })
+              try {
+                child.kill("SIGKILL")
+              } catch (err) {
+                log.debug("force-kill failed, process likely already exited", { key, error: err })
+              }
             }
           }
+        } finally {
+          delete processes[key]
         }
-        delete processes[key]
       }
       // kilocode_change end
 
