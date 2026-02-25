@@ -1,15 +1,10 @@
-# Integrations (for example GitHub connectivity)
+# Integrations (External System Connectivity)
 
-- **What it is**: Connecting external systems (notably GitHub) to enable higher-level workflows.
+**Priority:** P3
+**Status:** ❌ Not started
 
-## Docs references
+## Remaining Work
 
-- [`apps/kilocode-docs/pages/automate/integrations.md`](../../apps/kilocode-docs/pages/automate/integrations.md)
-
-## Suggested migration
-
-- **Kilo CLI availability**: Partial.
-- **Migration recommendation**:
-  - Use Kilo CLI's plugin system where it covers the integration (non-IDE-specific).
-  - Keep IDE-specific integrations (VS Code APIs, UI hooks) in the extension and decide per integration.
-- **Reimplementation required?**: Partial.
+- External system integrations (GitHub, Jira, Linear, Slack, etc.)
+- IDE-specific integration hooks (VS Code APIs)
+- Use CLI's plugin system for non-IDE-specific integrations

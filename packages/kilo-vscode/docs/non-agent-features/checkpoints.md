@@ -1,25 +1,17 @@
-# Checkpoints (shadow versioning, workspace time travel)
+# Checkpoints (Shadow Versioning, Workspace Time Travel)
 
-- **What it is**: Task-scoped snapshots stored in a shadow git repository, with UI to diff/restore.
+**Priority:** P1
+**Status:** 🔨 Partial
 
-## Capabilities
+## What Exists
 
-- Per-task checkpoint history.
-- Restore files only vs restore files + task state.
-- Safety checks to avoid problematic paths/nested repos.
+- `CheckpointsTab` settings toggle to enable/disable snapshot creation before file edits (`config.snapshot`)
 
-## Docs references
+## Remaining Work
 
-- [`apps/kilocode-docs/pages/code-with-ai/features/checkpoints.md`](../../apps/kilocode-docs/pages/code-with-ai/features/checkpoints.md)
-
-## Suggested migration
-
-- **Kilo CLI availability**: Partial.
-- **Migration recommendation**:
-  - Evaluate whether Kilo CLI snapshots/revert semantics map to Kilo checkpoints (per-task, excludes, UX expectations).
-  - If they map, delegate snapshot creation/storage/revert to Kilo CLI; otherwise keep the existing Kilo checkpoint service.
-- **Reimplementation required?**: Partial.
-
-## Primary implementation anchors
-
-- [`src/services/checkpoints/`](../../src/services/checkpoints/)
+- Checkpoint service with shadow git repo for per-task snapshots
+- Restore files only vs restore files + task state
+- Safety checks to avoid problematic paths/nested repos
+- Checkpoint navigation UI (timeline/list of checkpoints per task)
+- Diff viewing between checkpoints
+- Evaluate whether CLI session undo/redo/revert maps to Kilo's checkpoint model or if extension needs its own git-based implementation

@@ -1,18 +1,14 @@
-# Search & repo scanning infrastructure
+# Search & Repo Scanning Infrastructure
 
-- **What it is**: High-performance repo scanning and search utilities used across multiple features.
+**Priority:** P2
+**Status:** ❌ Not started
 
-## Suggested migration
+## What Exists
 
-- **Kilo CLI availability**: Already.
-- **Migration recommendation**:
-  - Delegate grep/glob/repo scanning to Kilo CLI server endpoints.
-  - Keep VS Code UX (search UI, previews, navigation) in the extension host.
-- **Reimplementation required?**: No.
+- `findFiles()` for fuzzy filename matching via CLI `/find/file` endpoint (used for `@` mentions)
 
-## Primary implementation anchors
+## Remaining Work
 
-- [`src/services/ripgrep/`](../../src/services/ripgrep/)
-- [`src/services/search/`](../../src/services/search/)
-- [`src/services/glob/`](../../src/services/glob/)
-- [`src/services/roo-config/`](../../src/services/roo-config/)
+- Search UI for grep/glob results within VS Code
+- Result previews and navigation
+- Extension-side search infrastructure (currently all search tools are CLI backend-only)

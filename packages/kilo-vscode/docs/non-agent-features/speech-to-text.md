@@ -1,15 +1,11 @@
-# Speech-to-text (voice input)
+# Speech-to-Text (Voice Input)
 
-- **What it is**: A streaming STT subsystem for dictation/voice input.
+**Priority:** P3
+**Status:** ❌ Not started
 
-## Suggested migration
+## Remaining Work
 
-- **Kilo CLI availability**: Already.
-- **Migration recommendation**:
-  - Keep speech capture and UX in the webview/UI (microphone permissions and streaming).
-  - Use Kilo CLI-compatible STT flows where helpful, but avoid making STT a required server capability.
-- **Reimplementation required?**: Partial.
-
-## Primary implementation anchors
-
-- [`src/services/stt/`](../../src/services/stt/)
+- Microphone capture in webview
+- Streaming STT integration
+- Voice input button in prompt area
+- Determine STT provider (browser API, CLI-compatible, or external service)

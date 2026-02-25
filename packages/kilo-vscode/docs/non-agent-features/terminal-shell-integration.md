@@ -1,19 +1,16 @@
-# Terminal / shell integration
+# Terminal / Shell Integration
 
-- **What it is**: Execute terminal commands and capture output without manual copy/paste, tracking exit codes and working directory changes.
+**Priority:** P1
+**Status:** 🔨 Partial
 
-## Docs references
+## What Exists
 
-- [`apps/kilocode-docs/pages/automate/extending/shell-integration.md`](../../apps/kilocode-docs/pages/automate/extending/shell-integration.md)
+- Agent Manager's `SetupScriptRunner` uses `terminal.shellIntegration` for setup scripts with exit code tracking (with fallback to `sendText`)
+- Terminal context menu actions registered (Add Content, Fix Command, Explain Command) but content capture is a stub
 
-## Suggested migration
+## Remaining Work
 
-- **Kilo CLI availability**: Already.
-- **Migration recommendation**:
-  - Delegate command execution and PTY/shell management to Kilo CLI server endpoints.
-  - Keep VS Code terminal UX (presentation, streaming, approvals) in the extension as an adapter.
-- **Reimplementation required?**: Partial.
-
-## Implementation notes
-
-- Some shell integration may live outside `src/services` (for example in tool implementations), but is a foundational automation substrate.
+- `getTerminalSelection()` implementation — currently returns empty string, needs VS Code shell integration API
+- General terminal integration for AI command execution display
+- Exit code tracking for command execution
+- Working directory change detection
