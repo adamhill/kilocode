@@ -132,12 +132,17 @@ export const TuiThreadCommand = cmd({
       // after shutdown because the worker's event loop drains. Send the
       // shutdown request without awaiting the response, wait for the worker
       // to exit naturally or force-terminate after a timeout.
-      const terminateWorker = () =>
-        new Promise<void>((resolve) => {
+      // Guard against multiple invocations (SIGHUP + SIGTERM + onExit).
+      let pending: Promise<void> | undefined
+      const terminateWorker = () => {
+        if (pending) return pending
+        pending = new Promise<void>((resolve) => {
           worker.addEventListener("close", () => resolve(), { once: true })
           setTimeout(resolve, 5000)
           client.call("shutdown", undefined).catch(() => {})
         }).then(() => worker.terminate())
+        return pending
+      }
       process.on("SIGHUP", terminateWorker)
       process.on("SIGTERM", terminateWorker)
       // kilocode_change end
