@@ -595,6 +595,16 @@ export namespace MCP {
     }
 
     const s = await state()
+    // kilocode_change start — close existing client *before* creating a new one to prevent
+    // process map corruption (old close could delete the new process entry)
+    const existingClient = s.clients[name]
+    if (existingClient) {
+      await existingClient.close().catch((error) => {
+        log.error("Failed to close existing MCP client", { name, error })
+      })
+      delete s.clients[name]
+    }
+    // kilocode_change end
     const result = await create(name, { ...mcp, enabled: true }, s.processes) // kilocode_change — pass processes
 
     if (!result) {
@@ -606,13 +616,6 @@ export namespace MCP {
     }
     s.status[name] = result.status
     if (result.mcpClient) {
-      // Close existing client if present to prevent memory leaks
-      const existingClient = s.clients[name]
-      if (existingClient) {
-        await existingClient.close().catch((error) => {
-          log.error("Failed to close existing MCP client", { name, error })
-        })
-      }
       s.clients[name] = result.mcpClient
     }
   }
