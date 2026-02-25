@@ -46,82 +46,82 @@ This document tracks remaining work needed for feature parity with the old exten
 
 ## Project Board Issues
 
-Open issues from the [GitHub project board](https://github.com/orgs/Kilo-Org/projects/25/views/1) not covered by the feature docs above. Items are grouped by category.
+Open issues from the [GitHub project board](https://github.com/orgs/Kilo-Org/projects/25/views/1) not covered by the feature docs above. Each item has its own detailed doc.
 
 ### UI Polish & Bugs
 
-| Issue                                                     | Title                                                             | Board Status |
-| --------------------------------------------------------- | ----------------------------------------------------------------- | ------------ |
-| [#6076](https://github.com/Kilo-Org/kilocode/issues/6076) | Jump to changed lines from diff                                   | Backlog      |
-| [#6081](https://github.com/Kilo-Org/kilocode/issues/6081) | Fix context compression icon (confusing UX)                       | Backlog      |
-| [#6085](https://github.com/Kilo-Org/kilocode/issues/6085) | Copy button sometimes copies extra fields                         | In progress  |
-| [#6087](https://github.com/Kilo-Org/kilocode/issues/6087) | Cursor misplaced after long input                                 | Backlog      |
-| [#6088](https://github.com/Kilo-Org/kilocode/issues/6088) | Improve markdown rendering (header sizes, etc.)                   | In progress  |
-| [#6092](https://github.com/Kilo-Org/kilocode/issues/6092) | Approval box doesn't show full path for out-of-workspace requests | In progress  |
-| [#6140](https://github.com/Kilo-Org/kilocode/issues/6140) | ProfileView missing back button to return to chat                 | Backlog      |
-| [#6250](https://github.com/Kilo-Org/kilocode/issues/6250) | Make it clear how to start a new task / escape current task       | Backlog      |
-| [#6254](https://github.com/Kilo-Org/kilocode/issues/6254) | Improve reasoning block styling to distinguish from normal output | Backlog      |
-| [#6255](https://github.com/Kilo-Org/kilocode/issues/6255) | Clickable items should change the cursor                          | Backlog      |
-| [#6273](https://github.com/Kilo-Org/kilocode/issues/6273) | Chat box dropdown and buttons overflow on narrow sidebar          | Backlog      |
-| [#6276](https://github.com/Kilo-Org/kilocode/issues/6276) | Chat background color should differ from editor background        | In progress  |
+| Feature                                                                                  | Status         | Remaining Work                                                                        | Priority |
+| ---------------------------------------------------------------------------------------- | -------------- | ------------------------------------------------------------------------------------- | -------- |
+| [Diff: Jump to Changed Lines](ui-polish/diff-jump-to-changed-lines.md)                   | ❌ Not started | Make diff entries clickable to open file at changed line in VS Code editor            | P2       |
+| [Context Compression Icon](ui-polish/context-compression-icon.md)                        | ❌ Not started | Replace icon that looks like a close button with a clear "compress" icon              | P2       |
+| [Copy Button Copies Extra Fields](ui-polish/copy-button-extra-fields.md)                 | 🔨 Partial     | Fix copy to strip markdown fence markers; only copy inner code content                | P1       |
+| [Chat Input Cursor Misplacement](ui-polish/chat-input-cursor-misplacement.md)            | 🔨 Partial     | Fix textarea height auto-resize so cursor doesn't desync from insertion point         | P1       |
+| [Markdown Rendering Improvements](ui-polish/markdown-rendering-improvements.md)          | 🔨 Partial     | Add CSS for heading sizes, weights, spacing so headings look different from body text | P1       |
+| [Approval Box Missing Full Path](ui-polish/approval-box-full-path.md)                    | 🔨 Partial     | Always show full absolute path for out-of-workspace permission requests               | P1       |
+| [Profile View Missing Back Button](ui-polish/profile-view-back-button.md)                | ❌ Not started | Add back button to Profile view header matching Settings view pattern                 | P2       |
+| [New Task Discoverability](ui-polish/new-task-discoverability.md)                        | ❌ Not started | Add "New task" button below chat and close button on session header                   | P1       |
+| [Reasoning Block Styling](ui-polish/reasoning-block-styling.md)                          | ❌ Not started | Style reasoning blocks with distinct background/italic; collapse by default           | P2       |
+| [Clickable Items Cursor](ui-polish/clickable-cursor-styles.md)                           | ❌ Not started | Add `cursor: pointer` to all interactive elements in chat                             | P2       |
+| [Chat Input Overflow on Narrow Sidebar](ui-polish/chat-input-narrow-sidebar-overflow.md) | ❌ Not started | Make chat input toolbar wrap when sidebar is too narrow                               | P2       |
+| [Chat Background Color](ui-polish/chat-background-color.md)                              | 🔨 Partial     | Use `--vscode-sideBar-background` instead of editor background                        | P2       |
 
 ### Features
 
-| Issue                                                     | Title                                                    | Board Status |
-| --------------------------------------------------------- | -------------------------------------------------------- | ------------ |
-| [#6078](https://github.com/Kilo-Org/kilocode/issues/6078) | File attachments (non-image) to session message input    | In progress  |
-| [#6082](https://github.com/Kilo-Org/kilocode/issues/6082) | Anonymous signin prompts (paid model, 100 message limit) | In progress  |
-| [#6084](https://github.com/Kilo-Org/kilocode/issues/6084) | Message queuing while agent is working                   | Backlog      |
-| [#6163](https://github.com/Kilo-Org/kilocode/issues/6163) | Custom OpenAI-compatible provider UI                     | In progress  |
-| [#6211](https://github.com/Kilo-Org/kilocode/issues/6211) | Remember user's last model choice                        | Backlog      |
-| [#6229](https://github.com/Kilo-Org/kilocode/issues/6229) | Make MCP tools expandable like regular tools             | Backlog      |
-| [#6234](https://github.com/Kilo-Org/kilocode/issues/6234) | Session preview improvements (better titles/summaries)   | Backlog      |
-| [#6252](https://github.com/Kilo-Org/kilocode/issues/6252) | Show what a subagent is doing                            | Backlog      |
-| [#6256](https://github.com/Kilo-Org/kilocode/issues/6256) | Show terminal command execution details and output in UI | Backlog      |
-| [#594](https://github.com/Kilo-Org/kilo/issues/594)       | Prompt improvement feature                               | Backlog      |
+| Feature                                                                       | Status         | Remaining Work                                                                   | Priority |
+| ----------------------------------------------------------------------------- | -------------- | -------------------------------------------------------------------------------- | -------- |
+| [File Attachments](features/file-attachments.md)                              | 🔨 Partial     | Add non-image file attachment via button, drag-and-drop, or file picker          | P2       |
+| [Anonymous Sign-In Prompts](features/anonymous-signin-prompts.md)             | 🔨 Partial     | Show prompt when anonymous user hits paid model or 100-message limit             | P1       |
+| [Task Completion Notification](features/task-completion-notification.md)      | ❌ Not started | VS Code toast when task completes or awaits input while panel is hidden          | P2       |
+| [Custom OpenAI-Compatible Provider UI](features/custom-openai-provider-ui.md) | 🔨 Partial     | Port `DialogCustomProvider` from `packages/app` to extension webview             | P1       |
+| [Remember Last Model Choice](features/remember-last-model.md)                 | ❌ Not started | Persist last-used model and pre-select it for new sessions                       | P2       |
+| [Expandable MCP Tools](features/expandable-mcp-tools.md)                      | ❌ Not started | Make MCP tool rows expandable to show inputs/outputs like regular tools          | P2       |
+| [Session Preview Improvements](features/session-preview-improvements.md)      | ❌ Not started | Evaluate showing first message snippet or improving title generation             | P2       |
+| [Subagent Visibility](features/subagent-visibility.md)                        | ❌ Not started | Show inline indicator of what a subagent is doing in single-session sidebar view | P2       |
+| [Terminal Command Output Visibility](features/terminal-output-visibility.md)  | ❌ Not started | Show actual command, truncated output, and success/failure in chat               | P1       |
+| [Prompt Improvement Feature](features/prompt-improvement.md)                  | ❌ Not started | Button/shortcut to rewrite the current draft message into a better prompt        | P3       |
 
 ### Migration (old extension → new)
 
-| Issue                                                     | Title                                        | Board Status |
-| --------------------------------------------------------- | -------------------------------------------- | ------------ |
-| [#6089](https://github.com/Kilo-Org/kilocode/issues/6089) | Migrate settings from old extension          | In progress  |
-| [#6090](https://github.com/Kilo-Org/kilocode/issues/6090) | Migrate sessions from old extension          | Backlog      |
-| [#6091](https://github.com/Kilo-Org/kilocode/issues/6091) | Migrate MemoryBank to AGENTS.md / equivalent | In progress  |
-| [#6188](https://github.com/Kilo-Org/kilocode/issues/6188) | Onboarding experience for users upgrading    | Backlog      |
+| Feature                                                   | Status         | Remaining Work                                                               | Priority |
+| --------------------------------------------------------- | -------------- | ---------------------------------------------------------------------------- | -------- |
+| [Settings Migration](migration/settings-migration.md)     | 🔨 Partial     | Read old extension settings and offer to import into CLI config on first run | P1       |
+| [Sessions Migration](migration/sessions-migration.md)     | ❌ Not started | Convert old session format to CLI session format; preserve chat history      | P3       |
+| [MemoryBank Migration](migration/memorybank-migration.md) | 🔨 Partial     | Detect MemoryBank content and offer to migrate it to AGENTS.md               | P1       |
+| [Upgrade Onboarding](migration/upgrade-onboarding.md)     | ❌ Not started | Show distinct onboarding for upgraders explaining what changed               | P1       |
 
 ### Error Handling & Reliability
 
-| Issue                                                     | Title                                                 | Board Status |
-| --------------------------------------------------------- | ----------------------------------------------------- | ------------ |
-| [#6083](https://github.com/Kilo-Org/kilocode/issues/6083) | Crash/CPU spike when switching pre-release ↔ release | Backlog      |
-| [#6086](https://github.com/Kilo-Org/kilocode/issues/6086) | Extension doesn't refresh on restart/update           | Backlog      |
-| [#6146](https://github.com/Kilo-Org/kilocode/issues/6146) | Propagate all CLI errors to UI                        | Backlog      |
-| [#6209](https://github.com/Kilo-Org/kilocode/issues/6209) | Surface CLI startup errors in extension               | Backlog      |
-| [#6284](https://github.com/Kilo-Org/kilocode/issues/6284) | Autocomplete reported broken, can't open settings     | Backlog      |
+| Feature                                                                                   | Status         | Remaining Work                                                               | Priority |
+| ----------------------------------------------------------------------------------------- | -------------- | ---------------------------------------------------------------------------- | -------- |
+| [Pre-Release Switch CPU Spike](error-handling/pre-release-switch-crash.md)                | ❌ Not started | Fix race condition / process conflict when switching release ↔ pre-release  | P0       |
+| [Extension View Doesn't Refresh on Update](error-handling/extension-refresh-on-update.md) | ❌ Not started | Force webview reload when extension version changes                          | P1       |
+| [Propagate CLI Errors to UI](error-handling/propagate-cli-errors-to-ui.md)                | 🔨 Partial     | Surface CLI stderr errors in chat or as VS Code notifications                | P1       |
+| [CLI Startup Errors](error-handling/cli-startup-errors.md)                                | 🔨 Partial     | Detect CLI process exit before connection; show error with details and retry | P1       |
+| [Autocomplete Settings Link Broken](error-handling/autocomplete-settings-link.md)         | ❌ Not started | Fix "settings" link in autocomplete broken notice; fix missing default model | P1       |
 
 ### Performance
 
-| Issue                                                     | Title                                                     | Board Status |
-| --------------------------------------------------------- | --------------------------------------------------------- | ------------ |
-| [#6221](https://github.com/Kilo-Org/kilocode/issues/6221) | Markdown syntax highlighting blocks main thread for 2.3s+ | Backlog      |
+| Feature                                                                                 | Status         | Remaining Work                                                                     | Priority |
+| --------------------------------------------------------------------------------------- | -------------- | ---------------------------------------------------------------------------------- | -------- |
+| [Markdown Syntax Highlighting Performance](performance/markdown-syntax-highlighting.md) | ❌ Not started | Two-pass render: show plain text first, highlight async with `requestIdleCallback` | P0       |
 
 ### Infrastructure / Refactoring
 
-| Issue                                                     | Title                                    | Board Status |
-| --------------------------------------------------------- | ---------------------------------------- | ------------ |
-| [#6079](https://github.com/Kilo-Org/kilocode/issues/6079) | Show changelog when extension is updated | In progress  |
-| [#6080](https://github.com/Kilo-Org/kilocode/issues/6080) | Publish to OpenVSX                       | Backlog      |
-| [#6243](https://github.com/Kilo-Org/kilocode/issues/6243) | Use SDK over direct HTTP requests        | Backlog      |
-| [#6244](https://github.com/Kilo-Org/kilocode/issues/6244) | Switch to using Session Turn             | Backlog      |
+| Feature                                                           | Status         | Remaining Work                                                                 | Priority |
+| ----------------------------------------------------------------- | -------------- | ------------------------------------------------------------------------------ | -------- |
+| [Show Changelog on Update](infrastructure/changelog-on-update.md) | 🔨 Partial     | Detect version change on activation and offer "What's New" notification        | P3       |
+| [Publish to OpenVSX](infrastructure/openvsx-publish.md)           | ❌ Not started | Add `ovsx publish` step to CI/CD pipeline after VS Code Marketplace publish    | P3       |
+| [Use SDK Over Direct HTTP](infrastructure/sdk-over-http.md)       | 🔨 Partial     | Replace raw `fetch()` calls in `HttpClient` with `@kilocode/sdk` typed methods | P2       |
+| [Switch to Session Turn](infrastructure/session-turn.md)          | 🔨 Partial     | Refactor session state to track turns, enabling better lifecycle management    | P2       |
 
 ### CLI-Side (tracked here for awareness)
 
-| Issue                                                     | Title                                        | Board Status |
-| --------------------------------------------------------- | -------------------------------------------- | ------------ |
-| [#6077](https://github.com/Kilo-Org/kilocode/issues/6077) | Add pre-commit secret check to /init         | In progress  |
-| [#6143](https://github.com/Kilo-Org/kilocode/issues/6143) | Plan mode: continually prompted to implement | In progress  |
-| [#6230](https://github.com/Kilo-Org/kilocode/issues/6230) | Re-add Architect mode / enhance Plan mode    | Backlog      |
-| [#6235](https://github.com/Kilo-Org/kilocode/issues/6235) | Ask mode should not make edits               | Backlog      |
+| Feature                                                              | Status         | Remaining Work                                                            | Priority |
+| -------------------------------------------------------------------- | -------------- | ------------------------------------------------------------------------- | -------- |
+| [/init Pre-Commit Secret Check](cli-side/init-secret-check.md)       | 🔨 Partial     | Check for secret scanning hooks in `/init`; suggest adding one if missing | P2       |
+| [Plan Mode Over-Prompting](cli-side/plan-mode-over-prompting.md)     | 🔨 Partial     | Fix Plan mode system prompt so agent stops repeatedly asking to implement | P1       |
+| [Architect Mode / Plan Files](cli-side/architect-mode-plan-files.md) | ❌ Not started | Export plan as `.md` to `/plans/` directory from Plan mode                | P2       |
+| [Ask Mode Should Not Edit](cli-side/ask-mode-no-edits.md)            | ❌ Not started | Disable write tools at configuration level in Ask mode                    | P1       |
 
 ---
 
