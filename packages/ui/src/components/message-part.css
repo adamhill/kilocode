@@ -345,7 +345,7 @@
   width: 100%;
   border: 1px solid var(--border-weak-base);
   border-radius: 6px;
-  background: transparent;
+  background: var(--background-stronger);
   position: relative;
   overflow: hidden;
 
@@ -397,6 +397,7 @@
     line-height: var(--line-height-large);
     white-space: pre-wrap;
     overflow-wrap: anywhere;
+    background: transparent;
   }
 }
 
