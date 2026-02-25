@@ -1456,6 +1456,7 @@ ToolRegistry.register({
     return (
       <BasicTool
         {...props}
+        defaultOpen={props.defaultOpen ?? true}
         icon="console"
         trigger={{
           title: i18n.t("ui.tool.shell"),
