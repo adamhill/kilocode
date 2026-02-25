@@ -18,7 +18,6 @@ Fully implemented features have been removed from the plans (docs deleted). This
 | `browser-session-controls.md`   | Partially implemented | In-chat browser controls, action replay, screenshot viewing             |
 | `checkpoint-task-management.md` | Not implemented       | Checkpoint restore, navigation, "See New Changes" diff buttons          |
 | `connection-state-ui.md`        | Partially implemented | Loading spinner overlay, error panel with retry, reconnecting indicator |
-| `follow-up-questions.md`        | Not implemented       | Suggestion chips, click-to-submit, auto-approval countdown              |
 | `mermaid-diagram-features.md`   | Not implemented       | Mermaid rendering, "Fix with AI", copy, open-as-PNG                     |
 | `message-editing-management.md` | Not implemented       | Inline editing, deletion, timestamps, up-arrow redo                     |
 | `special-content-types.md`      | Partially implemented | Copy on errors, MCP tool/resource rows, open-markdown-preview           |
@@ -70,7 +69,7 @@ Fully implemented features have been removed from the plans (docs deleted). This
 
 | Category                | Partially | Not    |
 | ----------------------- | --------- | ------ |
-| Chat UI Features (7)    | 3         | 4      |
+| Chat UI Features (6)    | 3         | 3      |
 | Non-Agent Features (23) | 10        | 13     |
 | Infrastructure (4)      | 2         | 2      |
-| **Total (34)**          | **15**    | **19** |
+| **Total (33)**          | **15**    | **18** |
