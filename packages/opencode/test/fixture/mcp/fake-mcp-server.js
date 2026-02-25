@@ -1,5 +1,5 @@
 // Minimal JSON-RPC 2.0 MCP server over stdio for testing
-// Implements initialize, tools/list, tools/call
+// Uses newline-delimited JSON (NDJSON) format matching the MCP SDK
 // Exits on stdin close, SIGTERM, or SIGINT
 
 let readBuffer = ""
@@ -19,24 +19,17 @@ process.on("SIGINT", () => process.exit(0))
 
 function processBuffer() {
   while (true) {
-    const headerEnd = readBuffer.indexOf("\r\n\r\n")
-    if (headerEnd === -1) break
-    const header = readBuffer.slice(0, headerEnd)
-    const match = /Content-Length:\s*(\d+)/i.exec(header)
-    if (!match) break
-    const len = parseInt(match[1], 10)
-    const bodyStart = headerEnd + 4
-    if (readBuffer.length < bodyStart + len) break
-    const body = readBuffer.slice(bodyStart, bodyStart + len)
-    readBuffer = readBuffer.slice(bodyStart + len)
-    handle(body)
+    const index = readBuffer.indexOf("\n")
+    if (index === -1) break
+    const line = readBuffer.slice(0, index).replace(/\r$/, "")
+    readBuffer = readBuffer.slice(index + 1)
+    if (line.length === 0) continue
+    handle(line)
   }
 }
 
 function send(msg) {
-  const json = JSON.stringify(msg)
-  const header = `Content-Length: ${Buffer.byteLength(json, "utf8")}\r\n\r\n`
-  process.stdout.write(header + json)
+  process.stdout.write(JSON.stringify(msg) + "\n")
 }
 
 function handle(raw) {
