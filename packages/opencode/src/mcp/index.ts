@@ -450,6 +450,9 @@ export namespace MCP {
       })
 
       // kilocode_change start — wrap start/close for process tracking and force-kill safety net
+      // NOTE: _process is a private field of StdioClientTransport from @modelcontextprotocol/sdk.
+      // Verified against @modelcontextprotocol/sdk@1.25.2. If the SDK is upgraded, verify this
+      // field still exists (see node_modules/@modelcontextprotocol/sdk/dist/esm/client/stdio.js).
       const originalStart = transport.start.bind(transport)
       transport.start = async () => {
         try {
