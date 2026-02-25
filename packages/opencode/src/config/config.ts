@@ -437,11 +437,11 @@ export namespace Config {
       if (!isOutdated) return false
       log.info("Cached version is outdated, proceeding with install", {
         pkg: "@kilocode/plugin",
-        // kilocode_change end
         cachedVersion: depVersion,
       })
       return true
     }
+    // kilocode_change end
     if (depVersion === targetVersion) return false
     return true
   }
