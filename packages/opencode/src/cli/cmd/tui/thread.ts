@@ -140,7 +140,7 @@ export const TuiThreadCommand = cmd({
         if (pending) return pending
         pending = new Promise<void>((resolve) => {
           worker.addEventListener("close", () => resolve(), { once: true })
-          setTimeout(resolve, 5000)
+          setTimeout(resolve, 5000).unref()
           client.call("shutdown", undefined).catch(() => {})
         }).then(() => worker.terminate())
         return pending
