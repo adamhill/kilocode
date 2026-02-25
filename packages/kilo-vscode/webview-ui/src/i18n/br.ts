@@ -1016,9 +1016,16 @@ export const dict = {
   "agentManager.dialog.branchBadge.remote": "remoto",
   "agentManager.dialog.versions": "Versões",
   "agentManager.dialog.versionHint": "{{count}} worktrees serão executados em paralelo",
+  "agentManager.dialog.compareModels": "Comparar Modelos",
+  "agentManager.dialog.compareModels.searchModels": "Pesquisar modelos...",
   "agentManager.dialog.creating": "Criando...",
   "agentManager.dialog.createWorkspace": "Criar Workspace",
+  "agentManager.dialog.removeImage": "Remover imagem",
   "agentManager.dialog.advanced": "Avançado...",
+
+  "agentManager.diff.toggle": "Alternar diff",
+  "agentManager.shortcuts.toggleDiff": "Alternar painel de diff",
+
   "agentManager.import.pullRequest": "Pull Request",
   "agentManager.import.pastePrUrl": "Cole a URL do PR...",
   "agentManager.import.open": "Abrir",

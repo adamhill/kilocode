@@ -234,6 +234,10 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
     void this.handleLoadSessions()
   }
 
+  public openCloudSession(sessionId: string): void {
+    this.postMessage({ type: "openCloudSession", sessionId })
+  }
+
   /**
    * Attach to a webview that already has its own HTML set.
    * Sets up message handling and connection without overriding HTML content.
@@ -312,6 +316,7 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
         case "clearSession":
           this.currentSession = null
           this.trackedSessionIds.clear()
+          this.syncedChildSessions.clear()
           break
         case "loadMessages":
           // Don't await: allow parallel loads so rapid session switching
@@ -829,6 +834,7 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
       const workspaceDir = this.getWorkspaceDirectory(sessionID)
       await this.httpClient.deleteSession(sessionID, workspaceDir)
       this.trackedSessionIds.delete(sessionID)
+      this.syncedChildSessions.delete(sessionID)
       this.sessionDirectories.delete(sessionID)
       if (this.currentSession?.id === sessionID) {
         this.currentSession = null
@@ -1850,6 +1856,7 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
     this.unsubscribeNotificationDismiss?.()
     this.webviewMessageDisposable?.dispose()
     this.trackedSessionIds.clear()
+    this.syncedChildSessions.clear()
     this.sessionDirectories.clear()
     this.ignoreController?.dispose()
   }
