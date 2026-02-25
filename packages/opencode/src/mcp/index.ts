@@ -28,6 +28,8 @@ import open from "open"
 export namespace MCP {
   const log = Log.create({ service: "mcp" })
   const DEFAULT_TIMEOUT = 30_000
+  // kilocode_change — grace period (ms) after SIGTERM before escalating to SIGKILL
+  const SIGTERM_GRACE_MS = 500
 
   export const Resource = z
     .object({
@@ -214,7 +216,7 @@ export namespace MCP {
       const surviving = Object.entries(state.processes).filter(([, child]) => child.exitCode === null)
       if (surviving.length > 0) {
         // Give SIGTERM (sent by client.close → transport.close) a moment to take effect
-        await new Promise((resolve) => setTimeout(resolve, 500))
+        await new Promise((resolve) => setTimeout(resolve, SIGTERM_GRACE_MS))
         for (const [key, child] of surviving) {
           if (child.exitCode === null) {
             log.info("force-killing surviving MCP child process", { key, pid: child.pid })
@@ -281,6 +283,16 @@ export namespace MCP {
 
   export async function add(name: string, mcp: Config.Mcp) {
     const s = await state()
+    // kilocode_change start — close existing client *before* creating a new one to prevent
+    // process map corruption (old close could delete the new process entry)
+    const existingClient = s.clients[name]
+    if (existingClient) {
+      await existingClient.close().catch((error) => {
+        log.error("Failed to close existing MCP client", { name, error })
+      })
+      delete s.clients[name]
+    }
+    // kilocode_change end
     const result = await create(name, mcp, s.processes) // kilocode_change — pass processes
     if (!result) {
       const status = {
@@ -297,13 +309,6 @@ export namespace MCP {
       return {
         status: s.status,
       }
-    }
-    // Close existing client if present to prevent memory leaks
-    const existingClient = s.clients[name]
-    if (existingClient) {
-      await existingClient.close().catch((error) => {
-        log.error("Failed to close existing MCP client", { name, error })
-      })
     }
     s.clients[name] = result.mcpClient
     s.status[name] = result.status
@@ -460,7 +465,10 @@ export namespace MCP {
         } finally {
           const child = (transport as any)._process as ChildProcess | undefined
           if (!child) {
-            log.warn("could not access transport._process — child process tracking unavailable", { key })
+            log.error(
+              "could not access transport._process — child process tracking unavailable; MCP SDK may have changed",
+              { key },
+            )
           } else {
             processes[key] = child
           }
@@ -472,7 +480,7 @@ export namespace MCP {
         await originalClose()
         if (child && child.exitCode === null) {
           // Give SIGTERM (sent by the SDK's close) a moment to take effect
-          await new Promise((resolve) => setTimeout(resolve, 500))
+          await new Promise((resolve) => setTimeout(resolve, SIGTERM_GRACE_MS))
           if (child.exitCode === null) {
             log.info("force-killing MCP child process after close", { key, pid: child.pid })
             try {
