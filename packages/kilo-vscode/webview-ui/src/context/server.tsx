@@ -58,6 +58,10 @@ export const ServerProvider: ParentComponent = (props) => {
           }
           break
 
+        case "workspaceDirectoryChanged":
+          setWorkspaceDirectory(message.directory)
+          break
+
         case "connectionState":
           console.log("[Kilo New] Connection state changed:", message.state)
           setConnectionState(message.state)

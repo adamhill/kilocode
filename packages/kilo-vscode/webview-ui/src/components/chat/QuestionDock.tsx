@@ -166,7 +166,11 @@ export const QuestionDock: Component<{ request: QuestionRequest }> = (props) => 
                 <button
                   type="button"
                   data-slot="question-progress-nav"
-                  disabled={store.sending || store.tab >= questions().length}
+                  disabled={
+                    store.sending ||
+                    store.tab >= questions().length ||
+                    (!confirm() && (store.answers[store.tab]?.length ?? 0) === 0)
+                  }
                   onClick={() => selectTab(store.tab + 1)}
                 >
                   <Icon name="chevron-right" size="small" />

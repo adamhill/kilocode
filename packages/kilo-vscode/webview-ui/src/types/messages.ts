@@ -345,6 +345,11 @@ export interface ReadyMessage {
   workspaceDirectory?: string
 }
 
+export interface WorkspaceDirectoryChangedMessage {
+  type: "workspaceDirectoryChanged"
+  directory: string
+}
+
 export interface ConnectionStateMessage {
   type: "connectionState"
   state: ConnectionState
@@ -763,6 +768,7 @@ export type ExtensionMessage =
   | AgentManagerBranchesMessage
   | AgentManagerExternalWorktreesMessage
   | AgentManagerImportResultMessage
+  | WorkspaceDirectoryChangedMessage
 
 // ============================================
 // Messages FROM webview TO extension
