@@ -92,7 +92,7 @@ Verify that PowerShell is installed and accessible by running:
 
 #### Symptoms
 
-- Cascade panel doesn't render or appears blankCollapse commentComment on line R101kiloconnect[bot] commented on Feb 25, 2026 kiloconnect[bot]on Feb 25, 2026ContributorAuthorMore actionsWARNING: Same issue — "Cascade panel" should be "Kilo Code panel".
+- Kilo Code panel doesn't render or appears blank
 - Errors such as `JCEF is not supported in this environment or failed to initialize`
 - `Internal JCEF not supported, trying external JCEF`
 
