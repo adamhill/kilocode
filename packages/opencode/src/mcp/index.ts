@@ -1,4 +1,3 @@
-import type { ChildProcess } from "child_process" // kilocode_change
 import { dynamicTool, type Tool, jsonSchema, type JSONSchema7 } from "ai"
 import { Client } from "@modelcontextprotocol/sdk/client/index.js"
 import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js"
@@ -28,8 +27,6 @@ import open from "open"
 export namespace MCP {
   const log = Log.create({ service: "mcp" })
   const DEFAULT_TIMEOUT = 30_000
-  // kilocode_change — grace period (ms) after SIGTERM before escalating to SIGKILL
-  const SIGTERM_GRACE_MS = 500
 
   export const Resource = z
     .object({
@@ -169,9 +166,6 @@ export namespace MCP {
       const config = cfg.mcp ?? {}
       const clients: Record<string, MCPClient> = {}
       const status: Record<string, Status> = {}
-      // kilocode_change start — track child processes for force-kill on dispose
-      const processes: Record<string, ChildProcess> = {}
-      // kilocode_change end
 
       await Promise.all(
         Object.entries(config).map(async ([key, mcp]) => {
@@ -186,7 +180,7 @@ export namespace MCP {
             return
           }
 
-          const result = await create(key, mcp, processes).catch(() => undefined) // kilocode_change — pass processes
+          const result = await create(key, mcp).catch(() => undefined)
           if (!result) return
 
           status[key] = result.status
@@ -199,7 +193,6 @@ export namespace MCP {
       return {
         status,
         clients,
-        processes, // kilocode_change
       }
     },
     async (state) => {
@@ -212,26 +205,6 @@ export namespace MCP {
           }),
         ),
       )
-      // kilocode_change start — force-kill any child processes that survived client.close()
-      const surviving = Object.entries(state.processes).filter(([, child]) => child.exitCode === null)
-      if (surviving.length > 0) {
-        // Give SIGTERM (sent by client.close → transport.close) a moment to take effect
-        await new Promise((resolve) => setTimeout(resolve, SIGTERM_GRACE_MS))
-        for (const [key, child] of surviving) {
-          if (child.exitCode === null) {
-            log.info("force-killing surviving MCP child process", { key, pid: child.pid })
-            try {
-              child.kill("SIGKILL")
-            } catch (err) {
-              log.debug("force-kill failed, process likely already exited", { key, error: err })
-            }
-          }
-        }
-      }
-      for (const key of Object.keys(state.processes)) {
-        delete state.processes[key]
-      }
-      // kilocode_change end
       pendingOAuthTransports.clear()
     },
   )
@@ -283,17 +256,7 @@ export namespace MCP {
 
   export async function add(name: string, mcp: Config.Mcp) {
     const s = await state()
-    // kilocode_change start — close existing client *before* creating a new one to prevent
-    // process map corruption (old close could delete the new process entry)
-    const existingClient = s.clients[name]
-    if (existingClient) {
-      await existingClient.close().catch((error) => {
-        log.error("Failed to close existing MCP client", { name, error })
-      })
-      delete s.clients[name]
-    }
-    // kilocode_change end
-    const result = await create(name, mcp, s.processes) // kilocode_change — pass processes
+    const result = await create(name, mcp)
     if (!result) {
       const status = {
         status: "failed" as const,
@@ -310,6 +273,13 @@ export namespace MCP {
         status: s.status,
       }
     }
+    // Close existing client if present to prevent memory leaks
+    const existingClient = s.clients[name]
+    if (existingClient) {
+      await existingClient.close().catch((error) => {
+        log.error("Failed to close existing MCP client", { name, error })
+      })
+    }
     s.clients[name] = result.mcpClient
     s.status[name] = result.status
 
@@ -318,8 +288,7 @@ export namespace MCP {
     }
   }
 
-  // kilocode_change — accept processes map for child process tracking
-  async function create(key: string, mcp: Config.Mcp, processes: Record<string, ChildProcess>) {
+  async function create(key: string, mcp: Config.Mcp) {
     if (mcp.enabled === false) {
       log.info("mcp server disabled", { key })
       return {
@@ -454,49 +423,6 @@ export namespace MCP {
         log.info(`mcp stderr: ${chunk.toString()}`, { key })
       })
 
-      // kilocode_change start — wrap start/close for process tracking and force-kill safety net
-      // NOTE: _process is a private field of StdioClientTransport from @modelcontextprotocol/sdk.
-      // Verified against @modelcontextprotocol/sdk@1.25.2. If the SDK is upgraded, verify this
-      // field still exists (see node_modules/@modelcontextprotocol/sdk/dist/esm/client/stdio.js).
-      const originalStart = transport.start.bind(transport)
-      transport.start = async () => {
-        try {
-          await originalStart()
-        } finally {
-          const child = (transport as any)._process as ChildProcess | undefined
-          if (!child) {
-            log.error(
-              "could not access transport._process — child process tracking unavailable; MCP SDK may have changed",
-              { key },
-            )
-          } else {
-            processes[key] = child
-          }
-        }
-      }
-      const originalClose = transport.close.bind(transport)
-      transport.close = async () => {
-        const child = (transport as any)._process ?? processes[key]
-        try {
-          await originalClose()
-          if (child && child.exitCode === null) {
-            // Give SIGTERM (sent by the SDK's close) a moment to take effect
-            await new Promise((resolve) => setTimeout(resolve, SIGTERM_GRACE_MS))
-            if (child.exitCode === null) {
-              log.info("force-killing MCP child process after close", { key, pid: child.pid })
-              try {
-                child.kill("SIGKILL")
-              } catch (err) {
-                log.debug("force-kill failed, process likely already exited", { key, error: err })
-              }
-            }
-          }
-        } finally {
-          delete processes[key]
-        }
-      }
-      // kilocode_change end
-
       const connectTimeout = mcp.timeout ?? DEFAULT_TIMEOUT
       try {
         const client = new Client({
@@ -516,11 +442,6 @@ export namespace MCP {
           cwd,
           error: error instanceof Error ? error.message : String(error),
         })
-        // kilocode_change start — close transport to kill orphaned child process on connect failure
-        await transport.close().catch((closeErr) => {
-          log.error("failed to close transport after connect failure", { key, error: closeErr })
-        })
-        // kilocode_change end
         status = {
           status: "failed" as const,
           error: error instanceof Error ? error.message : String(error),
@@ -605,28 +526,27 @@ export namespace MCP {
       return
     }
 
-    const s = await state()
-    // kilocode_change start — close existing client *before* creating a new one to prevent
-    // process map corruption (old close could delete the new process entry)
-    const existingClient = s.clients[name]
-    if (existingClient) {
-      await existingClient.close().catch((error) => {
-        log.error("Failed to close existing MCP client", { name, error })
-      })
-      delete s.clients[name]
-    }
-    // kilocode_change end
-    const result = await create(name, { ...mcp, enabled: true }, s.processes) // kilocode_change — pass processes
+    const result = await create(name, { ...mcp, enabled: true })
 
     if (!result) {
+      const s = await state()
       s.status[name] = {
         status: "failed",
         error: "Unknown error during connection",
       }
       return
     }
+
+    const s = await state()
     s.status[name] = result.status
     if (result.mcpClient) {
+      // Close existing client if present to prevent memory leaks
+      const existingClient = s.clients[name]
+      if (existingClient) {
+        await existingClient.close().catch((error) => {
+          log.error("Failed to close existing MCP client", { name, error })
+        })
+      }
       s.clients[name] = result.mcpClient
     }
   }
