@@ -118,7 +118,7 @@ Inside the interactive TUI, use the `/mcps` slash command to toggle MCP servers 
 
 ### Figma Desktop
 
-Connect to the Figma Desktop app's local MCP server:
+Connect to the Figma Desktop app's MCP server:
 
 ```json
 {
