@@ -579,9 +579,11 @@ const AgentManagerContent: Component = () => {
     } else if (fallback && isPending(fallback.id)) {
       setActivePendingId(fallback.id)
       session.clearCurrentSession()
+      vscode.postMessage({ type: "agentManager.showExistingLocalTerminal" })
     } else {
       setActivePendingId(undefined)
       session.clearCurrentSession()
+      vscode.postMessage({ type: "agentManager.showExistingLocalTerminal" })
     }
   }
 
@@ -612,6 +614,7 @@ const AgentManagerContent: Component = () => {
       else if (msg.action === "showTerminal") {
         const id = session.currentSessionID()
         if (id) vscode.postMessage({ type: "agentManager.showTerminal", sessionId: id })
+        else if (selection() === LOCAL) vscode.postMessage({ type: "agentManager.showLocalTerminal" })
       } else if (msg.action === "toggleDiff") {
         setDiffOpen((prev) => !prev)
       } else if (msg.action === "newTab") handleNewTabForCurrentSelection()
@@ -1713,6 +1716,7 @@ const AgentManagerContent: Component = () => {
                     onClick={() => {
                       const id = session.currentSessionID()
                       if (id) vscode.postMessage({ type: "agentManager.showTerminal", sessionId: id })
+                      else if (selection() === LOCAL) vscode.postMessage({ type: "agentManager.showLocalTerminal" })
                     }}
                   />
                 </TooltipKeybind>
