@@ -233,7 +233,7 @@ export const VscodeSessionTurn: Component<VscodeSessionTurnProps> = (props) => {
 
           {/* Diff summary — shown after completion */}
           <Show when={diffs().length > 0}>
-            <div class="vscode-session-turn-diffs">
+            <div class="vscode-session-turn-diffs" data-component="session-turn">
               <Collapsible open={open()} onOpenChange={setOpen} variant="ghost">
                 <Collapsible.Trigger>
                   <div data-component="session-turn-diffs-trigger">
