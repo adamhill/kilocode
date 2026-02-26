@@ -1,29 +1,21 @@
-import { describe, test, expect, afterEach } from "bun:test"
+import { describe, test, expect } from "bun:test"
 import path from "path"
 import { Instance } from "../../src/project/instance"
 import { MCP } from "../../src/mcp"
 import { LSPClient } from "../../src/lsp/client"
 import { spawn } from "child_process"
 import { tmpdir } from "../fixture/fixture"
-import {
-  PROJECT_ROOT,
-  snapshotDescendants,
-  assertNoOrphans,
-  forceKillAll,
-} from "./helper"
+import { PROJECT_ROOT, snapshotDescendants, assertNoOrphans, forceKillAll } from "./helper"
 
 const FAKE_MCP_SERVER = path.join(PROJECT_ROOT, "test/fixture/mcp/fake-mcp-server.js")
 const FAKE_LSP_SERVER = path.join(PROJECT_ROOT, "test/fixture/lsp/fake-lsp-server.js")
-
-// Track orphans for afterEach cleanup
-let beforePids: Set<number> = new Set()
 
 // Don't put MCP in config — the MCP state() init function connects to ALL
 // configured servers on first access, which doubles connections and causes timeouts.
 // Instead, use empty config and add servers via MCP.add().
 
 describe("memory: orphan process detection", () => {
-  afterEach(async () => {
+  const cleanup = async (beforePids: Set<number>) => {
     // Safety net: kill any orphaned processes to prevent cascading failures
     try {
       const afterPids = await snapshotDescendants(process.pid)
@@ -32,18 +24,25 @@ describe("memory: orphan process detection", () => {
         if (!beforePids.has(pid)) orphans.push(pid)
       }
       forceKillAll(orphans)
-    } catch {
+    } catch (error) {
       // Best-effort cleanup
+      console.warn("orphan cleanup failed", error)
     }
-  })
+  }
 
-  test(
-    "MCP local server: no orphans after dispose",
-    async () => {
-      await using tmp = await tmpdir({ git: true })
+  const baseline = async (run: (beforePids: Set<number>) => Promise<void>) => {
+    const beforePids = await snapshotDescendants(process.pid)
+    try {
+      await run(beforePids)
+    } finally {
+      await cleanup(beforePids)
+    }
+  }
 
-      beforePids = await snapshotDescendants(process.pid)
+  test("MCP local server: no orphans after dispose", async () => {
+    await using tmp = await tmpdir({ git: true })
 
+    await baseline(async (beforePids) => {
       await Instance.provide({
         directory: tmp.path,
         fn: async () => {
@@ -67,17 +66,13 @@ describe("memory: orphan process detection", () => {
       await Bun.sleep(500)
       const afterPids = await snapshotDescendants(process.pid)
       await assertNoOrphans(beforePids, afterPids)
-    },
-    60_000,
-  )
+    })
+  }, 60_000)
 
-  test(
-    "MCP local server: no orphans after disconnect",
-    async () => {
-      await using tmp = await tmpdir({ git: true })
+  test("MCP local server: no orphans after disconnect", async () => {
+    await using tmp = await tmpdir({ git: true })
 
-      beforePids = await snapshotDescendants(process.pid)
-
+    await baseline(async (beforePids) => {
       await Instance.provide({
         directory: tmp.path,
         fn: async () => {
@@ -96,18 +91,14 @@ describe("memory: orphan process detection", () => {
           await Instance.dispose()
         },
       })
-    },
-    60_000,
-  )
+    })
+  }, 60_000)
 
-  test(
-    "disposeAll cleans up all instances",
-    async () => {
-      await using tmp1 = await tmpdir({ git: true })
-      await using tmp2 = await tmpdir({ git: true })
+  test("disposeAll cleans up all instances", async () => {
+    await using tmp1 = await tmpdir({ git: true })
+    await using tmp2 = await tmpdir({ git: true })
 
-      beforePids = await snapshotDescendants(process.pid)
-
+    await baseline(async (beforePids) => {
       // Create two instances with MCP servers
       await Instance.provide({
         directory: tmp1.path,
@@ -140,17 +131,13 @@ describe("memory: orphan process detection", () => {
 
       const afterPids = await snapshotDescendants(process.pid)
       await assertNoOrphans(beforePids, afterPids)
-    },
-    120_000,
-  )
+    })
+  }, 120_000)
 
-  test(
-    "LSP server: no orphans after shutdown",
-    async () => {
-      await using tmp = await tmpdir({ git: true })
+  test("LSP server: no orphans after shutdown", async () => {
+    await using tmp = await tmpdir({ git: true })
 
-      beforePids = await snapshotDescendants(process.pid)
-
+    await baseline(async (beforePids) => {
       await Instance.provide({
         directory: tmp.path,
         fn: async () => {
@@ -177,7 +164,6 @@ describe("memory: orphan process detection", () => {
           await Instance.dispose()
         },
       })
-    },
-    30_000,
-  )
+    })
+  }, 30_000)
 })
