@@ -2,6 +2,7 @@ import { describe, test, expect, afterEach } from "bun:test"
 import path from "path"
 import { Instance } from "../../src/project/instance"
 import { LSPClient } from "../../src/lsp/client"
+import type { LSPServer } from "../../src/lsp/server"
 import { spawn } from "child_process"
 import { tmpdir } from "../fixture/fixture"
 import { PROJECT_ROOT, snapshotDescendants, assertNoOrphans, forceKillAll, stableHeapMB, isAlive } from "./helper"
@@ -10,7 +11,7 @@ const FAKE_LSP_SERVER = path.join(PROJECT_ROOT, "test/fixture/lsp/fake-lsp-serve
 
 let beforePids: Set<number> = new Set()
 
-function spawnLSP(cwd: string) {
+function spawnLSP(cwd: string): LSPServer.Handle["process"] {
   return spawn("bun", [FAKE_LSP_SERVER], {
     stdio: ["pipe", "pipe", "pipe"],
     cwd,
@@ -44,7 +45,7 @@ describe("memory: LSP lifecycle", () => {
 
         const client = await LSPClient.create({
           serverID: "test-lsp",
-          server: { process: serverProcess as any },
+          server: { process: serverProcess },
           root: tmp.path,
         })
         expect(client).toBeTruthy()
@@ -76,7 +77,7 @@ describe("memory: LSP lifecycle", () => {
           const serverProcess = spawnLSP(tmp.path)
           const client = await LSPClient.create({
             serverID: `test-lsp-${i}`,
-            server: { process: serverProcess as any },
+            server: { process: serverProcess },
             root: tmp.path,
           })
           await client!.shutdown()
@@ -102,7 +103,7 @@ describe("memory: LSP lifecycle", () => {
         const warmProc = spawnLSP(tmp.path)
         const warmClient = await LSPClient.create({
           serverID: "test-lsp-warm",
-          server: { process: warmProc as any },
+          server: { process: warmProc },
           root: tmp.path,
         })
         await warmClient!.shutdown()
@@ -114,7 +115,7 @@ describe("memory: LSP lifecycle", () => {
           const serverProcess = spawnLSP(tmp.path)
           const client = await LSPClient.create({
             serverID: `test-lsp-mem-${i}`,
-            server: { process: serverProcess as any },
+            server: { process: serverProcess },
             root: tmp.path,
           })
           await client!.shutdown()
