@@ -20,7 +20,7 @@ The CLI accepts several config filenames. The recommended file is `kilo.json`:
 | **Global**  | `~/.config/kilo/kilo.json`            | `kilo.jsonc`, `config.json`                           |
 | **Project** | `./kilo.json` or `./.kilo/kilo.json`  | `kilo.jsonc`                                          |
 
-Project-level configuration takes precedence over global settings. The CLI walks up from the project directory to the git worktree root, so config files in parent directories are also loaded.
+Project-level configuration takes precedence over global settings. 
 
 MCP servers configured in VS Code are **not** automatically available in the CLI. You must configure them separately.
 
