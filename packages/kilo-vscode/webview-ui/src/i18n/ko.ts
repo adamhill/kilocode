@@ -992,7 +992,7 @@ export const dict = {
   "agentManager.dialog.deleteWorktree.messagePost": "? 디스크에서 Worktree를 제거하고 모든 세션의 연결을 해제합니다.",
   "agentManager.dialog.deleteWorktree.cancel": "취소",
   "agentManager.dialog.deleteWorktree.confirm": "삭제",
-  "agentManager.dialog.openWorktree": "워크트리 열기",
+  "agentManager.dialog.openWorktree": "새 워크트리",
   "agentManager.dialog.tab.new": "새로 만들기",
   "agentManager.dialog.tab.import": "가져오기",
   "agentManager.dialog.namePlaceholder": "Worktree 이름 (선택사항)",
@@ -1010,7 +1010,7 @@ export const dict = {
   "agentManager.dialog.compareModels": "모델 비교",
   "agentManager.dialog.compareModels.searchModels": "모델 검색...",
   "agentManager.dialog.creating": "생성 중...",
-  "agentManager.dialog.createWorkspace": "워크스페이스 생성",
+  "agentManager.dialog.createWorkspace": "워크트리 생성",
   "agentManager.dialog.removeImage": "이미지 제거",
   "agentManager.dialog.advanced": "고급...",
 
@@ -1028,4 +1028,7 @@ export const dict = {
   "agentManager.import.noBranchesFound": "브랜치를 찾을 수 없습니다.",
   "agentManager.import.noBranchesHint": "위에 PR URL을 붙여넣거나 새 Worktree를 만드세요.",
   "agentManager.import.failed": "가져오기 실패",
+
+  "question.summary": "{{total}}개 질문 중 {{n}}번째",
+  "common.review": "검토",
 }

@@ -997,7 +997,7 @@ export const dict = {
   "agentManager.dialog.deleteWorktree.messagePost": "? Dette fjerner Worktree fra disken og kobler fra alle økter.",
   "agentManager.dialog.deleteWorktree.cancel": "Avbryt",
   "agentManager.dialog.deleteWorktree.confirm": "Slett",
-  "agentManager.dialog.openWorktree": "Åpne worktree",
+  "agentManager.dialog.openWorktree": "Ny worktree",
   "agentManager.dialog.tab.new": "Ny",
   "agentManager.dialog.tab.import": "Importer",
   "agentManager.dialog.namePlaceholder": "Worktree-navn (valgfritt)",
@@ -1015,7 +1015,7 @@ export const dict = {
   "agentManager.dialog.compareModels": "Sammenlign modeller",
   "agentManager.dialog.compareModels.searchModels": "Søk modeller...",
   "agentManager.dialog.creating": "Oppretter...",
-  "agentManager.dialog.createWorkspace": "Opprett arbeidsområde",
+  "agentManager.dialog.createWorkspace": "Opprett worktree",
   "agentManager.dialog.removeImage": "Fjern bilde",
   "agentManager.dialog.advanced": "Avansert...",
 
@@ -1033,4 +1033,7 @@ export const dict = {
   "agentManager.import.noBranchesFound": "Ingen branches funnet.",
   "agentManager.import.noBranchesHint": "Lim inn en PR URL ovenfor eller opprett et nytt Worktree.",
   "agentManager.import.failed": "Import mislyktes",
+
+  "question.summary": "{{n}} av {{total}} spørsmål",
+  "common.review": "Gjennomgå",
 } satisfies Partial<Record<Keys, string>>

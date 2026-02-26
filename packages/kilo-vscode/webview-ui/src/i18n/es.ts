@@ -1004,7 +1004,7 @@ export const dict = {
     "? Esto elimina el Worktree del disco y desasocia todas las sesiones.",
   "agentManager.dialog.deleteWorktree.cancel": "Cancelar",
   "agentManager.dialog.deleteWorktree.confirm": "Eliminar",
-  "agentManager.dialog.openWorktree": "Abrir Worktree",
+  "agentManager.dialog.openWorktree": "Nuevo Worktree",
   "agentManager.dialog.tab.new": "Nuevo",
   "agentManager.dialog.tab.import": "Importar",
   "agentManager.dialog.namePlaceholder": "Nombre del Worktree (opcional)",
@@ -1022,7 +1022,7 @@ export const dict = {
   "agentManager.dialog.compareModels": "Comparar modelos",
   "agentManager.dialog.compareModels.searchModels": "Buscar modelos...",
   "agentManager.dialog.creating": "Creando...",
-  "agentManager.dialog.createWorkspace": "Crear Workspace",
+  "agentManager.dialog.createWorkspace": "Crear Worktree",
   "agentManager.dialog.removeImage": "Eliminar imagen",
   "agentManager.dialog.advanced": "Avanzado...",
 
@@ -1040,4 +1040,7 @@ export const dict = {
   "agentManager.import.noBranchesFound": "No se encontraron branches.",
   "agentManager.import.noBranchesHint": "Pega una URL de PR arriba o crea un nuevo Worktree.",
   "agentManager.import.failed": "Error en la importación",
+
+  "question.summary": "{{n}} de {{total}} preguntas",
+  "common.review": "Revisar",
 }

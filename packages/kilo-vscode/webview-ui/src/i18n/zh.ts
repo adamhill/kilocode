@@ -987,7 +987,7 @@ export const dict = {
   "agentManager.dialog.deleteWorktree.messagePost": "？这将从磁盘中移除 Worktree 并取消所有会话的关联。",
   "agentManager.dialog.deleteWorktree.cancel": "取消",
   "agentManager.dialog.deleteWorktree.confirm": "删除",
-  "agentManager.dialog.openWorktree": "打开工作树",
+  "agentManager.dialog.openWorktree": "新建工作树",
   "agentManager.dialog.tab.new": "新建",
   "agentManager.dialog.tab.import": "导入",
   "agentManager.dialog.namePlaceholder": "Worktree 名称（可选）",
@@ -1005,7 +1005,7 @@ export const dict = {
   "agentManager.dialog.compareModels": "比较模型",
   "agentManager.dialog.compareModels.searchModels": "搜索模型...",
   "agentManager.dialog.creating": "创建中...",
-  "agentManager.dialog.createWorkspace": "创建工作区",
+  "agentManager.dialog.createWorkspace": "创建工作树",
   "agentManager.dialog.removeImage": "移除图片",
   "agentManager.dialog.advanced": "高级...",
 
@@ -1023,4 +1023,7 @@ export const dict = {
   "agentManager.import.noBranchesFound": "未找到分支。",
   "agentManager.import.noBranchesHint": "在上方粘贴 PR URL 或创建新的 Worktree。",
   "agentManager.import.failed": "导入失败",
+
+  "question.summary": "第 {{n}} / {{total}} 个问题",
+  "common.review": "审查",
 } satisfies Partial<Record<Keys, string>>

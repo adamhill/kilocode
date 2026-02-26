@@ -1010,7 +1010,7 @@ export const dict = {
     "? Dies entfernt den Worktree von der Festplatte und trennt alle Sitzungen.",
   "agentManager.dialog.deleteWorktree.cancel": "Abbrechen",
   "agentManager.dialog.deleteWorktree.confirm": "Löschen",
-  "agentManager.dialog.openWorktree": "Worktree öffnen",
+  "agentManager.dialog.openWorktree": "Neuer Worktree",
   "agentManager.dialog.tab.new": "Neu",
   "agentManager.dialog.tab.import": "Importieren",
   "agentManager.dialog.namePlaceholder": "Worktree-Name (optional)",
@@ -1028,7 +1028,7 @@ export const dict = {
   "agentManager.dialog.compareModels": "Modelle vergleichen",
   "agentManager.dialog.compareModels.searchModels": "Modelle suchen...",
   "agentManager.dialog.creating": "Wird erstellt...",
-  "agentManager.dialog.createWorkspace": "Arbeitsbereich erstellen",
+  "agentManager.dialog.createWorkspace": "Worktree erstellen",
   "agentManager.dialog.removeImage": "Bild entfernen",
   "agentManager.dialog.advanced": "Erweitert...",
 
@@ -1046,4 +1046,7 @@ export const dict = {
   "agentManager.import.noBranchesFound": "Keine Branches gefunden.",
   "agentManager.import.noBranchesHint": "Fügen Sie oben eine PR-URL ein oder erstellen Sie einen neuen Worktree.",
   "agentManager.import.failed": "Import fehlgeschlagen",
+
+  "question.summary": "{{n}} von {{total}} Fragen",
+  "common.review": "Überprüfen",
 } satisfies Partial<Record<Keys, string>>
