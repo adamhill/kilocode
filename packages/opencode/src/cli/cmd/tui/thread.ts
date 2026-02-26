@@ -83,6 +83,10 @@ export const TuiThreadCommand = cmd({
     // Keep ENABLE_PROCESSED_INPUT cleared even if other code flips it.
     // (Important when running under `bun run` wrappers on Windows.)
     const unguard = win32InstallCtrlCGuard()
+    const shutdown = {
+      pending: undefined as Promise<void> | undefined,
+      exiting: false,
+    }
     try {
       // Must be the very first thing — disables CTRL_C_EVENT before any Worker
       // spawn or async work so the OS cannot kill the process group.
@@ -135,18 +139,74 @@ export const TuiThreadCommand = cmd({
       // shutdown request without awaiting the response, wait for the worker
       // to exit naturally or force-terminate after a timeout.
       // Guard against multiple invocations (SIGHUP + SIGTERM + onExit).
-      let pending: Promise<void> | undefined
       const terminateWorker = () => {
-        if (pending) return pending
-        pending = new Promise<void>((resolve) => {
+        if (shutdown.pending) return shutdown.pending
+        shutdown.pending = new Promise<void>((resolve) => {
           worker.addEventListener("close", () => resolve(), { once: true })
           setTimeout(resolve, 5000).unref()
-          client.call("shutdown", undefined).catch(() => {})
+          client.call("shutdown", undefined).catch((error) => {
+            Log.Default.debug("worker shutdown RPC failed", { error })
+          })
         }).then(() => worker.terminate())
-        return pending
+        return shutdown.pending
       }
-      process.on("SIGHUP", terminateWorker)
-      process.on("SIGTERM", terminateWorker)
+      const shutdownAndExit = (input: { reason: string; code: number; signal?: NodeJS.Signals }) => {
+        if (shutdown.exiting) return
+        shutdown.exiting = true
+        Log.Default.info("shutting down tui thread", {
+          reason: input.reason,
+          signal: input.signal,
+          code: input.code,
+          pid: process.pid,
+          ppid: process.ppid,
+        })
+        terminateWorker()
+          .catch((error) => {
+            Log.Default.error("failed to terminate worker during shutdown", {
+              reason: input.reason,
+              signal: input.signal,
+              error,
+            })
+          })
+          .finally(() => {
+            unguard?.()
+            process.exit(input.code)
+          })
+      }
+      process.once("SIGHUP", () => shutdownAndExit({ reason: "signal", signal: "SIGHUP", code: 129 }))
+      process.once("SIGTERM", () => shutdownAndExit({ reason: "signal", signal: "SIGTERM", code: 143 }))
+      // In some terminal/tab-close paths the parent shell is terminated without
+      // forwarding a signal to this process, leaving the TUI orphaned. Detect
+      // parent PID re-parenting and exit explicitly.
+      const parent = process.ppid
+      const orphanWatch = setInterval(() => {
+        const orphaned = (() => {
+          if (process.ppid !== parent) return true
+          if (parent === 1) return false
+          try {
+            process.kill(parent, 0)
+            return false
+          } catch (error) {
+            const code = (error as NodeJS.ErrnoException).code
+            if (code !== "ESRCH") {
+              Log.Default.debug("parent liveness check failed", {
+                parent,
+                code,
+                error,
+              })
+              return false
+            }
+            Log.Default.debug("detected dead parent process", {
+              parent,
+              error,
+            })
+            return true
+          }
+        })()
+        if (!orphaned) return
+        shutdownAndExit({ reason: "parent-exit", code: 0 })
+      }, 1000)
+      orphanWatch.unref()
       // kilocode_change end
 
       const prompt = await iife(async () => {
@@ -203,6 +263,7 @@ export const TuiThreadCommand = cmd({
     } finally {
       unguard?.()
     }
+    if (shutdown.exiting) return
     process.exit(0)
   },
 })
