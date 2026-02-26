@@ -95,6 +95,8 @@ type SidebarSelection = typeof LOCAL | string | null
 const isMac = typeof navigator !== "undefined" && /Mac|iPhone|iPad/.test(navigator.userAgent)
 
 // Fallback keybindings before extension sends resolved ones
+const MAX_JUMP_INDEX = 9
+
 const defaultBindings: Record<string, string> = {
   previousSession: isMac ? "⌘↑" : "Ctrl+↑",
   nextSession: isMac ? "⌘↓" : "Ctrl+↓",
@@ -108,6 +110,9 @@ const defaultBindings: Record<string, string> = {
   closeWorktree: isMac ? "⌘⇧W" : "Ctrl+Shift+W",
   agentManagerOpen: isMac ? "⌘⇧M" : "Ctrl+Shift+M",
   focusPanel: isMac ? "⌘." : "Ctrl+.",
+  ...Object.fromEntries(
+    Array.from({ length: MAX_JUMP_INDEX }, (_, i) => [`jumpTo${i + 1}`, isMac ? `⌘${i + 1}` : `Ctrl+${i + 1}`]),
+  ),
 }
 
 /** Manages horizontal scroll for the tab list: hides the scrollbar, converts
@@ -192,6 +197,19 @@ function buildShortcutCategories(
   t: (key: string, params?: Record<string, string | number>) => string,
 ): ShortcutCategory[] {
   return [
+    {
+      title: t("agentManager.shortcuts.category.quickSwitch"),
+      shortcuts: [
+        {
+          label: t("agentManager.shortcuts.jumpToItem"),
+          binding: (() => {
+            const first = bindings.jumpTo1 ?? ""
+            const prefix = first.replace(/\d+$/, "")
+            return prefix ? `${prefix}1-9` : ""
+          })(),
+        },
+      ],
+    },
     {
       title: t("agentManager.shortcuts.category.sidebar"),
       shortcuts: [
@@ -507,6 +525,22 @@ const AgentManagerContent: Component = () => {
     if (el instanceof HTMLElement) scrollIntoView(el)
   }
 
+  // Jump to sidebar item by 1-based index (⌘1 = LOCAL, ⌘2 = first worktree, etc.)
+  const jumpToItem = (index: number) => {
+    if (index === 0) {
+      selectLocal()
+      const el = document.querySelector(`[data-sidebar-id="local"]`)
+      if (el instanceof HTMLElement) scrollIntoView(el)
+      return
+    }
+    const wts = sortedWorktrees()
+    const wt = wts[index - 1]
+    if (!wt) return
+    selectWorktree(wt.id)
+    const el = document.querySelector(`[data-sidebar-id="${wt.id}"]`)
+    if (el instanceof HTMLElement) scrollIntoView(el)
+  }
+
   // Navigate tabs with Cmd+Left/Right
   const navigateTab = (direction: "left" | "right") => {
     const tabs = activeTabs()
@@ -581,10 +615,15 @@ const AgentManagerContent: Component = () => {
       else if (msg.action === "advancedWorktree") showAdvancedWorktreeDialog()
       else if (msg.action === "closeWorktree") closeSelectedWorktree()
       else if (msg.action === "focusInput") window.dispatchEvent(new Event("focusPrompt"))
+      else {
+        // Handle jumpTo1 through jumpTo9
+        const match = /^jumpTo([1-9])$/.exec(msg.action ?? "")
+        if (match) jumpToItem(parseInt(match[1]!) - 1)
+      }
     }
     window.addEventListener("message", handler)
 
-    // Prevent Cmd+Arrow/T/W/N from triggering native browser actions
+    // Prevent Cmd+Arrow/T/W/N/digit from triggering native browser actions
     const preventDefaults = (e: KeyboardEvent) => {
       if (!(e.metaKey || e.ctrlKey)) return
       if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) {
@@ -596,6 +635,10 @@ const AgentManagerContent: Component = () => {
       }
       // Prevent defaults for shift variants (close worktree, advanced new worktree)
       if (["w", "n"].includes(e.key.toLowerCase()) && e.shiftKey) {
+        e.preventDefault()
+      }
+      // Prevent defaults for jump-to shortcuts (Cmd/Ctrl+1-9)
+      if (/^[1-9]$/.test(e.key)) {
         e.preventDefault()
       }
     }
@@ -826,11 +869,19 @@ const AgentManagerContent: Component = () => {
   // Start/stop diff watch when panel opens/closes or session changes
   createEffect(() => {
     const open = diffOpen()
+    const sel = selection()
     const id = session.currentSessionID()
-    if (open && id) {
-      const ms = managedSessions().find((s) => s.id === id)
-      if (ms?.worktreeId) {
-        vscode.postMessage({ type: "agentManager.startDiffWatch", sessionId: id })
+    if (open) {
+      if (sel === LOCAL) {
+        // For local tab, diff against unpushed changes using LOCAL sentinel
+        vscode.postMessage({ type: "agentManager.startDiffWatch", sessionId: LOCAL })
+      } else if (id) {
+        const ms = managedSessions().find((s) => s.id === id)
+        if (ms?.worktreeId) {
+          vscode.postMessage({ type: "agentManager.startDiffWatch", sessionId: id })
+        } else {
+          vscode.postMessage({ type: "agentManager.stopDiffWatch" })
+        }
       } else {
         vscode.postMessage({ type: "agentManager.stopDiffWatch" })
       }
@@ -1112,6 +1163,7 @@ const AgentManagerContent: Component = () => {
               <span class="am-local-branch">{repoBranch()}</span>
             </Show>
           </div>
+          <span class="am-shortcut-badge">{isMac ? "⌘" : "Ctrl+"}1</span>
         </button>
 
         {/* WORKTREES section */}
@@ -1324,6 +1376,17 @@ const AgentManagerContent: Component = () => {
                                       }
                                     />
                                   </Show>
+                                  {(() => {
+                                    const num = idx() + 2
+                                    return (
+                                      <Show when={num <= MAX_JUMP_INDEX}>
+                                        <span class="am-shortcut-badge">
+                                          {isMac ? "⌘" : "Ctrl+"}
+                                          {num}
+                                        </span>
+                                      </Show>
+                                    )
+                                  })()}
                                   <Show when={!busyWorktrees().has(wt.id)}>
                                     <div
                                       class="am-worktree-close"
@@ -1532,22 +1595,20 @@ const AgentManagerContent: Component = () => {
                 />
               </TooltipKeybind>
               <div class="am-tab-actions">
-                <Show when={selection() !== LOCAL}>
-                  <TooltipKeybind
-                    title={t("agentManager.diff.toggle")}
-                    keybind={kb().toggleDiff ?? ""}
-                    placement="bottom"
-                  >
-                    <IconButton
-                      icon="layers"
-                      size="small"
-                      variant="ghost"
-                      label={t("agentManager.diff.toggle")}
-                      class={diffOpen() ? "am-tab-diff-btn-active" : ""}
-                      onClick={() => setDiffOpen((prev) => !prev)}
-                    />
-                  </TooltipKeybind>
-                </Show>
+                <TooltipKeybind
+                  title={t("agentManager.diff.toggle")}
+                  keybind={kb().toggleDiff ?? ""}
+                  placement="bottom"
+                >
+                  <IconButton
+                    icon="layers"
+                    size="small"
+                    variant="ghost"
+                    label={t("agentManager.diff.toggle")}
+                    class={diffOpen() ? "am-tab-diff-btn-active" : ""}
+                    onClick={() => setDiffOpen((prev) => !prev)}
+                  />
+                </TooltipKeybind>
                 <TooltipKeybind
                   title={t("agentManager.tab.terminal")}
                   keybind={kb().showTerminal ?? ""}
@@ -1662,17 +1723,17 @@ const AgentManagerContent: Component = () => {
               </Show>
             </div>
             <Show when={diffOpen()}>
-              <ResizeHandle
-                direction="horizontal"
-                edge="end"
-                size={diffWidth()}
-                min={200}
-                max={Math.round(window.innerWidth * 0.8)}
-                onResize={(w) => setDiffWidth(Math.max(200, Math.min(w, window.innerWidth * 0.8)))}
-              />
               <div class="am-diff-panel-wrapper" style={{ width: `${diffWidth()}px`, "flex-shrink": "0" }}>
+                <ResizeHandle
+                  direction="horizontal"
+                  edge="start"
+                  size={diffWidth()}
+                  min={200}
+                  max={Math.round(window.innerWidth * 0.8)}
+                  onResize={(w) => setDiffWidth(Math.max(200, Math.min(w, window.innerWidth * 0.8)))}
+                />
                 <DiffPanel
-                  diffs={diffDatas()[session.currentSessionID() ?? ""] ?? []}
+                  diffs={diffDatas()[selection() === LOCAL ? LOCAL : (session.currentSessionID() ?? "")] ?? []}
                   loading={diffLoading()}
                   onClose={() => setDiffOpen(false)}
                 />
