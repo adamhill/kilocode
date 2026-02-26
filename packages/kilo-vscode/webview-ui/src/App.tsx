@@ -64,7 +64,6 @@ export const DataBridge: Component<{ children: any }> = (props) => {
 
   const data = createMemo(() => {
     const id = session.currentSessionID()
-    const perms = id ? session.permissions().filter((p) => p.sessionID === id) : []
     const allParts = session.allParts()
     // Expose ALL session messages (including child sessions from sub-agents),
     // not just the current session. This lets VscodeSessionTurn and
@@ -84,7 +83,15 @@ export const DataBridge: Component<{ children: any }> = (props) => {
           .filter(([, parts]) => (parts as SDKPart[]).length > 0)
           .map(([msgId, parts]) => [msgId, parts as unknown as SDKPart[]]),
       ),
-      permission: id ? { [id]: perms as unknown as any[] } : {},
+      permission: (() => {
+        const grouped: Record<string, any[]> = {}
+        for (const p of session.permissions()) {
+          const sid = p.sessionID
+          if (!sid) continue
+          ;(grouped[sid] ??= []).push(p)
+        }
+        return grouped
+      })(),
       // Questions are handled directly by QuestionDock via session.questions(),
       // not through DataProvider. The DataProvider's question field is unused here.
       question: {},
