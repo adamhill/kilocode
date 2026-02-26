@@ -3,7 +3,7 @@ import path from "path"
 import { Instance } from "../../src/project/instance"
 import { MCP } from "../../src/mcp"
 import { tmpdir } from "../fixture/fixture"
-import { PROJECT_ROOT, snapshotDescendants, assertNoOrphans, forceKillAll, stableHeapMB } from "./helper"
+import { PROJECT_ROOT, snapshotDescendants, assertNoOrphans, forceKillAll, stableHeapMB, waitForExit } from "./helper"
 
 const FAKE_MCP_SERVER = path.join(PROJECT_ROOT, "test/fixture/mcp/fake-mcp-server.js")
 
@@ -34,7 +34,8 @@ describe("memory: MCP lifecycle", () => {
             })
 
             const afterFirstPids = await snapshotDescendants(process.pid)
-            const firstCount = [...afterFirstPids].filter((p) => !baseline.has(p)).length
+            const firstOnlyPids = [...afterFirstPids].filter((p) => !baseline.has(p))
+            const firstCount = firstOnlyPids.length
 
             // Add second server with same key — should close first
             await MCP.add("lifecycle-test", {
@@ -42,7 +43,7 @@ describe("memory: MCP lifecycle", () => {
               command: ["bun", FAKE_MCP_SERVER],
             })
 
-            await Bun.sleep(500)
+            expect(await waitForExit(firstOnlyPids)).toBe(true)
             const afterSecondPids = await snapshotDescendants(process.pid)
             const secondCount = [...afterSecondPids].filter((p) => !baseline.has(p)).length
 
@@ -55,7 +56,8 @@ describe("memory: MCP lifecycle", () => {
         },
       })
 
-      await Bun.sleep(500)
+      const beforeAssertPids = await snapshotDescendants(process.pid)
+      expect(await waitForExit([...beforeAssertPids].filter((p) => !baseline.has(p)))).toBe(true)
       const afterPids = await snapshotDescendants(process.pid)
       await assertNoOrphans(baseline, afterPids)
     } finally {
@@ -86,12 +88,13 @@ describe("memory: MCP lifecycle", () => {
             await MCP.connect("connect-test")
 
             const afterFirstPids = await snapshotDescendants(process.pid)
-            const firstCount = [...afterFirstPids].filter((p) => !baseline.has(p)).length
+            const firstOnlyPids = [...afterFirstPids].filter((p) => !baseline.has(p))
+            const firstCount = firstOnlyPids.length
 
             // Second connect — should close existing before reconnecting
             await MCP.connect("connect-test")
 
-            await Bun.sleep(500)
+            expect(await waitForExit(firstOnlyPids)).toBe(true)
             const afterSecondPids = await snapshotDescendants(process.pid)
             const secondCount = [...afterSecondPids].filter((p) => !baseline.has(p)).length
 
@@ -103,7 +106,8 @@ describe("memory: MCP lifecycle", () => {
         },
       })
 
-      await Bun.sleep(500)
+      const beforeAssertPids = await snapshotDescendants(process.pid)
+      expect(await waitForExit([...beforeAssertPids].filter((p) => !baseline.has(p)))).toBe(true)
       const afterPids = await snapshotDescendants(process.pid)
       await assertNoOrphans(baseline, afterPids)
     } finally {
