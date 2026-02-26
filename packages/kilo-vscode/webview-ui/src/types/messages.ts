@@ -652,6 +652,7 @@ export interface AgentManagerStateMessage {
   sessions: ManagedSessionState[]
   tabOrder?: Record<string, string[]>
   sessionsCollapsed?: boolean
+  reviewDiffStyle?: "unified" | "split"
   isGitRepo?: boolean
 }
 
@@ -1165,6 +1166,12 @@ export interface SetSessionsCollapsedRequest {
   collapsed: boolean
 }
 
+// Persist review diff style preference
+export interface SetReviewDiffStyleRequest {
+  type: "agentManager.setReviewDiffStyle"
+  style: "unified" | "split"
+}
+
 export interface RequestBranchesMessage {
   type: "agentManager.requestBranches"
 }
@@ -1279,6 +1286,7 @@ export type WebviewMessage =
   | CreateMultiVersionRequest
   | SetTabOrderRequest
   | SetSessionsCollapsedRequest
+  | SetReviewDiffStyleRequest
   | PersistVariantRequest
   | RequestVariantsMessage
   | RequestCloudSessionDataMessage
