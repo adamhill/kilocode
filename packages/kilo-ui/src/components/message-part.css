@@ -110,3 +110,7 @@ html[data-theme="kilo-vscode"] [data-component="bash-output"] {
     }
   }
 }
+
+[data-component="question-answers"] {
+  padding: 8px;
+}
