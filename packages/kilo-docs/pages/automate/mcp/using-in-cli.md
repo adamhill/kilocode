@@ -13,12 +13,14 @@ MCP servers add to your context, so be careful with which ones you enable. Certa
 
 ## Configuration Location
 
-| Scope       | Config Path                           |
-| ----------- | ------------------------------------- |
-| **Global**  | `~/.config/kilo/config.json`          |
-| **Project** | `./.kilocode/config.json`             |
+The CLI accepts several config filenames. The recommended file is `kilo.json`:
 
-Project-level configuration takes precedence over global settings.
+| Scope       | Recommended Path                      | Also supported                                        |
+| ----------- | ------------------------------------- | ----------------------------------------------------- |
+| **Global**  | `~/.config/kilo/kilo.json`            | `kilo.jsonc`, `config.json`                           |
+| **Project** | `./kilo.json` or `./.kilo/kilo.json`  | `kilo.jsonc`                                          |
+
+Project-level configuration takes precedence over global settings. The CLI walks up from the project directory to the git worktree root, so config files in parent directories are also loaded.
 
 MCP servers configured in VS Code are **not** automatically available in the CLI. You must configure them separately.
 
@@ -176,3 +178,7 @@ Use `{env:VARIABLE_NAME}` syntax in config files to reference environment variab
   }
 }
 ```
+
+## Finding MCP Servers
+
+Browse community-contributed MCP server configurations and agent skills in the [Kilo Marketplace](https://github.com/Kilo-Org/kilo-marketplace). The marketplace includes ready-to-use configs for popular tools like Figma, Sentry, and more.
