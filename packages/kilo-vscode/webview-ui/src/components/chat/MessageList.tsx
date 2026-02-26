@@ -18,7 +18,7 @@ import { useLanguage } from "../../context/language"
 import { formatRelativeDate } from "../../utils/date"
 import { CloudImportDialog } from "./CloudImportDialog"
 import { VscodeSessionTurn } from "./VscodeSessionTurn"
-import { WorkingIndicator } from "./WorkingIndicator"
+import { WorkingIndicator } from "../shared/WorkingIndicator"
 
 const KiloLogo = (): JSX.Element => {
   const iconsBaseUri = (window as { ICONS_BASE_URI?: string }).ICONS_BASE_URI || ""
