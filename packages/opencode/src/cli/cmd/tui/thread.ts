@@ -141,14 +141,33 @@ export const TuiThreadCommand = cmd({
       // Guard against multiple invocations (SIGHUP + SIGTERM + onExit).
       const terminateWorker = () => {
         if (shutdown.pending) return shutdown.pending
-        shutdown.pending = new Promise<void>((resolve) => {
-          worker.addEventListener("close", () => resolve(), { once: true })
+        const state = {
+          closed: false,
+        }
+        const result = new Promise<void>((resolve) => {
+          worker.addEventListener(
+            "close",
+            () => {
+              state.closed = true
+              resolve()
+            },
+            { once: true },
+          )
           setTimeout(resolve, 5000).unref()
           client.call("shutdown", undefined).catch((error) => {
             Log.Default.debug("worker shutdown RPC failed", { error })
           })
-        }).then(() => worker.terminate())
-        return shutdown.pending
+        }).then(async () => {
+          if (state.closed) return
+          await Promise.resolve()
+            .then(() => worker.terminate())
+            .catch((error) => {
+              shutdown.pending = undefined
+              Log.Default.debug("worker terminate failed", { error })
+            })
+        })
+        shutdown.pending = result
+        return result
       }
       const shutdownAndExit = (input: { reason: string; code: number; signal?: NodeJS.Signals }) => {
         if (shutdown.exiting) return
