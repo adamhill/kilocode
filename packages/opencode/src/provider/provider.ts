@@ -7,7 +7,10 @@ import { NoSuchModelError, type Provider as SDK } from "ai"
 import { Log } from "../util/log"
 import { BunProc } from "../bun"
 import { Plugin } from "../plugin"
-import { ModelsDev } from "./models"
+import {
+  ModelsDev,
+  Prompt, // kilocode_change
+} from "./models"
 import { NamedError } from "@opencode-ai/util/error"
 import { Auth } from "../auth"
 import { Env } from "../env"
@@ -666,10 +669,7 @@ export namespace Provider {
 
       // kilocode_change start
       recommendedIndex: z.number().optional(),
-      prompt: z
-        .enum(["codex", "gemini", "beast", "anthropic", "trinity", "anthropic_without_todo"])
-        .optional()
-        .catch(undefined),
+      prompt: Prompt.optional().catch(undefined),
       // kilocode_change end
     })
     .meta({
