@@ -100,7 +100,7 @@ html[data-theme="kilo-vscode"] [data-component="bash-output"] {
     position: absolute;
     top: 4px;
     right: 4px;
-    buttom: auto;
+    bottom: auto;
     min-height: unset;
     margin-top: 0;
     width: auto;
