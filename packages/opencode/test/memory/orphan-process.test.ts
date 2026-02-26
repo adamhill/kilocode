@@ -5,7 +5,7 @@ import { MCP } from "../../src/mcp"
 import { LSPClient } from "../../src/lsp/client"
 import { spawn } from "child_process"
 import { tmpdir } from "../fixture/fixture"
-import { PROJECT_ROOT, snapshotDescendants, assertNoOrphans, forceKillAll } from "./helper"
+import { PROJECT_ROOT, snapshotDescendants, assertNoOrphans, forceKillAll, waitForExit } from "./helper"
 
 const FAKE_MCP_SERVER = path.join(PROJECT_ROOT, "test/fixture/mcp/fake-mcp-server.js")
 const FAKE_LSP_SERVER = path.join(PROJECT_ROOT, "test/fixture/lsp/fake-lsp-server.js")
@@ -43,6 +43,8 @@ describe("memory: orphan process detection", () => {
     await using tmp = await tmpdir({ git: true })
 
     await baseline(async (beforePids) => {
+      const spawned = new Set<number>()
+
       await Instance.provide({
         directory: tmp.path,
         fn: async () => {
@@ -56,14 +58,16 @@ describe("memory: orphan process detection", () => {
           const duringPids = await snapshotDescendants(process.pid)
           const newProcesses = [...duringPids].filter((p) => !beforePids.has(p))
           expect(newProcesses.length).toBeGreaterThan(0)
+          for (const pid of newProcesses) {
+            spawned.add(pid)
+          }
 
           // Dispose the instance — should close all MCP clients and kill processes
           await Instance.dispose()
         },
       })
 
-      // Wait for processes to exit after disposal
-      await Bun.sleep(500)
+      expect(await waitForExit([...spawned])).toBe(true)
       const afterPids = await snapshotDescendants(process.pid)
       await assertNoOrphans(beforePids, afterPids)
     })
@@ -81,9 +85,13 @@ describe("memory: orphan process detection", () => {
             command: ["bun", FAKE_MCP_SERVER],
           })
 
+          const duringPids = await snapshotDescendants(process.pid)
+          const newProcesses = [...duringPids].filter((p) => !beforePids.has(p))
+          expect(newProcesses.length).toBeGreaterThan(0)
+
           // Disconnect should close the client (which closes the transport/process)
           await MCP.disconnect("test-server")
-          await Bun.sleep(500)
+          expect(await waitForExit(newProcesses)).toBe(true)
 
           const afterPids = await snapshotDescendants(process.pid)
           await assertNoOrphans(beforePids, afterPids)
@@ -127,7 +135,7 @@ describe("memory: orphan process detection", () => {
 
       // Dispose all
       await Instance.disposeAll()
-      await Bun.sleep(500)
+      expect(await waitForExit(newProcesses)).toBe(true)
 
       const afterPids = await snapshotDescendants(process.pid)
       await assertNoOrphans(beforePids, afterPids)
@@ -156,7 +164,9 @@ describe("memory: orphan process detection", () => {
 
           // Shutdown should kill the process
           await client!.shutdown()
-          await Bun.sleep(500)
+          if (serverProcess.pid) {
+            expect(await waitForExit([serverProcess.pid])).toBe(true)
+          }
 
           const afterPids = await snapshotDescendants(process.pid)
           await assertNoOrphans(beforePids, afterPids)
