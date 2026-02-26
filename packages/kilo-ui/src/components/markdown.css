@@ -44,4 +44,9 @@
       }
     }
   }
+
+  [data-component="markdown-code"] {
+    background: var(--background-stronger);
+    margin-bottom: 1rem;
+  }
 }
