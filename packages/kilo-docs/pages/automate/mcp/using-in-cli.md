@@ -22,8 +22,6 @@ The CLI accepts several config filenames. The recommended file is `kilo.json`:
 
 Project-level configuration takes precedence over global settings. 
 
-MCP servers configured in VS Code are **not** automatically available in the CLI. You must configure them separately.
-
 ## Configuration Format
 
 Add MCP servers under the `mcp` key in your config file. Each server has a unique name that you can reference in prompts.
