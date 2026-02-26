@@ -346,6 +346,12 @@ export namespace ProviderTransform {
   const OPENAI_EFFORTS = ["none", "minimal", ...WIDELY_SUPPORTED_EFFORTS, "xhigh"]
 
   export function variants(model: Provider.Model): Record<string, Record<string, any>> {
+    // kilocode_change start
+    if (model.api.npm === "@kilocode/kilo-gateway" && model.variants && Object.keys(model.variants).length > 0) {
+      return model.variants
+    }
+    // kilocode_change end
+
     if (!model.capabilities.reasoning) return {}
 
     const id = model.id.toLowerCase()

@@ -751,9 +751,9 @@ export namespace Provider {
         interleaved: model.interleaved ?? false,
       },
       release_date: model.release_date,
-      variants: {},
 
       // kilocode_change start
+      variants: provider.id === "kilo" ? (model.variants ?? {}) : {},
       recommendedIndex: model.recommendedIndex,
       prompt: model.prompt,
       // kilocode_change end
