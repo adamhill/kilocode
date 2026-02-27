@@ -3,9 +3,12 @@ import Prism from "prismjs"
 import * as React from "react"
 import { Codicon } from "./Codicon"
 
+let mermaidInitialized = false
+
 function MermaidBlock({ children }) {
   const ref = React.useRef(null)
   const [svg, setSvg] = React.useState("")
+  const [error, setError] = React.useState(false)
 
   React.useEffect(() => {
     const code = typeof children === "string" ? children : ref.current?.textContent || ""
@@ -14,33 +17,43 @@ function MermaidBlock({ children }) {
 
     import("mermaid").then((mod) => {
       const mermaid = mod.default
-      mermaid.initialize({
-        startOnLoad: false,
-        theme: "base",
-        themeVariables: {
-          primaryColor: "#33332d",
-          primaryTextColor: "#e9e9e9",
-          primaryBorderColor: "#555",
-          lineColor: "#a3a3a2",
-          secondaryColor: "#2a2a24",
-          tertiaryColor: "#1a1a18",
-          background: "#1a1a18",
-          mainBkg: "#33332d",
-          nodeBorder: "#555",
-          clusterBkg: "#2a2a24",
-          clusterBorder: "#444",
-          titleColor: "#e9e9e9",
-          edgeLabelBackground: "#1a1a18",
-        },
-        securityLevel: "strict",
-        fontFamily: "inherit",
-      })
+      if (!mermaidInitialized) {
+        mermaid.initialize({
+          startOnLoad: false,
+          theme: "base",
+          themeVariables: {
+            primaryColor: "#33332d",
+            primaryTextColor: "#e9e9e9",
+            primaryBorderColor: "#555",
+            lineColor: "#a3a3a2",
+            secondaryColor: "#2a2a24",
+            tertiaryColor: "#1a1a18",
+            background: "#1a1a18",
+            mainBkg: "#33332d",
+            nodeBorder: "#555",
+            clusterBkg: "#2a2a24",
+            clusterBorder: "#444",
+            titleColor: "#e9e9e9",
+            edgeLabelBackground: "#1a1a18",
+          },
+          securityLevel: "strict",
+          fontFamily: "inherit",
+        })
+        mermaidInitialized = true
+      }
       mermaid
         .render(id, code.trim())
         .then(({ svg }) => setSvg(svg))
-        .catch(console.error)
+        .catch((err) => {
+          console.error(err)
+          setError(true)
+        })
     })
   }, [children])
+
+  if (error) {
+    return <pre className="language-mermaid">{children}</pre>
+  }
 
   if (svg) {
     return (
