@@ -57,5 +57,5 @@ Copy the Service Provider details (Entity ID, ACS URL, and Metadata) from the Wo
 After enabling SSO:
 
 - Invite new users with their company email domain.
-- Manage team access and roles from the **[Organization](/docs/plans/dashboard)** tab.
-- View user activity across the team in the **[Audit Logs](/docs/plans/enterprise/audit-logs)** tab.
+- Manage team access and roles from the **[Organization](/docs/collaborate/adoption-dashboard/overview)** tab.
+- View user activity across the team in the **[Audit Logs](/docs/collaborate/enterprise/audit-logs)** tab
