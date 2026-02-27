@@ -41,7 +41,7 @@ If you configure domain policy before setting up SSO, you may lock users out of 
 
 Your admin will need to use the WorkOS link to:
 
-###  Configure your Identity Provider in WorkOS
+### Configure your Identity Provider in WorkOS
 
 Find the Metadata in your Identity Provider and apply that configuration in WorkOS.
 
