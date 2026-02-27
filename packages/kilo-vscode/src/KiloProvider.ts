@@ -50,6 +50,9 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
   private projectID: string | undefined
   /** Abort controller for the current loadMessages request; aborted when a new session is selected. */
   private loadMessagesAbort: AbortController | null = null
+  /** Set when refreshSessions() is called before the HTTP client is ready.
+   *  Cleared and retried once the connection transitions to "connected". */
+  private pendingSessionRefresh = false
   private unsubscribeEvent: (() => void) | null = null
   private unsubscribeState: (() => void) | null = null
   private unsubscribeNotificationDismiss: (() => void) | null = null
@@ -558,6 +561,7 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
               this.postMessage({ type: "profileData", data: profileData })
             }
             await this.syncWebviewState("sse-connected")
+            await this.flushPendingSessionRefresh("sse-connected")
           } catch (error) {
             console.error("[Kilo New] KiloProvider: ❌ Failed during connected state handling:", error)
             this.postMessage({
@@ -591,6 +595,7 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
 
       this.postMessage({ type: "connectionState", state: this.connectionState })
       await this.syncWebviewState("initializeConnection")
+      await this.flushPendingSessionRefresh("initializeConnection")
 
       // Fetch providers, agents, config, and notifications in parallel
       await Promise.all([
@@ -776,10 +781,18 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
   }
 
   /**
-   * Handle loading all sessions.
+   * Retry a deferred sessions refresh once the HTTP client is ready.
    */
-  private async handleLoadSessions(): Promise<void> {
+  private async flushPendingSessionRefresh(reason: string): Promise<void> {
+    if (!this.pendingSessionRefresh) {
+      return
+    }
+
     if (!this.httpClient) {
+      if (this.connectionState === "connecting") {
+        return
+      }
+
       this.postMessage({
         type: "error",
         message: "Not connected to CLI backend",
@@ -787,9 +800,35 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
       return
     }
 
+    console.log("[Kilo New] KiloProvider: 🔄 Flushing deferred sessions refresh", { reason })
+    await this.handleLoadSessions()
+  }
+
+  /**
+   * Handle loading all sessions.
+   */
+  private async handleLoadSessions(): Promise<void> {
+    const client = this.httpClient
+    if (!client) {
+      // HTTP client isn't ready yet — mark for retry once connected.
+      // This avoids silently dropping the request when initializeState()
+      // calls refreshSessions() before the CLI server has started.
+      this.pendingSessionRefresh = true
+
+      if (this.connectionState !== "connecting") {
+        this.postMessage({
+          type: "error",
+          message: "Not connected to CLI backend",
+        })
+      }
+      return
+    }
+
+    this.pendingSessionRefresh = false
+
     try {
       const workspaceDir = this.getWorkspaceDirectory()
-      const sessions = await this.httpClient.listSessions(workspaceDir)
+      const sessions = await client.listSessions(workspaceDir)
 
       // The primary fetch already returns all sessions for this project (scoped
       // by project_id on the backend). Worktree directories share the same
@@ -801,7 +840,7 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
       const worktreeDirs = new Set(this.sessionDirectories.values())
       const extra = await Promise.all(
         [...worktreeDirs].map((dir) =>
-          this.httpClient!.listSessions(dir).catch((err) => {
+          client.listSessions(dir).catch((err) => {
             console.error(`[Kilo New] KiloProvider: Failed to list sessions for ${dir}:`, err)
             return [] as SessionInfo[]
           }),
