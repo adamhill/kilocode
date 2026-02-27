@@ -32,7 +32,7 @@ function MermaidBlock({ children }) {
           titleColor: "#e9e9e9",
           edgeLabelBackground: "#1a1a18",
         },
-        securityLevel: "loose",
+        securityLevel: "strict",
         fontFamily: "inherit",
       })
       mermaid
