@@ -50,7 +50,7 @@ export function Tabs({ children }: TabsProps) {
 
   return (
     <div className="tabs-container my-6 border border-neutral-300 dark:border-neutral-700 rounded-lg overflow-hidden">
-      <div className="tabs-header flex border-b border-neutral-300 dark:border-neutral-700 bg-neutral-100 dark:bg-neutral-800/50 overflow-x-auto scrollbar-none">
+      <div className="tabs-header flex border-b border-neutral-300 dark:border-neutral-700 bg-neutral-100 dark:bg-neutral-800/50 overflow-x-auto scrollbar-none touch-pan-x">
         {tabs.map((tab, index) => (
           <button
             key={index}
