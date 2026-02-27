@@ -41,13 +41,21 @@ If you configure domain policy before setting up SSO, you may lock users out of 
 
 Your admin will need to use the WorkOS link to:
 
-1. Configure your Identity Provider Configuration in WorkOS.
-2. Copy the Service Provider details (Entity ID, ACS URL, and Metadata) from the WorkOS dashboard and apply them in your Identity Provider.
-3. Set the organization policy and user provisioning settings according to your organization's needs.
-4. Configure domain policy and domain verification in WorkOS.
+###  Configure your Identity Provider in WorkOS
+
+Find the Metadata in your Identity Provider and apply that configuration in WorkOS.
+
+### Configure WorkOS in your Identity Provider
+
+Copy the Service Provider details (Entity ID, ACS URL, and Metadata) from the WorkOS dashboard and apply them in your Identity Provider.
+
+### Configure Policy and Domain Settings in WorkOS
+
+1. Set the organization policy and user provisioning settings according to your organization's needs.
+2. Configure domain policy and domain verification in WorkOS.
 
 After enabling SSO:
 
 - Invite new users with their company email domain.
 - Manage team access and roles from the **[Organization](/docs/plans/dashboard)** tab.
-- View user activity across the team in the **[Audit Logs](/docs/plans/enterprise/audit-logs)** tab
+- View user activity across the team in the **[Audit Logs](/docs/plans/enterprise/audit-logs)** tab.
