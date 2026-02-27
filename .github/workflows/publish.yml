@@ -50,6 +50,7 @@ jobs:
           ./script/version.ts
         env:
           GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
           KILO_BUMP: ${{ inputs.bump }}
           KILO_VERSION: ${{ inputs.version }}
           KILO_API_KEY: ${{ secrets.KILO_API_KEY }}
@@ -312,6 +313,7 @@ jobs:
         env:
           KILO_VERSION: ${{ needs.version.outputs.version }}
           KILO_RELEASE: ${{ needs.version.outputs.release }}
+          GH_REPO: ${{ github.repository }}
           AUR_KEY: ${{ secrets.AUR_KEY }}
           GITHUB_TOKEN: ${{ steps.committer.outputs.token }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
